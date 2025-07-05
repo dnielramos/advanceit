@@ -1,0 +1,68 @@
+<div class="bg-white rounded-xl shadow overflow-hidden transform transition-transform hover:scale-101 flex flex-col min-w-xs relative">
+  <!-- Imagen del producto -->
+  <img
+    [src]="producto.imagen | sanitizeImageUrl"
+    [alt]="producto.nombre"
+    class="w-full h-48 object-contain p-4"
+  />
+
+  <!-- Marca (logo) con posicionamiento absoluto y máscara blanca -->
+  <div class="absolute top-2 right-2 z-10">
+    <div class="bg-white rounded-2xl p-2 inline-flex items-center justify-center">
+      <img
+        [src]="producto.marca | sanitizeImageUrl"
+        [alt]="'Marca: ' + producto.marca"
+        class="h-12 w-auto object-contain"
+      />
+    </div>
+  </div>
+
+  <div class="p-4 flex flex-col flex-grow">
+    <!-- Nombre del producto -->
+    <h2 class="text-xl md:text-xl font-semibold text-gray-800 mb-2">
+      {{ producto.nombre }}
+    </h2>
+
+    <!-- Descripción -->
+    <p class="text-gray-600 text-sm md:text-md line-clamp-4">
+      {{ producto.descripcion }}
+    </p>
+
+    <!-- Características -->
+    <ul class="p-4 text-gray-500 text-xs md:text-md">
+      <li *ngFor="let c of producto.caracteristicas">
+        ✔ {{ c }}
+      </li>
+    </ul>
+
+    <!-- Categoría (sin cambios) -->
+    <div class="flex gap-4 my-2">
+      <span class="text-orange-700 text-xs font-semibold px-2 py-1 rounded-full inline-flex items-center">
+        <fa-icon [icon]="faLayerGroup"></fa-icon>
+        {{ producto.categoria | sanitizeImageUrl }}
+      </span>
+    </div>
+
+    <!-- Etiquetas -->
+    <div class="flex flex-wrap gap-2 mb-4">
+      <span *ngFor="let tag of producto.etiquetas"
+        class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full">
+        <fa-icon [icon]="faTag"></fa-icon>
+        {{ tag }}
+      </span>
+    </div>
+
+    <!-- Precio y botón de compra -->
+    <div class="flex justify-between items-center mt-auto">
+      <span class="text-purple-700 font-bold text-lg">
+        $ {{ producto.precio | number : '1.2-2' }}
+      </span>
+      <button
+        class="bg-gradient-to-r bg-purple-500 hover:bg-purple-800 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105 hover:-rotate-5"
+        (click)="addToCart(producto)">
+        Comprar
+        <fa-icon [icon]="faShoppingCart"></fa-icon>
+      </button>
+    </div>
+  </div>
+</div>

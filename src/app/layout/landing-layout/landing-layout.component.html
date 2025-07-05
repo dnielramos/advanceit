@@ -1,9 +1,9 @@
-<div class="flex flex-col min-h-screen pt-8 lg:pt-10">
+<div class="flex flex-col min-h-screen">
   <!-- Navbar Dashboard -->
-  <app-navbar></app-navbar>
+  <app-navbar class="pt-8 lg:pt-10" *ngIf="showNav"></app-navbar>
 
   <!-- Contenido principal del dashboard -->
-  <main class="flex-1 pt-5">
+  <main class="flex-1">
     <router-outlet></router-outlet>
   </main>
 </div>

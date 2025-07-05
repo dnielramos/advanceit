@@ -1,219 +1,77 @@
-<div class="min-h-[86dvh] bg-gray-50 p-2 t-50 md:p-6">
-  <!-- Header Section -->
-  <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-    <h1 class="text-2xl font-bold text-purple-800">Catálogo de Productos {{ filteredProducts().length }}</h1>
-    <p>{{ filteredProducts().length }}</p>
+<!-- home.component.html -->
+<div class="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
 
-    <div class="flex w-full flex-col gap-4 md:w-auto md:flex-row md:items-center">
-      <!-- Search Box -->
-      <div class="relative w-full md:w-80">
-        <fa-icon [icon]="faSearch" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></fa-icon>
-        <input
-          type="text"
-          [(ngModel)]="searchTerm"
-          placeholder="Buscar producto..."
-          class="w-full rounded-lg border border-purple-200 bg-white py-2 pl-10 pr-4 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200"
-        />
-      </div>
-
-      <!-- Add Product Button -->
-      <!-- <button
-        (click)="mostrarModal = true"
-        class="flex items-center justify-center rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white shadow-md transition-all hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-      >
-        <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>
-        Añadir Producto
-      </button> -->
-    </div>
-  </div>
-
-  <!-- Filter Section -->
-  <div class="mb-6 flex flex-wrap gap-3">
-    <div class="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-800">
-      <span class="mr-2">Filtros:</span>
-      <button
-        (click)="filtroDisponibilidad = !filtroDisponibilidad"
-        [class.bg-purple-600]="filtroDisponibilidad"
-        [class.text-white]="filtroDisponibilidad"
-        class="mr-2 rounded-full px-3 py-1 transition-colors hover:bg-purple-200"
-      >
-        Disponibles
-      </button>
-      <button
-        (click)="filtroDescuentos = !filtroDescuentos"
-        [class.bg-purple-600]="filtroDescuentos"
-        [class.text-white]="filtroDescuentos"
-        class="rounded-full px-3 py-1 transition-colors hover:bg-purple-200"
-      >
-        Con descuento
-      </button>
-    </div>
-  </div>
-
-  <!-- Products Grid -->
-  <div class="grid grid-cols-1 z-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    <div
-      *ngFor="let producto of filteredProducts()"
-      class="group overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg"
-    >
-      <!-- Product Image -->
-      <div class="relative h-48 w-full bg-purple-50">
-        <img
-          [src]="producto.imagen"
-          [alt]="producto.nombre"
-          class="h-full w-full object-contain p-4"
-        />
-        <div
-          *ngIf="producto.disponibilidad"
-          class="absolute right-2 top-2 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800"
-        >
-          Disponible
-        </div>
-        <div
-          *ngIf="producto.descuentos"
-          class="absolute left-2 top-2 rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800"
-        >
-          Descuento
+  <!-- Hero Slider -->
+  <section class="relative overflow-hidden">
+    <div class="flex animate-scroll">
+      <!-- Slider Items -->
+      <div class="w-full flex-shrink-0 p-8 bg-gradient-to-r from-purple-900/30 to-transparent">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-8 md:mb-0">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Next Generation <span class="text-purple-400">Cloud Solutions</span></h1>
+            <p class="text-gray-300 mb-6">Transform your business with our cutting-edge technology ecosystem</p>
+            <button class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg transition-all transform hover:scale-105">Explore Now</button>
+          </div>
+          <div class="md:w-1/2">
+            <img src="cloud-hero.png" alt="Cloud Technology" class="max-w-full h-auto">
+          </div>
         </div>
       </div>
 
-      <!-- Product Info -->
-      <div class="p-4">
-        <div class="mb-2 flex items-start justify-between">
-          <h3 class="font-semibold text-gray-900 line-clamp-2">{{ producto.nombre }}</h3>
-          <span class="ml-2 text-lg font-bold text-purple-700" *ngIf="producto.precio !== null">
-            ${{ producto.precio | number:'1.2-2' }}
-          </span>
-          <span class="ml-2 text-lg font-bold text-gray-500" *ngIf="producto.precio === null">
-            N/A
-          </span>
+      <!-- Add more slider items as needed -->
+    </div>
+  </section>
+
+  <!-- Featured Categories -->
+  <section class="py-16 px-4">
+    <h2 class="text-3xl font-bold mb-10 text-center">Top Categories</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+      <div *ngFor="let category of featuredCategories"
+           class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-purple-900/20 transition-all duration-300 transform hover:-translate-y-1">
+        <div class="text-4xl mb-3">{{ category.icon }}</div>
+        <h3 class="font-semibold">{{ category.name }}</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="py-16 px-4 bg-gray-900/30">
+    <h2 class="text-3xl font-bold mb-10 text-center">Featured Products</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+      <div *ngFor="let product of featuredProducts"
+           class="bg-gray-800 rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-500">
+        <div class="relative overflow-hidden">
+          <img [src]="'assets/images/' + product.image" [alt]="product.name"
+               class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
-
-        <p class="mb-3 text-sm text-gray-600 line-clamp-2">{{ producto.descripcion }}</p>
-
-        <div class="mb-3 flex flex-wrap gap-2">
-          <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800">
-            {{ producto.categoria }}
-          </span>
-          <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
-            {{ producto.marca }}
-          </span>
-          <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800">
-            {{ producto.warehouseId }}
-          </span>
-        </div>
-
-        <!-- Expandable Details -->
-        <div class="mt-3 border-t border-gray-100 pt-3">
-          <button
-            (click)="toggleProductDetails(producto.id)"
-            class="flex w-full items-center justify-between text-sm font-medium text-purple-600 hover:text-purple-800"
-          >
-            {{ expandedProductId === producto.id ? "Ocultar detalles ": "Mostrar detalles" }}
-            <fa-icon
-              [icon]="expandedProductId === producto.id ? faChevronUp : faChevronDown"
-              class="ml-1"
-            ></fa-icon>
-          </button>
-
-          <div *ngIf="expandedProductId === producto.id" class="mt-3 space-y-2 text-sm">
-            <div class="flex items-center">
-              <fa-icon [icon]="faBarcode" class="mr-2 text-purple-500"></fa-icon>
-              <span class="text-gray-500">SKU:</span>
-              <span class="ml-2 font-medium">{{ producto.SKU }}</span>
-            </div>
-
-            <div class="flex items-center">
-              <fa-icon [icon]="faTag" class="mr-2 text-purple-500"></fa-icon>
-              <span class="text-gray-500">ID:</span>
-              <span class="ml-2 font-medium truncate">{{ producto.id }}</span>
-            </div>
-
-            <div class="flex items-center">
-              <fa-icon [icon]="faDollarSign" class="mr-2 text-purple-500"></fa-icon>
-              <span class="text-gray-500">Precio Retail:</span>
-              <span class="ml-2 font-medium">${{ producto.precioRetail }}</span>
-            </div>
-
-            <div class="flex items-center">
-              <fa-icon [icon]="faBoxOpen" class="mr-2 text-purple-500"></fa-icon>
-              <span class="text-gray-500">Cantidad:</span>
-              <span class="ml-2 font-medium">{{ producto.cantidad || 'N/A' }}</span>
-            </div>
-
-            <div class="flex items-center">
-              <fa-icon [icon]="faWarehouse" class="mr-2 text-purple-500"></fa-icon>
-              <span class="text-gray-500">Almacén:</span>
-              <span class="ml-2 font-medium">{{ producto.warehouse || 'N/A' }}</span>
-            </div>
-
-            <div class="flex flex-wrap items-center">
-              <fa-icon [icon]="faTags" class="mr-2 text-purple-500"></fa-icon>
-              <span class="text-gray-500">Etiquetas:</span>
-              <div class="ml-2 mt-1 flex flex-wrap gap-1">
-                <span
-                  *ngFor="let tag of producto.etiquetas"
-                  class="inline-block rounded bg-purple-50 px-2 py-0.5 text-xs text-purple-700"
-                >
-                  {{ tag }}
-                </span>
-                <span *ngIf="!producto.etiquetas || producto.etiquetas.length === 0" class="text-gray-400">
-                  Sin etiquetas
-                </span>
-              </div>
-            </div>
-
-            <div class="flex items-center">
-              <fa-icon
-                [icon]="producto.disponibilidad ? faCheckCircle : faTimesCircle"
-                [class]="producto.disponibilidad ? 'text-green-500' : 'text-red-500'"
-                class="mr-2"
-              ></fa-icon>
-              <span class="text-gray-500">Estado:</span>
-              <span
-                class="ml-2 font-medium"
-                [class]="producto.disponibilidad ? 'text-green-600' : 'text-red-600'"
-              >
-                {{ producto.estado }}
-              </span>
-            </div>
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-2">{{ product.name }}</h3>
+          <div class="flex justify-between items-center">
+            <span class="text-purple-400 font-bold">{{ product.price }}</span>
+            <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all">
+              View Details
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Empty State -->
-  <div *ngIf="filteredProducts().length === 0" class="flex flex-col items-center justify-center py-12">
-    <div class="rounded-full bg-purple-100 p-4">
-      <fa-icon [icon]="faSearch" class="text-3xl text-purple-500"></fa-icon>
+  <!-- Newsletter -->
+  <section class="py-16 px-4 relative overflow-hidden">
+    <div class="absolute inset-0 bg-purple-900/10 backdrop-blur-sm"></div>
+    <div class="relative max-w-3xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-4">Join Our Tech Revolution</h2>
+      <p class="text-gray-300 mb-8">Get exclusive offers and the latest updates on cutting-edge technology</p>
+      <form class="flex flex-col sm:flex-row gap-4">
+        <input type="email" placeholder="Your email address"
+               class="flex-1 px-6 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:border-purple-500 outline-none">
+        <button type="submit"
+                class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg transition-all">
+          Subscribe
+        </button>
+      </form>
     </div>
-    <h3 *ngIf="!isLoading"  class="mt-4 text-lg font-medium text-gray-900">No se encontraron productos</h3>
-    <p *ngIf="!isLoading"  class="mt-1 text-center text-gray-500">Intenta con otros términos de búsqueda o filtros</p>
-  </div>
-
-  <!-- Loading State (Opcional) -->
-  <div *ngIf="isLoading" class="flex items-center justify-center py-12">
-    <div class="h-8 w-8 animate-spin rounded-full border-4 border-purple-200 border-t-purple-600"></div>
-    <span class="ml-3 text-purple-800">Cargando productos...</span>
-  </div>
+  </section>
 </div>
-
-<!-- Pagination (Opcional) -->
-<div *ngIf="filteredProducts().length > 0" class="mt-6 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-  <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-    <div>
-      <p class="text-sm text-gray-700">
-        Mostrando <span class="font-medium">{{ filteredProducts().length }}</span> productos
-      </p>
-    </div>
-    <!-- Aquí puedes agregar botones de paginación si implementas paginación -->
-  </div>
-</div>
-
-<!-- Add Product Modal -->
-<!-- <app-add-form
-  *ngIf="mostrarModal"
-  (onAddProduct)="agregarProducto($event)"
-  (onClose)="mostrarModal = false"
-></app-add-form> -->

@@ -7,11 +7,15 @@ export const dashboardRoutes: Routes = [
     children: [
       {
         path: 'home',
-        loadComponent: () => import('../pages/dashboard/home/home.component').then(m => m.HomeComponent)
+        loadComponent: () => import('../pages/luki/luki.component').then(m => m.LukiComponent)
       },
       {
-        path: 'add-products',
+        path: 'add-ingram-products',
         loadComponent: () => import('../pages/dashboard/add-products/add-products.component').then(m => m.AddProductsComponent)
+      },
+      {
+        path: 'add-nexsys-products',
+        loadComponent: () => import('../components/dashboard/nexsys/nexsys.component').then(m => m.NexsysComponent)
       },
       {
         path: 'orders',

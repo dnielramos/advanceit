@@ -5,15 +5,23 @@ import { bufferCount, concatMap, map, scan, delay } from 'rxjs/operators';
 
 // Asegúrate de que la ruta al modelo sea correcta
 import { ApiDetailsResponse, ProductAdvance } from '../models/ingram';
+import { Producto } from '../models/Productos';
 
 interface SaveBatchResponse {
   message: string;
 }
 
+export interface CategoryResponse {
+  total: number;
+  products: number;
+  categories: { name: string; quantity: number }[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdvanceProductsService {
   private API_PRODUCTS_URL = 'https://advance-backend.onrender.com/advance-products/ingram';
-  private API_LIST_URL = 'https://advance-backend.onrender.com/advance-products';
+  private API_LIST_URL = 'https://advance-backend.onrender.com/advance-products/all';
+  private API_CATEGORY_URL = 'https://advance-backend.onrender.com/advance-products/categories';
 
   // BehaviorSubject para emitir el array de productos de forma progresiva
   private _allProducts$ = new BehaviorSubject<ApiDetailsResponse<ProductAdvance>[]>([]);
@@ -36,7 +44,7 @@ export class AdvanceProductsService {
    * @param delayTime El tiempo de espera entre emisiones de lotes (en ms, opcional, por defecto es 500ms).
    * @returns Un Observable que emite arrays de productos de forma progresiva.
    */
-  loadAllProductsProgressively(batchSize: number = 5, delayTime: number = 500): Observable<ApiDetailsResponse<ProductAdvance>[]> {
+  loadAllProductsProgressively(batchSize: number = 10, delayTime: number = 500): Observable<ApiDetailsResponse<ProductAdvance>[]> {
     return this.http.get<ApiDetailsResponse<ProductAdvance>[]>(this.API_LIST_URL).pipe(
       // Convertir el array de productos inicial en un Observable
       concatMap(allProducts => from(allProducts)),
@@ -58,7 +66,11 @@ export class AdvanceProductsService {
    * Útil si la carga progresiva ya se ha completado o para otros casos de uso.
    * @returns Un Observable con el array completo de productos.
    */
-  getAllProducts(): Observable<ProductAdvance[]> {
-    return this.http.get<ProductAdvance[]>(this.API_LIST_URL);
+  getAllProducts(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(this.API_LIST_URL);
+  }
+
+   getAllCategories(): Observable<CategoryResponse> {
+    return this.http.get<CategoryResponse>(this.API_CATEGORY_URL);
   }
 }

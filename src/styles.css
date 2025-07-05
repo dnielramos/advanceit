@@ -3,6 +3,30 @@
 
 
 @layer utilities {
+
+  .scroll-purple {
+    scrollbar-width: thin;
+    scrollbar-color: #8a5cf646 transparent;
+    /* púrpura y fondo transparente */
+  }
+
+  .scroll-purple::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scroll-purple::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-purple::-webkit-scrollbar-thumb {
+    background-color: #8b5cf6;
+    /* púrpura de Tailwind: purple-500 */
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
   .bg-radial-white-purple {
     background: radial-gradient(circle at center, white 40%, #f3e8ff 60%);
   }
@@ -39,6 +63,35 @@
     border-radius: 0.5rem;
     color: #000000;
   }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .rotate-y-6 {
+    transform: rotateY(6deg);
+  }
+
+  .rotate-y-3 {
+    transform: rotateY(3deg);
+  }
+}
+
+.banner-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  /* ajusta según lo que quieras */
+  z-index: 0;
+}
+
+.banner-slide>* {
+  position: relative;
+  z-index: 10;
 }
 
 .input-field {
@@ -73,6 +126,28 @@
   background-color: white;
 }
 
+.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+}
+
+
+/* Animaciones personalizadas */
+@keyframes slide {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.carousel-item {
+  transition: transform 0.5s ease-in-out;
+}
 
 @media screen and (max-width: 500px) {
   /* Use max-width for mobile-first approach */

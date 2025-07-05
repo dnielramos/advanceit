@@ -1,0 +1,137 @@
+<div class="bg-white z-60 w-full px-4 py-4 shadow-md">
+
+  <div class="grid lg:flex">
+    <!-- Logo -->
+    <div class="flex items-center transition-opacity ease-in-out mr-2 ">
+      <a routerLink="/">
+        <img src="logo.png" alt="Advance Technology Projects" class="h-8 lg:h-11" />
+      </a>
+    </div>
+    <!-- input -->
+    <div class="container my-2 mx-auto max-w-5xl">
+      <div class="relative">
+        <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="filterProducts()"
+        (focus)="onInputFocus()"
+        (blur)="onInputBlur()"
+        placeholder="{{welcomeMessage()}}"
+          class="w-full px-6 py-4 rounded-full border border-gray-300 shadow-xl shadow-purple-50 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-lg outline-none" />
+        <fa-icon [icon]="faSearch"
+          class="absolute right-6 top-1/2 transform -translate-y-1/2 text-purple-500 text-xl"></fa-icon>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <fa-icon [icon]="faChat" class="text-gray-300 lg:text-2xl"></fa-icon>
+      <fa-icon [icon]="faHome" routerLink="/" class="text-gray-300 hover:text-purple-500 cursor-pointer lg:text-2xl"
+        title="Regresar al inicio"></fa-icon>
+    </div>
+  </div>
+  <div class="px-2 flex gap-1 justify-between items-center">
+    <div class="flex items-center gap-1">
+      <svg class="lg:text-2xl" (click)="onMenucategories()" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+        viewBox="0 0 32 32">
+        <path fill="currentColor"
+          d="M14 25h14v2H14zm-6.83 1l-2.58 2.58L6 30l4-4l-4-4l-1.42 1.41zM14 15h14v2H14zm-6.83 1l-2.58 2.58L6 20l4-4l-4-4l-1.42 1.41zM14 5h14v2H14zM7.17 6L4.59 8.58L6 10l4-4l-4-4l-1.42 1.41z" />
+      </svg>
+      <h1 (click)="onMenucategories()" class="text-slate-500 text-sm hover:text-purple-500 hover:cursor-pointer">
+        Todos los productos</h1>
+    </div>
+
+    <div class="hidden items-center lg:flex">
+      <app-trm></app-trm>
+    </div>
+  </div>
+
+  <!-- //sugerencias -->
+  <div *ngIf="inputFocused" (mouseenter)="onMouseEnterSuggestions()"
+     (mouseleave)="onMouseLeaveSuggestions()" class="h-82 animate__animated animate__fadeIn bg-purple-50 rounded-2xl scroll-purple">
+
+    <div class="relative rounded-2xl m-2">
+      <!-- Botón retroceder -->
+      <button (click)="scrollFavorites('left')"
+        class="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-purple-100 rounded-full shadow-md hover:bg-gray-100 p-2">
+        <fa-icon [icon]="faChevronLeft"></fa-icon>
+      </button>
+
+      <!-- Contenedor de productos favoritos -->
+      <section #favoritesContainer class="flex max-w-screen overflow-x-auto my-4 gap-4 rounded-md scroll-smooth ">
+        @for (producto of productos; track $index) {
+        <div
+          class="bg-white rounded-xl m-2 shadow overflow-hidden h-75 transform transition-transform hover:scale-101 flex flex-col min-w-xs relative">
+          <!-- Imagen del producto -->
+          <img [src]="producto.imagen | sanitizeImageUrl" [alt]="producto.nombre"
+            class="w-full h-28 object-contain p-4" />
+
+          <!-- Marca (logo) con posicionamiento absoluto y máscara blanca -->
+          <div class="absolute top-2 right-2 z-10">
+            <div class="bg-white rounded-2xl p-2 inline-flex items-center justify-center">
+              <img [src]="producto.marca | sanitizeImageUrl" [alt]="'Marca: ' + producto.marca"
+                class="h-12 w-auto object-contain" />
+            </div>
+          </div>
+
+          <div class="p-4 flex flex-col flex-grow">
+            <!-- Nombre del producto -->
+            <h2 class="text-md md:text-md font-semibold text-gray-800 mb-2">
+              {{ producto.nombre }}
+            </h2>
+
+            <!-- Descripción -->
+            <p class="text-gray-600 text-xs line-clamp-4">
+              {{ producto.descripcion }}
+            </p>
+
+            <!-- Características -->
+            <!-- <ul class="p-4 text-gray-500 text-xs md:text-md">
+              <li *ngFor="let c of producto.caracteristicas">
+                ✔ {{ c }}
+              </li>
+            </ul> -->
+
+            <!-- Categoría (sin cambios) -->
+            <div class="flex gap-4 my-2">
+              <span class="text-orange-700 text-xs font-semibold px-2 py-1 rounded-full inline-flex items-center">
+                <fa-icon [icon]="faLayerGroup"></fa-icon>
+                {{ producto.categoria | sanitizeImageUrl }}
+              </span>
+            </div>
+
+            <!-- Etiquetas -->
+            <div class="flex flex-wrap gap-2">
+              <span *ngFor="let tag of producto.etiquetas"
+                class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full">
+                <fa-icon [icon]="faTag"></fa-icon>
+                {{ tag }}
+              </span>
+            </div>
+
+            <!-- Precio y botón de compra -->
+            <!-- <div class="flex justify-between items-center">
+              <span class="text-purple-700 font-bold text-sm">
+                $ {{ producto.precio | number : '1.2-2' }}
+              </span>
+              <button
+                class="bg-gradient-to-r bg-purple-500 hover:bg-purple-800 text-white p-2  rounded-lg transition-transform transform hover:scale-105 hover:-rotate-5 text-sm">
+                Ver
+                <fa-icon [icon]="faEye"></fa-icon>
+              </button>
+            </div> -->
+
+
+          </div>
+        </div>
+        }
+      </section>
+
+      <!-- Botón avanzar -->
+      <button (click)="scrollFavorites('right')"
+        class="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-purple-100 rounded-full p-2 shadow-md hover:bg-gray-100">
+        <fa-icon [icon]="faChevronRight"></fa-icon>
+      </button>
+
+    </div>
+  </div>
+</div>

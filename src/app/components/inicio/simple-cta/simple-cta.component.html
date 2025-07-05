@@ -17,6 +17,6 @@
     </p>
 
 
-    <app-button-simple-cta *ngIf = "buttonText" buttonText="L" link="contacto"></app-button-simple-cta>
+    <app-button-simple-cta *ngIf = "buttonText" [buttonText]="buttonText.toUpperCase()" link="contacto"></app-button-simple-cta>
   </div>
 </div>

@@ -1,0 +1,23 @@
+
+<div class="min-h-screen bg-gradient-to-r from-white to-purple-50 py-8">
+  <div class="container mx-auto px-4">
+    <div class="flex flex-col md:flex-row gap-8">
+      <div class="w-full">
+        <div class="mb-4 text-gray-700">
+          <p>
+            Mostrando {{ productosFiltrados.length }} resultados de
+            {{ productos.length }} productos.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <app-product-advance *ngFor="let p of filteredProducts()" [producto]="p"
+            (agregarAlCarrito)="addToCart($event)" />
+        </div>
+
+        <!-- Sentinel invisible para IntersectionObserver -->
+        <div #sentinel class="h-1 w-full"></div>
+      </div>
+    </div>
+  </div>
+</div>

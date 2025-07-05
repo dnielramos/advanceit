@@ -1,0 +1,146 @@
+<div class="max-w-4xl mt-8 mx-auto p-6 bg-slate-50 rounded-xl">
+  <!-- Título -->
+  <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-2 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
+      <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+    </svg>
+    Carrito de Compras
+  </h2>
+
+  <!-- Carrito vacío -->
+  <div *ngIf="cartItems.length === 0" class="text-center py-12 px-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+    </svg>
+    <p class="text-xl text-gray-500 font-medium">El carrito está vacío</p>
+    <button
+      (click)="continueShopping()"
+      class="mt-4 inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+      </svg>
+      Seguir Comprando
+    </button>
+  </div>
+
+  <!-- Items del carrito -->
+  <div *ngFor="let item of cartItems" class="flex flex-col md:flex-row items-start justify-between border-b py-6 last:border-b-0">
+    <div class="flex items-start space-x-4 mb-4 md:mb-0">
+      <!-- Imagen del producto -->
+      <div class="bg-gray-100 p-3 rounded-lg">
+        <img [src]="item.product.imagen || 'default-image.jpg'" [alt]="item.product.nombre" class="w-30 object-cover rounded">
+      </div>
+      <!-- Detalles del producto -->
+      <div>
+        <h3 class="font-semibold text-lg text-gray-800">{{ item.product.nombre }}</h3>
+        <p class="text-sm text-gray-500 mt-1">{{ item.product.descripcion }}</p>
+        <div class="mt-2 flex items-center">
+          <span class="text-purple-600 font-bold">${{ item.product.precio }}</span>
+          <span class="mx-2">•</span>
+          <span class="text-gray-600">Subtotal: ${{ item.product.precio * item.quantity }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controles de cantidad y eliminación -->
+    <div class="flex items-center space-x-3">
+      <div class="flex items-center border rounded-lg overflow-hidden">
+        <button
+          (click)="decreaseQuantity(item)"
+          class="px-3 py-1 bg-gray-100 hover:bg-gray-200 focus:outline-none"
+          [disabled]="item.quantity <= 1"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <input
+          type="number"
+          [(ngModel)]="item.quantity"
+          (change)="updateQuantity(item.product.id, item.quantity)"
+          class="w-16 text-center py-1 text-lg border-t border-b focus:outline-none"
+          min="1"
+        >
+        <button
+          (click)="increaseQuantity(item)"
+          class="px-3 py-1 bg-gray-100 hover:bg-gray-200 focus:outline-none"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+
+      <button
+        (click)="removeFromCart(item.product.id)"
+        class="ml-2 p-2 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Resumen del carrito -->
+  <div *ngIf="cartItems.length > 0" class="mt-8 p-6 bg-gray-50 rounded-lg border-t">
+    <!-- Cupón y total -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+      <!-- Cupón -->
+      <div class="mb-4 md:mb-0">
+        <h3 class="text-lg font-medium text-gray-700">¿Tienes un cupón?</h3>
+        <div class="flex mt-2">
+          <input
+            type="text"
+            placeholder="Ingresar código de descuento"
+            class="px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [(ngModel)]="couponCode"
+            aria-label="Código de cupón"
+          >
+          <button
+            (click)="applyCoupon()"
+            class="px-4 py-2 bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            Aplicar
+          </button>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="text-right">
+        <div class="text-lg text-gray-700">Total:
+          <span class="font-bold text-2xl text-purple-600">
+            ${{ total | number: '1.2-2' }}
+          </span>
+        </div>
+        <div *ngIf="discount > 0" class="text-green-600 text-sm">
+          Ahorro: -${{ discount | number: '1.2-2' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <button
+        (click)="continueShopping()"
+        class="w-full py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors flex items-center justify-center"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+        Seguir Comprando
+      </button>
+
+      <button
+        (click)="checkout()"
+        class="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-md transition-all transform hover:scale-105 flex items-center justify-center"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+        </svg>
+        Finalizar Compra
+      </button>
+    </div>
+  </div>
+</div>

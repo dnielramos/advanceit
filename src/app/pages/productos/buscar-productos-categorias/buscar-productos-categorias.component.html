@@ -1,0 +1,19 @@
+<div class="p-4 bg-gray-50 rounded-lg shadow-md">
+  <h2 class="text-3xl font-bold text-purple-700 mb-4">
+    Productos por Categoría:
+    <span class="text-blue-600 capitalize">{{ category || 'No especificada' }}</span>
+  </h2>
+
+  @if (productosCategoria.length > 0) {
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    @for (item of productosCategoria; track item.id) {
+    <app-product-advance [producto]="item"></app-product-advance>
+    }
+  </div>
+  } @else {
+  <p class="text-gray-600 text-lg mt-8">
+    No se encontraron productos para la categoría
+    <span class="font-semibold text-red-500">{{ category || 'especificada' }}</span>.
+  </p>
+  }
+</div>

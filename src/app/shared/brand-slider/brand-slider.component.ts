@@ -8,7 +8,7 @@ import { NgFor } from '@angular/common';
   template: `
     <div class="marquee-container mt-12">
       <div class="marquee">
-        <ng-container *ngFor="let brand of brandImagesDoubled">
+        <ng-container *ngFor="let brand of brandsDoubled">
           <img
             [src]="brand"
             [alt]="'brand-' + brand"
@@ -50,7 +50,7 @@ import { NgFor } from '@angular/common';
   ],
 })
 export class BrandSliderComponent {
-  @Input() brandImages  = [
+  @Input() brands  = [
   'assets/logos/samsung.avif',
   'assets/logos/adobe.png',
   'assets/logos/apple.png',
@@ -93,9 +93,9 @@ export class BrandSliderComponent {
 ];
 
   // Duplicamos para que la animación sea continua
-  brandImagesDoubled = [
-    ...this.brandImages,
-    ...this.brandImages,
-    ...this.brandImages,
+  brandsDoubled = [
+    ...this.brands,
+    ...this.brands,
+    ...this.brands,
   ];
 }

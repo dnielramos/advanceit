@@ -1,1 +1,223 @@
-<p>productos works!</p>
+<section class="min-h-[80vh] bg-white">
+
+  <!-- Buscador principal -->
+  <app-buscador-principal (showCategoriesMenu)="onMenucategories()"></app-buscador-principal>
+
+  <!-- t+item de carrito -->
+  <div *ngIf="cartItemCount > 0"
+    class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
+    <a routerLink="/productos/cart" class="relative flex items-center justify-center w-full h-full">
+      <span
+        class="p-2 absolute top-2 right-2 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+        {{ cartItemCount }}
+      </span>
+      <fa-icon [icon]="faShoppingCart" class="text-xl md:text-2xl "></fa-icon>
+    </a>
+  </div>
+
+  <app-slider-product></app-slider-product>
+
+  <h1 class="text-center text-gray-900 text-4xl font-extrabold my-4">
+    Productos Destacados
+  </h1>
+
+  <div class="relative px-8 py-2 bg-purple-50 rounded-2xl m-2">
+    <!-- Botón retroceder -->
+    <button (click)="scrollFavorites('left')"
+      class="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-purple-100 rounded-full p-2 shadow-md hover:bg-gray-100">
+      <fa-icon [icon]="faChevronLeft"></fa-icon>
+    </button>
+
+    <!-- Contenedor de productos favoritos -->
+    <section #favoritesContainer
+      class="flex max-w-screen overflow-x-auto my-4 gap-4 rounded-md scroll-smooth">
+      @for (item of productosFavorites; track $index) {
+      <app-product-advance (agregarAlCarrito)="addToCart($event)" [producto]="item"></app-product-advance>
+      }
+    </section>
+
+    <!-- Botón avanzar -->
+    <button (click)="scrollFavorites('right')"
+      class="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-purple-100 rounded-full p-2 shadow-md hover:bg-gray-100">
+      <fa-icon [icon]="faChevronRight"></fa-icon>
+    </button>
+  </div>
+
+    <h1 class="text-center text-gray-900 text-4xl font-extrabold my-4">
+    Productos Comprados recientemente
+  </h1>
+
+  <section class="flex my-4 gap-4 bg-gray-50 p-4 m-4 rounded-md">
+    <app-product-vertical (agregarAlCarrito)="addToCart($event)" [producto]="productosFavorites[2]"></app-product-vertical>
+  </section>
+  <section class="flex my-4 gap-4 bg-gray-50 p-4 m-4 rounded-md">
+    <app-product-vertical (agregarAlCarrito)="addToCart($event)" [producto]="productosFavorites[5]"
+      [imagenIzquierda]="false"></app-product-vertical>
+  </section>
+  <section class="flex my-4 gap-4 bg-gray-50 p-4 m-4 rounded-md">
+    <app-product-vertical (agregarAlCarrito)="addToCart($event)" [producto]="productosFavorites[4]"></app-product-vertical>
+  </section>
+  <section class="flex my-4 gap-4 bg-gray-50 p-4 m-4 rounded-md">
+    <app-product-vertical (agregarAlCarrito)="addToCart($event)" [producto]="productosFavorites[3]"
+      [imagenIzquierda]="false"></app-product-vertical>
+  </section>
+
+    <h1 class="text-center text-gray-900 text-4xl font-extrabold my-4">
+    Distribuidores autorizados de las mejores marcas
+  </h1>
+
+  <app-certificate-slider></app-certificate-slider>
+  <app-brand-slider></app-brand-slider>
+
+  <app-team-form-lite></app-team-form-lite>
+
+  <h1 class="text-center sticky top-2 text-gray-900 text-4xl font-extrabold my-4">
+    Todos los productos
+  </h1>
+  <!-- productos -->
+<app-grid-products-store [productos]="filteredProducts()"></app-grid-products-store>
+
+  <!-- componente de categorias -->
+  <div *ngIf="menuCategories" class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden">
+    <app-category-menu></app-category-menu>
+    <div (click)="onMenucategories()" class="p-4 text-gray-50 font-bold text-2xl">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1.25em" height="1em" viewBox="0 0 640 512">
+        <path fill="currentColor"
+          d="M17.89 123.62L5.51 142.2c-14.2 21.3 1 49.8 26.59 49.8h74.26ZM576 413.42V224h-64v140l-128-99v-41h-53.08l-41.4-32H608c25.5 0 40.7-28.5 26.59-49.8l-85.29-128A32.18 32.18 0 0 0 522.6 0H117.42a31.87 31.87 0 0 0-26.61 14.2l-10.66 16L45.46 3.38A16 16 0 0 0 23 6.19L3.37 31.46a16 16 0 0 0 2.81 22.45l588.35 454.72a16 16 0 0 0 22.47-2.82l19.64-25.26a16 16 0 0 0-2.81-22.45ZM320 384H128V224H64v256a32 32 0 0 0 32 32h256a32 32 0 0 0 32-32v-73.41l-64-49.47Z" />
+      </svg>
+      <p class="text-xs">Cerrar</p>
+    </div>
+  </div>
+
+
+  <app-footer></app-footer>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Featured Products Section -->
+<!-- <div class="max-w-6xl mx-auto px-4 py-12">
+  <h2 class="text-4xl font-semibold text-purple-600 text-center mb-12">
+    Featured Solutions
+  </h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> -->
+<!-- Card: Business Kit -->
+<!-- <div class="bg-gray-50 shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-300">
+      <h3 class="text-2xl font-bold text-purple-600">Business Kit</h3>
+      <p class="mt-2 text-gray-600">
+        Comprehensive packages that provide the latest hardware and
+        software to drive your business forward.
+      </p>
+      <button class="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700" routerLink="/contacto">
+        Discover More
+      </button>
+    </div> -->
+
+<!-- Card: Enterprise Solutions -->
+<!-- <div class="bg-gray-50 shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-300">
+      <h3 class="text-2xl font-bold text-purple-600">
+        Enterprise Solutions
+      </h3>
+      <p class="mt-2 text-gray-600">
+        Customized IT strategies designed to keep your operations running
+        smoothly and securely.
+      </p>
+      <button class="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700" routerLink="/contacto">
+        Explore Now
+      </button>
+    </div> -->
+
+<!-- Card: Special Kits -->
+<!-- <div class="bg-gray-50 shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-300">
+      <h3 class="text-2xl font-bold text-purple-600">Special Kits</h3>
+      <p class="mt-2 text-gray-600">
+        Tailored solutions that blend advanced technology with expert
+        support for maximum efficiency.
+      </p>
+      <button class="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700" routerLink="/contacto">
+        View Kits
+      </button>
+    </div>
+  </div>
+</div> -->
+
+<!-- Client Testimonials Section -->
+<!-- <div class="py-16">
+  <div class="max-w-4xl mx-auto px-4 text-center">
+    <h2 class="text-4xl font-semibold text-purple-600 mb-8">
+      What Our Clients Say
+    </h2>
+    <div class="space-y-8">
+      <blockquote class="text-xl text-gray-700 italic">
+        "The level of professionalism and expertise at Mission has
+        transformed our IT operations. Their solutions are simply
+        outstanding."
+      </blockquote>
+      <blockquote class="text-xl text-gray-700 italic">
+        "A true partner in success. Their commitment to excellence has
+        made a significant impact on our business performance."
+      </blockquote>
+    </div>
+  </div>
+</div> -->
+
+<!-- Call to Action Section -->
+<!-- <div class="bg-purple-600 py-16">
+        <div class="max-w-4xl mx-auto text-center px-4">
+          <h2 class="text-4xl font-bold text-white mb-4">Ready to Transform Your Business?</h2>
+          <p class="text-xl text-purple-100 mb-8">
+            Join the ranks of leading companies that trust Mission to power their IT operations and drive business success.
+          </p>
+          <button class="bg-white text-purple-600 px-8 py-3 rounded font-semibold hover:bg-gray-200">
+            Get in Touch
+          </button>
+        </div>
+      </div>
+    </section> -->

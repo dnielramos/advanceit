@@ -1,0 +1,17 @@
+<div class="relative px-8 py-2 bg-purple-50 rounded-2xl m-2">
+  <button (click)="scrollFavorites('left')"
+    class="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-purple-100 rounded-full p-2 shadow-md hover:bg-gray-100">
+    <fa-icon [icon]="faChevronLeft"></fa-icon>
+  </button>
+
+  <section #favoritesContainer
+    class="flex max-w-screen overflow-x-auto my-4 gap-4 rounded-md scroll-smooth">
+    @for (item of favoritesProducts; track item.id) { <app-product-advance (agregarAlCarrito)="addToCart($event)" [producto]="item"></app-product-advance>
+    }
+  </section>
+
+  <button (click)="scrollFavorites('right')"
+    class="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-purple-100 rounded-full p-2 shadow-md hover:bg-gray-100">
+    <fa-icon [icon]="faChevronRight"></fa-icon>
+  </button>
+</div>

@@ -89,11 +89,18 @@ import {
           </button>
           <div *ngIf="uiElementsOpen" class="pl-10 flex flex-col space-y-1 mt-1">
             <a
-              routerLink="/dashboard/add-products"
+              routerLink="/dashboard/add-ingram-products"
               routerLinkActive="text-purple-600"
               class="text-sm text-gray-600 hover:text-purple-600"
             >
-              ➤ Ingram Inventory
+              ➤ Ingram
+            </a>
+            <a
+              routerLink="/dashboard/add-nexsys-products"
+              routerLinkActive="text-purple-600"
+              class="text-sm text-gray-600 hover:text-purple-600"
+            >
+              ➤ Nexsys
             </a>
             <!-- <a
               routerLink="/dashboard/orders"

@@ -1,5 +1,7 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TrmService } from '../../../services/trm.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-trm',
@@ -7,13 +9,10 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <section class="bg-white rounded max-w-250 mx-auto relative">
-      <!-- Contenedor relativo para solapar el widget y el skeleton -->
       <div class="relative">
-        <!-- Contenedor donde se inyectará el widget -->
-        <div id="widgetContainer" class="text-xs bg-rose-500 text-center flex items-center justify-center"></div>
-        <!-- Overlay Skeleton: se muestra mientras isWidgetLoaded es false -->
+        <div #widgetContainer class="text-xs bg-rose-500 text-center flex items-center justify-center"></div>
         <div
-          *ngIf="!isWidgetLoaded"
+          *ngIf="!(trmService.widgetLoaded$ | async)"
           class="absolute inset-0 flex animate-pulse items-center justify-center"
         >
           <div class="animate-pulse space-y-2 w-150">
@@ -29,32 +28,25 @@ import { CommonModule } from '@angular/common';
     </section>
   `,
 })
-export class TrmComponent implements OnInit {
+export class TrmComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
-  isWidgetLoaded: boolean = false;
-
-  constructor(private elementRef: ElementRef) {}
+  constructor(
+    private elementRef: ElementRef,
+    public trmService: TrmService
+  ) {}
 
   ngOnInit(): void {
-    const widgetContainer = this.elementRef.nativeElement.querySelector('#widgetContainer');
-    // Se almacena la función original de document.write
-    const originalDocWrite = document.write.bind(document);
-    // Se utiliza casting a "any" para evitar la advertencia de deprecación en TypeScript
-    (document as any).write = (content: string) => {
-      widgetContainer.innerHTML += content;
-    };
+    const widgetContainer = this.elementRef.nativeElement.querySelector('[widgetContainer]') ||
+                          this.elementRef.nativeElement.querySelector('div');
 
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'https://widgets.wilkinsonpc.com.co/curr/curr-usd-cop4.js';
-    script.onload = () => {
-      // Restauramos document.write a su funcionalidad original
-      (document as any).write = originalDocWrite;
-      this.isWidgetLoaded = true;
-    };
+    this.trmService.loadWidget(widgetContainer)
+      .catch(error => console.error('Error loading TRM widget:', error));
+  }
 
-    this.elementRef.nativeElement.appendChild(script);
+  ngOnDestroy(): void {
+    this.trmService.cleanup();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
-
-

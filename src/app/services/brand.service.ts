@@ -1,163 +1,163 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BrandService {
   brands = [
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/443.webp',
+      url: 'assets/logos/microsoft.png',
       name: 'microsoft',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/444_s.webp',
+      url: 'assets/logos/redhat.png',
       name: 'redhat',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/463.webp',
+      url: 'assets/logos/condeco.png',
       name: 'condeco',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/350.webp', name: 'adobe' },
+    { url: 'assets/logos/adobe.png', name: 'adobe' },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/380.webp',
+      url: 'assets/logos/kaspersky.png',
       name: 'kaspersky',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/388.webp',
+      url: 'assets/logos/oracle.png',
       name: 'oracle',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/358.webp',
+      url: 'assets/logos/autodesk.png',
       name: 'autodesk',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/446.webp',
+      url: 'assets/logos/acronis.webp', // Extensión .webp según la imagen
       name: 'acronis',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/447.webp',
+      url: 'assets/logos/checkpoint.png',
       name: 'checkpoint',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/448.webp',
+      url: 'assets/logos/citrix.png',
       name: 'citrix',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/451.webp',
+      url: 'assets/logos/sophos.png',
       name: 'sophos',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/349.webp', name: 'adata' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/352.webp', name: 'apc' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/433.webp', name: 'apple' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/354.webp', name: 'aruba' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/355.webp', name: 'asus' },
+    { url: 'assets/logos/adata.png', name: 'adata' }, // No visible en imagen, asumimos .png
+    { url: 'assets/logos/apc.png', name: 'apc' },
+    { url: 'assets/logos/apple.png', name: 'apple' },
+    { url: 'assets/logos/aruba.png', name: 'aruba' },
+    { url: 'assets/logos/asus.webp', name: 'asus' }, // Extensión .webp según la imagen
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/356.webp',
+      url: 'assets/logos/asus corporativo.png',
       name: 'asus corporativo',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/461.webp', name: 'barco' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/359.webp', name: 'canon' },
+    { url: 'assets/logos/barco.png', name: 'barco' },
+    { url: 'assets/logos/canon.png', name: 'canon' },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/360.webp',
+      url: 'assets/logos/canon corporativo.png', // No visible en imagen, asumimos .png
       name: 'canon corporativo',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/362.webp', name: 'dlink' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/440.webp', name: 'dell' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/365.webp', name: 'elo' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/366.webp', name: 'epson' },
+    { url: 'assets/logos/dlink.png', name: 'dlink' },
+    { url: 'assets/logos/dell.png', name: 'dell' },
+    { url: 'assets/logos/elo.png', name: 'elo' },
+    { url: 'assets/logos/epson.png', name: 'epson' },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/367.webp',
+      url: 'assets/logos/epson consumo.webp', // Extensión .webp según la imagen
       name: 'epson consumo',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/368.webp',
+      url: 'assets/logos/epson pos.png', // No visible en imagen, asumimos .png
       name: 'epson pos',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/369.webp',
+      url: 'assets/logos/epson scanners.png',
       name: 'epson scanners',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/434.webp',
+      url: 'assets/logos/google.png', // No visible en imagen, asumimos .png
       name: 'google',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/371.webp',
+      url: 'assets/logos/honeywell.png',
       name: 'honeywell',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/372.webp',
+      url: 'assets/logos/hp gran formato.png',
       name: 'hp gran formato',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/373.webp',
+      url: 'assets/logos/hp consumo.png', // No visible en imagen, asumimos .png
       name: 'hp consumo',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/374.webp', name: 'hp' },
+    { url: 'assets/logos/hp gran formato.png', name: 'hp' }, // No visible en imagen, asumimos .png
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/375.webp',
+      url: 'assets/logos/hp plus.png', // No visible en imagen, asumimos .png
       name: 'hp plus',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/376.webp',
+      url: 'assets/logos/hp portátiles.png', // No visible en imagen, asumimos .png
       name: 'hp portátiles',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/377.webp',
+      url: 'assets/logos/hp unknown 1.png', // No visible en imagen, asumimos .png
       name: 'hp unknown 1',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/378.webp',
+      url: 'assets/logos/hp unknown 2.png', // No visible en imagen, asumimos .png
       name: 'hp unknown 2',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/379.webp', name: 'jabra' },
+    { url: 'assets/logos/jabra.png', name: 'jabra' },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/382.webp',
+      url: 'assets/logos/lenovo.png',
       name: 'lenovo',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/384.webp',
+      url: 'assets/logos/lenovo servers.png',
       name: 'lenovo servers',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/383.webp',
+      url: 'assets/logos/lenovo workstation.png', // No visible en imagen, asumimos .png
       name: 'lenovo workstation',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/385.webp', name: 'lg' },
+    { url: 'assets/logos/lg.png', name: 'lg' },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/439.webp',
+      url: 'assets/logos/logitech.png',
       name: 'logitech',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/436.webp',
-      name: 'microsoft (alt)',
+      url: 'assets/logos/microsoft.png', // La imagen muestra microsoft.png
+      name: 'microsoft (alt)', // Asumiendo que "microsoft (alt)" también usa microsoft.png
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/389.webp',
+      url: 'assets/logos/panasonic.png',
       name: 'panasonic',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/390.webp', name: 'poly' },
+    { url: 'assets/logos/poly.png', name: 'poly' }, // No visible en imagen, asumimos .png
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/391.webp',
+      url: 'assets/logos/samsung.png',
       name: 'samsung',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/392.webp',
+      url: 'assets/logos/samsung mobile.png', // No visible en imagen, asumimos .png
       name: 'samsung mobile',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/393.webp',
+      url: 'assets/logos/samsung monitores.png', // No visible en imagen, asumimos .png
       name: 'samsung monitores',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/395.webp',
+      url: 'assets/logos/tplink.png',
       name: 'tplink',
     },
     {
-      url: 'https://cdn.osabana.com/advanceit/marcas/396.webp',
+      url: 'assets/logos/viewsonic.png',
       name: 'viewsonic',
     },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/397.webp', name: 'wacom' },
-    { url: 'https://cdn.osabana.com/advanceit/marcas/398.webp', name: 'zebra' },
+    { url: 'assets/logos/wacom.jpg', name: 'wacom' }, // Extensión .jpg según la imagen
+    { url: 'assets/logos/zebra.png', name: 'zebra' },
   ];
 }

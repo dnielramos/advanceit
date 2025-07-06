@@ -54,18 +54,14 @@ import { SlideProductStoreComponent } from "../../components/products/slide-prod
     ProductAdvanceComponent,
     FontAwesomeModule,
     CategoryMenuComponent,
-    TrmComponent,
     SliderProductComponent,
     ProductVerticalComponent,
     BrandSliderComponent,
     TeamFormLiteComponent,
-    SimpleCtaComponent,
     BuscadorPrincipalComponent,
-    SanitizeImageUrlPipe,
     FontAwesomeModule,
     CertificateSliderComponent,
     GridProductsStoreComponent,
-    SlideProductStoreComponent
 ],
   templateUrl: './productos.component.html',
   styles: [
@@ -81,6 +77,7 @@ import { SlideProductStoreComponent } from "../../components/products/slide-prod
   ],
 })
 export class ProductosComponent implements OnInit {
+
   // Mensajes de bienvenida
   welcomeMessages = [
     '¿Estás buscando algún producto en específico?',

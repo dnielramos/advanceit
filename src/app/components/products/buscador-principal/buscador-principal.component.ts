@@ -43,8 +43,6 @@ import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
     RouterLink,
     FontAwesomeModule,
     TrmComponent,
-    AdvanceProductsComponent,
-    ProductAdvanceComponent,
     SanitizeImageUrlPipe,
   ],
   templateUrl: './buscador-principal.component.html',

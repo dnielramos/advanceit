@@ -29,10 +29,9 @@ import {
   imports: [CommonModule, RouterLink, RouterLinkActive, FontAwesomeModule],
   template: `
     <div
-      class="h-[100dvh] transition-all flex flex-col py-2 shadow-md"
+      class="transition-all flex flex-col py-2 shadow-md"
       [ngClass]="{
-        'w-24': isToggleSidebarDesktop,
-        'w-auto': !isToggleSidebarDesktop,
+        'w-48': !isToggleSidebarDesktop,
         'items-center': isToggleSidebarDesktop
       }"
       (mouseenter)="onMouseEnter()"
@@ -51,8 +50,8 @@ import {
           alt="User Avatar"
           class="w-10 h-10 rounded-full"
         />
-        <div class="leading-tight" *ngIf="!isToggleSidebarDesktop">
-          <p class="font-semibold text-gray-600">Arturo Esguerra</p>
+        <div class="leading-tight pt-6" *ngIf="!isToggleSidebarDesktop">
+          <p class="font-semibold text-gray-600 text-sm">Arturo Esguerra</p>
           <p class="text-sm text-purple-600">CEO</p>
         </div>
       </div>
@@ -79,7 +78,7 @@ import {
             <div class="flex items-center space-x-2">
               <fa-icon [icon]="faCube" class="text-gray-600"></fa-icon>
               <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
-                >Products</span
+                >Proveedores</span
               >
             </div>
             <fa-icon
@@ -102,20 +101,34 @@ import {
             >
               ➤ Nexsys
             </a>
-            <!-- <a
-              routerLink="/dashboard/orders"
-              routerLinkActive="text-purple-600"
-              class="text-sm text-gray-600 hover:text-purple-600"
-            >
-              ➤ Orders
-            </a> -->
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <button
+            (click)="toggleUIElements()"
+            class="w-full flex items-center justify-between space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition"
+          >
+            <div class="flex items-center space-x-2">
+              <fa-icon [icon]="faIcons" class="text-gray-600"></fa-icon>
+              <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
+                >Aplicacion</span
+              >
+            </div>
+            <fa-icon
+              [icon]="uiElementsOpen ? faChevronDown : faChevronRight"
+              class="text-gray-500"
+            ></fa-icon>
+          </button>
+          <div *ngIf="uiElementsOpen" class="pl-10 flex flex-col space-y-1 mt-1">
             <a
               routerLink="/dashboard/advance-products"
               routerLinkActive="text-purple-600"
               class="text-sm text-gray-600 hover:text-purple-600"
             >
-              ➤ Database Products
+              ➤ Productos
             </a>
+
           </div>
         </div>
 
@@ -151,64 +164,8 @@ import {
               ➤ Crear Meta
             </a>
           </div>
-        </div> -->
+        </div>  }}-->
 
-    <!-- }}
-
-        <a
-          routerLink="/dashboard/forms"
-          routerLinkActive="bg-purple-100"
-          class="flex items-center space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition mt-2"
-        >
-          <fa-icon [icon]="faFillDrip" class="text-gray-600"></fa-icon>
-          <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
-            >Embeddings</span
-          >
-        </a>
-
-        <a
-          routerLink="/dashboard/charts"
-          routerLinkActive="bg-purple-100"
-          class="flex items-center space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition"
-        >
-          <fa-icon [icon]="faChartPie" class="text-purple-600"></fa-icon>
-          <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
-            >Charts</span
-          >
-        </a>
-
-        <a
-          routerLink="/dashboard/tables"
-          routerLinkActive="bg-purple-100"
-          class="flex items-center space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition"
-        >
-          <fa-icon [icon]="faTable" class="text-purple-600"></fa-icon>
-          <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
-            >Tables</span
-          >
-        </a>
-
-        <a
-          routerLink="/dashboard/user-pages"
-          routerLinkActive="bg-purple-100"
-          class="flex items-center space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition"
-        >
-          <fa-icon [icon]="faUser" class="text-purple-600"></fa-icon>
-          <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
-            >User Pages</span
-          >
-        </a>
-
-        <a
-          routerLink="/dashboard/docs"
-          routerLinkActive="bg-purple-100"
-          class="flex items-center space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition"
-        >
-          <fa-icon [icon]="faBook" class="text-purple-600"></fa-icon>
-          <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
-            >Documentation</span
-          >
-        </a> -->
 
       </nav>
 

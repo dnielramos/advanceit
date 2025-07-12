@@ -1,10 +1,7 @@
 /*==================================*/
 /*   LAYOUT COMPONENT (dashboard-layout.component.ts)   */
 /*==================================*/
-import {
-  Component,
-  ViewChild
-} from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../../components/dashboard/sidebar/sidebar.component';
@@ -15,14 +12,14 @@ import { TopbarComponent } from '../../components/dashboard/topbar/topbar.compon
   standalone: true,
   imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent],
   template: `
-    <div class="min-h-screen md:flex bg-gray-100">
+    <div class="bg-gray-100 h-screen lg:flex">
       <!-- SIDEBAR -->
       <aside
-        class="sticky top-0 z-20 md:z-auto left-0 h-full bg-white shadow-lg transform md:translate-x-0 transition-all"
+        class="fixed inset-y-0 left-0 z-20 w-48 bg-white shadow-lg transform transition-transform duration-300"
         [ngClass]="{
           '-translate-x-full': !sidebarOpen,
-          'md:w-24': isToggleSidebarDesktop,
-          'md:w-60': !isToggleSidebarDesktop
+          'translate-x-0': sidebarOpen,
+          'lg:translate-x-0 lg:static lg:inset-auto': true
         }"
       >
         <app-sidebar
@@ -56,7 +53,7 @@ import { TopbarComponent } from '../../components/dashboard/topbar/topbar.compon
       </div>
     </div>
   `,
-  styles: []
+  styles: [],
 })
 export class DashboardLayoutComponent {
   @ViewChild('sidebar') sidebarRef!: SidebarComponent;

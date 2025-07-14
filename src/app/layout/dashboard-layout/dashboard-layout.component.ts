@@ -39,7 +39,7 @@ import { TopbarComponent } from '../../components/dashboard/topbar/topbar.compon
       <!-- CONTENIDO PRINCIPAL -->
       <div class="flex-1 flex flex-col z-0">
         <!-- TOPBAR -->
-        <header class="sticky top-0 z-999 bg-white shadow-sm">
+        <header class="sticky top-0 z-21 bg-white shadow-sm">
           <!-- Añadido bg-white y shadow-sm para mejor visibilidad -->
           <app-topbar
             (toggleSidebarMobile)="toggleSidebarMobile()"

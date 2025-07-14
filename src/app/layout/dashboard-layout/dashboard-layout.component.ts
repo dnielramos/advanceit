@@ -15,7 +15,7 @@ import { TopbarComponent } from '../../components/dashboard/topbar/topbar.compon
     <div class="bg-gray-100 h-screen lg:flex">
       <!-- SIDEBAR -->
       <aside
-        class="fixed inset-y-0 left-0 z-20 w-48 bg-white shadow-lg transform transition-transform duration-300
+        class="fixed inset-y-0 left-0 z-25 lg:z-10 w-48 bg-white shadow-lg transform transition-transform duration-300
            lg:translate-x-0 lg:static lg:inset-auto"
         [ngClass]="{
           '-translate-x-full': !sidebarOpen,
@@ -31,7 +31,7 @@ import { TopbarComponent } from '../../components/dashboard/topbar/topbar.compon
 
       <!-- OVERLAY PARA MOBILE -->
       <div
-        class="fixed inset-0 bg-black/50 md:hidden z-10"
+        class="fixed inset-0 bg-black/50 md:hidden z-21"
         *ngIf="sidebarOpen"
         (click)="closeSidebarMobile()"
       ></div>

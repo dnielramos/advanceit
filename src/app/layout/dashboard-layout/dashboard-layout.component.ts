@@ -15,11 +15,11 @@ import { TopbarComponent } from '../../components/dashboard/topbar/topbar.compon
     <div class="bg-gray-100 h-screen lg:flex">
       <!-- SIDEBAR -->
       <aside
-        class="fixed inset-y-0 left-0 z-20 w-48 bg-white shadow-lg transform transition-transform duration-300"
+        class="fixed inset-y-0 left-0 z-20 w-48 bg-white shadow-lg transform transition-transform duration-300
+           lg:translate-x-0 lg:static lg:inset-auto"
         [ngClass]="{
           '-translate-x-full': !sidebarOpen,
-          'translate-x-0': sidebarOpen,
-          'lg:translate-x-0 lg:static lg:inset-auto': true
+          'translate-x-0': sidebarOpen
         }"
       >
         <app-sidebar
@@ -39,15 +39,17 @@ import { TopbarComponent } from '../../components/dashboard/topbar/topbar.compon
       <!-- CONTENIDO PRINCIPAL -->
       <div class="flex-1 flex flex-col z-0">
         <!-- TOPBAR -->
-        <header class="sticky top-0 z-999">
+        <header class="sticky top-0 z-999 bg-white shadow-sm">
+          <!-- Añadido bg-white y shadow-sm para mejor visibilidad -->
           <app-topbar
             (toggleSidebarMobile)="toggleSidebarMobile()"
             (toggleSidebarDesktop)="toggleSidebarDesktop()"
           ></app-topbar>
         </header>
 
-        <!-- ROUTER OUTLET -->
-        <main class="flex-1">
+        <!-- ROUTER OUTLET - CONTENIDO SCROLLABLE -->
+        <main class="flex-1 overflow-y-auto">
+          <!-- CLAVE: Añadido overflow-y-auto aquí -->
           <router-outlet></router-outlet>
         </main>
       </div>

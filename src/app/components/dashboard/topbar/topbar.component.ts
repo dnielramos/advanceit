@@ -11,11 +11,12 @@ import {
   faSearch,
   faCircleDot
 } from '@fortawesome/free-solid-svg-icons';
+import { TrmComponent } from "../../navbar/trm/trm.component";
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, TrmComponent],
   template: `
     <div class="h-16 bg-white shadow px-4 z-9999 flex sticky top-0 items-center justify-between">
       <div class="flex items-center space-x-4">
@@ -35,8 +36,9 @@ import {
           <fa-icon [icon]="faBars" class="text-xl"></fa-icon>
         </button> -->
 
+        <app-trm></app-trm>
         <!-- Caja de búsqueda -->
-        <div class="items-center hidden md:flex space-x-2 text-gray-500">
+        <!-- <div class="items-center hidden md:flex space-x-2 text-gray-500">
           <fa-icon [icon]="faSearch" for="search-input"></fa-icon>
           <input
             id="search-input"
@@ -44,7 +46,7 @@ import {
             placeholder="Preguntame cualquier cosa..."
             class="focus:outline-none lg:w-2xl text-xs lg:text-sm max-w-2xl border border-gray-200 p-2 rounded-lg"
           />
-        </div>
+        </div> -->
       </div>
 
       <div class="flex items-center space-x-4">

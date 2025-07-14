@@ -9,7 +9,7 @@
           </div>
           <div>
             <h1 class="text-2xl font-bold text-gray-800">Gestor de Productos Nexsys</h1>
-            <p class="text-gray-600">Administra y consulta tu inventario</p>
+            <p class="text-gray-600">100 Productos cargados</p>
           </div>
         </div>
 
@@ -38,7 +38,7 @@
           <div class="flex flex-wrap gap-2">
             <div *ngFor="let mode of searchModes" class="flex items-center">
               <input type="radio" [id]="'mode-' + mode.value" [value]="mode.value" formControlName="searchMode"
-                (change)="onSearchModeChange()" class="sr-only peer">
+                class="sr-only peer">
               <label [for]="'mode-' + mode.value"
                 class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 peer-checked:bg-purple-100 peer-checked:text-purple-700 peer-checked:border-purple-300 border border-gray-300 rounded-lg cursor-pointer transition-all">
                 <fa-icon [icon]="mode.icon" class="text-sm"></fa-icon>
@@ -123,7 +123,7 @@
 
       <div class="flex justify-between items-center mb-6 px-2">
         <div class="text-gray-600">
-          Mostrando <span class="font-medium">{{ products().length }}</span> de <span class="font-medium">{{
+          Mostrando <span class="font-medium">{{ displayedProducts().length }}</span> de <span class="font-medium">{{
             pagination().totalItems }}</span> productos
         </div>
         <div class="text-sm text-gray-500">
@@ -136,7 +136,7 @@
         'space-y-4': viewMode() === 'list'
       }">
 
-        <div *ngFor="let product of products()"
+        <div *ngFor="let product of displayedProducts()"
           [ngClass]="viewMode() === 'grid' ? 'product-card-grid' : 'product-card-list'"
           class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group"
           (click)="selectProduct(product)">
@@ -331,12 +331,12 @@
               <button
                 class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
                 <fa-icon [icon]="faHeart" class="text-sm"></fa-icon>
-                <span>Favoritos</span>
+                <span>Recomendado</span>
               </button>
               <button
                 class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
                 <fa-icon [icon]="faShareAlt" class="text-sm"></fa-icon>
-                <span>Compartir</span>
+                <span>Mostrar en Tienda</span>
               </button>
             </div>
           </div>

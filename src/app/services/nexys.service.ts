@@ -18,7 +18,7 @@ export class NexsysApiService {
   getProductsByMark(mark: string): Observable<any> {
     const params = new HttpParams().set('mark', mark);
     return this.http
-      .get<ApiResponse<any>>(`${this.apiUrl}/nexys/products-by-mark`, {
+      .get<ApiResponse<any>>(`${this.apiUrl}/nexys/by-mark`, {
         params,
       })
       .pipe(
@@ -31,7 +31,7 @@ export class NexsysApiService {
   getProductBySKU(sku: string): Observable<any> {
     const params = new HttpParams().set('sku', sku);
     return this.http
-      .get<ApiResponse<any>>(`${this.apiUrl}/nexys/product-by-sku`, { params })
+      .get<ApiResponse<any>>(`${this.apiUrl}/nexys/by-sku`, { params })
       .pipe(
         map((response) => response.data),
         catchError((error) => this.handleError('getProductBySKU', error))

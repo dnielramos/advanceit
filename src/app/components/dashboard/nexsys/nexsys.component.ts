@@ -24,24 +24,15 @@ import {
   faGrin as faGrid,
   faTimes,
   faBoxOpen,
-  faShoppingCart,
+  faVialVirus,
   faHeart,
   faShareAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs'; // Removed switchMap, of as not directly used in the provided snippet logic for search
 import { NexsysApiService } from '../../../services/nexys.service';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-
-interface Product {
-  id?: string;
-  sku: string;
-  name: string;
-  mark: string;
-  price?: number;
-  description?: string;
-  stock?: number;
-  image?: string;
-}
+import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
+import { NexsysProduct } from '../../../models/Productos';
 
 interface PaginationInfo {
   currentPage: number;
@@ -53,13 +44,22 @@ interface PaginationInfo {
 @Component({
   selector: 'app-nexsys',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FontAwesomeModule,
+    SanitizeImageUrlPipe,
+  ],
   templateUrl: './nexsys.component.html',
   styleUrls: ['./nexsys.component.css'],
 })
 export class NexsysComponent implements OnInit, OnDestroy {
+  convertToInt(arg0: string) {
+    return parseInt(arg0, 10);
+  }
   faBoxOpen = faBoxOpen;
-  faShoppingCart: IconProp = faShoppingCart;
+  faVialVirus: IconProp = faVialVirus;
   faHeart: IconProp = faHeart;
   faShareAlt: IconProp = faShareAlt;
 
@@ -80,8 +80,8 @@ export class NexsysComponent implements OnInit, OnDestroy {
   faTimes = faTimes;
 
   // Reactive signals
-  allProducts = signal<Product[]>([]); // Store ALL products (or search results) here
-  displayedProducts = signal<Product[]>([]); // Only the products for the current page
+  allProducts = signal<NexsysProduct[]>([]); // Store ALL products (or search results) here
+  displayedProducts = signal<NexsysProduct[]>([]); // Only the products for the current page
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
   viewMode = signal<'grid' | 'list'>('grid');
@@ -131,7 +131,7 @@ export class NexsysComponent implements OnInit, OnDestroy {
     { value: 'sku', label: 'Por SKU', icon: faBarcode },
   ];
 
-  selectedProduct = signal<Product | null>(null);
+  selectedProduct = signal<NexsysProduct | null>(null);
 
   constructor(
     private nexsysService: NexsysApiService,
@@ -211,18 +211,22 @@ export class NexsysComponent implements OnInit, OnDestroy {
     // If nexsysService.getAllProducts truly paginates, use this:
     const offset = (page - 1) * this.pagination().itemsPerPage;
     this.nexsysService
-      .getAllProducts(offset, this.pagination().itemsPerPage) // Use itemsPerPage here
+      .getAllProducts() // Use itemsPerPage here
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: any) => {
-          console.log('Productos cargados:', data.return);
+          console.log(
+            'Cant. Productos cargados:',
+            data.return.length,
+            data.return
+          );
           const products = data.return || [];
           this.allProducts.set(products); // Store all products
           // If getAllProducts provides total count directly, use it. Otherwise, assume data.return is the total here.
           // You might need an actual `totalItems` from the API response for accurate pagination.
           // For now, let's assume data.return.length is the total if the API gives all in one go for getAllProducts.
           // If your API provides totalItems in the response, use: data.totalItems
-          this.updatePagination(data.return.totalItems || products.length, page); // Pass totalItems from API or array length
+          this.updatePagination(products.length, 1); // Pass totalItems from API or array length
           this.paginateDisplayedProducts(); // Update displayed products based on current page
           this.loading.set(false);
         },
@@ -255,7 +259,11 @@ export class NexsysComponent implements OnInit, OnDestroy {
     searchObservable.pipe(takeUntil(this.destroy$)).subscribe({
       next: (data: any) => {
         // Handle single product or array
-        const products = Array.isArray(data.return) ? data.return : data.return ? [data.return] : []; // Ensure products is always an array
+        const products = Array.isArray(data.return)
+          ? data.return
+          : data.return
+          ? [data.return]
+          : []; // Ensure products is always an array
         this.allProducts.set(products); // Store all matching products
         this.updatePagination(products.length, 1); // Reset to page 1 for new search results
         this.paginateDisplayedProducts(); // Update displayed products for the first page of search results
@@ -353,7 +361,7 @@ export class NexsysComponent implements OnInit, OnDestroy {
   }
 
   // Product methods
-  selectProduct(product: Product): void {
+  selectProduct(product: NexsysProduct): void {
     this.selectedProduct.set(product);
   }
 
@@ -382,7 +390,7 @@ export class NexsysComponent implements OnInit, OnDestroy {
   }
 
   // Template helper methods
-  getProductImage(product: Product): string {
+  getProductImage(product: NexsysProduct): string {
     return product.image || 'assets/images/no-image.png';
   }
 
@@ -394,10 +402,10 @@ export class NexsysComponent implements OnInit, OnDestroy {
     }).format(price);
   }
 
-  getStockStatus(stock: number | undefined): { text: string; class: string } {
-    if (!stock || stock === 0) {
+  getStockStatus(stock: string | undefined): { text: string; class: string } {
+    if (!stock || parseInt(stock) === 0) {
       return { text: 'Sin stock', class: 'text-red-600 bg-red-100' };
-    } else if (stock < 10) {
+    } else if (parseInt(stock) < 10) {
       return { text: 'Stock bajo', class: 'text-yellow-600 bg-yellow-100' };
     } else {
       return { text: 'En stock', class: 'text-green-600 bg-green-100' };

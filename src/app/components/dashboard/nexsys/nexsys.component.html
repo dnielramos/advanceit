@@ -67,11 +67,11 @@
             <span class="hidden sm:inline">Buscar</span>
           </button>
 
-          <button type="button" (click)="toggleFilters()"
+          <!-- <button type="button" (click)="toggleFilters()"
             class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
             [class.bg-purple-100]="showFilters()" [class.text-purple-700]="showFilters()">
             <fa-icon [icon]="faFilter"></fa-icon>
-          </button>
+          </button> -->
         </div>
 
         <div *ngIf="showFilters()" @slideInOut class="border-t pt-4 mt-4">
@@ -143,12 +143,12 @@
 
           <div *ngIf="viewMode() === 'grid'" class="h-full flex flex-col">
             <div class="aspect-square bg-gray-100 relative overflow-hidden">
-              <img [src]="getProductImage(product)" [alt]="product.name"
+              <img [src]="getProductImage(product) | sanitizeImageUrl" [alt]="product.name"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
               <div class="absolute top-2 right-2">
-                <span [ngClass]="getStockStatus(product.stock).class"
+                <span [ngClass]="getStockStatus(product.inventory).class"
                   class="px-2 py-1 rounded-full text-xs font-medium">
-                  {{ getStockStatus(product.stock).text }}
+                  {{ getStockStatus(product.inventory).text }}
                 </span>
               </div>
             </div>
@@ -199,9 +199,9 @@
                   {{ product.sku }}
                 </span>
               </div>
-              <span [ngClass]="getStockStatus(product.stock).class"
+              <span [ngClass]="getStockStatus(product.inventory).class"
                 class="inline-block px-2 py-1 rounded-full text-xs font-medium">
-                {{ getStockStatus(product.stock).text }}
+                {{ getStockStatus(product.inventory).text }}
               </span>
             </div>
 
@@ -285,8 +285,8 @@
           <div>
             <span class="block text-sm font-medium text-purple-600 mb-1">{{ selectedProduct()!.mark }}</span>
             <h3 class="text-3xl font-bold text-gray-800 mb-3">{{ selectedProduct()!.name }}</h3>
-            <p *ngIf="selectedProduct()!.description" class="text-gray-600 text-sm leading-relaxed mb-4">
-              {{ selectedProduct()!.description }}
+            <p *ngIf="selectedProduct()!.long_description" class="text-gray-600 text-sm leading-relaxed mb-4">
+              {{ selectedProduct()!.long_description }}
             </p>
           </div>
 
@@ -299,10 +299,10 @@
             <div class="flex items-center gap-3">
               <fa-icon [icon]="faBox" class="text-purple-600 w-5 text-center"></fa-icon>
               <span class="font-medium text-gray-700">Stock:</span>
-              <span [ngClass]="getStockStatus(selectedProduct()!.stock).class"
+              <span [ngClass]="getStockStatus(selectedProduct()!.inventory).class"
                 class="px-3 py-1 rounded-full text-sm font-medium">
-                {{ getStockStatus(selectedProduct()!.stock).text }}
-                <span *ngIf="selectedProduct()!.stock "> ({{ selectedProduct()!.stock }} unidades)</span>
+                {{ getStockStatus(selectedProduct()!.inventory).text }}
+                <span *ngIf="selectedProduct()!.inventory"> ({{ selectedProduct()!.inventory }} unidades)</span>
               </span>
             </div>
           </div>
@@ -322,21 +322,21 @@
           <div class="mt-auto space-y-3">
             <button
               class="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-              [disabled]="!selectedProduct()!.stock || selectedProduct()!.stock === 0">
-              <fa-icon [icon]="faShoppingCart" class="text-lg"></fa-icon>
-              <span>{{ (selectedProduct()!.stock) ? 'Agregar al Carrito' : 'Producto Agotado' }}</span>
+              [disabled]="!selectedProduct()!.inventory || convertToInt(selectedProduct()!.inventory) === 0">
+              <fa-icon [icon]="faShareAlt" class="text-lg"></fa-icon>
+              <span>{{ (selectedProduct()!.inventory) ? 'Agregar a la tienda' : 'Producto Agotado' }}</span>
             </button>
 
             <div class="grid grid-cols-2 gap-3">
               <button
                 class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
                 <fa-icon [icon]="faHeart" class="text-sm"></fa-icon>
-                <span>Recomendado</span>
+                <span>Recomendar</span>
               </button>
               <button
                 class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                <fa-icon [icon]="faShareAlt" class="text-sm"></fa-icon>
-                <span>Mostrar en Tienda</span>
+                <fa-icon [icon]="faVialVirus" class="text-sm"></fa-icon>
+                <span>Mejorar con IA</span>
               </button>
             </div>
           </div>

@@ -39,7 +39,7 @@ export class NexsysApiService {
   }
 
   // Obtener productos paginados
-  getAllProducts(offset: number = 0, perPage: number = 10): Observable<any> {
+  getAllProducts(offset: number = 0, perPage: number = 50): Observable<any> {
     const params = new HttpParams()
       .set('offset', offset.toString())
       .set('perPage', perPage.toString());

@@ -50,7 +50,7 @@ export class IngramService {
       );
     }
 
-    getProducts(): Observable<ProductoIngram[]> {
-    return this.http.post<ProductoIngram[]>(this.API_PRODUCTS_URL, {ingramPartNumbers: ingramPartNumbersDell});
+    getProducts(skus: string[]): Observable<ProductoIngram[]> {
+    return this.http.post<ProductoIngram[]>(this.API_PRODUCTS_URL, {ingramPartNumbers: skus});
   }
 }

@@ -4,11 +4,12 @@ import { from, Observable } from 'rxjs';
 import { bufferCount, concatMap, map } from 'rxjs/operators';
 
 import { ApiDetailsResponse, ProductoIngram, ProductoIngramDetails  } from '../models/ingram';
+import { ingramPartNumbersDell } from '../constants/ingramPartNumbersDell';
 
 @Injectable({ providedIn: 'root' })
 export class IngramService {
   private API_DETAILS_URL = 'https://advance-backend.onrender.com/scraper/multiple';
-  private API_PRODUCTS_URL = 'https://advance-backend.onrender.com/ingram/products';
+  private API_PRODUCTS_URL = 'http://localhost:3002/ingram/products';
 
   constructor(private http: HttpClient) {}
 
@@ -48,4 +49,8 @@ export class IngramService {
         )
       );
     }
+
+    getProducts(): Observable<ProductoIngram[]> {
+    return this.http.post<ProductoIngram[]>(this.API_PRODUCTS_URL, {ingramPartNumbers: ingramPartNumbersDell});
+  }
 }

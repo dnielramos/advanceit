@@ -1,25 +1,47 @@
-// home.component.ts
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http'; // Importa HttpClientModule
+import { AdvanceProductsService } from '../../../services/product.service';
+import { ProductoIngram } from '../../../models/ingram';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faTag, faBoxesStacked, faMoneyBillWave, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons'; // Iconos de ejemplo
+import { IngramService } from '../../../services/ingram.service';
 
 @Component({
-  selector: 'app-home',
-  imports : [CommonModule],
+  selector: 'app-product-list',
+  standalone: true,
+  imports: [CommonModule, HttpClientModule, FontAwesomeModule], // Añade HttpClientModule y FontAwesomeModule aquí
   templateUrl: './add-products.component.html',
-  standalone: true
 })
-export class AddProductsComponent {
-  featuredCategories = [
-    { name: 'Cloud Solutions', icon: '☁️' },
-    { name: 'Hardware', icon: '💻' },
-    { name: 'Networking', icon: '📡' },
-    { name: 'Storage', icon: '💾' }
-  ];
+export class AddProductsComponent implements OnInit {
+  products: ProductoIngram[] = [];
+  loading: boolean = true;
+  error: string | null = null;
 
-  featuredProducts = [
-    { name: 'Quantum Server', price: '$1,499', image: 'server.jpg' },
-    { name: 'AI Workstation', price: '$2,899', image: 'workstation.jpg' },
-    { name: 'Edge Router', price: '$499', image: 'router.jpg' },
-    { name: 'Quantum Drive', price: '$299', image: 'drive.jpg' }
-  ];
+  // Iconos de Font Awesome
+  faTag = faTag;
+  faBoxesStacked = faBoxesStacked;
+  faMoneyBillWave = faMoneyBillWave;
+  faCheckCircle = faCheckCircle;
+  faTimesCircle = faTimesCircle;
+
+  constructor(private productService: IngramService) { }
+
+  ngOnInit(): void {
+    this.getProducts();
+  }
+
+  getProducts(): void {
+    this.productService.getProducts().subscribe({
+      next: (data) => {
+        this.products = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Error al cargar los productos. Inténtalo de nuevo más tarde.';
+        this.loading = false;
+        console.error(err);
+      }
+    });
+  }
 }

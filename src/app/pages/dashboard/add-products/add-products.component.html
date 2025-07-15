@@ -1,77 +1,76 @@
-<!-- home.component.html -->
-<div class="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+<div class="container mx-auto p-4">
+  <h1 class="text-4xl font-bold text-center mb-8 text-indigo-700 animate__animated animate__fadeInDown">
+    Gestión de Productos
+  </h1>
 
-  <!-- Hero Slider -->
-  <section class="relative overflow-hidden">
-    <div class="flex animate-scroll">
-      <!-- Slider Items -->
-      <div class="w-full flex-shrink-0 p-8 bg-gradient-to-r from-purple-900/30 to-transparent">
-        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center">
-          <div class="md:w-1/2 mb-8 md:mb-0">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4">Next Generation <span class="text-purple-400">Cloud Solutions</span></h1>
-            <p class="text-gray-300 mb-6">Transform your business with our cutting-edge technology ecosystem</p>
-            <button class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg transition-all transform hover:scale-105">Explore Now</button>
-          </div>
-          <div class="md:w-1/2">
-            <img src="cloud-hero.png" alt="Cloud Technology" class="max-w-full h-auto">
+  <div *ngIf="loading" class="text-center text-lg text-gray-600 animate__animated animate__flash animate__infinite">
+    Cargando productos...
+  </div>
+
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 animate__animated animate__shakeX" role="alert">
+    <strong class="font-bold">Error:</strong>
+    <span class="block sm:inline"> {{ error }}</span>
+  </div>
+
+  <div *ngIf="!loading && !error && products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let product of products"
+         class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-transform hover:scale-105 animate__animated animate__fadeInUp">
+      <img [src]="product.imagen" [alt]="product.nombre" class="w-full h-48 object-cover">
+      <div class="p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">{{ product.nombre }}</h2>
+        <p class="text-gray-600 mb-3 text-sm">{{ product.descripcion }}</p>
+
+        <div class="flex items-center mb-2">
+          <fa-icon [icon]="faTag" class="text-indigo-500 mr-2"></fa-icon>
+          <span class="font-medium">SKU:</span> {{ product.SKU }}
+        </div>
+
+        <div class="flex items-center mb-2">
+          <fa-icon [icon]="faMoneyBillWave" class="text-green-500 mr-2"></fa-icon>
+          <span class="font-medium">Precio:</span>
+          <span class="text-green-600 font-bold ml-1">
+            {{ product.precio | currency:'USD':'symbol':'1.0-2' }}
+          </span>
+          <span *ngIf="product.precioRetail" class="text-gray-400 line-through ml-2 text-sm">
+            {{ product.precioRetail | currency:'USD':'symbol':'1.0-2' }}
+          </span>
+        </div>
+
+        <div class="flex items-center mb-2">
+          <fa-icon [icon]="faBoxesStacked" class="text-blue-500 mr-2"></fa-icon>
+          <span class="font-medium">Cantidad:</span> {{ product.cantidad }}
+        </div>
+
+        <div class="flex items-center mb-2">
+          <fa-icon [icon]="product.disponibilidad ? faCheckCircle : faTimesCircle"
+                   [class.text-green-500]="product.disponibilidad"
+                   [class.text-red-500]="!product.disponibilidad"
+                   class="mr-2"></fa-icon>
+          <span class="font-medium">Disponibilidad:</span>
+          <span [class.text-green-600]="product.disponibilidad"
+                [class.text-red-600]="!product.disponibilidad"
+                class="ml-1 font-semibold">
+            {{ product.disponibilidad ? 'En Stock' : 'Agotado' }}
+          </span>
+        </div>
+
+        <div class="text-sm text-gray-500 mt-4 border-t pt-4">
+          <p><strong>Marca:</strong> {{ product.marca }}</p>
+          <p><strong>Categoría:</strong> {{ product.categoria }}</p>
+          <p><strong>Almacén:</strong> {{ product.warehouse }} ({{ product.warehouseId }})</p>
+          <div *ngIf="product.etiquetas.length > 0">
+            <strong>Etiquetas:</strong>
+            <span *ngFor="let tag of product.etiquetas"
+                  class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full ml-2">
+              {{ tag }}
+            </span>
           </div>
         </div>
       </div>
-
-      <!-- Add more slider items as needed -->
     </div>
-  </section>
+  </div>
 
-  <!-- Featured Categories -->
-  <section class="py-16 px-4">
-    <h2 class="text-3xl font-bold mb-10 text-center">Top Categories</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-      <div *ngFor="let category of featuredCategories"
-           class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-purple-900/20 transition-all duration-300 transform hover:-translate-y-1">
-        <div class="text-4xl mb-3">{{ category.icon }}</div>
-        <h3 class="font-semibold">{{ category.name }}</h3>
-      </div>
-    </div>
-  </section>
-
-  <!-- Featured Products -->
-  <section class="py-16 px-4 bg-gray-900/30">
-    <h2 class="text-3xl font-bold mb-10 text-center">Featured Products</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-      <div *ngFor="let product of featuredProducts"
-           class="bg-gray-800 rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-500">
-        <div class="relative overflow-hidden">
-          <img [src]="'assets/images/' + product.image" [alt]="product.name"
-               class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-        </div>
-        <div class="p-6">
-          <h3 class="text-xl font-semibold mb-2">{{ product.name }}</h3>
-          <div class="flex justify-between items-center">
-            <span class="text-purple-400 font-bold">{{ product.price }}</span>
-            <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all">
-              View Details
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Newsletter -->
-  <section class="py-16 px-4 relative overflow-hidden">
-    <div class="absolute inset-0 bg-purple-900/10 backdrop-blur-sm"></div>
-    <div class="relative max-w-3xl mx-auto text-center">
-      <h2 class="text-3xl font-bold mb-4">Join Our Tech Revolution</h2>
-      <p class="text-gray-300 mb-8">Get exclusive offers and the latest updates on cutting-edge technology</p>
-      <form class="flex flex-col sm:flex-row gap-4">
-        <input type="email" placeholder="Your email address"
-               class="flex-1 px-6 py-3 rounded-lg bg-gray-800/50 border border-gray-700 focus:border-purple-500 outline-none">
-        <button type="submit"
-                class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg transition-all">
-          Subscribe
-        </button>
-      </form>
-    </div>
-  </section>
+  <div *ngIf="!loading && !error && products.length === 0" class="text-center text-lg text-gray-600 mt-8 animate__animated animate__fadeIn">
+    No se encontraron productos.
+  </div>
 </div>

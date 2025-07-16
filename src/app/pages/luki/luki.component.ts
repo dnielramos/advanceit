@@ -1,4 +1,12 @@
-import { Component, OnInit, OnDestroy, signal, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  signal,
+  ViewChild,
+  ElementRef,
+  AfterViewChecked,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -9,7 +17,10 @@ import {
   faExclamationTriangle,
   faRobot,
   faPaperPlane,
-  faPaperclip
+  faPaperclip,
+  faCommentDots,
+  faEllipsis,
+  faLightbulb,
 } from '@fortawesome/free-solid-svg-icons';
 import { io, Socket } from 'socket.io-client';
 
@@ -34,7 +45,7 @@ interface DisplayMessage {
   content: string;
   timestamp: Date;
   isUser: boolean;
-  state : MessageState;
+  state: MessageState;
 }
 
 @Component({
@@ -42,7 +53,42 @@ interface DisplayMessage {
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule],
   templateUrl: './luki.component.html',
-  styleUrls: [],
+  styles: [
+    `
+      /* Estilos personalizados */
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f3f4f6;
+        border-radius: 9999px;
+      }
+
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #a78bfa;
+        border-radius: 9999px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+
+      /* Animación para mensajes entrantes */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
+    `,
+  ],
 })
 export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
@@ -62,9 +108,17 @@ export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
   faRobot = faRobot;
   faPaperPlane = faPaperPlane;
   faPaperclip = faPaperclip;
+  faCommentDots = faCommentDots;
+  faEllipsis = faEllipsis;
+  faLightbulb = faLightbulb;
 
   // Quick action buttons
-  quickActions = ['¿Cómo estás?', 'Ayuda', 'Información', 'Soporte'];
+  quickActions = [
+    'Quiero hacer una cotización',
+    'Ayuda con mi pedido',
+    'Información',
+    'Soporte',
+  ];
 
   private shouldScrollToBottom = false;
 
@@ -85,7 +139,9 @@ export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   private initializeSocket(): void {
-    this.socket = io('http://localhost:3002/chat', { transports: ['websocket'] });
+    this.socket = io('http://localhost:3002/chat', {
+      transports: ['websocket'],
+    });
 
     this.socket.on('connect', () => {
       console.log('Connected to chat gateway:', this.socket.id);
@@ -95,7 +151,10 @@ export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
       const { id, state, response, error } = payload;
 
       // Mostrar indicador de escritura cuando llega una respuesta
-      if (response && (state === MessageState.RECEIVED || state === MessageState.SENT)) {
+      if (
+        response &&
+        (state === MessageState.RECEIVED || state === MessageState.SENT)
+      ) {
         this.isTyping.set(true);
         // Simular tiempo de escritura y luego mostrar respuesta
         setTimeout(() => {
@@ -113,14 +172,18 @@ export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
   }
 
-  private updateMessageStatus(id: string, state: MessageState, response?: string): void {
-    this.messages.update(msgs => {
-      const idx = msgs.findIndex(m => m.id === id);
+  private updateMessageStatus(
+    id: string,
+    state: MessageState,
+    response?: string
+  ): void {
+    this.messages.update((msgs) => {
+      const idx = msgs.findIndex((m) => m.id === id);
       if (idx !== -1) {
         msgs[idx] = {
           ...msgs[idx],
           state,
-          response: response || msgs[idx].response
+          response: response || msgs[idx].response,
         };
       }
       return [...msgs];
@@ -138,14 +201,14 @@ export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
   getAllMessagesInOrder(): DisplayMessage[] {
     const allMessages: DisplayMessage[] = [];
 
-    this.messages().forEach(msg => {
+    this.messages().forEach((msg) => {
       // Agregar mensaje del usuario
       allMessages.push({
         id: msg.id,
         content: msg.content,
         timestamp: msg.timestamp,
         isUser: true,
-        state: msg.state
+        state: msg.state,
       });
 
       // Agregar respuesta de la IA si existe
@@ -155,13 +218,15 @@ export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
           content: msg.response,
           state: msg.state,
           timestamp: new Date(msg.timestamp.getTime() + 1000), // 1 segundo después
-          isUser: false
+          isUser: false,
         });
       }
     });
 
     // Ordenar por timestamp
-    return allMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    return allMessages.sort(
+      (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+    );
   }
 
   private showWelcomeMessage(): void {
@@ -197,7 +262,7 @@ export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
       timestamp: new Date(),
     };
 
-    this.messages.update(msgs => [...msgs, newMsg]);
+    this.messages.update((msgs) => [...msgs, newMsg]);
     this.socket.emit('sendMessage', { id, userId: this.userId, content });
     this.messageText.set('');
     this.shouldScrollToBottom = true;
@@ -242,7 +307,7 @@ export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (!timestamp) return '';
     return new Date(timestamp).toLocaleTimeString('es-ES', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 

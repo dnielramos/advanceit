@@ -1,205 +1,119 @@
-<div class="flex flex-col h-screen max-w-2xl mx-auto bg-gradient-to-br from-purple-50 via-gray-50 to-white">
-  <!-- Header -->
-  <div class="bg-gradient-to-r from-purple-600 via-purple-700 to-gray-700 text-white p-4 shadow-lg">
-    <h1 class="text-xl font-bold text-center">Advance Chat</h1>
-    <div class="text-center text-sm opacity-90 mt-1">
-      <span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-      Conectado
-    </div>
-  </div>
+<!-- advance-chat.component.html -->
+<div class="flex flex-col h-dvh w-full bg-gray-50 text-gray-800 transition-all duration-300">
 
-  <!-- Welcome Message (solo se muestra al inicio) -->
-  <div *ngIf="messages().length === 0" class="welcome-container p-8 text-center animate__animated animate__fadeInDown">
-    <div class="welcome-text text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-orange-500 to-purple-800 bg-clip-text text-transparent animate__animated animate__pulse animate__infinite">
-      ¡Hola! Bienvenido a Advance
+  <!-- VISTA DE BIENVENIDA CON ANIMACIÓN -->
+  <div *ngIf="messages().length === 0"
+    class="flex flex-col flex-1 items-center justify-center px-4 space-y-10 animate__animated animate__fadeIn">
+
+    <!-- LOGO CON EFECTO SUAVE -->
+    <div class="w-28 h-20 flex items-center justify-center group">
+      <div class="w-16 h-16 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+        <img src="imagelogo.png" alt="Logo de Advance AI" class="w-12 h-12 animate-pulse">
+      </div>
     </div>
-    <p class="text-gray-600 text-lg">Estamos listos para ayudarte.</p>
-    <div class="mt-6">
-      <div class="inline-flex items-center space-x-2 bg-purple-100 px-4 py-2 rounded-full">
-        <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce"></div>
-        <div class="w-3 h-3 bg-orange-500 rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
-        <div class="w-3 h-3 bg-purple-700 rounded-full animate-bounce" style="animation-delay: 0.4s;"></div>
+
+    <!-- INPUT CENTRAL CON SOMBRAS SUAVES -->
+    <div class="w-full max-w-xl">
+      <form (ngSubmit)="sendMessage()" class="relative group">
+        <input [ngModel]="messageText()"
+               (ngModelChange)="messageText.set($event)"
+               type="text"
+               name="message"
+               placeholder="¿En qué puedo ayudarte hoy?"
+               class="w-full px-6 py-4 bg-white text-gray-900 placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-md transition-all duration-300 group-hover:shadow-lg" />
+        <button type="submit"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-600 transition-colors duration-200">
+          <fa-icon [icon]="faPaperPlane" class="animate__animated animate__heartBeat"></fa-icon>
+        </button>
+      </form>
+    </div>
+
+    <!-- OPCIONES SUGERIDAS CON TARJETAS -->
+    <div class="space-y-3 text-left w-full max-w-lg">
+      <h3 class="text-sm font-medium text-purple-600 mb-2">Sugerencias rápidas</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div *ngFor="let action of quickActions"
+             (click)="sendQuickMessage(action)"
+             class="border border-gray-200 rounded-xl px-4 py-3 hover:bg-purple-50 hover:border-purple-200 transition-all duration-200 cursor-pointer shadow-sm hover:shadow">
+          <fa-icon [icon]="faCommentDots" class="mr-2 text-purple-400"></fa-icon>
+          <span class="text-gray-700 text-sm">{{ action }}</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Messages Container -->
-  <div class="flex-1 overflow-hidden px-4 pt-4">
-    <div #messagesContainer class="h-full overflow-y-auto space-y-4 pb-4 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-gray-100">
+  <!-- VISTA DE CHAT CON DISEÑO MODERNO -->
+  <div *ngIf="messages().length > 0" class="flex flex-col h-full">
+    <!-- HEADER CON GRADIENTE SUTIL -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-4 shadow-md sticky top-0 z-10">
+      <h1 class="text-xl font-bold flex items-center">
+        <fa-icon [icon]="faRobot" class="mr-2"></fa-icon>
+        Advance Chat
+      </h1>
+    </div>
 
-      <!-- Mensajes en orden cronológico -->
-      <div *ngFor="let msg of getAllMessagesInOrder(); trackBy: trackByMessageId"
-           class="animate__animated animate__fadeInUp"
-           [ngClass]="msg.isUser ? 'flex justify-end' : 'flex justify-start'">
+    <!-- ÁREA DE MENSAJES CON SCROLL SUAVE -->
+    <div class="flex-1 overflow-y-auto px-4 pt-4 space-y-6 pb-16 scrollbar-thin"
+         #messagesContainer>
 
-        <!-- User Message -->
-        <div *ngIf="msg.isUser"
-             class="max-w-xs lg:max-w-md bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-lg transform hover:scale-105 transition-all duration-200">
-          <div class="font-medium mb-1">{{ msg.content }}</div>
-          <div class="flex items-center justify-end space-x-2 text-xs opacity-90">
-            <span>{{ getTimeString(msg.timestamp) }}</span>
-            <div class="flex items-center">
-              <span [ngClass]="{
-                'text-yellow-200': msg.state === 'PENDING',
-                'text-blue-200': msg.state === 'SENT',
-                'text-green-200': msg.state === 'RECEIVED',
-                'text-red-200': msg.state === 'ERROR'
-              }">
-                <fa-icon
-                  [icon]="getMessageIcon(msg.state)"
-                  [ngClass]="getIconClass(msg.state)">
-                </fa-icon>
+      <ng-container *ngFor="let msg of getAllMessagesInOrder(); trackBy: trackByMessageId">
+        <div [ngClass]="msg.isUser ? 'justify-end' : 'justify-start'"
+             class="flex">
+
+          <!-- MENSAJE USUARIO CON ANIMACIÓN -->
+          <div *ngIf="msg.isUser"
+               class="max-w-xs sm:max-w-md bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl rounded-tr-sm px-5 py-4 shadow-md transform transition-all duration-300 hover:scale-[1.02]">
+            <div class="font-medium mb-1">{{ msg.content }}</div>
+            <div class="flex items-center justify-end space-x-2 text-xs opacity-90 mt-1">
+              <span>{{ getTimeString(msg.timestamp) }}</span>
+              <span [ngClass]="getIconClass(msg.state)">
+                <fa-icon [icon]="getMessageIcon(msg.state)"></fa-icon>
               </span>
             </div>
           </div>
-        </div>
 
-        <!-- AI Response -->
-        <div *ngIf="!msg.isUser"
-             class="max-w-xs lg:max-w-md bg-white border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3 shadow-lg transform hover:scale-105 transition-all duration-200">
-          <div class="flex items-center mb-2">
-            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-orange-500 rounded-full flex items-center justify-center mr-3">
-              <fa-icon [icon]="faRobot" class="text-white text-sm"></fa-icon>
+          <!-- RESPUESTA AI CON DETALLES -->
+          <div *ngIf="!msg.isUser"
+               class="max-w-xs sm:max-w-md bg-white text-gray-800 border border-gray-200 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm">
+            <div class="flex items-start space-x-3">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0 animate-pulse">
+                <fa-icon [icon]="faRobot" class="text-white"></fa-icon>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm font-semibold text-purple-700 mb-1">Advance AI</div>
+                <div class="text-gray-900 leading-relaxed whitespace-pre-line">{{ msg.content }}</div>
+                <div class="text-xs text-gray-500 mt-2 text-right">{{ getTimeString(msg.timestamp) }}</div>
+              </div>
             </div>
-            <span class="font-semibold text-gray-700">Advance AI</span>
-          </div>
-          <div class="text-gray-800 leading-relaxed">{{ msg.content }}</div>
-          <div class="text-xs text-gray-500 mt-2 text-right">
-            {{ getTimeString(msg.timestamp) }}
           </div>
         </div>
-      </div>
+      </ng-container>
 
-      <!-- Typing Indicator -->
-      <div *ngIf="isTyping() && !showWelcome()" class="flex justify-start animate__animated animate__fadeIn">
-        <div class="bg-white border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3 shadow-lg">
-          <div class="flex items-center mb-2">
-            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-orange-500 rounded-full flex items-center justify-center mr-3">
-              <fa-icon [icon]="faRobot" class="text-white text-sm"></fa-icon>
-            </div>
-            <span class="font-semibold text-gray-700">Advance AI está escribiendo...</span>
-          </div>
-          <div class="flex space-x-1">
-            <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-            <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
-            <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.4s;"></div>
-          </div>
-        </div>
+      <!-- INDICADOR DE ESCRITURA CON ANIMACIÓN -->
+      <div *ngIf="isTyping()" class="flex items-center space-x-2 text-sm text-gray-500 animate-pulse">
+        <fa-icon [icon]="faEllipsis" class="text-purple-400"></fa-icon>
+        <span>Escribiendo...</span>
       </div>
     </div>
-  </div>
 
-  <!-- Input Area (Fixed at bottom) -->
-  <div class="bg-white border-t border-gray-200 p-4 shadow-lg">
-    <form (ngSubmit)="sendMessage()" class="flex items-end space-x-3">
-      <div class="flex-1 relative">
-        <textarea
-          [ngModel]="messageText()"
-          (ngModelChange)="messageText.set($event)"
-          (keydown)="onKeyDown($event)"
-          name="message"
-          placeholder="Escribe tu mensaje aquí..."
-          rows="1"
-          class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all duration-200 scrollbar-thin scrollbar-thumb-purple-300"
-          style="max-height: 120px; overflow-y: auto;"
-        ></textarea>
-        <button
-          type="button"
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-500 transition-colors"
-          title="Adjuntar archivo"
-        >
-          <fa-icon [icon]="faPaperclip"></fa-icon>
+    <!-- INPUT CON DISEÑO FLOTANTE -->
+    <div class="bg-white p-4 border-t border-gray-200 shadow-lg sticky bottom-0">
+      <form (ngSubmit)="sendMessage()" class="flex items-center space-x-3">
+        <div class="relative flex-1">
+          <input [ngModel]="messageText()"
+                 (ngModelChange)="messageText.set($event)"
+                 type="text"
+                 name="message"
+                 placeholder="Escribe tu mensaje..."
+                 class="w-full px-5 py-3 bg-gray-100 text-gray-900 placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all duration-200" />
+          <fa-icon [icon]="faLightbulb" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" *ngIf="messageText().length === 0"></fa-icon>
+        </div>
+        <button type="submit"
+                class="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-full flex items-center justify-center shadow-md transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="!messageText().trim()">
+          <fa-icon [icon]="faPaperPlane"></fa-icon>
         </button>
-      </div>
-      <button
-        type="submit"
-        [disabled]="!messageText().trim()"
-        class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full hover:from-purple-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-lg"
-      >
-        <fa-icon [icon]="faPaperPlane"></fa-icon>
-      </button>
-    </form>
-
-    <!-- Quick Actions -->
-    <div class="flex justify-center mt-3 space-x-2">
-      <button
-        *ngFor="let action of quickActions"
-        (click)="sendQuickMessage(action)"
-        class="px-3 py-1 bg-gray-100 hover:bg-purple-100 text-sm text-gray-700 hover:text-purple-700 rounded-full transition-all duration-200 transform hover:scale-105"
-      >
-        {{ action }}
-      </button>
+      </form>
     </div>
   </div>
 </div>
-
-<!-- Custom Styles -->
-<style>
-  @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
-
-  .welcome-container {
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(249, 115, 22, 0.1) 50%, rgba(147, 51, 234, 0.1) 100%);
-    border-radius: 20px;
-    margin: 20px;
-    border: 1px solid rgba(147, 51, 234, 0.2);
-  }
-
-  .welcome-text {
-    animation: gradient 3s ease infinite;
-    background-size: 200% 200%;
-  }
-
-  @keyframes gradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 10px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #d8b4fe;
-    border-radius: 10px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: #c084fc;
-  }
-
-  /* Smooth scrolling */
-  .overflow-y-auto {
-    scroll-behavior: smooth;
-  }
-
-  /* Message hover effects */
-  .max-w-xs, .max-w-md {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Input focus animation */
-  textarea:focus {
-    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-  }
-
-  /* Button press animation */
-  button:active {
-    transform: scale(0.95);
-  }
-
-  /* FontAwesome spin animation */
-  .fa-spin {
-    animation: fa-spin 2s infinite linear;
-  }
-
-  @keyframes fa-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(359deg); }
-  }
-</style>

@@ -19,9 +19,9 @@ export interface CategoryResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AdvanceProductsService {
-  private API_PRODUCTS_URL = 'https://advance-backend.onrender.com/advance-products/ingram';
+  private API_PRODUCTS_URL = 'http://localhost:3002/advance-products/ingram';
   private API_LIST_URL = 'http://localhost:3002/advance-products/all-products';
-  private API_CATEGORY_URL = 'https://advance-backend.onrender.com/advance-products/categories';
+  private API_CATEGORY_URL = 'http://localhost:3002/advance-products/categories';
 
   // BehaviorSubject para emitir el array de productos de forma progresiva
   private _allProducts$ = new BehaviorSubject<ApiDetailsResponse<ProductAdvance>[]>([]);

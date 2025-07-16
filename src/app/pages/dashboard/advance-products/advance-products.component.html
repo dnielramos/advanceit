@@ -1,28 +1,21 @@
 <div class="min-h-screen bg-gray-50">
-  <!-- Header con mensaje aleatorio -->
-  <!-- Banner -->
+  <div class="bg-purple-600 text-white py-4 px-4 text-center shadow-md">
+    <h1 class="text-3xl font-bold">{{ welcomeMessage() }}</h1>
+  </div>
 
-  <!-- Buscador principal -->
   <div class="bg-white py-8 px-4 shadow-md">
     <div class="container mx-auto max-w-3xl">
       <div class="relative">
-        <input
-          type="text"
-          [(ngModel)]="searchTerm"
-          (input)="filterProducts()"
-          placeholder="Buscar"
-          class="w-full px-6 py-4 rounded-full border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-lg outline-none"
-        />
-        <fa-icon
-          [icon]="faSearch"
-          class="absolute right-6 top-1/2 transform -translate-y-1/2 text-purple-500 text-xl"
-        ></fa-icon>
+        <input type="text" [(ngModel)]="searchTerm" (input)="filterProducts()"
+          placeholder="Buscar productos por nombre, marca o SKU..."
+          class="w-full px-6 py-4 rounded-full border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-lg outline-none" />
+        <fa-icon [icon]="faSearch"
+          class="absolute right-6 top-1/2 transform -translate-y-1/2 text-purple-500 text-xl"></fa-icon>
       </div>
     </div>
   </div>
 
   <div class="container mx-auto py-8 px-4">
-    <!-- Stats y filtros -->
     <div class="flex flex-col md:flex-row justify-between items-start mb-8">
       <div class="mb-4 md:mb-0">
         <h2 class="text-xl font-semibold text-gray-800">
@@ -30,36 +23,30 @@
         </h2>
       </div>
 
-      <!-- <div class="flex flex-wrap gap-4">
+      <div class="flex flex-wrap gap-4">
         <div class="relative inline-block">
-          <button
-            (click)="toggleCategoryFilter()"
-            class="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-all"
-          >
+          <button (click)="toggleCategoryFilter()"
+            class="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-all">
             <fa-icon [icon]="faFilter" class="mr-2 text-purple-500"></fa-icon>
             <span>Categorías</span>
+            <span *ngIf="selectedCategories.length > 0"
+              class="ml-2 px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full">{{ selectedCategories.length
+              }}</span>
           </button>
 
-          <div *ngIf="showCategoryFilter()"
-               class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-            <div class="p-3">
+          <div *ngIf="showCategoryFilter()" @fadeIn
+            class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div class="p-3 max-h-60 overflow-y-auto">
               <div *ngFor="let category of uniqueCategories()" class="mb-1 last:mb-0">
                 <label class="flex items-center cursor-pointer hover:bg-purple-50 p-2 rounded">
-                  <input
-                    type="checkbox"
-                    [checked]="selectedCategories.includes(category)"
-                    (change)="toggleCategory(category)"
-                    class="w-4 h-4 accent-purple-500"
-                  />
+                  <input type="checkbox" [checked]="selectedCategories.includes(category)"
+                    (change)="toggleCategory(category)" class="w-4 h-4 accent-purple-500" />
                   <span class="ml-2">{{ category }}</span>
                 </label>
               </div>
             </div>
             <div class="border-t border-gray-200 p-3 flex justify-end">
-              <button
-                (click)="clearCategoryFilters()"
-                class="text-sm text-purple-500 hover:text-purple-700"
-              >
+              <button (click)="clearCategoryFilters()" class="text-sm text-purple-500 hover:text-purple-700">
                 Limpiar filtros
               </button>
             </div>
@@ -67,80 +54,71 @@
         </div>
 
         <div class="relative inline-block">
-          <button
-            (click)="toggleBrandFilter()"
-            class="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-all"
-          >
+          <button (click)="toggleBrandFilter()"
+            class="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-all">
             <fa-icon [icon]="faStore" class="mr-2 text-purple-500"></fa-icon>
             <span>Marcas</span>
+            <span *ngIf="selectedBrands.length > 0"
+              class="ml-2 px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full">{{ selectedBrands.length }}</span>
           </button>
 
-          <div *ngIf="showBrandFilter()"
-               class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-            <div class="p-3">
+          <div *ngIf="showBrandFilter()" @fadeIn
+            class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div class="p-3 max-h-60 overflow-y-auto">
               <div *ngFor="let brand of uniqueBrands()" class="mb-1 last:mb-0">
                 <label class="flex items-center cursor-pointer hover:bg-purple-50 p-2 rounded">
-                  <input
-                    type="checkbox"
-                    [checked]="selectedBrands.includes(brand)"
-                    (change)="toggleBrand(brand)"
-                    class="w-4 h-4 accent-purple-500"
-                  />
+                  <input type="checkbox" [checked]="selectedBrands.includes(brand)" (change)="toggleBrand(brand)"
+                    class="w-4 h-4 accent-purple-500" />
                   <span class="ml-2">{{ brand }}</span>
                 </label>
               </div>
             </div>
             <div class="border-t border-gray-200 p-3 flex justify-end">
-              <button
-                (click)="clearBrandFilters()"
-                class="text-sm text-purple-500 hover:text-purple-700"
-              >
+              <button (click)="clearBrandFilters()" class="text-sm text-purple-500 hover:text-purple-700">
                 Limpiar filtros
               </button>
             </div>
           </div>
         </div>
-      </div> -->
+        <button *ngIf="searchTerm || selectedCategories.length > 0 || selectedBrands.length > 0"
+          (click)="resetFilters()"
+          class="px-4 py-2 bg-red-100 text-red-700 rounded-lg shadow-sm hover:bg-red-200 transition-all flex items-center">
+          <fa-icon [icon]="faFilter" class="mr-2"></fa-icon>
+          Limpiar Todos
+        </button>
+      </div>
     </div>
 
-    <!-- Grid de productos -->
+    ---
+
+    ### Contenedor de Productos y Tarjetas Individuales
+
+    ```html
     <div *ngIf="filteredProducts().length > 0; else noProducts"
-         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-
-      <div *ngFor="let item of filteredProducts()"
-           class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 flex flex-col">
-
-        <!-- Carrusel de imágenes -->
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div *ngFor="let item of filteredProducts()" @fadeIn
+        class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 flex flex-col">
         <div class="relative h-64 bg-gray-100 overflow-hidden group">
           <div *ngIf="hasMultipleImages(item)" class="absolute left-4 bottom-4 z-10 flex space-x-1">
-            <button *ngFor="let _, let i = index; of: getImagesArray(item)"
-                    (click)="setActiveImage(item._sku, i)"
-                    class="w-2 h-2 rounded-full"
-                    [ngClass]="getCurrentImageIndex(item._sku) === i ? 'bg-purple-500' : 'bg-white/70'">
-            </button>
+            <button *ngFor="let _, let i = index; of: getImagesArray(item)" (click)="setActiveImage(item._sku, i)"
+              class="w-2 h-2 rounded-full" [ngClass]="
+                getCurrentImageIndex(item._sku) === i
+                  ? 'bg-purple-500'
+                  : 'bg-white/70'
+              "></button>
           </div>
 
           <div class="absolute inset-0 flex items-center justify-center">
-            <img
-              [src]="getActiveImage(item)"
-              alt="{{ getProductTitle(item) }}"
-              class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-            />
+            <img [src]="getActiveImage(item)" alt="{{ getProductTitle(item) }}"
+              class="object-contain w-full h-full transition-transform duration-500 group-hover:scale-105" />
           </div>
 
-          <!-- <div class="absolute top-3 right-3 flex flex-col gap-2">
-            <button class="bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-gray-100">
-              <fa-icon [icon]="faHeart" class="text-gray-400 hover:text-purple-500"></fa-icon>
-            </button>
-          </div> -->
-
           <div *ngIf="item.product.descuentos"
-               class="absolute top-3 left-3 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded">
+            class="absolute top-3 left-3 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded">
             OFERTA
           </div>
         </div>
 
-        <!-- Información del producto -->
         <div class="p-5 flex-grow flex flex-col">
           <div class="mb-2">
             <div class="flex items-center mb-1">
@@ -158,10 +136,9 @@
             {{ getProductDescription(item) }}
           </p>
 
-          <!-- Etiquetas -->
           <div class="mb-4 flex flex-wrap gap-1">
             <span *ngFor="let tag of getProductTags(item).slice(0, 3)"
-                 class="inline-block text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">
+              class="inline-block text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">
               {{ tag }}
             </span>
             <span *ngIf="getProductTags(item).length > 3" class="text-xs text-gray-500">
@@ -170,11 +147,10 @@
           </div>
 
           <div class="mt-auto">
-            <!-- Disponibilidad -->
             <div class="flex items-center mb-3 text-sm">
-              <div class="w-2 h-2 rounded-full mr-2"
-                   [ngClass]="item.product.disponibilidad ? 'bg-green-500' : 'bg-red-500'">
-              </div>
+              <div class="w-2 h-2 rounded-full mr-2" [ngClass]="
+                  item.product.disponibilidad ? 'bg-green-500' : 'bg-red-500'
+                "></div>
               <span *ngIf="item.product.disponibilidad" class="text-green-700">
                 Disponible ({{ item.product.cantidad }} en stock)
               </span>
@@ -183,13 +159,13 @@
               </span>
             </div>
 
-            <!-- Precios y botón -->
             <div class="flex items-center justify-between">
               <div>
                 <p class="font-bold text-xl text-gray-900">
                   ${{ item.product.precio.toFixed(2) }}
                 </p>
-                <p *ngIf="item.product.precio < item.product.precioRetail" class="text-sm text-gray-500 line-through">
+                <p *ngIf="item.product.precioRetail && item.product.precio < item.product.precioRetail"
+                  class="text-sm text-gray-500 line-through">
                   ${{ item.product.precioRetail.toFixed(2) }}
                 </p>
               </div>
@@ -204,20 +180,25 @@
       </div>
     </div>
 
-    <!-- Mensaje si no hay productos -->
+    ---
+
+    ### Mensaje de No Productos Encontrados
+
+    ```html
     <ng-template #noProducts>
       <div class="text-center py-20">
         <fa-icon [icon]="faStore" class="text-gray-300 text-6xl mb-4"></fa-icon>
-        <h3 class="text-xl font-semibold text-gray-700 mb-2">No se encontraron productos</h3>
-        <p class="text-gray-500 mb-6">Intenta con otros términos de búsqueda o ajusta los filtros</p>
-        <button
-          (click)="resetFilters()"
-          class="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-        >
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">
+          No se encontraron productos
+        </h3>
+        <p class="text-gray-500 mb-6">
+          Intenta con otros términos de búsqueda o ajusta los filtros
+        </p>
+        <button (click)="resetFilters()"
+          class="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
           Ver todos los productos
         </button>
       </div>
     </ng-template>
   </div>
-
 </div>

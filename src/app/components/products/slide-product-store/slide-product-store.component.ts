@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'; // Importa CommonModule
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'; // Asumiendo que usas Font Awesome
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { ProductAdvanceComponent } from "../product-advance/product-advance.component"; // Importa los iconos específicos
-import { Producto } from '../../../models/Productos';
+import { ProductoFinal } from '../../../models/Productos';
 
 // Asumiendo que tienes una interfaz para Product y el componente app-product-advance
 // Si no tienes una interfaz, puedes definirla aquí o ajustarla a tu tipo de dato.
@@ -26,8 +26,8 @@ export interface Product {
   templateUrl: './slide-product-store.component.html',
 })
 export class SlideProductStoreComponent {
-  @Input() favoritesProducts: Producto[] = []; // El input que recibe los productos favoritos
-  @Output() productAddedToCart = new EventEmitter<Producto>(); // Evento de salida para cuando un producto se añade al carrito
+  @Input() favoritesProducts: ProductoFinal[] = []; // El input que recibe los productos favoritos
+  @Output() productAddedToCart = new EventEmitter<ProductoFinal>(); // Evento de salida para cuando un producto se añade al carrito
 
   @ViewChild('favoritesContainer') favoritesContainer!: ElementRef;
 
@@ -53,7 +53,7 @@ export class SlideProductStoreComponent {
   }
 
   // Método para manejar el evento agregarAlCarrito de app-product-advance
-  addToCart(product: Producto): void {
+  addToCart(product: ProductoFinal): void {
     this.productAddedToCart.emit(product);
     console.log('Producto agregado al carrito desde slideProductStore:', product);
     // Aquí puedes añadir más lógica si necesitas hacer algo inmediatamente en este componente

@@ -5,7 +5,7 @@ import { bufferCount, concatMap, map, scan, delay } from 'rxjs/operators';
 
 // Asegúrate de que la ruta al modelo sea correcta
 import { ApiDetailsResponse, ProductAdvance } from '../models/ingram';
-import { Producto } from '../models/Productos';
+import { ProductoFinal } from '../models/Productos';
 
 interface SaveBatchResponse {
   message: string;
@@ -66,8 +66,8 @@ export class AdvanceProductsService {
    * Útil si la carga progresiva ya se ha completado o para otros casos de uso.
    * @returns Un Observable con el array completo de productos.
    */
-  getAllProducts(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.API_LIST_URL);
+  getAllProducts(): Observable<ProductoFinal[]> {
+    return this.http.get<ProductoFinal[]>(this.API_LIST_URL);
   }
 
    getAllCategories(): Observable<CategoryResponse> {

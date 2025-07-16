@@ -26,7 +26,7 @@ import {
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { RouterLink } from '@angular/router';
-import { Producto } from '../../../models/Productos';
+import { ProductoFinal } from '../../../models/Productos';
 import { TrmComponent } from '../../navbar/trm/trm.component';
 import { AdvanceProductsComponent } from '../../../pages/dashboard/advance-products/advance-products.component';
 import { ProductAdvanceComponent } from '../product-advance/product-advance.component';
@@ -93,106 +93,119 @@ export class BuscadorPrincipalComponent implements OnInit {
   @Output() showCategoriesMenu = new EventEmitter<void>();
 
   // Lista de productos (ejemplo ampliado con propiedades adicionales)
-  productos: Producto[] = [
-    {
-      id: '1',
-      nombre: 'Latitude 5450 Portátil',
-      descripcion:
-        'Intel® Core™ i7-1370P, vPro® de 13.ª generación (14 núcleos, hasta 5,2 GHz de frecuencia Turbo) ',
-      precio: 1499.99,
-      imagen: '/products/notebook-latitude-14-5440-nt-gray-gallery-2.avif',
-      marca: 'Dell',
-      caracteristicas: [
-        'Intel® Core™ Ultra 5 135U, vPro®',
-        'Windows 11 Pro',
-        'Intel® Graphics',
-        '16 GB DDR5 | 512 GB SSD | 14.0-in. display Full HD (1920X1080)',
-      ],
-      categoria: 'Computadoras',
-      etiquetas: ['Nuevo', 'Popular'],
-    },
-    {
-      id: '2',
-      nombre: 'Latitude 7450 Laptop or 2-in-1',
-      descripcion:
-        '14-inch premium AI laptop or 2-in-1 featuring 16:10 displays, enhanced audio, ultralight option and Intel® Core™ Ultra processor.',
-      precio: 999.99,
-      imagen: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
-      marca: 'Dell',
-      caracteristicas: [
-        'Intel® Core™ Ultra 7 165U, vPro®',
-        'Windows 11 Pro',
-        'Intel® Graphics',
-        '16 GB LPDDR5X | 256 GB SSD | 14" Non-Touch FHD+ (1920x1200)',
-      ],
-      categoria: 'Computadoras',
-      etiquetas: ['Nuevo'],
-    },
-    {
-      id: '3',
-      nombre: 'Dell Pro Wired ANC Headset - WH5024',
-      descripcion:
-        'Elevate your workday communication with this headset that comes equipped with an AI-based microphone and Active Noise Cancellation, designed to reduce background noise, ensure comfort, and bring your productivity to the next level.',
-      precio: 199.99,
-      imagen: '/products/accessories-dell-wh5024-anc-bk-gallery-1.avif',
-      marca: 'Dell',
-      caracteristicas: [
-        'Microsoft Teams (Open Office) Certified, Zoom Certified',
-        '3 Year Limited Hardware with Advanced Exchange Service',
-        'Win11/10 64 Bit, Mac OS',
-      ],
-      categoria: 'Accesorios',
-      etiquetas: ['Recomendado', 'Sonido'],
-    },
-    {
-      id: '4',
-      nombre: 'Dell Pro 24 Plus Monitor - P2425H',
-      descripcion: 'In-Plane Switching (IPS) technology | 1920 x 1080',
-      precio: 399.99,
-      imagen: '/products/monitor-p2425h-black-gallery-2.avif',
-      marca: 'Dell',
-      caracteristicas: [
-        'In-Plane Switching (IPS) technology',
-        'Resolution / Refresh Rate 1920 x 1080',
-        'Adjustability Height, Tilt, Swivel, Pivot',
-        'Diagonal Size 23.8',
-      ],
-      categoria: 'Monitores',
-      etiquetas: ['Nuevo'],
-    },
-    {
-      id: '5',
-      nombre: 'Dell Pro Dock - WD25',
-      descripcion:
-        'Boost your productivity with the latest pro dock that offers up to 100W power delivery and a wide variety of connecting options.',
-      precio: 129.99,
-      imagen: '/products/dock-station-wd25-black-gallery-1.avif',
-      marca: 'Dell',
-      caracteristicas: [
-        '100W (Dell systems) 96W (non-Dell systems)',
-        'RJ45 Ethernet port, 2.5GbE',
-        '3-Year Limited Hardware Warranty with Advanced Exchange Additional 4- & 5-year warranty optional',
-      ],
-      categoria: 'Accesorios',
-      etiquetas: ['Popular'],
-    },
-    {
-      id: '6',
-      nombre: 'Dell Premier Multi-Device Wireless Keyboard and Mouse – KM7321W',
-      descripcion:
-        'Experience superior multitasking features with a stylish and comfortable premium keyboard and mouse combo. Complete your tasks powered by one of the industry’s leading battery lives at up to 36 months.',
-      precio: 59.99,
-      imagen: '/products/km7321w-xkb-01-gy.avif',
-      marca: 'Dell',
-      caracteristicas: [
-        'USB wireless receiver',
-        'Adjustable DPI. 1000, 1600(default), 2400, 4000',
-        '12 programmable keys of F1-F12',
-      ],
-      categoria: 'Accesorios',
-      etiquetas: ['Oferta', 'Popular'],
-    },
-  ];
+  productos : ProductoFinal[] = [
+  {
+    id: '1',
+    sku: 'LAT5450',
+    cantidad: '10',
+    estado: 'available',
+    nombre: 'Latitude 5450 Portátil',
+    descripcion: 'Intel® Core™ i7-1370P, vPro® de 13.ª generación (14 núcleos, hasta 5,2 GHz de frecuencia Turbo)',
+    precio: 1499.99,
+    imagen: '/products/notebook-latitude-14-5440-nt-gray-gallery-2.avif',
+    marca: 'Dell',
+    categoria: 'Computadoras',
+    caracteristicas: [
+      'Intel® Core™ Ultra 5 135U, vPro®',
+      'Windows 11 Pro',
+      'Intel® Graphics',
+      '16 GB DDR5 | 512 GB SSD | 14.0-in. display Full HD (1920X1080)',
+    ],
+    etiquetas: ['Nuevo', 'Popular'],
+  },
+  {
+    id: '2',
+    sku: 'LAT7450',
+    cantidad: '5',
+    estado: 'available',
+    nombre: 'Latitude 7450 Laptop or 2-in-1',
+    descripcion: '14-inch premium AI laptop or 2-in-1 featuring 16:10 displays, enhanced audio, ultralight option and Intel® Core™ Ultra processor.',
+    precio: 999.99,
+    imagen: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
+    marca: 'Dell',
+    categoria: 'Computadoras',
+    caracteristicas: [
+      'Intel® Core™ Ultra 7 165U, vPro®',
+      'Windows 11 Pro',
+      'Intel® Graphics',
+      '16 GB LPDDR5X | 256 GB SSD | 14" Non-Touch FHD+ (1920x1200)',
+    ],
+    etiquetas: ['Nuevo'],
+  },
+  {
+    id: '3',
+    sku: 'DWH5024',
+    cantidad: '20',
+    estado: 'available',
+    nombre: 'Dell Pro Wired ANC Headset - WH5024',
+    descripcion: 'Elevate your workday communication with this headset that comes equipped with an AI-based microphone and Active Noise Cancellation, designed to reduce background noise, ensure comfort, and bring your productivity to the next level.',
+    precio: 199.99,
+    imagen: '/products/accessories-dell-wh5024-anc-bk-gallery-1.avif',
+    marca: 'Dell',
+    categoria: 'Accesorios',
+    caracteristicas: [
+      'Microsoft Teams (Open Office) Certified, Zoom Certified',
+      '3 Year Limited Hardware with Advanced Exchange Service',
+      'Win11/10 64 Bit, Mac OS',
+    ],
+    etiquetas: ['Recomendado', 'Sonido'],
+  },
+  {
+    id: '4',
+    sku: 'P2425H',
+    cantidad: '15',
+    estado: 'available',
+    nombre: 'Dell Pro 24 Plus Monitor - P2425H',
+    descripcion: 'In-Plane Switching (IPS) technology | 1920 x 1080',
+    precio: 399.99,
+    imagen: '/products/monitor-p2425h-black-gallery-2.avif',
+    marca: 'Dell',
+    categoria: 'Monitores',
+    caracteristicas: [
+      'In-Plane Switching (IPS) technology',
+      'Resolution / Refresh Rate 1920 x 1080',
+      'Adjustability Height, Tilt, Swivel, Pivot',
+      'Diagonal Size 23.8',
+    ],
+    etiquetas: ['Nuevo'],
+  },
+  {
+    id: '5',
+    sku: 'WD25',
+    cantidad: '8',
+    estado: 'available',
+    nombre: 'Dell Pro Dock - WD25',
+    descripcion: 'Boost your productivity with the latest pro dock that offers up to 100W power delivery and a wide variety of connecting options.',
+    precio: 129.99,
+    imagen: '/products/dock-station-wd25-black-gallery-1.avif',
+    marca: 'Dell',
+    categoria: 'Accesorios',
+    caracteristicas: [
+      '100W (Dell systems) 96W (non-Dell systems)',
+      'RJ45 Ethernet port, 2.5GbE',
+      '3-Year Limited Hardware Warranty with Advanced Exchange Additional 4- & 5-year warranty optional',
+    ],
+    etiquetas: ['Popular'],
+  },
+  {
+    id: '6',
+    sku: 'KM7321W',
+    cantidad: '25',
+    estado: 'available',
+    nombre: 'Dell Premier Multi-Device Wireless Keyboard and Mouse – KM7321W',
+    descripcion: 'Experience superior multitasking features with a stylish and comfortable premium keyboard and mouse combo. Complete your tasks powered by one of the industry’s leading battery lives at up to 36 months.',
+    precio: 59.99,
+    imagen: '/products/km7321w-xkb-01-gy.avif',
+    marca: 'Dell',
+    categoria: 'Accesorios',
+    caracteristicas: [
+      'USB wireless receiver',
+      'Adjustable DPI. 1000, 1600(default), 2400, 4000',
+      '12 programmable keys of F1-F12',
+    ],
+    etiquetas: ['Oferta', 'Popular'],
+  },
+];
 
   constructor(private brandService: BrandService) {}
 

@@ -12,7 +12,7 @@ import {
   faFilter,
 } from '@fortawesome/free-solid-svg-icons';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { ApiDetailsResponse, ProductAdvance } from '../../../models/ingram';
+import { ApiDetailsResponse, ProductAdvance } from '../../../models/ingram'; // Asegúrate de que ProductAdvance sea compatible o ajusta.
 import { Subscription } from 'rxjs';
 import { AdvanceProductsService } from '../../../services/product.service';
 
@@ -31,9 +31,9 @@ interface Product {
     marca: string;
     categoria: string;
     cantidad: number;
-    warehouse: string;
-    warehouseId: string;
-    precioRetail: number;
+    warehouse?: string; // Hago opcional porque no está en tus datos de ejemplo de API
+    warehouseId?: string; // Hago opcional porque no está en tus datos de ejemplo de API
+    precioRetail?: number; // Hago opcional porque no está en tus datos de ejemplo de API
     etiquetas: string[];
   };
   details?: {
@@ -47,12 +47,20 @@ interface Product {
   };
 }
 
-interface ApiResponse {
-  success: boolean;
-  found: number;
-  nulls: number;
-  failed: number;
-  data: Product[];
+// Interfaz para el formato de los datos que realmente estás recibiendo de la API
+interface FlatProductApi {
+  id: string;
+  sku: string;
+  cantidad: string; // Puede ser string o number, ajusta según necesidad en el servicio
+  estado: string;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  imagen: string;
+  marca: string;
+  categoria: string;
+  caracteristicas: string[];
+  etiquetas: string[];
 }
 
 @Component({
@@ -82,7 +90,7 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
   allProducts: Product[] = [];
   filteredProducts = signal<Product[]>([]);
 
-  apiDetailsResponse: ApiDetailsResponse<ProductAdvance>[] = [];
+  // apiDetailsResponse: ApiDetailsResponse<ProductAdvance>[] = []; // Ya no parece ser necesaria con el nuevo formato.
   private productsSubscription?: Subscription;
 
   constructor(private advanceProductService: AdvanceProductsService) {}
@@ -109,11 +117,9 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
   welcomeMessage = signal('');
 
   ngOnInit() {
-    // Simulamos la carga de datos desde la API
     this.loadProducts();
     this.setRandomWelcomeMessage();
 
-    // Cambiamos el mensaje de bienvenida cada 8 segundos
     setInterval(() => {
       this.setRandomWelcomeMessage();
     }, 5000);
@@ -134,147 +140,54 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
     this.productsSubscription = this.advanceProductService
       .getAllProducts()
       .subscribe({
-        next: (batchOfProducts: any) => {
-          // 'batchOfProducts' contendrá cada lote de productos emitido por el servicio
-          this.allProducts = batchOfProducts; // Actualiza la lista completa cada vez que llega un lote
+        next: (batchOfProducts: FlatProductApi[]) => {
+          // Mapeamos los datos recibidos al formato 'Product'
+          const mappedProducts: Product[] = batchOfProducts.map((p ) => ({
+            _sku: p.sku,
+            product: {
+              id: p.id,
+              SKU: p.sku,
+              nombre: p.nombre,
+              descripcion: p.descripcion,
+              precio: p.precio,
+              descuentos: false, // Asumiendo false, ya que no está en el formato plano
+              estado: p.estado,
+              disponibilidad: p.estado === 'available', // Basado en el estado
+              imagen: p.imagen,
+              marca: p.marca,
+              categoria: p.categoria,
+              cantidad: parseFloat(p.cantidad), // Convertir a number
+              etiquetas: p.etiquetas || [],
+            },
+            details: {
+              titulo: p.nombre,
+              categorias: [p.categoria], // Puedes expandir esto si las categorías vienen de forma más granular
+              descripcion: p.descripcion,
+              imagenes: [p.imagen], // Puedes añadir más imágenes si tu API las proporciona
+              etiquetas: p.etiquetas.join(', '), // Unir las etiquetas en un string si es necesario
+              // No hay especificaciones_tecnicas ni garantia_e_informacion_adicional en el formato plano
+            },
+          }));
+
+          this.allProducts = mappedProducts;
           this.filteredProducts.set([...this.allProducts]);
-          console.log('Lote de productos recibido:', batchOfProducts);
-          //   // Inicializar los índices de imágenes activas
-            this.allProducts.forEach(product => {
-              this.activeImageIndexes[product._sku] = 0;
-            });
-          // Aquí puedes realizar acciones adicionales con cada lote,
-          // como actualizar la interfaz de usuario progresivamente.
+          console.log(
+            'Lote de productos recibido y mapeado:',
+            this.allProducts
+          );
+
+          this.allProducts.forEach((product) => {
+            this.activeImageIndexes[product._sku] = 0;
+          });
         },
         error: (error) => {
           console.error('Error al cargar los productos:', error);
-          // Maneja el error de manera apropiada (mostrar mensaje al usuario, etc.)
         },
         complete: () => {
           console.log('Todos los productos cargados.');
-          // Realiza acciones cuando se hayan cargado todos los productos (si es necesario)
         },
       });
   }
-
-  // fetchProducts() {
-  //   // Simular la llamada a la API - En un caso real usarías un servicio HTTP
-  //   const mockApiResponse: ApiResponse = {
-  //     "success": true,
-  //     "found": 2,
-  //     "nulls": 0,
-  //     "failed": 0,
-  //     "data": [
-  //       {
-  //         "_sku": "SKU123",
-  //         "product": {
-  //           "id": "product-abc-123",
-  //           "SKU": "SKU123",
-  //           "nombre": "Laptop Profesional",
-  //           "descripcion": "Potente laptop para productividad y desarrollo.",
-  //           "precio": 1299.99,
-  //           "descuentos": true,
-  //           "estado": "activo",
-  //           "disponibilidad": true,
-  //           "imagen": "https://example.com/images/laptop1.jpg",
-  //           "marca": "Acme",
-  //           "categoria": "Electrónica",
-  //           "cantidad": 10,
-  //           "warehouse": "Bodega Central",
-  //           "warehouseId": "WH001",
-  //           "precioRetail": 1499.99,
-  //           "etiquetas": ["portátil", "profesional", "rendimiento"]
-  //         },
-  //         "details": {
-  //           "titulo": "Laptop Acme Pro X",
-  //           "categorias": ["Electrónica", "Computadoras", "Portátiles"],
-  //           "descripcion": "La Acme Pro X ofrece un rendimiento excepcional con su procesador de última generación y pantalla de alta resolución.",
-  //           "imagenes": [
-  //             "https://example.com/images/laptop1-front.jpg",
-  //             "https://example.com/images/laptop1-side.jpg"
-  //           ],
-  //           "etiquetas": "laptop, profesional, intel, ssd, 16gb ram",
-  //           "especificaciones_tecnicas": {
-  //             "Procesador": {
-  //               "Modelo": "Intel Core i7-12700H",
-  //               "Velocidad": "2.3 GHz"
-  //             },
-  //             "Memoria RAM": {
-  //               "Capacidad": "16 GB DDR5",
-  //               "Velocidad": "4800 MHz"
-  //             },
-  //             "Almacenamiento": {
-  //               "Tipo": "SSD NVMe",
-  //               "Capacidad": "1 TB"
-  //             },
-  //             "Pantalla": {
-  //               "Tamaño": "14 pulgadas",
-  //               "Resolución": "2560 x 1440"
-  //             }
-  //           },
-  //           "garantia_e_informacion_adicional": {
-  //             "Garantía": "1 año limitada",
-  //             "Soporte Técnico": "Disponible 24/7"
-  //           }
-  //         }
-  //       },
-  //       {
-  //         "_sku": "SKU456",
-  //         "product": {
-  //           "id": "product-def-456",
-  //           "SKU": "SKU456",
-  //           "nombre": "Monitor 27 Pulgadas",
-  //           "descripcion": "Monitor IPS de 27 pulgadas con alta resolución.",
-  //           "precio": 299.00,
-  //           "descuentos": false,
-  //           "estado": "activo",
-  //           "disponibilidad": true,
-  //           "imagen": "https://example.com/images/monitor1.jpg",
-  //           "marca": "VisionTech",
-  //           "categoria": "Electrónica",
-  //           "cantidad": 50,
-  //           "warehouse": "Almacén B",
-  //           "warehouseId": "WH002",
-  //           "precioRetail": 299.00,
-  //           "etiquetas": ["monitor", "27 pulgadas", "ips"]
-  //         },
-  //         "details": {
-  //           "titulo": "Monitor VisionTech 27\" IPS",
-  //           "categorias": ["Electrónica", "Monitores"],
-  //           "descripcion": "Disfruta de imágenes nítidas y colores vibrantes con este monitor IPS de 27 pulgadas.",
-  //           "imagenes": [
-  //             "https://example.com/images/monitor1-front.jpg",
-  //             "https://example.com/images/monitor1-back.jpg"
-  //           ],
-  //           "etiquetas": "monitor, 27inch, ips panel, full hd",
-  //           "especificaciones_tecnicas": {
-  //             "Tamaño de Pantalla": "27 pulgadas",
-  //             "Resolución": "1920 x 1080 (Full HD)",
-  //             "Tipo de Panel": "IPS",
-  //             "Tasa de Refresco": "75 Hz",
-  //             "Tiempo de Respuesta": "5 ms"
-  //           },
-  //           "garantia_e_informacion_adicional": {
-  //             "Garantía": "2 años",
-  //             "Puertos": "HDMI, DisplayPort"
-  //           }
-  //         }
-  //       }
-  //     ]
-  //   };
-
-  //   this.advanceProductService
-
-  //   const advance_products
-
-  //   this.allProducts = mockApiResponse.data;
-  //   this.filteredProducts.set([...this.allProducts]);
-
-  //   // Inicializar los índices de imágenes activas
-  //   this.allProducts.forEach(product => {
-  //     this.activeImageIndexes[product._sku] = 0;
-  //   });
-  // }
 
   // Métodos para manejar filtros
   filterProducts() {
@@ -288,12 +201,18 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
         const description = this.getProductDescription(item).toLowerCase();
         const brand = item.product.marca.toLowerCase();
         const sku = item.product.SKU.toLowerCase();
+        const categories = this.getProductCategories(item).map((cat) =>
+          cat.toLowerCase()
+        );
+        const tags = this.getProductTags(item).map((tag) => tag.toLowerCase());
 
         return (
           title.includes(term) ||
           description.includes(term) ||
           brand.includes(term) ||
-          sku.includes(term)
+          sku.includes(term) ||
+          categories.some((cat) => cat.includes(term)) ||
+          tags.some((tag) => tag.includes(term))
         );
       });
     }

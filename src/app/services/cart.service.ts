@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Producto } from '../models/Productos';
+import { ProductoFinal } from '../models/Productos';
 
 export interface CartItem {
-  product: Producto;
+  product: ProductoFinal;
   quantity: number;
 }
 
@@ -29,7 +29,7 @@ export class CartService {
   }
 
   // Añadir producto al carrito
-  addToCart(product: Producto, quantity: number = 1): void {
+  addToCart(product: ProductoFinal, quantity: number = 1): void {
     const existingItem = this.cartItems.find(item => item.product.id === product.id);
 
     if (existingItem) {

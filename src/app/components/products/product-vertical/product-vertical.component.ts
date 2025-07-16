@@ -10,7 +10,7 @@ import {
   faTag,
   faCodeBranch,
 } from '@fortawesome/free-solid-svg-icons';
-import { Producto } from '../../../models/Productos';
+import { ProductoFinal } from '../../../models/Productos';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -20,11 +20,11 @@ import { RouterLink } from '@angular/router';
 })
 export class ProductVerticalComponent {
   @Input() imagenIzquierda: boolean = true;
-  @Input() productosFiltrados: Producto[] = [];
-  @Input() producto!: Producto;
-  @Output() agregarAlCarrito = new EventEmitter<Producto>();
+  @Input() productosFiltrados: ProductoFinal[] = [];
+  @Input() producto!: ProductoFinal;
+  @Output() agregarAlCarrito = new EventEmitter<ProductoFinal>();
 
-  addToCart(producto: Producto) {
+  addToCart(producto: ProductoFinal) {
     this.agregarAlCarrito.emit(producto);
   }
 

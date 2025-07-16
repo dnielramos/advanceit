@@ -68,6 +68,29 @@ interface FlatProductApi {
   standalone: true,
   imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './advance-products.component.html',
+  styles: `
+    .loader {
+      height: 4px;
+      width: 130px;
+      --c: no-repeat linear-gradient(#6100ee 0 0);
+      background: var(--c), var(--c), #d7b8fc;
+      background-size: 60% 100%;
+      animation: l16 3s infinite;
+      border-radius: 100px;
+    }
+
+    @keyframes l16 {
+      0% {
+        background-position: -150% 0, -150% 0;
+      }
+      66% {
+        background-position: 250% 0, -150% 0;
+      }
+      100% {
+        background-position: 250% 0, 250% 0;
+      }
+    }
+  `,
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -96,7 +119,7 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
   constructor(private advanceProductService: AdvanceProductsService) {}
 
   // Estados UI
-  searchTerm = '';
+  searchTerm : string = '';
   selectedCategories: string[] = [];
   selectedBrands: string[] = [];
   showCategoryFilter = signal(false);
@@ -201,18 +224,18 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
         const description = this.getProductDescription(item).toLowerCase();
         const brand = item.product.marca.toLowerCase();
         const sku = item.product.SKU.toLowerCase();
-        const categories = this.getProductCategories(item).map((cat) =>
-          cat.toLowerCase()
-        );
-        const tags = this.getProductTags(item).map((tag) => tag.toLowerCase());
+        // const categories = this.getProductCategories(item).map((cat) =>
+        //   cat.toLowerCase()
+        // );
+        // const tags = this.getProductTags(item).map((tag) => tag.toLowerCase());
 
         return (
           title.includes(term) ||
           description.includes(term) ||
           brand.includes(term) ||
-          sku.includes(term) ||
-          categories.some((cat) => cat.includes(term)) ||
-          tags.some((tag) => tag.includes(term))
+          sku.includes(term)
+          // categories.some((cat) => cat.includes(term)) ||
+          // tags.some((tag) => tag.includes(term))
         );
       });
     }
@@ -347,7 +370,7 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
 
   // Métodos para obtener información del producto (con fallbacks)
   getProductTitle(product: Product): string {
-    return product.details?.titulo || product.product.nombre;
+    return product.product.nombre || product.details?.titulo || 'Producto sin título';
   }
 
   getProductDescription(product: Product): string {

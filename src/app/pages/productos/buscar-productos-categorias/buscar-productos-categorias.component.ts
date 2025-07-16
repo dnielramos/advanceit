@@ -17,8 +17,6 @@ import { BrandService } from '../../../services/brand.service';
   standalone: true,
   imports: [
     CommonModule,
-    SanitizeImageUrlPipe,
-    AdvanceProductsComponent,
     ProductAdvanceComponent,
   ],
   templateUrl: './buscar-productos-categorias.component.html',

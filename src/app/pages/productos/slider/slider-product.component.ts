@@ -1,13 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'app-slider-product',
   templateUrl: './slider-product.component.html',
   imports: [CommonModule]
 })
-export class SliderProductComponent {
+export class SliderProductComponent implements AfterViewInit {
   currentSlide = 0;
+
+  @ViewChild('videoFondo', { static: true }) videoRef!: ElementRef<HTMLVideoElement>;
+
+  ngAfterViewInit() {
+    const video = this.videoRef.nativeElement;
+    video.playbackRate = 0.5; // 🔹 Más lento (0.5 = 50% velocidad)
+  }
 
   banners = [
     {
@@ -15,7 +22,8 @@ export class SliderProductComponent {
       description: 'Proveemos hardware autorizado por las grandes marcas.',
       buttonText: 'Shop Now',
       image: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
-     background: 'url(https://wahlaptopstore.weebly.com/uploads/1/1/6/6/116678227/logo-banner-51_orig.jpg)'
+     background: 'url(https://wahlaptopstore.weebly.com/uploads/1/1/6/6/116678227/logo-banner-51_orig.jpg)',
+     video: 'banners/videobanner.webm'
     },
     // {
     //   title: 'Gaming Power Unleashed',
@@ -39,11 +47,12 @@ export class SliderProductComponent {
     //   background: 'linear-gradient(to right, #ff4e50, #f9d423)'
     // },
     {
-      title: 'Business Ready',
-      description: 'Professional laptops with enhanced security and performance.',
+      title: 'Dell Latitude 14 5440',
+      description: 'Equipo portátil de alta gama con procesadores Intel Core de última generación.',
       buttonText: 'See Plans',
       image: '/products/notebook-latitude-14-5440-nt-gray-gallery-2.avif',
-      background: 'url(banners/gemini2.jpg)'
+      background: 'url(banners/gemini2.jpg)',
+      video: 'banners/videobanner.webm'
     }
   ];
 

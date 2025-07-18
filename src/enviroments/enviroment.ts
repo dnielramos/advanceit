@@ -2,5 +2,6 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:3002', // URL de tu API NestJS
+  apiUrlRender: 'https://advance-genai.onrender.com', // URL de tu API en Render
   socketUrl: 'http://localhost:3002/chat' // URL de tu servidor WebSocket
 };

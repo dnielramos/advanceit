@@ -10,7 +10,7 @@ import { ApiResponse } from '../models/Response'; // Asegúrate de que la ruta s
   providedIn: 'root',
 })
 export class NexsysApiService {
-  private readonly apiUrl = environment.apiUrl;
+  private readonly apiUrlRender = environment.apiUrlRender;
 
   constructor(private http: HttpClient) {}
 
@@ -18,7 +18,7 @@ export class NexsysApiService {
   getProductsByMark(mark: string): Observable<any> {
     const params = new HttpParams().set('mark', mark);
     return this.http
-      .get<ApiResponse<any>>(`${this.apiUrl}/nexys/by-mark`, {
+      .get<ApiResponse<any>>(`${this.apiUrlRender}/nexys/by-mark`, {
         params,
       })
       .pipe(
@@ -31,7 +31,7 @@ export class NexsysApiService {
   getProductBySKU(sku: string): Observable<any> {
     const params = new HttpParams().set('sku', sku);
     return this.http
-      .get<ApiResponse<any>>(`${this.apiUrl}/nexys/by-sku`, { params })
+      .get<ApiResponse<any>>(`${this.apiUrlRender}/nexys/by-sku`, { params })
       .pipe(
         map((response) => response.data),
         catchError((error) => this.handleError('getProductBySKU', error))
@@ -45,7 +45,7 @@ export class NexsysApiService {
       .set('perPage', perPage.toString());
 
     return this.http
-      .get<ApiResponse<any>>(`${this.apiUrl}/nexys/all-products`, { params })
+      .get<ApiResponse<any>>(`${this.apiUrlRender}/nexys/all-products`, { params })
       .pipe(
         map((response) => response.data),
         catchError((error) => this.handleError('getAllProducts', error))

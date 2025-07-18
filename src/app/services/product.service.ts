@@ -6,6 +6,7 @@ import { bufferCount, concatMap, map, scan, delay } from 'rxjs/operators';
 // Asegúrate de que la ruta al modelo sea correcta
 import { ApiDetailsResponse, ProductAdvance } from '../models/ingram';
 import { ProductoFinal } from '../models/Productos';
+import { environment } from '../../enviroments/enviroment';
 
 interface SaveBatchResponse {
   message: string;
@@ -19,9 +20,11 @@ export interface CategoryResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AdvanceProductsService {
-  private API_PRODUCTS_URL = 'http://localhost:3002/advance-products/ingram';
-  private API_LIST_URL = 'http://localhost:3002/advance-products/all-products';
-  private API_CATEGORY_URL = 'http://localhost:3002/advance-products/categories';
+
+  private readonly apiUrlRender = environment.apiUrlRender; // URL de tu API NestJS
+  private API_PRODUCTS_URL = `${this.apiUrlRender}/advance-products/ingram`;
+  private API_LIST_URL = `${this.apiUrlRender}/advance-products/all-products`;
+  private API_CATEGORY_URL = `${this.apiUrlRender}/advance-products/categories`;
 
   // BehaviorSubject para emitir el array de productos de forma progresiva
   private _allProducts$ = new BehaviorSubject<ApiDetailsResponse<ProductAdvance>[]>([]);

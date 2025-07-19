@@ -27,7 +27,7 @@ export class AdvanceProductsService implements OnInit{
   private readonly apiUrlRender = environment.apiUrlRender; // URL de tu API NestJS
   private API_PRODUCTS_URL = `${this.apiUrlRender}/advance-products/ingram`;
   private API_LIST_URL = `${this.apiUrlRender}/advance-products/all-products`;
-  private API_CATEGORY_URL = `http://localhost:3002/categories`;
+  private API_CATEGORY_URL = `${this.apiUrlRender}/categories`;
    categorias: any = [];
 
   // BehaviorSubject para emitir el array de productos de forma progresiva

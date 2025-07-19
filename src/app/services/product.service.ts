@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { from, Observable, concat, BehaviorSubject } from 'rxjs';
 import { bufferCount, concatMap, map, scan, delay } from 'rxjs/operators';
@@ -13,25 +13,35 @@ interface SaveBatchResponse {
 }
 
 export interface CategoryResponse {
-  total: number;
-  products: number;
-  categories: { name: string; quantity: number }[];
+  catalog: GroupedCategory[];
+}
+
+export interface GroupedCategory {
+  category: string;
+  subCategories: string[];
 }
 
 @Injectable({ providedIn: 'root' })
-export class AdvanceProductsService {
+export class AdvanceProductsService implements OnInit{
 
   private readonly apiUrlRender = environment.apiUrlRender; // URL de tu API NestJS
   private API_PRODUCTS_URL = `${this.apiUrlRender}/advance-products/ingram`;
   private API_LIST_URL = `${this.apiUrlRender}/advance-products/all-products`;
-  private API_CATEGORY_URL = `${this.apiUrlRender}/advance-products/categories`;
+  private API_CATEGORY_URL = `http://localhost:3002/categories`;
+   categorias: any = [];
 
   // BehaviorSubject para emitir el array de productos de forma progresiva
   private _allProducts$ = new BehaviorSubject<ApiDetailsResponse<ProductAdvance>[]>([]);
   public allProducts$: Observable<ApiDetailsResponse<ProductAdvance>[]> = this._allProducts$.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
 
+  }
+
+  ngOnInit(): void {
+    // Aquí podrías inicializar algo si es necesario
+    this.getAllCategories();
+  }
   /**
    * Envía un lote de productos a la API para ser guardados.
    * @param payload El lote de productos a guardar.
@@ -74,6 +84,8 @@ export class AdvanceProductsService {
   }
 
    getAllCategories(): Observable<CategoryResponse> {
-    return this.http.get<CategoryResponse>(this.API_CATEGORY_URL);
+     const cats =  this.http.get<CategoryResponse>(this.API_CATEGORY_URL);
+     this.categorias = cats;
+     return cats;
   }
 }

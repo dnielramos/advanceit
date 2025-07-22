@@ -1,12 +1,7 @@
 /*==================================*/
 /*   SIDEBAR COMPONENT (sidebar.component.ts)   */
 /*==================================*/
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -17,19 +12,22 @@ import {
   faFillDrip,
   faChartPie,
   faTable,
+  faBullhorn,
+  faDatabase,
   faUser,
+  faGears,
   faBook,
   faChevronDown,
-  faChevronRight
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, FontAwesomeModule],
-  template: `
+template: `
     <div
-      class="transition-all flex flex-col py-2 shadow-md h-full Z-21"
+      class="transition-all flex flex-col py-2 shadow-md h-full Z-2"
       [ngClass]="{
         'w-48': !isToggleSidebarDesktop,
         'items-center': isToggleSidebarDesktop
@@ -65,7 +63,9 @@ import {
           class="flex items-center space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition"
         >
           <fa-icon [icon]="faTachometerAlt" class="text-gray-600"></fa-icon>
-          <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
+          <span
+            *ngIf="!isToggleSidebarDesktop"
+            class="text-gray-700 font-semibold"
             >Dashboard</span
           >
         </a>
@@ -77,7 +77,9 @@ import {
           >
             <div class="flex items-center space-x-2">
               <fa-icon [icon]="faCube" class="text-gray-600"></fa-icon>
-              <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
+              <span
+                *ngIf="!isToggleSidebarDesktop"
+                class="text-gray-700 font-semibold"
                 >Proveedores</span
               >
             </div>
@@ -86,7 +88,10 @@ import {
               class="text-gray-500"
             ></fa-icon>
           </button>
-          <div *ngIf="uiElementsOpen" class="pl-10 flex flex-col space-y-1 mt-1">
+          <div
+            *ngIf="uiElementsOpen"
+            class="pl-10 flex flex-col space-y-1 mt-1"
+          >
             <a
               routerLink="/dashboard/add-ingram-products"
               routerLinkActive="text-purple-600"
@@ -111,7 +116,9 @@ import {
           >
             <div class="flex items-center space-x-2">
               <fa-icon [icon]="faIcons" class="text-gray-600"></fa-icon>
-              <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
+              <span
+                *ngIf="!isToggleSidebarDesktop"
+                class="text-gray-700 font-semibold"
                 >Aplicacion</span
               >
             </div>
@@ -120,7 +127,10 @@ import {
               class="text-gray-500"
             ></fa-icon>
           </button>
-          <div *ngIf="uiElementsOpen" class="pl-10 flex flex-col space-y-1 mt-1">
+          <div
+            *ngIf="uiElementsOpen"
+            class="pl-10 flex flex-col space-y-1 mt-1"
+          >
             <a
               routerLink="/dashboard/advance-products"
               routerLinkActive="text-purple-600"
@@ -128,7 +138,6 @@ import {
             >
               ➤ Productos
             </a>
-
           </div>
         </div>
 
@@ -138,8 +147,10 @@ import {
             class="w-full flex items-center justify-between space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition"
           >
             <div class="flex items-center space-x-2">
-              <fa-icon [icon]="faIcons" class="text-gray-600"></fa-icon>
-              <span *ngIf="!isToggleSidebarDesktop" class="text-gray-700 font-semibold"
+              <fa-icon [icon]="faBullhorn" class="text-gray-600"></fa-icon>
+              <span
+                *ngIf="!isToggleSidebarDesktop"
+                class="text-gray-700 font-semibold"
                 >Marketing</span
               >
             </div>
@@ -148,7 +159,10 @@ import {
               class="text-gray-500"
             ></fa-icon>
           </button>
-          <div *ngIf="iconsSubmenuOpen" class="pl-10 flex flex-col space-y-1 mt-1">
+          <div
+            *ngIf="iconsSubmenuOpen"
+            class="pl-10 flex flex-col space-y-1 mt-1"
+          >
             <a
               routerLink="/dashboard/icons/library"
               routerLinkActive="text-purple-600"
@@ -161,23 +175,61 @@ import {
               routerLinkActive="text-purple-600"
               class="text-sm text-gray-600 hover:text-purple-600"
             >
-              ➤ Crear Meta
+              ➤ Crear Contenido
             </a>
           </div>
-        </div>  }}-->
+        </div> -->
 
-
+        <div class="mt-2">
+          <button
+            (click)="toggleIconsSubmenu()"
+            class="w-full flex items-center justify-between space-x-2 px-3 py-2 rounded hover:bg-purple-50 transition"
+          >
+            <div class="flex items-center space-x-2">
+              <fa-icon [icon]="faDatabase" class="text-gray-600"></fa-icon>
+              <span
+                *ngIf="!isToggleSidebarDesktop"
+                class="text-gray-700 font-semibold"
+                >Ordenes</span
+              >
+            </div>
+            <fa-icon
+              [icon]="iconsSubmenuOpen ? faChevronDown : faChevronRight"
+              class="text-gray-500"
+            ></fa-icon>
+          </button>
+          <div
+            *ngIf="iconsSubmenuOpen"
+            class="pl-10 flex flex-col space-y-1 mt-1"
+          >
+            <a
+              routerLink="/dashboard/orders"
+              routerLinkActive="text-purple-600"
+              class="text-sm text-gray-600 hover:text-purple-600"
+            >
+              ➤ Ver Ordenes
+            </a>
+          </div>
+        </div>
       </nav>
 
       <div
         *ngIf="!isToggleSidebarDesktop"
         class="p-4 text-center text-sm text-gray-500"
       >
-        © 2025 Advance Technologies. All rights reserved.
+        <!-- © 2025 Advance Technologies. All rights reserved. -->
+        <a
+          routerLink="/dashboard/icons/library"
+          routerLinkActive="text-purple-600"
+          class="text-sm text-gray-600 hover:text-purple-600"
+        >
+          Configuración
+          <fa-icon [icon]="faGears" class="text-gray-500"></fa-icon>
+        </a>
       </div>
     </div>
-  `
-  })
+  `,
+})
 export class SidebarComponent {
   faTachometerAlt = faTachometerAlt;
   faCube = faCube;
@@ -187,6 +239,9 @@ export class SidebarComponent {
   faTable = faTable;
   faUser = faUser;
   faBook = faBook;
+  faGears = faGears;
+  faBullhorn = faBullhorn;
+  faDatabase = faDatabase;
   faChevronDown = faChevronDown;
   faChevronRight = faChevronRight;
 

@@ -6,6 +6,7 @@ import {
   faPen, faEye, faCheckSquare, faTrash, faSearch, faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { OrdersService, Order, Product } from '../../../services/orders.service';
+import { NexsysProduct } from '../../../models/Productos';
 import { FormsModule } from '@angular/forms';
 import { NgIf, NgFor } from '@angular/common';
 
@@ -13,7 +14,7 @@ import { NgIf, NgFor } from '@angular/common';
   selector: 'app-orders',
   standalone: true,
   imports: [CommonModule, FontAwesomeModule, FormsModule, NgIf, NgFor],
-  templateUrl: './orders.component.html',
+templateUrl: './orders.component.html',
 })
 export class OrdersComponent implements OnInit {
   faPlus = faPlus;
@@ -114,8 +115,9 @@ export class OrdersComponent implements OnInit {
 
     this.ordersService.searchProductBySku(this.newProductInput.trim()).subscribe({
       next: (product) => {
-        if (product) {
-          this.productSearchResult = product;
+        console.log('Producto encontrado:', product?.["data"].return[0]);
+        if (product?.["data"].return) {
+          this.productSearchResult = this.mapNexsysProductToProduct(product["data"].return[0]);
         } else {
           this.productSearchError = 'Producto no encontrado';
         }
@@ -125,6 +127,26 @@ export class OrdersComponent implements OnInit {
       }
     });
   }
+
+
+  mapNexsysProductToProduct(nexsysProduct: NexsysProduct): Product {
+  return {
+    nombre: nexsysProduct.name,
+    sku: nexsysProduct.sku,
+    precio: nexsysProduct.price,
+    _id: nexsysProduct.sku, // Assuming sku can be used as a unique identifier
+    // Include additional fields from NexsysProduct as part of the [key: string]: any
+    category: nexsysProduct.category,
+    currency: nexsysProduct.currency,
+    image: nexsysProduct.image,
+    inventory: nexsysProduct.inventory,
+    long_description: nexsysProduct.long_description,
+    mark: nexsysProduct.mark,
+    parent: nexsysProduct.parent,
+    short_description: nexsysProduct.short_description,
+    tax_excluded: nexsysProduct.tax_excluded,
+  };
+}
 
   addProductToOrder(product: Product): void {
     this.newOrderProducts.push(product);
@@ -141,13 +163,34 @@ export class OrdersComponent implements OnInit {
     return this.newOrderProducts.reduce((acc, p) => acc + (p.precio || 0), 0);
   }
 
-  createOrder(): void {
-    const newOrder: Partial<Order> = {
-      cliente: this.newOrderClient,
-      nota: this.newOrderNote,
-      productos: this.newOrderProducts,
+    private generateOrderNumber(): string {
+    // Example: Generate a unique order number (replace with your logic)
+    return `SH-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
+  }
+
+  getCurrentDateTime(): { fecha: string; hora: string } {
+    const now = new Date();
+    const fecha = now.toISOString().split('T')[0]; // e.g., "2025-07-24"
+    const hora = now.toTimeString().split(' ')[0]; // e.g., "17:32:00"
+    return { fecha, hora };
+  }
+
+  mapNexsysProductsToSkus(nexsysProducts: Product[]): string[] {
+  return nexsysProducts.map(product => product.sku);
+}
+
+createOrder(): void {
+    const { fecha, hora } = this.getCurrentDateTime();
+    const newOrder: Order = {
+      numeroOrden: this.generateOrderNumber(),
+      fecha,
+      hora,
       estadoPago: 'pendiente',
-      total: this.calculateTotal()
+      precioTotal: this.calculateTotal(),
+      productos: this.mapNexsysProductsToSkus(this.newOrderProducts),
+      cliente: this.newOrderClient,
+      shippingNo: `ENVIO-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+      notas: this.newOrderNote,
     };
 
     this.ordersService.createOrder(newOrder).subscribe({
@@ -155,7 +198,7 @@ export class OrdersComponent implements OnInit {
         this.loadOrders();
         this.closeCreateModal();
       },
-      error: (err: any) => console.error('Error creando orden:', err)
+      error: (err: any) => console.error('Error creando orden:', err),
     });
   }
 }

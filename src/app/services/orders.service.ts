@@ -12,14 +12,16 @@ export interface Product {
 }
 
 export interface Order {
-  _id?: string;
+  id?: string;
   numeroOrden: string;
-  cliente: string;
-  productos: Product[];
-  nota: string;
+  fecha: string;
+  hora: string;
   estadoPago: 'pagado' | 'no_pagado' | 'pendiente' | 'cancelado';
-  total: number;
-  createdAt?: string;
+  precioTotal: number;
+  productos: string[];
+  cliente: string;
+  shippingNo: string;
+  notas: string;
 }
 
 @Injectable({
@@ -27,7 +29,7 @@ export interface Order {
 })
 export class OrdersService {
   private apiUrl = 'http://localhost:3002/orders';
-  private productSearchUrl = 'http://localhost:3002/products';
+  private productSearchUrl = 'http://localhost:3002/nexys/by-sku';
 
   constructor(private http: HttpClient) {}
 
@@ -36,7 +38,7 @@ export class OrdersService {
   }
 
   searchProductBySku(sku: string): Observable<Product | null> {
-    return this.http.get<Product | null>(`${this.productSearchUrl}/sku/${sku}`);
+    return this.http.get<Product | null>(`${this.productSearchUrl}?sku=${sku}`);
   }
 
   createOrder(order: Partial<Order>): Observable<Order> {

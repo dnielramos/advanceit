@@ -22,11 +22,13 @@
     </div>
     <!-- Botones de acción -->
     <div class="flex gap-2">
-      <button class="flex items-center bg-white border border-gray-200 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+      <button
+        class="flex items-center bg-white border border-gray-200 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
         <fa-icon [icon]="faFileExport" class="mr-2"></fa-icon>
         Export All
       </button>
-      <button class="flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors">
+      <button
+        class="flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors">
         <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>
         Create Order
       </button>
@@ -50,11 +52,8 @@
     <div class="flex-1"></div>
     <!-- Filtro -->
     <div class="relative text-gray-600">
-      <input
-        type="search"
-        placeholder="Filter..."
-        class="bg-gray-100 h-10 px-5 pr-10 rounded-md text-sm focus:outline-none"
-      />
+      <input type="search" placeholder="Filter..."
+        class="bg-gray-100 h-10 px-5 pr-10 rounded-md text-sm focus:outline-none" />
       <button class="absolute right-0 top-0 mt-2 mr-2">
         <fa-icon [icon]="faFilter"></fa-icon>
       </button>
@@ -63,28 +62,23 @@
 
   <!-- Listado de órdenes -->
   <div class="space-y-4">
-    <div
-      *ngFor="let order of orders"
-      class="bg-white rounded-md shadow p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between"
-    >
+    <div *ngFor="let order of orders"
+      class="bg-white rounded-md shadow p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
       <!-- Información principal de la orden -->
       <div class="flex-1">
         <div class="flex flex-wrap items-center gap-2 mb-1">
-          <span class="text-lg font-semibold text-gray-700">Order #{{ order.id }}</span>
-          <span
-            class="text-xs font-semibold uppercase px-2 py-1 rounded-md"
-            [ngClass]="{
-              'bg-green-100 text-green-700': order.estadoPago === 'paid',
-              'bg-yellow-100 text-yellow-700': order.estadoPago === 'waiting',
-              'bg-red-100 text-red-700': order.estadoPago === 'unpaid',
-              'bg-gray-100 text-gray-600': order.estadoPago === 'canceled'
-            }"
-          >
+          <span class="text-lg font-semibold text-gray-700">Order #{{ order._id }}</span>
+          <span class="text-xs font-semibold uppercase px-2 py-1 rounded-md" [ngClass]="{
+              'bg-green-100 text-green-700': order.estadoPago === 'pagado',
+              'bg-yellow-100 text-yellow-700': order.estadoPago === 'pendiente',
+              'bg-red-100 text-red-700': order.estadoPago === 'no_pagado',
+              'bg-gray-100 text-gray-600': order.estadoPago === 'cancelado'
+            }">
             {{ order.estadoPago }}
           </span>
         </div>
         <div class="text-sm text-gray-500 mb-1">
-          {{ order.fecha }}, {{ order.hora }} | Shipping NO: {{ order.shippingNo }}
+          {{ order.createdAt }}, {{ order.createdAt }} | Shipping NO: {{ order.numeroOrden }}
         </div>
         <div class="text-sm text-gray-500 mb-1">
           Cliente: {{ order.cliente }}
@@ -98,7 +92,7 @@
 
       <!-- Precio total -->
       <div class="text-xl font-semibold text-gray-700">
-        ${{ order.precioTotal | number:'1.2-2' }}
+        ${{ order.total | number:'1.2-2' }}
       </div>
 
       <!-- Acciones secundarias -->
@@ -119,7 +113,8 @@
           <fa-icon [icon]="faPen" class="mr-1"></fa-icon>
           Update Order
         </button>
-        <button class="flex items-center bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-md transition-colors">
+        <button
+          class="flex items-center bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-md transition-colors">
           <fa-icon [icon]="faEye" class="mr-1"></fa-icon>
           View Details
         </button>

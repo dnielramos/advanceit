@@ -25,7 +25,7 @@ import { ViewOrderModalComponent } from './view-order-modal/view-order-modal.com
     OrderCardComponent,
     CreateOrderModalComponent,
     EditOrderModalComponent,
-    ViewOrderModalComponent,
+    ViewOrderModalComponent
   ],
   templateUrl: './orders.component.html',
 })

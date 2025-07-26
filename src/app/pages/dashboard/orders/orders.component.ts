@@ -4,9 +4,14 @@ import { OrdersService, Order } from '../../../services/orders.service';
 
 // Importa los nuevos componentes individuales
 import { PageHeaderComponent } from './page-header/page-header.component';
-import { OrderFilterComponent, FilterData, ResumenData } from './order-filter/order-filter.component';
+import {
+  OrderFilterComponent,
+  FilterData,
+  ResumenData,
+} from './order-filter/order-filter.component';
 import { OrderCardComponent } from './order-card/order-card.component';
 import { CreateOrderModalComponent } from './create-order-modal/create-order-modal.component';
+import { EditOrderModalComponent } from './edit-order-modal/edit-order-modal.component';
 
 @Component({
   selector: 'app-orders',
@@ -18,6 +23,7 @@ import { CreateOrderModalComponent } from './create-order-modal/create-order-mod
     OrderFilterComponent,
     OrderCardComponent,
     CreateOrderModalComponent,
+    EditOrderModalComponent,
   ],
   templateUrl: './orders.component.html',
 })
@@ -38,6 +44,7 @@ export class OrdersComponent implements OnInit {
   };
 
   isCreateModalVisible = false;
+  orderToEdit: Order | null = null; // ¡NUEVO!
 
   constructor(private ordersService: OrdersService) {}
 
@@ -58,8 +65,12 @@ export class OrdersComponent implements OnInit {
 
   applyFilters(): void {
     this.filteredOrders = this.allOrders.filter((order) => {
-      const estadoMatch = this.filters.estado ? order.estadoPago === this.filters.estado : true;
-      const numeroMatch = this.filters.numeroOrden ? order.numeroOrden.includes(this.filters.numeroOrden) : true;
+      const estadoMatch = this.filters.estado
+        ? order.estadoPago === this.filters.estado
+        : true;
+      const numeroMatch = this.filters.numeroOrden
+        ? order.numeroOrden.includes(this.filters.numeroOrden)
+        : true;
       return estadoMatch && numeroMatch;
     });
   }
@@ -68,12 +79,45 @@ export class OrdersComponent implements OnInit {
     this.resumen = {
       total: this.allOrders.length,
       pagado: this.allOrders.filter((o) => o.estadoPago === 'pagado').length,
-      pendiente: this.allOrders.filter((o) => o.estadoPago === 'pendiente').length,
-      cancelado: this.allOrders.filter((o) => o.estadoPago === 'cancelado').length,
+      pendiente: this.allOrders.filter((o) => o.estadoPago === 'pendiente')
+        .length,
+      cancelado: this.allOrders.filter((o) => o.estadoPago === 'cancelado')
+        .length,
     };
   }
 
   // --- Manejadores de eventos de componentes hijos ---
+
+  /**
+   * Se activa cuando el usuario hace clic en "Editar" en una tarjeta de orden.
+   * Establece la orden a editar, lo que causa que el modal de edición se muestre.
+   */
+  handleEditOrder(order: Order): void {
+    this.orderToEdit = order;
+  }
+
+  /**
+   * Se activa cuando el usuario guarda los cambios en el modal de edición.
+   * Actualiza la orden en la lista principal y recarga la vista.
+   */
+  handleSaveChanges(updatedOrder: any): void {
+
+    console.log('ORDEN PARA ACTUALIZAR:', updatedOrder);
+    // Lógica para actualizar la orden en la base de datos
+    // this.ordersService.updateOrder(updatedOrder.id, updatedOrder).subscribe(...)
+
+    // Simulación en el frontend:
+    const index = this.allOrders.findIndex(
+      (o) => o.numeroOrden === updatedOrder.numeroOrden
+    );
+    if (index !== -1) {
+      this.allOrders[index] = updatedOrder;
+    }
+
+    this.orderToEdit = null; // Cierra el modal
+    this.applyFilters(); // Refresca la lista filtrada
+    this.updateResumen(); // Actualiza los contadores
+  }
 
   handleFilterChange(newFilters: FilterData): void {
     this.filters = { ...this.filters, ...newFilters };
@@ -96,11 +140,15 @@ export class OrdersComponent implements OnInit {
   }
 
   handleMarkAsPaid(order: Order): void {
-    const confirmation = confirm(`¿Marcar la Orden #${order.numeroOrden} como "Pagada"?`);
+    const confirmation = confirm(
+      `¿Marcar la Orden #${order.numeroOrden} como "Pagada"?`
+    );
     if (!confirmation) return;
 
     // Lógica para actualizar (aquí simulada en el front)
-    const orderToUpdate = this.allOrders.find(o => o.numeroOrden === order.numeroOrden);
+    const orderToUpdate = this.allOrders.find(
+      (o) => o.numeroOrden === order.numeroOrden
+    );
     if (orderToUpdate) {
       orderToUpdate.estadoPago = 'pagado';
       this.applyFilters(); // Re-aplica filtros para actualizar la vista

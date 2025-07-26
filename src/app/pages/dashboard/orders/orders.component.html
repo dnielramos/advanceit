@@ -18,6 +18,7 @@
       *ngFor="let order of filteredOrders"
       [order]="order"
       (markAsPaid)="handleMarkAsPaid($event)"
+      (edit)="handleEditOrder(order)"
     ></app-order-card>
   </div>
 
@@ -26,6 +27,13 @@
     (close)="isCreateModalVisible = false"
     (createOrder)="handleCreateOrder($event)"
   ></app-create-order-modal>
+
+  <app-edit-order-modal
+    *ngIf="orderToEdit"
+    [order]="orderToEdit"
+    (save)="handleSaveChanges($event)"
+    (close)="orderToEdit = null"
+  ></app-edit-order-modal>
 
   <!-- <app-edit-order-modal
     *ngIf="isEditModalVisible && selectedOrderForEdit"
@@ -37,5 +45,4 @@
 </div>
 
       <!-- (view)="viewOrder($event)" -->
-      <!-- (edit)="editOrder($event)" -->
       <!-- (delete)="deleteOrder($event)" -->

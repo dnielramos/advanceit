@@ -12,6 +12,7 @@ import {
 import { OrderCardComponent } from './order-card/order-card.component';
 import { CreateOrderModalComponent } from './create-order-modal/create-order-modal.component';
 import { EditOrderModalComponent } from './edit-order-modal/edit-order-modal.component';
+import { ViewOrderModalComponent } from './view-order-modal/view-order-modal.component';
 
 @Component({
   selector: 'app-orders',
@@ -24,6 +25,7 @@ import { EditOrderModalComponent } from './edit-order-modal/edit-order-modal.com
     OrderCardComponent,
     CreateOrderModalComponent,
     EditOrderModalComponent,
+    ViewOrderModalComponent,
   ],
   templateUrl: './orders.component.html',
 })
@@ -45,6 +47,7 @@ export class OrdersComponent implements OnInit {
 
   isCreateModalVisible = false;
   orderToEdit: Order | null = null; // ¡NUEVO!
+  orderToView: Order | null = null;
 
   constructor(private ordersService: OrdersService) {}
 
@@ -75,6 +78,14 @@ export class OrdersComponent implements OnInit {
     });
   }
 
+  /**
+   * Se activa cuando el usuario hace clic en "Ver" en una tarjeta de orden.
+   * Establece la orden a visualizar, lo que causa que el modal se muestre.
+   */
+  handleViewOrder(order: Order): void {
+    this.orderToView = order;
+  }
+
   updateResumen(): void {
     this.resumen = {
       total: this.allOrders.length,
@@ -101,7 +112,6 @@ export class OrdersComponent implements OnInit {
    * Actualiza la orden en la lista principal y recarga la vista.
    */
   handleSaveChanges(updatedOrder: any): void {
-
     console.log('ORDEN PARA ACTUALIZAR:', updatedOrder);
     // Lógica para actualizar la orden en la base de datos
     // this.ordersService.updateOrder(updatedOrder.id, updatedOrder).subscribe(...)

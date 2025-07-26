@@ -19,6 +19,7 @@
       [order]="order"
       (markAsPaid)="handleMarkAsPaid($event)"
       (edit)="handleEditOrder(order)"
+      (view)="handleViewOrder(order)"
     ></app-order-card>
   </div>
 
@@ -35,14 +36,13 @@
     (close)="orderToEdit = null"
   ></app-edit-order-modal>
 
-  <!-- <app-edit-order-modal
-    *ngIf="isEditModalVisible && selectedOrderForEdit"
-    [order]="selectedOrderForEdit"
-    (save)="handleSaveEditedOrder($event)"
-    (close)="isEditModalVisible = false; selectedOrderForEdit = null;"
-  ></app-edit-order-modal> -->
+   <app-view-order-modal
+    *ngIf="orderToView"
+    [order]="orderToView"
+    (close)="orderToView = null"
+  ></app-view-order-modal>
+
 
 </div>
 
-      <!-- (view)="viewOrder($event)" -->
       <!-- (delete)="deleteOrder($event)" -->

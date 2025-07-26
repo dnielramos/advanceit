@@ -129,6 +129,10 @@
     height: 100dvh;
   }
 
+  .hflexy {
+    height: calc(100dvh - 4rem);
+  }
+
 
   #widget_usd_cop4 {
     color: #6d6d6d;

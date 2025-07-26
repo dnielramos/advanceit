@@ -8,7 +8,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
   standalone: true,
   imports: [CommonModule, FontAwesomeModule],
   template: `
-    <header class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between mb-6 sticky top-0 bg-white z-10 shadow-md p-4">
+    <header class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between mb-6">
       <h1 class="text-3xl font-black text-slate-800 mb-4 sm:mb-0">{{ title }}</h1>
       <button (click)="buttonClick.emit()" class="flex items-center gap-2 bg-purple-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all">
         <fa-icon [icon]="faPlus"></fa-icon>

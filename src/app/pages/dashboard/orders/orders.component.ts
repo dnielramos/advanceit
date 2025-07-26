@@ -21,11 +21,12 @@ import {
   Product,
 } from '../../../services/orders.service';
 import { NexsysProduct } from '../../../models/Productos';
+import { OrderFilterComponent } from './order-filter/order-filter.component';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, FormsModule, NgIf, NgFor],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, NgIf, NgFor, OrderFilterComponent],
   templateUrl: './orders.component.html',
 })
 export class OrdersComponent implements OnInit {

@@ -1,0 +1,26 @@
+  <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <input [(ngModel)]="filterNumeroOrden" (input)="onFilterChange()" placeholder="Buscar por #"
+          class="block w-full sm:w-auto flex-grow rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+        <select [(ngModel)]="filterEstado" (change)="onFilterChange()"
+          class="block w-full sm:w-auto flex-grow rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+          <option value="">Todos los estados</option>
+          <option value="pagado">Pagado</option>
+          <option value="no_pagado">No pagado</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+        <button (click)="clearFilters()"
+          class="text-sm text-slate-600 hover:text-purple-600 font-semibold transition-colors py-2">
+          Limpiar filtros
+        </button>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-center">
+        <div class="bg-slate-100 p-3 rounded-lg"><span class="text-xs font-medium text-slate-500">TOTAL</span><p class="text-xl font-bold text-slate-800">{{ resumen.total }}</p></div>
+        <div class="bg-green-100 p-3 rounded-lg"><span class="text-xs font-medium text-green-600">PAGADO</span><p class="text-xl font-bold text-green-800">{{ resumen.pagado }}</p></div>
+        <div class="bg-yellow-100 p-3 rounded-lg"><span class="text-xs font-medium text-yellow-600">PENDIENTE</span><p class="text-xl font-bold text-yellow-800">{{ resumen.pendiente }}</p></div>
+        <div class="bg-red-100 p-3 rounded-lg"><span class="text-xs font-medium text-red-600">CANCELADO</span><p class="text-xl font-bold text-red-800">{{ resumen.cancelado }}</p></div>
+      </div>
+    </div>
+  </div>

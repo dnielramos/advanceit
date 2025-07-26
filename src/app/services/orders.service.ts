@@ -28,8 +28,8 @@ export interface Order {
   providedIn: 'root'
 })
 export class OrdersService {
-  private apiUrl = 'http://localhost:3002/orders';
-  private productSearchUrl = 'http://localhost:3002/nexys/by-sku';
+  private apiUrl = 'https://advance-genai.onrender.com/orders';
+  private productSearchUrl = 'https://advance-genai.onrender.com/nexys/by-sku';
 
   constructor(private http: HttpClient) {}
 

@@ -25,11 +25,27 @@ import { ViewOrderModalComponent } from './view-order-modal/view-order-modal.com
     OrderCardComponent,
     CreateOrderModalComponent,
     EditOrderModalComponent,
-    ViewOrderModalComponent
+    ViewOrderModalComponent,
   ],
   templateUrl: './orders.component.html',
 })
 export class OrdersComponent implements OnInit {
+  handleDeleteOrder(_t9: Order) {
+    // Aquí puedes implementar la lógica para eliminar una orden
+    // Por ejemplo, podrías mostrar un modal de confirmación y luego llamar al servicio para eliminar la orden
+    console.log('Eliminar orden:', _t9);
+    alert(`Orden #${_t9.numeroOrden} eliminada.`);
+    // Lógica de eliminación aquí, como llamar a ordersService.deleteOrder(_t9.id).subscribe(...)
+    // Luego recargar las órdenes o actualizar la lista filtrada
+
+    //simulación de eliminación en el frontend:
+    this.allOrders = this.allOrders.filter(
+      (order) => order.numeroOrden !== _t9.numeroOrden
+    );
+    this.applyFilters(); // Re-aplica filtros para actualizar la vista
+    this.updateResumen(); // Actualiza el contador
+
+  }
   allOrders: Order[] = [];
   filteredOrders: Order[] = [];
 

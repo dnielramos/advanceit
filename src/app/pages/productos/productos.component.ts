@@ -41,13 +41,15 @@ import { BrandService } from '../../services/brand.service';
 import { CertificateSliderComponent } from '../../shared/certificate-slider/certificate-slider.component';
 import { GridProductsStoreComponent } from '../../components/products/products-store/products-store.component';
 import { SlideProductStoreComponent } from '../../components/products/slide-product-store/slide-product-store.component';
+import { AngularToastifyModule, ToastService } from 'angular-toastify';
 
 @Component({
   selector: 'app-productos',
   standalone: true,
   imports: [
-    CommonModule,
+  CommonModule,
     FormsModule,
+    AngularToastifyModule,
     FontAwesomeModule,
     FooterComponent,
     RouterLink,
@@ -360,7 +362,8 @@ export class ProductosComponent implements OnInit {
     private ingramService: IngramService,
     private cartService: CartService,
     private productService: AdvanceProductsService,
-    private brandService: BrandService
+    private brandService: BrandService,
+    private toastService: ToastService
   ) {
     // En el constructor de NavbarComponent
     cartService.getCart().subscribe((items) => {
@@ -424,8 +427,9 @@ export class ProductosComponent implements OnInit {
   }
 
   addToCart(product: ProductoFinal): void {
-    this.cartService.addToCart(product);
-    alert(`${product.nombre} añadido al carrito`);
+    // this.cartService.addToCart(product);
+    // alert(`${product.nombre} añadido al carrito`);
+    this.toastService.success(`${product.nombre} añadido al carrito`);
   }
 
   mapearProducto(nexsysProducto: NexsysProduct): ProductoFinal {

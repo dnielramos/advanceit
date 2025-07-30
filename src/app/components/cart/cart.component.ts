@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CartService, CartItem } from '../../services/cart.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-cart',
@@ -14,11 +15,12 @@ export class CartComponent implements OnInit {
   total: number = 0;
   couponCode: string = '';
   discount: number = 0;
+  private apiUrlOrders = 'https://advance-genai.onrender.com/orders';
 
-  constructor(private cartService: CartService) {}
+  constructor(private cartService: CartService, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.cartService.getCart().subscribe(items => {
+    this.cartService.getCart().subscribe((items) => {
       this.cartItems = items;
       this.total = this.cartService.getTotal();
     });
@@ -62,7 +64,39 @@ export class CartComponent implements OnInit {
 
   // Finaliza la compra
   checkout(): void {
-    alert('Funcionalidad de pago pendiente');
+    this.createOrder();
+  }
+
+  createOrder(): void {
+    const productosSKU = this.cartItems.map((item) => item.product.sku);
+    const numeroOrden = 'ORD-' + Date.now(); // Puedes ajustar esta lógica
+    const now = new Date();
+    const fecha = now.toISOString().split('T')[0]; // yyyy-mm-dd
+    const hora = now.toTimeString().split(' ')[0]; // hh:mm:ss
+    const precioTotal = this.total;
+
+    const nuevaOrden = {
+      numeroOrden,
+      fecha,
+      hora,
+      estadoPago: 'pendiente', // Asumimos pago inmediato por ahora
+      precioTotal,
+      productos: productosSKU,
+      cliente: 'cliente-anónimo', // Cambiar si tienes login
+      shippingNo: 'ENVIO-' + Date.now(), // Puedes mejorar esto
+      notas: '', // O permitir que el usuario escriba algo
+    };
+
+    this.http.post(this.apiUrlOrders, nuevaOrden).subscribe({
+      next: (response) => {
+        alert('Orden creada con éxito');
+        this.cartService.clearCart();
+      },
+      error: (error) => {
+        console.error('Error creando la orden', error);
+        alert('Hubo un error al crear la orden');
+      },
+    });
   }
 
   // Continuar comprando

@@ -22,8 +22,8 @@ export class SliderProductComponent implements AfterViewInit {
       description: 'Proveemos hardware autorizado por las grandes marcas.',
       buttonText: 'Shop Now',
       image: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
-     background: 'url(https://wahlaptopstore.weebly.com/uploads/1/1/6/6/116678227/logo-banner-51_orig.jpg)',
-     video: 'banners/videobanner.webm'
+      background: 'url(banners/background.jpeg)',
+      video: 'banners/videobanner.webm'
     },
     // {
     //   title: 'Gaming Power Unleashed',
@@ -51,7 +51,7 @@ export class SliderProductComponent implements AfterViewInit {
       description: 'Equipo portátil de alta gama con procesadores Intel Core de última generación.',
       buttonText: 'See Plans',
       image: '/products/notebook-latitude-14-5440-nt-gray-gallery-2.avif',
-      background: 'url(banners/gemini2.jpg)',
+      background: 'url(banners/background.jpeg)',
       video: 'banners/videobanner.webm'
     }
   ];

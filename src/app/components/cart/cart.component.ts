@@ -3,6 +3,7 @@ import { CartService, CartItem } from '../../services/cart.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -17,7 +18,7 @@ export class CartComponent implements OnInit {
   discount: number = 0;
   private apiUrlOrders = 'https://advance-genai.onrender.com/orders';
 
-  constructor(private cartService: CartService, private http: HttpClient) {}
+  constructor(private cartService: CartService, private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
     this.cartService.getCart().subscribe((items) => {
@@ -91,6 +92,7 @@ export class CartComponent implements OnInit {
       next: (response) => {
         alert('Orden creada con éxito');
         this.cartService.clearCart();
+          this.router.navigate(['productos/orden-exitosa']); // Ruta al componente
       },
       error: (error) => {
         console.error('Error creando la orden', error);

@@ -427,9 +427,12 @@ export class ProductosComponent implements OnInit {
   }
 
   addToCart(product: ProductoFinal): void {
-    // this.cartService.addToCart(product);
+    if(this.cartService.addToCart(product)){
+      this.toastService.success(`${product.nombre} añadido al carrito`);
+    } else {
+      this.toastService.error(`NO pude añadir ${product.nombre} al carrito`);
+    }
     // alert(`${product.nombre} añadido al carrito`);
-    this.toastService.success(`${product.nombre} añadido al carrito`);
   }
 
   mapearProducto(nexsysProducto: NexsysProduct): ProductoFinal {

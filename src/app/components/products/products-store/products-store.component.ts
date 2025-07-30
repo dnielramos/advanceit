@@ -6,6 +6,8 @@ import {
   ViewChild,
   AfterViewInit,
   OnDestroy,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { ProductAdvanceComponent } from '../product-advance/product-advance.component';
 import { CartService } from '../../../services/cart.service';
@@ -17,7 +19,7 @@ import { CartService } from '../../../services/cart.service';
 })
 export class GridProductsStoreComponent implements AfterViewInit, OnDestroy {
   @Input() productos: any[] = [];
-
+  @Output() añadirAlCarrito: EventEmitter<any> = new EventEmitter();
   productosFiltrados: any[] = [];
   itemsPorPagina: number = 8; // 2 filas * 4 columnas
   paginaActual: number = 1;
@@ -68,7 +70,9 @@ export class GridProductsStoreComponent implements AfterViewInit, OnDestroy {
 
   addToCart(product: any) {
     const cantidad = parseInt(product.cantidad) || 1;
-    this.cartService.addToCart(product, cantidad);
-    console.log('Producto añadido al carrito:', product);
+    // this.cartService.addToCart(product, cantidad);
+    this.añadirAlCarrito.emit(product);
+    // Mostrar mensaje de éxito
+    // console.log('Producto añadido al carrito:', product);
   }
 }

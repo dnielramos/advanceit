@@ -29,7 +29,7 @@ export class CartService {
   }
 
   // Añadir producto al carrito
-  addToCart(product: ProductoFinal, quantity: number = 1): void {
+  addToCart(product: ProductoFinal, quantity: number = 1): boolean {
     const existingItem = this.cartItems.find(item => item.product.id === product.id);
 
     if (existingItem) {
@@ -38,7 +38,17 @@ export class CartService {
       this.cartItems.push({ product, quantity });
     }
 
-    this.updateCart();
+    try {
+      this.updateCart();
+      return true; // Indicar que se ha añadido correctamente
+
+    } catch (error) {
+      console.error('Error al añadir producto al carrito:', error);
+      // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+      return false;
+
+    }
+
   }
 
   // Actualizar cantidad de un producto

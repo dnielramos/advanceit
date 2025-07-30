@@ -19,6 +19,7 @@ import { RouterLink } from '@angular/router';
   templateUrl: './product-vertical.component.html',
 })
 export class ProductVerticalComponent {
+
   @Input() imagenIzquierda: boolean = true;
   @Input() productosFiltrados: ProductoFinal[] = [];
   @Input() producto!: ProductoFinal;

@@ -1,6 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { ProductAdvanceComponent } from "../product-advance/product-advance.component";
+import {
+  Component,
+  Input,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
+import { ProductAdvanceComponent } from '../product-advance/product-advance.component';
+import { CartService } from '../../../services/cart.service';
 
 @Component({
   selector: 'app-grid-products-store',
@@ -16,6 +24,8 @@ export class GridProductsStoreComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('sentinel', { static: false }) sentinelRef!: ElementRef;
   private observer!: IntersectionObserver;
+
+  constructor(private cartService: CartService) {}
 
   ngAfterViewInit(): void {
     this.cargarProductos();
@@ -57,6 +67,8 @@ export class GridProductsStoreComponent implements AfterViewInit, OnDestroy {
   }
 
   addToCart(product: any) {
+    const cantidad = parseInt(product.cantidad) || 1;
+    this.cartService.addToCart(product, cantidad);
     console.log('Producto añadido al carrito:', product);
   }
 }

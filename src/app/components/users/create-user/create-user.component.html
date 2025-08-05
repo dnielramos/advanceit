@@ -1,0 +1,109 @@
+<div class="bg-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-auto p-6 sm:p-8 animate__animated animate__fadeInUp animate__faster transition-all duration-300">
+
+    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 text-center tracking-tight">
+      Crear Nueva Cuenta
+    </h2>
+
+    <form #createUserForm="ngForm" (ngSubmit)="onSubmit(createUserForm)" class="space-y-5" novalidate>
+
+      <div>
+        <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1.5">
+          Nombre
+        </label>
+        <div class="relative">
+          <fa-icon [icon]="faUser" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-600"></fa-icon>
+          <input
+            id="nombre"
+            name="nombre"
+            type="text"
+            [(ngModel)]="user.nombre"
+            #nombre="ngModel"
+            required
+            placeholder="Ingresa tu nombre"
+            class="w-full pl-10 pr-4 py-2.5 bg-white border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ease-in-out"
+            [ngClass]="{
+              'border-red-500 focus:ring-red-500': nombre.invalid && (nombre.dirty || nombre.touched),
+              'border-gray-300 focus:ring-purple-500': !nombre.invalid
+            }"
+          />
+        </div>
+        <div *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)" class="text-sm text-red-500 mt-1.5 animate__animated animate__fadeIn">
+          <span *ngIf="nombre.errors?.['required']">El nombre es obligatorio.</span>
+        </div>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">
+          Correo Electrónico
+        </label>
+        <div class="relative">
+          <fa-icon [icon]="faEnvelope" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-600"></fa-icon>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            [(ngModel)]="user.email"
+            #email="ngModel"
+            required
+            email
+            placeholder="Ingresa tu correo electrónico"
+            class="w-full pl-10 pr-4 py-2.5 bg-white border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ease-in-out"
+            [ngClass]="{
+              'border-red-500 focus:ring-red-500': email.invalid && (email.dirty || email.touched),
+              'border-gray-300 focus:ring-purple-500': !email.invalid
+            }"
+          />
+        </div>
+        <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-sm text-red-500 mt-1.5 animate__animated animate__fadeIn">
+          <span *ngIf="email.errors?.['required']">El correo es obligatorio.</span>
+          <span *ngIf="email.errors?.['email']">Ingresa un formato de correo válido.</span>
+        </div>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">
+          Contraseña
+        </label>
+        <div class="relative">
+          <fa-icon [icon]="faLock" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-600"></fa-icon>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            [(ngModel)]="user.password"
+            #password="ngModel"
+            required
+            minlength="8"
+            placeholder="Ingresa tu contraseña"
+            class="w-full pl-10 pr-4 py-2.5 bg-white border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ease-in-out"
+            [ngClass]="{
+              'border-red-500 focus:ring-red-500': password.invalid && (password.dirty || password.touched),
+              'border-gray-300 focus:ring-purple-500': !password.invalid
+            }"
+          />
+        </div>
+        <div *ngIf="password.invalid && (password.dirty || password.touched)" class="text-sm text-red-500 mt-1.5 animate__animated animate__fadeIn">
+          <span *ngIf="password.errors?.['required']">La contraseña es obligatoria.</span>
+          <span *ngIf="password.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres.</span>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="createUserForm.invalid"
+        class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-x-2 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-400 disabled:opacity-50 disabled:cursor-not-allowed animate__animated"
+        [class.animate__pulse]="createUserForm.valid"
+      >
+        <fa-icon [icon]="faUserPlus"></fa-icon>
+        <span>Crear Cuenta</span>
+      </button>
+
+      <div class="text-center mt-5">
+        <a href="#" class="text-sm text-purple-600 hover:text-purple-700 transition-colors duration-200">
+          ¿Ya tienes una cuenta? Inicia Sesión
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

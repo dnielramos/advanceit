@@ -43,6 +43,7 @@ import { GridProductsStoreComponent } from '../../components/products/products-s
 import { SlideProductStoreComponent } from '../../components/products/slide-product-store/slide-product-store.component';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 import { InfoLoginComponent } from "./info-login/info-login.component";
+import { CreateUserComponent } from "../../components/users/create-user/create-user.component";
 
 @Component({
   selector: 'app-productos',
@@ -65,7 +66,8 @@ import { InfoLoginComponent } from "./info-login/info-login.component";
     FontAwesomeModule,
     CertificateSliderComponent,
     GridProductsStoreComponent,
-    InfoLoginComponent
+    InfoLoginComponent,
+    CreateUserComponent
 ],
   templateUrl: './productos.component.html',
   styles: [

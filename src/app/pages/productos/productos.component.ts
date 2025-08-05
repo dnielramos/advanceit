@@ -599,7 +599,7 @@ export class ProductosComponent implements OnInit {
    handleLogin(): void {
     console.log("El usuario quiere iniciar sesión. Redirigiendo a la página de login...");
     this.onComprarProductos();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/in']);
 
   }
 }

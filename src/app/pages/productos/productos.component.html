@@ -34,7 +34,7 @@
     <section #favoritesContainer
       class="flex max-w-screen overflow-x-auto my-4 gap-4 rounded-md scroll-smooth">
       @for (item of productosFavorites; track $index) {
-      <app-product-advance (agregarAlCarrito)="addToCart($event)" [producto]="item"></app-product-advance>
+      <app-product-advance (agregarAlCarrito)="onComprarProductos()" [producto]="item"></app-product-advance>
       }
     </section>
 
@@ -90,6 +90,18 @@
       <p class="text-xs">Cerrar</p>
     </div>
   </div>
+
+
+  <div *ngIf="comprarProductos" class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden">
+
+   <app-info-login
+  *ngIf="comprarProductos"
+  (close)="onComprarProductos()"
+  (loginAction)="handleLogin()">
+</app-info-login>
+  </div>
+
+
 
 
   <app-footer></app-footer>

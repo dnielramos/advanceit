@@ -20,7 +20,7 @@ import {
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NexsysApiService } from '../../services/nexys.service';
 import { IngramService } from '../../services/ingram.service';
 import { NexsysProduct, ProductoFinal } from '../../models/Productos'; // Asegúrate de que la ruta sea correcta
@@ -42,12 +42,13 @@ import { CertificateSliderComponent } from '../../shared/certificate-slider/cert
 import { GridProductsStoreComponent } from '../../components/products/products-store/products-store.component';
 import { SlideProductStoreComponent } from '../../components/products/slide-product-store/slide-product-store.component';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
+import { InfoLoginComponent } from "./info-login/info-login.component";
 
 @Component({
   selector: 'app-productos',
   standalone: true,
   imports: [
-  CommonModule,
+    CommonModule,
     FormsModule,
     AngularToastifyModule,
     FontAwesomeModule,
@@ -64,7 +65,8 @@ import { AngularToastifyModule, ToastService } from 'angular-toastify';
     FontAwesomeModule,
     CertificateSliderComponent,
     GridProductsStoreComponent,
-  ],
+    InfoLoginComponent
+],
   templateUrl: './productos.component.html',
   styles: [
     `
@@ -97,7 +99,10 @@ export class ProductosComponent implements OnInit {
   searchTerm: string = '';
   filtrosCategorias: string[] = [];
   filtrosMarcas: string[] = [];
+
   menuCategories = false;
+  comprarProductos = false;
+
   faChat = faComments;
   faShoppingCart = faShoppingCart;
   faEye = faEye;
@@ -360,6 +365,7 @@ export class ProductosComponent implements OnInit {
   constructor(
     private nexsysService: NexsysApiService,
     private ingramService: IngramService,
+    private router : Router,
     private cartService: CartService,
     private productService: AdvanceProductsService,
     private brandService: BrandService,
@@ -574,5 +580,26 @@ export class ProductosComponent implements OnInit {
       html.classList.remove('no-scroll');
       body.classList.remove('no-scroll');
     }
+  }
+
+  onComprarProductos(): void{
+    this.comprarProductos = !this.comprarProductos;
+    const html = document.documentElement;
+    const body = document.body;
+
+    if (this.comprarProductos) {
+      html.classList.add('no-scroll');
+      body.classList.add('no-scroll');
+    } else {
+      html.classList.remove('no-scroll');
+      body.classList.remove('no-scroll');
+    }
+  }
+
+   handleLogin(): void {
+    console.log("El usuario quiere iniciar sesión. Redirigiendo a la página de login...");
+    this.onComprarProductos();
+    this.router.navigate(['/login']);
+
   }
 }

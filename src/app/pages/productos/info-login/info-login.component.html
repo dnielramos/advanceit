@@ -1,0 +1,38 @@
+<div (click)="onCloseModal()" class="bg-black/60 backdrop-blur-sm fixed inset-0 z-50 flex justify-center items-center p-4">
+
+  <div (click)="$event.stopPropagation()"
+       class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md mx-auto relative
+              animate__animated animate__fadeInDown animate__faster">
+
+    <button (click)="onCloseModal()"
+            class="absolute top-3 right-3 text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-purple-500">
+      <fa-icon [icon]="faTimes" class="h-6 w-6"></fa-icon>
+    </button>
+
+    <div class="p-6 sm:p-8 text-center">
+
+      <div class="w-16 h-16 bg-custom-purple-light dark:bg-slate-700 rounded-full mx-auto flex items-center justify-center mb-4">
+        <fa-icon [icon]="faLock" class="text-custom-purple dark:text-custom-purple-light text-3xl"></fa-icon>
+      </div>
+
+      <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+        Inicia Sesión para una Experiencia Completa
+      </h2>
+
+      <p class="text-slate-600 dark:text-slate-300 mb-6">
+        Para ver todos nuestros productos, precios y realizar compras, además de recibir
+        <span class="font-semibold text-custom-purple dark:text-custom-purple-light">apoyo con nuestra IA</span>,
+        es necesario que inicies sesión en tu cuenta.
+      </p>
+
+      <button (click)="onLogin()"
+              class="w-full bg-custom-purple hover:bg-custom-purple-dark text-white font-bold py-3 px-4 rounded-lg
+                     flex items-center justify-center gap-x-2 transition-all duration-300
+                     focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800">
+        <fa-icon [icon]="faRightToBracket"></fa-icon>
+        <span>Iniciar Sesión</span>
+      </button>
+
+    </div>
+  </div>
+</div>

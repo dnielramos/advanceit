@@ -17,6 +17,10 @@
 
   <lib-toastify-toast-container></lib-toastify-toast-container>
 
+  <div *ngIf="createUser" class="bg-black/60 backdrop-blur-sm fixed top-0 z-50 w-full h-full overflow-hidden" (click)="onOutregister()">
+    <app-create-user></app-create-user>
+  </div>
+
   <app-slider-product></app-slider-product>
 
   <h1 class="text-center text-gray-900 text-4xl font-extrabold my-4">

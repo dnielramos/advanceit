@@ -42,8 +42,8 @@ import { CertificateSliderComponent } from '../../shared/certificate-slider/cert
 import { GridProductsStoreComponent } from '../../components/products/products-store/products-store.component';
 import { SlideProductStoreComponent } from '../../components/products/slide-product-store/slide-product-store.component';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
-import { InfoLoginComponent } from "./info-login/info-login.component";
-import { CreateUserComponent } from "../../components/users/create-user/create-user.component";
+import { InfoLoginComponent } from './info-login/info-login.component';
+import { CreateUserComponent } from '../../components/users/create-user/create-user.component';
 
 @Component({
   selector: 'app-productos',
@@ -67,8 +67,8 @@ import { CreateUserComponent } from "../../components/users/create-user/create-u
     CertificateSliderComponent,
     GridProductsStoreComponent,
     InfoLoginComponent,
-    CreateUserComponent
-],
+    CreateUserComponent,
+  ],
   templateUrl: './productos.component.html',
   styles: [
     `
@@ -83,6 +83,22 @@ import { CreateUserComponent } from "../../components/users/create-user/create-u
   ],
 })
 export class ProductosComponent implements OnInit {
+  createUser: boolean = false;
+
+  onOutregister() {
+    this.createUser = !this.createUser;
+
+    const html = document.documentElement;
+    const body = document.body;
+
+    if (this.comprarProductos) {
+      html.classList.add('no-scroll');
+      body.classList.add('no-scroll');
+    } else {
+      html.classList.remove('no-scroll');
+      body.classList.remove('no-scroll');
+    }
+  }
   // Mensajes de bienvenida
   welcomeMessages = [
     '¿Estás buscando algún producto en específico?',
@@ -367,7 +383,7 @@ export class ProductosComponent implements OnInit {
   constructor(
     private nexsysService: NexsysApiService,
     private ingramService: IngramService,
-    private router : Router,
+    private router: Router,
     private cartService: CartService,
     private productService: AdvanceProductsService,
     private brandService: BrandService,
@@ -435,7 +451,7 @@ export class ProductosComponent implements OnInit {
   }
 
   addToCart(product: ProductoFinal): void {
-    if(this.cartService.addToCart(product)){
+    if (this.cartService.addToCart(product)) {
       this.toastService.success(`${product.nombre} añadido al carrito`);
     } else {
       this.toastService.error(`NO pude añadir ${product.nombre} al carrito`);
@@ -584,7 +600,7 @@ export class ProductosComponent implements OnInit {
     }
   }
 
-  onComprarProductos(): void{
+  onComprarProductos(): void {
     this.comprarProductos = !this.comprarProductos;
     const html = document.documentElement;
     const body = document.body;
@@ -598,10 +614,12 @@ export class ProductosComponent implements OnInit {
     }
   }
 
-   handleLogin(): void {
-    console.log("El usuario quiere iniciar sesión. Redirigiendo a la página de login...");
+  handleLogin(): void {
+    console.log(
+      'El usuario quiere iniciar sesión. Redirigiendo a la página de login...'
+    );
     this.onComprarProductos();
-    this.router.navigate(['/in']);
-
+    this.createUser = true;
+    // this.router.navigate(['/in']);
   }
 }

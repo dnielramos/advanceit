@@ -13,11 +13,11 @@ import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
       <div class="container mx-auto px-4 pt-16 pb-32 flex flex-col items-center justify-center">
 
         <!-- Logo de la aplicación -->
-        <!-- <img
+         <img
           src="logo.png"
           alt="Logo"
           class="h-12 mb-8"
-        /> -->
+        />
 
         <!-- Tarjeta de login -->
         <div class="bg-white rounded-4xl shadow-xl p-8 w-full max-w-md">

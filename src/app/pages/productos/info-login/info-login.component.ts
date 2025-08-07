@@ -15,6 +15,7 @@ export class InfoLoginComponent {
 
   // Evento para notificar al componente padre que el usuario quiere iniciar sesión
   @Output() loginAction = new EventEmitter<void>();
+  @Output() createAction = new EventEmitter<void>();
 
   // Definición de los iconos para usarlos en el template
   faLock = faLock;
@@ -27,6 +28,11 @@ export class InfoLoginComponent {
 
   onLogin(): void {
     this.loginAction.emit();
+    // Opcionalmente, podrías cerrar el modal aquí también si la lógica de login navega a otra página
+    // this.onCloseModal();
+  }
+  onCreate(): void {
+    this.createAction.emit();
     // Opcionalmente, podrías cerrar el modal aquí también si la lógica de login navega a otra página
     // this.onCloseModal();
   }

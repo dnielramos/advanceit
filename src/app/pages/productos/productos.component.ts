@@ -614,12 +614,19 @@ export class ProductosComponent implements OnInit {
     }
   }
 
+  handleCreate(): void {
+    console.log(
+      'El usuario quiere registrarse.'
+    );
+    this.onComprarProductos();
+    this.createUser = true;
+  }
+
   handleLogin(): void {
     console.log(
       'El usuario quiere iniciar sesión. Redirigiendo a la página de login...'
     );
     this.onComprarProductos();
-    this.createUser = true;
-    // this.router.navigate(['/in']);
+    this.router.navigate(['/in']);
   }
 }

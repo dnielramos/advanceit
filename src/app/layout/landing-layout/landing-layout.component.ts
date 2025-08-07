@@ -20,7 +20,7 @@ export class LandingLayoutComponent implements OnInit {
    ngOnInit(): void {
      // 1. Comprobación inicial al cargar
     const currentUrl = this.router.url;
-    const isProductPage = currentUrl.startsWith('/productos');
+    const isProductPage = currentUrl.startsWith('/productos') || currentUrl.startsWith('/in');
     this.contextService.setNavVisibility(!isProductPage);
 
     // Escucha cambios de ruta
@@ -30,8 +30,8 @@ export class LandingLayoutComponent implements OnInit {
       const currentUrl = event.urlAfterRedirects;
 
       // Si la ruta es /productos, ocultar el navbar
-      const isProductPage = currentUrl.startsWith('/productos');
-      this.contextService.setNavVisibility(!isProductPage);
+      const isProductPageOrLogin = currentUrl.startsWith('/productos') || currentUrl.startsWith('/in');
+      this.contextService.setNavVisibility(!isProductPageOrLogin);
     });
 
     // Suscribirse al observable de visibilidad

@@ -72,7 +72,7 @@ export const landingRoutes = [
       { path: 'productos', loadComponent: () => import('../pages/productos/productos.component').then(m => m.ProductosComponent) },
       { path: 'contacto', loadComponent: () => import('../pages/contacto/contacto.component').then(m => m.ContactoComponent) },
       { path: 'in', loadComponent: () => import('../pages/login/login.component').then(m => m.LoginComponent) },
-      // { path: 'register', loadComponent: () => import('../components/users/create-user/create-user.component').then(m => m.CreateUserComponent) },
+      { path: 'registro', loadComponent: () => import('../components/users/create-user/create-user.component').then(m => m.CreateUserComponent) },
     ]
   }
 ];

@@ -1,65 +1,75 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core'; // <-- inject es una forma moderna de inyectar
 import { NgForm, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUser, faEnvelope, faLock, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faEnvelope,
+  faLock,
+  faUserPlus,
+} from '@fortawesome/free-solid-svg-icons';
+import { HttpClient } from '@angular/common/http'; // <-- Importa HttpClient
+import { Router } from '@angular/router'; // <-- Importa Router para navegar
 
 @Component({
   selector: 'app-create-user',
   standalone: true,
-  // La sección 'imports' es la clave para solucionar los errores.
-  // Aquí le decimos a este componente qué herramientas puede usar.
-  imports: [
-    CommonModule,      // Necesario para *ngIf, [ngClass], etc.
-    FormsModule,       // Necesario para [(ngModel)], #nombre="ngModel", (ngSubmit), etc.
-    FontAwesomeModule  // Necesario para el elemento <fa-icon>.
-  ],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './create-user.component.html',
 })
 export class CreateUserComponent {
+  // Inyección de dependencias moderna y recomendada
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
-  // @ViewChild permite obtener una referencia directa al formulario del HTML.
   @ViewChild('createUserForm') createUserForm!: NgForm;
 
-  // Objeto para almacenar los datos del formulario usando el bindeo de doble vía [(ngModel)].
   user = {
     nombre: '',
     email: '',
-    password: ''
+    password: '',
   };
 
-  // Definimos los íconos como propiedades de la clase para usarlos en el template.
+  // Íconos...
   faUser = faUser;
   faEnvelope = faEnvelope;
   faLock = faLock;
   faUserPlus = faUserPlus;
 
-  /**
-   * Esta función se ejecuta cuando el formulario es enviado.
-   * @param form La instancia del formulario (NgForm) que se está enviando.
-   */
+  // URL de tu API de NestJS. Es mejor poner esto en los archivos de environment.
+  private apiUrl = 'http://localhost:3002/auth/register'; // Reemplaza 3000 con tu puerto
+
   onSubmit(form: NgForm): void {
-    // Si el formulario es inválido, detenemos la ejecución.
     if (form.invalid) {
-      // Opcionalmente, podemos marcar todos los campos como "tocados" para mostrar todos los errores.
-      Object.keys(form.controls).forEach(field => {
-        const control = form.control.get(field);
-        control?.markAsTouched({ onlySelf: true });
-      });
+      // Marcar campos como tocados para mostrar errores
+      Object.values(form.controls).forEach((control) =>
+        control.markAsTouched()
+      );
       return;
     }
 
-    // Si llegamos aquí, el formulario es válido.
-    console.log('Formulario enviado exitosamente. Es Válido:', form.valid);
-    console.log('Valores:', form.value);
-
-    // Creamos un objeto 'limpio' con los datos, listo para ser enviado a un API.
     const userPayload = { ...this.user };
 
-    console.log('Body listo para el servicio:', userPayload);
-    alert(`¡Usuario listo para crear!\n\nNombre: ${userPayload.nombre}\nEmail: ${userPayload.email}`);
+    console.log('Enviando al backend:', userPayload);
 
-    // Como buena práctica de UX, limpiamos el formulario después del envío.
-    form.resetForm();
+    // Aquí ocurre la magia: llamamos a la API
+    this.http.post(this.apiUrl, userPayload).subscribe({
+      // Callback para cuando la petición es exitosa
+      next: (response) => {
+        console.log('Usuario registrado exitosamente:', response);
+        alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
+
+        // Navegamos al usuario a la página de login
+        this.router.navigate(['/in']);
+      },
+      // Callback para cuando hay un error
+      error: (err) => {
+        console.error('Error en el registro:', err);
+        // El backend probablemente devuelva un error con un mensaje específico
+        alert(
+          `Error: ${err.error.message || 'No se pudo completar el registro.'}`
+        );
+      },
+    });
   }
 }

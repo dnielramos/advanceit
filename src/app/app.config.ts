@@ -27,7 +27,7 @@ export const appConfig: ApplicationConfig = {
         useFactory: httpLoaderFactory,
         deps: [HttpClient],
       },
-       defaultLanguage: 'en'
+       defaultLanguage: 'es'
     })
   ],
 };

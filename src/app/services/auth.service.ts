@@ -46,17 +46,17 @@ export class AuthService {
 
   // Llama a este método después de un login exitoso
   handleLogin(token: string): void {
-    localStorage.setItem('auth_token', token);
+    localStorage.setItem('adtkn', token);
     this.decodeAndStoreToken(token);
   }
 
   logout(): void {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('adtkn');
     this.currentUserRole.next(null);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('auth_token');
+    return localStorage.getItem('adtkn');
   }
 
   // Método de conveniencia para usar en la UI

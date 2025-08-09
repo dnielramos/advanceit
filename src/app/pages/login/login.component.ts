@@ -21,7 +21,6 @@ import { AngularToastifyModule, ToastService } from 'angular-toastify';
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink,
     FaIconComponent,
     AngularToastifyModule,
   ],

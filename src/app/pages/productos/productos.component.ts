@@ -26,7 +26,7 @@ import { IngramService } from '../../services/ingram.service';
 import { NexsysProduct, ProductoFinal } from '../../models/Productos'; // Asegúrate de que la ruta sea correcta
 import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
 import { CartService } from '../../services/cart.service';
-import { AdvanceProductsService } from '../../services/product.service';
+import { ProductsService } from '../../services/product.service';
 import { CategoryMenuComponent } from './categories/category.component';
 import { TrmComponent } from '../../components/navbar/trm/trm.component';
 import { SliderProductComponent } from './slider/slider-product.component';
@@ -385,7 +385,7 @@ export class ProductosComponent implements OnInit {
     private ingramService: IngramService,
     private router: Router,
     private cartService: CartService,
-    private productService: AdvanceProductsService,
+    private productService: ProductsService,
     private brandService: BrandService,
     private toastService: ToastService
   ) {

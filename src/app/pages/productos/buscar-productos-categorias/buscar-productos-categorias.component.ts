@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { AdvanceProductsService } from '../../../services/product.service';
+import { ProductsService } from '../../../services/product.service';
 import { map, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { ProductAdvance } from '../../../models/ingram';
@@ -28,7 +28,7 @@ export class BuscarProductosCategoriasComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private productService: AdvanceProductsService,
+    private productService: ProductsService,
     private brandService : BrandService
   ) {}
 

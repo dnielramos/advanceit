@@ -14,7 +14,7 @@ import {
 import { trigger, transition, style, animate } from '@angular/animations';
 import { ApiDetailsResponse, ProductAdvance } from '../../../models/ingram'; // Asegúrate de que ProductAdvance sea compatible o ajusta.
 import { Subscription } from 'rxjs';
-import { AdvanceProductsService } from '../../../services/product.service';
+import { ProductsService } from '../../../services/product.service';
 
 interface Product {
   _sku: string;
@@ -116,7 +116,7 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
   // apiDetailsResponse: ApiDetailsResponse<ProductAdvance>[] = []; // Ya no parece ser necesaria con el nuevo formato.
   private productsSubscription?: Subscription;
 
-  constructor(private advanceProductService: AdvanceProductsService) {}
+  constructor(private advanceProductService: ProductsService) {}
 
   // Estados UI
   searchTerm : string = '';

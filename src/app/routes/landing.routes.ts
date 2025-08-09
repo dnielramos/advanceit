@@ -8,6 +8,7 @@ export const landingRoutes = [
     loadComponent: () => LandingLayoutComponent,
     children: [
       { path: '', loadComponent: () => import('../pages/inicio/inicio.component').then(m => m.InicioComponent) },
+      // { path: 'productos', loadComponent: () => import('../pages/agente/agent.component').then(m => m.ChatAiComponent) },
 
 
       { path: 'hardware-provisioning', loadComponent: () => import('../components/inicio/hardware-provisioning/hardware-provisioning.component').then(m => m.HardwareProvisioningComponent) },

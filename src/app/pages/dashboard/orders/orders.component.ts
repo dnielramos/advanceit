@@ -184,6 +184,8 @@ export class OrdersComponent implements OnInit {
   }
 
   handleCreateOrder(newOrderData: Omit<Order, 'id'>): void {
+
+    console.log('Nueva Orden RECIBIDA:', newOrderData);
     this.ordersService.createOrder(newOrderData).subscribe({
       next: () => {
         this.loadOrders(); // Recargar para ver la nueva orden

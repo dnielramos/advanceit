@@ -112,6 +112,7 @@ export class CreateOrderModalComponent {
       notas: this.newOrderNote.trim(),
     };
 
+    console.log('Nueva Orden:', newOrderData);
     this.createOrder.emit(newOrderData);
     this.close.emit(); // Cierra el modal después de emitir
   }

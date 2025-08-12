@@ -65,6 +65,11 @@ export class OrdersComponent implements OnInit {
   orderToEdit: Order | null = null; // ¡NUEVO!
   orderToView: Order | null = null;
 
+
+    // --- Propiedades para manejar el estado de la UI ---
+  isUpdating = false;
+  updateError: string | null = null;
+
   constructor(private ordersService: OrdersService) {}
 
   ngOnInit(): void {
@@ -123,26 +128,49 @@ export class OrdersComponent implements OnInit {
     this.orderToEdit = order;
   }
 
-  /**
+ /**
    * Se activa cuando el usuario guarda los cambios en el modal de edición.
-   * Actualiza la orden en la lista principal y recarga la vista.
+   * Llama al servicio para actualizar la orden en la base de datos y,
+   * si tiene éxito, actualiza la orden en la lista local y cierra el modal.
+   * @param updatedOrder El objeto de la orden con los datos modificados desde el modal.
    */
-  handleSaveChanges(updatedOrder: any): void {
-    console.log('ORDEN PARA ACTUALIZAR:', updatedOrder);
-    // Lógica para actualizar la orden en la base de datos
-    // this.ordersService.updateOrder(updatedOrder.id, updatedOrder).subscribe(...)
-
-    // Simulación en el frontend:
-    const index = this.allOrders.findIndex(
-      (o) => o.numeroOrden === updatedOrder.numeroOrden
-    );
-    if (index !== -1) {
-      this.allOrders[index] = updatedOrder;
+  handleSaveChanges(updatedOrder: Order): void {
+    // 1. Validar que tenemos una orden para actualizar
+    if (!updatedOrder || !updatedOrder.id) {
+      console.error('Error: No se proporcionó una orden válida para actualizar.');
+      return;
     }
 
-    this.orderToEdit = null; // Cierra el modal
-    this.applyFilters(); // Refresca la lista filtrada
-    this.updateResumen(); // Actualiza los contadores
+    this.isUpdating = true;
+    this.updateError = null;
+
+    // 2. Extraer el ID y el resto de los datos para la petición PUT/PATCH.
+    // El servicio espera el ID como parámetro y el resto de los datos en el cuerpo.
+    const { id, ...orderData } = updatedOrder;
+
+    // 3. Llamar al servicio y suscribirse a la respuesta.
+    this.ordersService.updateOrder(id, orderData).subscribe({
+      // 4. 'next' se ejecuta si la llamada a la API fue exitosa.
+      next: (savedOrder) => {
+        // Actualiza la lista local con los datos frescos del servidor.
+        const index = this.allOrders.findIndex(o => o.id === savedOrder.id);
+        if (index !== -1) {
+          this.allOrders[index] = savedOrder;
+        }
+
+        // Refresca la vista y cierra el modal.
+        this.orderToEdit = null;
+        this.applyFilters();
+        this.updateResumen();
+        this.isUpdating = false;
+      },
+      // 5. 'error' se ejecuta si la API devuelve un error.
+      error: (err) => {
+        console.error('Error al actualizar la orden:', err);
+        this.updateError = 'No se pudo guardar la orden. Inténtalo de nuevo.';
+        this.isUpdating = false;
+      }
+    });
   }
 
   handleFilterChange(newFilters: FilterData): void {

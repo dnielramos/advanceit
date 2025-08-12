@@ -2,7 +2,11 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { OrdersService, Order, Product } from '../../../../services/orders.service';
+import {
+  OrdersService,
+  Order,
+  Product,
+} from '../../../../services/orders.service';
 
 @Component({
   selector: 'app-view-order-modal',
@@ -34,18 +38,6 @@ export class ViewOrderModalComponent implements OnInit {
 
   loadProductDetails(): void {
     this.isLoading = true;
-    // Se asume que el servicio tiene un método para obtener productos por un array de SKUs.
-    // Este método es crucial para mostrar los detalles completos.
-    // this.ordersService.getProductsBySkus(this.order.productos).subscribe({
-    //   next: (products) => {
-    //     this.orderProducts = products;
-    //     this.isLoading = false;
-    //   },
-    //   error: (err) => {
-    //     console.error('Error cargando los detalles de los productos:', err);
-    //     this.isLoading = false;
-    //   },
-    // });
 
     this.order.productos.forEach((sku) => {
       this.ordersService.searchProductBySku(sku).subscribe({
@@ -57,6 +49,10 @@ export class ViewOrderModalComponent implements OnInit {
         },
         complete: () => {
           this.isLoading = false;
+          console.log(
+            'Productos en la orden encontrados: ',
+            this.order.productos
+          );
         },
       });
     });

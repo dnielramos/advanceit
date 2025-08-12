@@ -19,6 +19,7 @@ export interface CategoryResponse {
 export interface GroupedCategory {
   category: string;
   subCategories: string[];
+  [key: string] : any;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -294,11 +295,11 @@ export class ProductsService implements OnInit {
    * @param payload El lote de productos a guardar.
    * @returns Un Observable con la respuesta de la API.
    */
-  saveBatch(
-    payload: ApiDetailsResponse<ProductAdvance>[]
-  ): Observable<SaveBatchResponse> {
-    return this.http.post<SaveBatchResponse>(this.API_PRODUCTS_URL, payload);
-  }
+  // saveBatch(
+  //   payload: ApiDetailsResponse<ProductAdvance>[]
+  // ): Observable<SaveBatchResponse> {
+  //   return this.http.post<SaveBatchResponse>(this.API_PRODUCTS_URL, payload);
+  // }
 
   /**
    * Obtiene todos los productos de la API en lotes y los emite progresivamente.

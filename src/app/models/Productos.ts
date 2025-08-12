@@ -12,18 +12,3 @@ export interface ProductoFinal {
   caracteristicas: string[];
   etiquetas: string[];
 }
-
-export interface NexsysProduct {
-  mark: string;
-  parent: string;
-  category: string;
-  sku: string;
-  name: string;
-  price: number;
-  currency: string;
-  tax_excluded: string;
-  inventory: string;
-  short_description: string;
-  long_description: string;
-  image: string;
-}

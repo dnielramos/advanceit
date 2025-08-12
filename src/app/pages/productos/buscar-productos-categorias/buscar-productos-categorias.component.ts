@@ -5,7 +5,7 @@ import { ProductsService } from '../../../services/product.service';
 import { map, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { ProductAdvance } from '../../../models/ingram';
-import { NexsysProduct, ProductoFinal } from '../../../models/Productos';
+import { ProductoFinal } from '../../../models/Productos';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { AdvanceProductsComponent } from '../../dashboard/advance-products/advance-products.component';
 import { ProductAdvanceComponent } from '../../../components/products/product-advance/product-advance.component';

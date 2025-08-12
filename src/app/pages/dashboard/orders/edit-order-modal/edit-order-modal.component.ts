@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { OrdersService, Order, Product } from '../../../../services/orders.service';
+import {
+  OrdersService,
+  Order,
+  Product,
+} from '../../../../services/orders.service';
 import { NexsysProduct } from '../../../../models/Productos';
 
 @Component({
@@ -48,23 +52,34 @@ export class EditOrderModalComponent implements OnInit {
 
   loadProductDetails(): void {
     this.isLoadingProducts = true;
-    // Asumimos que el servicio puede buscar múltiples productos.
-    // Aquí usamos un método simulado `getProductsBySkus` que deberías implementar.
-    // this.ordersService.getProductsBySkus(this.editableOrder.productos).subscribe({
-    //   next: (products) => {
-    //     this.orderProducts = products;
-    //     this.isLoadingProducts = false;
-    //     this.recalculateTotal(); // Recalcular total con los productos cargados
-    //   },
-    //   error: (err) => {
-    //     console.error("Error cargando detalles de productos", err);
-    //     this.isLoadingProducts = false;
-    //   }
-    // });
+
+    this.ordersService.getOrderProducts(this.editableOrder.id).subscribe({
+      next: (response) => {
+        console.log('Respuesta cruda de la API:', response);
+
+        // Si la API trae 'return' como propiedad con los productos
+        this.orderProducts = Array.isArray(response)
+          ? response
+          : [];
+
+        console.log('Productos en la orden procesados:', this.orderProducts);
+
+        this.isLoadingProducts = false;
+        this.recalculateTotal(); // Recalcular total
+      },
+      error: (err) => {
+        console.error('Error cargando detalles de productos', err);
+        this.isLoadingProducts = false;
+        this.orderProducts = [];
+      },
+    });
   }
 
   recalculateTotal(): void {
-    this.editableOrder.precioTotal = this.orderProducts.reduce((acc, p) => acc + (p.precio || 0), 0);
+    this.editableOrder.precioTotal = this.orderProducts.reduce(
+      (acc, p) => acc + (p["price"] || 0),
+      0
+    );
   }
 
   // --- Lógica de Productos (similar al modal de creación) ---
@@ -74,7 +89,7 @@ export class EditOrderModalComponent implements OnInit {
 
   addProductToOrder(product: Product): void {
     // Evitar duplicados
-    if (!this.orderProducts.some(p => p.sku === product.sku)) {
+    if (!this.orderProducts.some((p) => p.sku === product.sku)) {
       this.orderProducts.push(product);
       this.recalculateTotal();
     }
@@ -90,7 +105,7 @@ export class EditOrderModalComponent implements OnInit {
   // --- Acción Final ---
   submitSaveChanges(): void {
     // Actualizar el array de SKUs en la orden a guardar
-    this.editableOrder.productos = this.orderProducts.map(p => p.sku);
+    this.editableOrder.productos = this.orderProducts.map((p) => p.sku);
 
     // Emitir la orden completamente actualizada
     this.save.emit(this.editableOrder);

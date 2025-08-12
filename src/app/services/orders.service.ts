@@ -26,6 +26,10 @@ export interface Order {
   notas?: string;
 }
 
+interface ApiNexsysResponse {
+  return: Product[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -84,9 +88,9 @@ export class OrdersService {
 
   // --- Métodos para Productos relacionados a una Orden ---
 
-  getOrderProducts(orderId: string): Observable<Product[]> {
+  getOrderProducts(orderId: string): Observable<ApiNexsysResponse> {
     return this.http
-      .get<Product[]>(`${this.apiUrl}/${orderId}/products`)
+      .get<ApiNexsysResponse>(`${this.apiUrl}/${orderId}/products`)
       .pipe(catchError(this.handleError));
   }
 

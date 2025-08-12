@@ -12,46 +12,56 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Cliente</label>
-            <input [(ngModel)]="editableOrder.cliente" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500" />
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Cliente</label>
+          <input [(ngModel)]="editableOrder.cliente"
+            class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500" />
         </div>
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Estado del Pago</label>
-            <select [(ngModel)]="editableOrder.estadoPago" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
-                <option value="pagado">Pagado</option>
-                <option value="no_pagado">No pagado</option>
-                <option value="pendiente">Pendiente</option>
-                <option value="cancelado">Cancelado</option>
-            </select>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Estado del Pago</label>
+          <select [(ngModel)]="editableOrder.estadoPago"
+            class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+            <option value="pagado">Pagado</option>
+            <option value="no_pagado">No pagado</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
         </div>
       </div>
 
       <div>
-        </div>
+      </div>
 
       <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Productos en la Orden ({{ orderProducts.length }})</label>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">Productos en la Orden ({{ orderProducts.length
+          }})</label>
         <div *ngIf="isLoadingProducts" class="text-center text-sm text-slate-500 py-4">Cargando productos...</div>
-        <ul *ngIf="!isLoadingProducts" class="border border-slate-200 rounded-md p-2 space-y-1 min-h-[80px] max-h-40 overflow-y-auto bg-slate-50">
-          <li *ngIf="orderProducts.length === 0" class="text-center text-sm text-slate-500 py-4">No hay productos en la orden</li>
-          <li *ngFor="let p of orderProducts; let i = index" class="flex justify-between items-center text-sm p-1 rounded hover:bg-slate-200">
-            <span>{{ p.nombre }} - <strong>${{ p.precio | number:'1.2-2' }}</strong></span>
-            <button (click)="removeProductFromOrder(i)" class="text-red-500 hover:text-red-700 font-bold text-xs">QUITAR</button>
+        <ul *ngIf="!isLoadingProducts"
+          class="border border-slate-200 rounded-md p-2 space-y-1 min-h-[80px] max-h-40 overflow-y-auto bg-slate-50">
+          <li *ngIf="orderProducts.length === 0" class="text-center text-sm text-slate-500 py-4">No hay productos en la
+            orden</li>
+          <li *ngFor="let p of orderProducts; let i = index"
+            class="flex justify-between items-center text-sm p-1 rounded hover:bg-slate-200">
+            <span>{{ p.nombre || p["name"] }} - <strong>${{ p["price"] | number:'1.2-2' }}</strong></span>
+            <button (click)="removeProductFromOrder(i)"
+              class="text-red-500 hover:text-red-700 font-bold text-xs">QUITAR</button>
           </li>
         </ul>
       </div>
 
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-1">Nota Adicional</label>
-        <textarea [(ngModel)]="editableOrder.notas" rows="3" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 resize-y"></textarea>
+        <textarea [(ngModel)]="editableOrder.notas" rows="3"
+          class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 resize-y"></textarea>
       </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row items-center justify-between p-4 bg-slate-50 border-t border-slate-200 mt-auto">
+    <div
+      class="flex flex-col sm:flex-row items-center justify-between p-4 bg-slate-50 border-t border-slate-200 mt-auto">
       <div class="text-xl font-bold text-slate-800 mb-4 sm:mb-0">
         Total: <span class="text-purple-600">${{ editableOrder.precioTotal | number:'1.2-2' }}</span>
       </div>
-      <button (click)="submitSaveChanges()" class="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-bold px-8 py-3 rounded-lg shadow-md transition-all">
+      <button (click)="submitSaveChanges()"
+        class="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-bold px-8 py-3 rounded-lg shadow-md transition-all">
         Guardar Cambios
       </button>
     </div>

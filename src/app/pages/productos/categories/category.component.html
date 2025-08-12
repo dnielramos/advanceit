@@ -1,23 +1,24 @@
 <div class="w-80 h-[100dvh] bg-white shadow-xl rounded-lg overflow-hidden font-sans">
   <!-- Logo -->
   <div class="flex p-4 items-center border-b">
-    <img src="https://placehold.co/150x50/8b5cf6/ffffff?text=Logo" alt="Advance Technology Projects" class="h-10" />
+    <img src="logo.png" alt="Advance Technology Projects" class="h-10" />
   </div>
 
   <div class="relative w-full h-[calc(100vh-70px)]">
     <!-- Categories View -->
-    <div class="absolute w-full h-full p-4 overflow-y-auto transition-transform duration-300 ease-in-out" [ngClass]="{
-        '-translate-x-full opacity-0': selectedCategory(),
-        'translate-x-0 opacity-100': !selectedCategory()
-      }">
-      <h2 class="text-xl font-bold text-purple-700 mb-4">Categories</h2>
+    <div class="absolute w-full h-full p-4 overflow-y-auto transition-transform duration-300 ease-in-out"
+         [ngClass]="{
+           '-translate-x-full opacity-0': selectedCategory(),
+           'translate-x-0 opacity-100': !selectedCategory()
+         }">
+      <h2 class="text-xl font-bold text-purple-700 mb-4">Categorias</h2>
       <ul class="space-y-3">
         <li *ngFor="let category of categories"
-          class="flex items-center justify-between p-3 bg-gray-50 hover:bg-purple-100 rounded-lg cursor-pointer transition-colors"
-          (click)="selectCategory(category)">
+            class="flex items-center justify-between p-3 bg-gray-50 hover:bg-purple-100 rounded-lg cursor-pointer transition-colors"
+            (click)="selectCategory(category)">
           <span class="flex items-center font-medium text-gray-800">
             <fa-icon [icon]="faCopyright" class="mr-3 text-purple-600"></fa-icon>
-            {{ category.name }}
+            {{ category.category }}
           </span>
           <fa-icon [icon]="faChevronRight" class="text-gray-400"></fa-icon>
         </li>
@@ -26,21 +27,33 @@
 
     <!-- Subcategories View -->
     <div *ngIf="selectedCategory()"
-      class="absolute w-full h-full p-4 overflow-y-auto transition-transform duration-300 ease-in-out" [ngClass]="{
-        'translate-x-0 opacity-100': selectedCategory(),
-        'translate-x-full opacity-0': !selectedCategory()
-      }">
-      <button (click)="goBack()" class="mb-4 flex items-center text-purple-600 hover:text-purple-800 font-semibold">
+         class="absolute w-full h-full p-4 overflow-y-auto transition-transform duration-300 ease-in-out"
+         [ngClass]="{
+           'translate-x-0 opacity-100': selectedCategory(),
+           'translate-x-full opacity-0': !selectedCategory()
+         }">
+      <button (click)="goBack()"
+              class="mb-4 flex items-center text-purple-600 hover:text-purple-800 font-semibold">
         <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon>
-        Back
+        Volver
       </button>
-      <h2 class="text-xl font-bold text-purple-700 mb-4">{{ selectedCategory()?.name }}</h2>
+
+      <!-- El título de la categoría ahora es clickeable para navegar -->
+      <h2 (click)="navigateToCategory(selectedCategory()!.category)"
+          class="text-xl font-bold text-purple-700 mb-4 cursor-pointer hover:underline">
+          {{ selectedCategory()?.category }}
+      </h2>
+
       <ul class="space-y-2">
-        <li *ngIf="!selectedCategory()?.subcategories?.length" class="p-2 text-gray-500">
-          No subcategories available.
+        <li *ngIf="!selectedCategory()?.subCategories?.length"
+            class="p-2 text-gray-500">
+          No hay subcategorías disponibles.
         </li>
-        <li *ngFor="let sub of selectedCategory()?.subcategories"
-          class="p-3 bg-gray-50 hover:bg-purple-100 rounded-lg cursor-pointer transition-colors text-gray-700">
+
+        <!-- Cada subcategoría ahora es clickeable para navegar -->
+        <li *ngFor="let sub of selectedCategory()?.subCategories"
+            (click)="navigateToCategory(sub)"
+            class="p-3 bg-gray-50 hover:bg-purple-100 rounded-lg cursor-pointer transition-colors text-gray-700">
           {{ sub }}
         </li>
       </ul>

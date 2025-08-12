@@ -23,7 +23,7 @@ import {
   faLightbulb,
 } from '@fortawesome/free-solid-svg-icons';
 import { io, Socket } from 'socket.io-client';
-import { environment } from '../../../enviroments/enviroment';
+import { ENVIRONMENT } from '../../../enviroments/enviroment';
 
 enum MessageState {
   PENDING = 'PENDING',
@@ -93,7 +93,7 @@ interface DisplayMessage {
 })
 export class LukiComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
-  private readonly apiUrlRender = environment.apiUrlRender; // URL de tu API en Render
+  private readonly apiUrlRender = ENVIRONMENT.apiUrlRender; // URL de tu API en Render
 
   private socket!: Socket;
   userId = crypto.randomUUID();

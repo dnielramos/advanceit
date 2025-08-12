@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError, map, throwError } from 'rxjs';
-import { environment } from '../../enviroments/enviroment';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 import { ApiResponse } from '../models/Response'; // Asegúrate de que la ruta sea correcta
 
 
@@ -10,7 +10,7 @@ import { ApiResponse } from '../models/Response'; // Asegúrate de que la ruta s
   providedIn: 'root',
 })
 export class NexsysApiService {
-  private readonly apiUrlRender = environment.apiUrlRender;
+  private readonly apiUrlRender = ENVIRONMENT.apiUrlRender;
 
   constructor(private http: HttpClient) {}
 

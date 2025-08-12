@@ -8,7 +8,6 @@ import {
   Order,
   Product,
 } from '../../../../services/orders.service';
-import { NexsysProduct } from '../../../../models/Productos';
 
 @Component({
   selector: 'app-edit-order-modal',
@@ -111,14 +110,4 @@ export class EditOrderModalComponent implements OnInit {
     this.save.emit(this.editableOrder);
   }
 
-  // Métodos de ayuda (pueden ser idénticos al otro modal)
-  private mapNexsysProductToProduct(nexsysProduct: NexsysProduct): Product {
-    // ...
-    return {
-      nombre: nexsysProduct.name,
-      sku: nexsysProduct.sku,
-      precio: nexsysProduct.price,
-      // ... resto de propiedades
-    } as Product;
-  }
 }

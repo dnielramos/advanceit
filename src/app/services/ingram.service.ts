@@ -5,12 +5,12 @@ import { bufferCount, concatMap, map } from 'rxjs/operators';
 
 import { ApiDetailsResponse, ProductoIngram, ProductoIngramDetails  } from '../models/ingram';
 import { ingramPartNumbersDell } from '../constants/ingramPartNumbersDell';
-import { environment } from '../../enviroments/enviroment';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 @Injectable({ providedIn: 'root' })
 export class IngramService {
 
-  private readonly apiUrlRender = environment.apiUrlRender;
+  private readonly apiUrlRender = ENVIRONMENT.apiUrlRender;
   private API_DETAILS_URL = `${this.apiUrlRender}/scraper/multiple`;
   private API_PRODUCTS_URL = `${this.apiUrlRender}/ingram/products`;
 

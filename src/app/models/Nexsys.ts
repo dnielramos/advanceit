@@ -1,8 +1,8 @@
-interface NexsysProduct {
+export interface NexsysProduct {
   category: string;
   currency: string;
   image: string;
-  inventory: number;
+  inventory: string;
   long_description: string;
   mark: string;
   name: string;

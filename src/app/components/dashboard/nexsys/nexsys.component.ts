@@ -32,7 +32,7 @@ import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs'; /
 import { NexsysApiService } from '../../../services/nexys.service';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
-import { NexsysProduct } from '../../../models/Productos';
+import { NexsysProduct } from '../../../models/Nexsys';
 
 interface PaginationInfo {
   currentPage: number;

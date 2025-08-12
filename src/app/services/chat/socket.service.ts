@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { environment } from '../../../enviroments/enviroment';
+import { ENVIRONMENT } from '../../../enviroments/enviroment';
 
 export interface ChatMessage {
   id: string;
@@ -34,7 +34,7 @@ export class SocketService {
   private typingSubject = new Subject<{ isTyping: boolean; message?: string }>();
 
   constructor() {
-    this.socket = io(environment.socketUrl, {
+    this.socket = io(ENVIRONMENT.socketUrl, {
       transports: ['websocket'],
       autoConnect: true,
     });

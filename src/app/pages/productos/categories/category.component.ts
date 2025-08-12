@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faChevronRight, faArrowLeft, faCopyright } from '@fortawesome/free-solid-svg-icons';
 import { ProductsService, GroupedCategory, CategoryResponse } from '../../../services/product.service';
+import { CategoriesService } from '../../../services/categories.service';
 
 @Component({
   selector: 'app-category-menu',
@@ -75,7 +76,7 @@ export class CategoryMenuComponent implements OnInit {
   categories: GroupedCategory[] = [];
   currentCategory: GroupedCategory | null = null;
 
-  constructor(private categoryService: ProductsService) {}
+  constructor(private categoryService: CategoriesService) {}
 
   ngOnInit(): void {
     this.getCategories();

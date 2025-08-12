@@ -22,8 +22,8 @@ import { BrandService } from '../../../services/brand.service';
   templateUrl: './buscar-productos-categorias.component.html',
 })
 export class BuscarProductosCategoriasComponent implements OnInit {
+
   category: string | null = null;
-  // Ahora productosCategoria será un array de ProductAdvancedData
   productosCategoria: ProductoFinal[] = [];
 
   constructor(

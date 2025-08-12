@@ -23,7 +23,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { Router, RouterLink } from '@angular/router';
 import { NexsysApiService } from '../../services/nexys.service';
 import { IngramService } from '../../services/ingram.service';
-import { NexsysProduct, ProductoFinal } from '../../models/Productos'; // Asegúrate de que la ruta sea correcta
+import { ProductoFinal } from '../../models/Productos'; // Asegúrate de que la ruta sea correcta
 import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
 import { CartService } from '../../services/cart.service';
 import { ProductsService } from '../../services/product.service';
@@ -44,6 +44,7 @@ import { SlideProductStoreComponent } from '../../components/products/slide-prod
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 import { InfoLoginComponent } from './info-login/info-login.component';
 import { CreateUserComponent } from '../../components/users/create-user/create-user.component';
+import { PRODUCTOS_DEFAULT } from '../../constants/default-products';
 
 @Component({
   selector: 'app-productos',
@@ -138,243 +139,9 @@ export class ProductosComponent implements OnInit {
   categorias: string[] = ['Computadoras', 'Accesorios', 'Monitores'];
   marcas: string[] = ['Dell'];
 
-  productos: ProductoFinal[] = [
-    {
-      id: '1',
-      sku: 'LAT5450',
-      cantidad: '10',
-      estado: 'available',
-      nombre: 'Latitude 5450 Portátil',
-      descripcion:
-        'Intel® Core™ i7-1370P, vPro® de 13.ª generación (14 núcleos, hasta 5,2 GHz de frecuencia Turbo)',
-      precio: 1499.99,
-      imagen: '/products/notebook-latitude-14-5440-nt-gray-gallery-2.avif',
-      marca: 'Dell',
-      categoria: 'Computadoras',
-      caracteristicas: [
-        'Intel® Core™ Ultra 5 135U, vPro®',
-        'Windows 11 Pro',
-        'Intel® Graphics',
-        '16 GB DDR5 | 512 GB SSD | 14.0-in. display Full HD (1920X1080)',
-      ],
-      etiquetas: ['Nuevo', 'Popular'],
-    },
-    {
-      id: '2',
-      sku: 'LAT7450',
-      cantidad: '5',
-      estado: 'available',
-      nombre: 'Latitude 7450 Laptop or 2-in-1',
-      descripcion:
-        '14-inch premium AI laptop or 2-in-1 featuring 16:10 displays, enhanced audio, ultralight option and Intel® Core™ Ultra processor.',
-      precio: 999.99,
-      imagen: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
-      marca: 'Dell',
-      categoria: 'Computadoras',
-      caracteristicas: [
-        'Intel® Core™ Ultra 7 165U, vPro®',
-        'Windows 11 Pro',
-        'Intel® Graphics',
-        '16 GB LPDDR5X | 256 GB SSD | 14" Non-Touch FHD+ (1920x1200)',
-      ],
-      etiquetas: ['Nuevo'],
-    },
-    {
-      id: '3',
-      sku: 'DWH5024',
-      cantidad: '20',
-      estado: 'available',
-      nombre: 'Dell Pro Wired ANC Headset - WH5024',
-      descripcion:
-        'Elevate your workday communication with this headset that comes equipped with an AI-based microphone and Active Noise Cancellation, designed to reduce background noise, ensure comfort, and bring your productivity to the next level.',
-      precio: 199.99,
-      imagen: '/products/accessories-dell-wh5024-anc-bk-gallery-1.avif',
-      marca: 'Dell',
-      categoria: 'Accesorios',
-      caracteristicas: [
-        'Microsoft Teams (Open Office) Certified, Zoom Certified',
-        '3 Year Limited Hardware with Advanced Exchange Service',
-        'Win11/10 64 Bit, Mac OS',
-      ],
-      etiquetas: ['Recomendado', 'Sonido'],
-    },
-    {
-      id: '4',
-      sku: 'P2425H',
-      cantidad: '15',
-      estado: 'available',
-      nombre: 'Dell Pro 24 Plus Monitor - P2425H',
-      descripcion: 'In-Plane Switching (IPS) technology | 1920 x 1080',
-      precio: 399.99,
-      imagen: '/products/monitor-p2425h-black-gallery-2.avif',
-      marca: 'Dell',
-      categoria: 'Monitores',
-      caracteristicas: [
-        'In-Plane Switching (IPS) technology',
-        'Resolution / Refresh Rate 1920 x 1080',
-        'Adjustability Height, Tilt, Swivel, Pivot',
-        'Diagonal Size 23.8',
-      ],
-      etiquetas: ['Nuevo'],
-    },
-    {
-      id: '5',
-      sku: 'WD25',
-      cantidad: '8',
-      estado: 'available',
-      nombre: 'Dell Pro Dock - WD25',
-      descripcion:
-        'Boost your productivity with the latest pro dock that offers up to 100W power delivery and a wide variety of connecting options.',
-      precio: 129.99,
-      imagen: '/products/dock-station-wd25-black-gallery-1.avif',
-      marca: 'Dell',
-      categoria: 'Accesorios',
-      caracteristicas: [
-        '100W (Dell systems) 96W (non-Dell systems)',
-        'RJ45 Ethernet port, 2.5GbE',
-        '3-Year Limited Hardware Warranty with Advanced Exchange Additional 4- & 5-year warranty optional',
-      ],
-      etiquetas: ['Popular'],
-    },
-    {
-      id: '6',
-      sku: 'KM7321W',
-      cantidad: '25',
-      estado: 'available',
-      nombre: 'Dell Premier Multi-Device Wireless Keyboard and Mouse – KM7321W',
-      descripcion:
-        'Experience superior multitasking features with a stylish and comfortable premium keyboard and mouse combo. Complete your tasks powered by one of the industry’s leading battery lives at up to 36 months.',
-      precio: 59.99,
-      imagen: '/products/km7321w-xkb-01-gy.avif',
-      marca: 'Dell',
-      categoria: 'Accesorios',
-      caracteristicas: [
-        'USB wireless receiver',
-        'Adjustable DPI. 1000, 1600(default), 2400, 4000',
-        '12 programmable keys of F1-F12',
-      ],
-      etiquetas: ['Oferta', 'Popular'],
-    },
-  ];
+  productos: ProductoFinal[] = PRODUCTOS_DEFAULT;
 
-  productosFavorites: ProductoFinal[] = [
-    {
-      id: '1',
-      sku: 'LAT5450',
-      cantidad: '10',
-      estado: 'available',
-      nombre: 'Latitude 5450 Portátil',
-      descripcion:
-        'Intel® Core™ i7-1370P, vPro® de 13.ª generación (14 núcleos, hasta 5,2 GHz de frecuencia Turbo)',
-      precio: 1499.99,
-      imagen: '/products/notebook-latitude-14-5440-nt-gray-gallery-2.avif',
-      marca: 'Dell',
-      categoria: 'Computadoras',
-      caracteristicas: [
-        'Intel® Core™ Ultra 5 135U, vPro®',
-        'Windows 11 Pro',
-        'Intel® Graphics',
-        '16 GB DDR5 | 512 GB SSD | 14.0-in. display Full HD (1920X1080)',
-      ],
-      etiquetas: ['Nuevo', 'Popular'],
-    },
-    {
-      id: '2',
-      sku: 'LAT7450',
-      cantidad: '5',
-      estado: 'available',
-      nombre: 'Latitude 7450 Laptop or 2-in-1',
-      descripcion:
-        '14-inch premium AI laptop or 2-in-1 featuring 16:10 displays, enhanced audio, ultralight option and Intel® Core™ Ultra processor.',
-      precio: 999.99,
-      imagen: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
-      marca: 'Dell',
-      categoria: 'Computadoras',
-      caracteristicas: [
-        'Intel® Core™ Ultra 7 165U, vPro®',
-        'Windows 11 Pro',
-        'Intel® Graphics',
-        '16 GB LPDDR5X | 256 GB SSD | 14" Non-Touch FHD+ (1920x1200)',
-      ],
-      etiquetas: ['Nuevo'],
-    },
-    {
-      id: '3',
-      sku: 'DWH5024',
-      cantidad: '20',
-      estado: 'available',
-      nombre: 'Dell Pro Wired ANC Headset - WH5024',
-      descripcion:
-        'Elevate your workday communication with this headset that comes equipped with an AI-based microphone and Active Noise Cancellation, designed to reduce background noise, ensure comfort, and bring your productivity to the next level.',
-      precio: 199.99,
-      imagen: '/products/accessories-dell-wh5024-anc-bk-gallery-1.avif',
-      marca: 'Dell',
-      categoria: 'Accesorios',
-      caracteristicas: [
-        'Microsoft Teams (Open Office) Certified, Zoom Certified',
-        '3 Year Limited Hardware with Advanced Exchange Service',
-        'Win11/10 64 Bit, Mac OS',
-      ],
-      etiquetas: ['Recomendado', 'Sonido'],
-    },
-    {
-      id: '4',
-      sku: 'P2425H',
-      cantidad: '15',
-      estado: 'available',
-      nombre: 'Dell Pro 24 Plus Monitor - P2425H',
-      descripcion: 'In-Plane Switching (IPS) technology | 1920 x 1080',
-      precio: 399.99,
-      imagen: '/products/monitor-p2425h-black-gallery-2.avif',
-      marca: 'Dell',
-      categoria: 'Monitores',
-      caracteristicas: [
-        'In-Plane Switching (IPS) technology',
-        'Resolution / Refresh Rate 1920 x 1080',
-        'Adjustability Height, Tilt, Swivel, Pivot',
-        'Diagonal Size 23.8',
-      ],
-      etiquetas: ['Nuevo'],
-    },
-    {
-      id: '5',
-      sku: 'WD25',
-      cantidad: '8',
-      estado: 'available',
-      nombre: 'Dell Pro Dock - WD25',
-      descripcion:
-        'Boost your productivity with the latest pro dock that offers up to 100W power delivery and a wide variety of connecting options.',
-      precio: 129.99,
-      imagen: '/products/dock-station-wd25-black-gallery-1.avif',
-      marca: 'Dell',
-      categoria: 'Accesorios',
-      caracteristicas: [
-        '100W (Dell systems) 96W (non-Dell systems)',
-        'RJ45 Ethernet port, 2.5GbE',
-        '3-Year Limited Hardware Warranty with Advanced Exchange Additional 4- & 5-year warranty optional',
-      ],
-      etiquetas: ['Popular'],
-    },
-    {
-      id: '6',
-      sku: 'KM7321W',
-      cantidad: '25',
-      estado: 'available',
-      nombre: 'Dell Premier Multi-Device Wireless Keyboard and Mouse – KM7321W',
-      descripcion:
-        'Experience superior multitasking features with a stylish and comfortable premium keyboard and mouse combo. Complete your tasks powered by one of the industry’s leading battery lives at up to 36 months.',
-      precio: 59.99,
-      imagen: '/products/km7321w-xkb-01-gy.avif',
-      marca: 'Dell',
-      categoria: 'Accesorios',
-      caracteristicas: [
-        'USB wireless receiver',
-        'Adjustable DPI. 1000, 1600(default), 2400, 4000',
-        '12 programmable keys of F1-F12',
-      ],
-      etiquetas: ['Oferta', 'Popular'],
-    },
-  ];
+  productosFavorites: ProductoFinal[] = PRODUCTOS_DEFAULT;
 
   @ViewChild('favoritesContainer')
   favoritesContainer!: ElementRef<HTMLDivElement>;
@@ -396,13 +163,12 @@ export class ProductosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadMarkInFavorites();
 
-    this.loadProductsByMark();
+    this.loadMarkInFavorites();
     // Cambiamos el mensaje de bienvenida cada 8 segundos
     setInterval(() => {
       this.setRandomWelcomeMessage();
-    }, 5000);
+    }, 3000);
   }
 
   loadMarkInFavorites() {
@@ -457,86 +223,6 @@ export class ProductosComponent implements OnInit {
       this.toastService.error(`NO pude añadir ${product.nombre} al carrito`);
     }
     // alert(`${product.nombre} añadido al carrito`);
-  }
-
-  mapearProducto(nexsysProducto: NexsysProduct): ProductoFinal {
-    return {
-      id: uuidv4(), // Generamos un UUID para el id
-      sku: nexsysProducto.sku,
-      cantidad: nexsysProducto.inventory || '0', // Asegúrate de que este campo sea un string
-      estado: 'available', // Asignamos un estado por defecto
-      nombre: nexsysProducto.name,
-      descripcion:
-        nexsysProducto.long_description ||
-        nexsysProducto.short_description ||
-        '',
-      precio: nexsysProducto.price,
-      imagen: nexsysProducto.image,
-      marca: nexsysProducto.mark,
-      categoria: nexsysProducto.category,
-      etiquetas: [
-        nexsysProducto.sku,
-        nexsysProducto.mark,
-        nexsysProducto.currency,
-        nexsysProducto.parent,
-      ],
-      caracteristicas: [
-        nexsysProducto.long_description || '',
-        nexsysProducto.short_description || '',
-      ],
-    };
-  }
-
-  loadProductsByMark(): void {
-    this.productService.getAllProducts().subscribe({
-      next: (data) => {
-        console.log('Data cargada:', data);
-        // Verificamos si la respuesta es válida
-        if (!data) {
-          console.error('Respuesta no válida:', data);
-          console.warn('No se encontraron productos por marca', typeof data);
-          return;
-        }
-        this.productsFromDB = Array.from(data);
-        const $productos = this.productsFromDB.map(
-          (producto: ProductoFinal) => producto
-        );
-        this.productos = [...$productos, ...this.productos];
-        this.productos = this.productos.map((producto) => {
-          const brand = this.brandService.brands.find((b) =>
-            producto.marca
-              .trim()
-              .toLowerCase()
-              .includes(b.name.trim().toLowerCase())
-          );
-          return {
-            ...producto,
-            marca: brand ? brand.url : producto.marca, // si no se encuentra, deja el texto original
-          };
-        });
-        this.filteredProducts.set(this.productos);
-        console.log('Productos cargados por marca:', this.productos);
-        console.log(
-          'Productos cargados por marca desde nexsys:',
-          this.productsFromDB
-        );
-      },
-      error: (err) => console.error('Error cargando productos por marca:', err),
-    });
-  }
-
-  loadProductBySKU(): void {
-    this.nexsysService.getProductBySKU('GP.BAG11.017').subscribe({
-      next: (data) => (this.productBySKU = data),
-      error: (err) => console.error('Error cargando producto por SKU:', err),
-    });
-  }
-
-  loadPaginatedProducts(): void {
-    this.nexsysService.getAllProducts(0, 10).subscribe({
-      next: (data) => (this.paginatedProducts = data),
-      error: (err) => console.error('Error cargando productos paginados:', err),
-    });
   }
 
   // Filtrado dinámico

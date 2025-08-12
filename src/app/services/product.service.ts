@@ -6,7 +6,7 @@ import { bufferCount, concatMap, map, scan, delay } from 'rxjs/operators';
 // Asegúrate de que la ruta al modelo sea correcta
 import { ApiDetailsResponse, ProductAdvance } from '../models/ingram';
 import { ProductoFinal } from '../models/Productos';
-import { environment } from '../../enviroments/enviroment';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 interface SaveBatchResponse {
   message: string;
@@ -24,7 +24,7 @@ export interface GroupedCategory {
 
 @Injectable({ providedIn: 'root' })
 export class ProductsService implements OnInit {
-  private readonly apiUrlRender = environment.apiUrlRender; // URL de tu API NestJS
+  private readonly apiUrlRender = ENVIRONMENT.apiUrlRender; // URL de tu API NestJS
   private API_PRODUCTS_URL = `${this.apiUrlRender}/advance-products/ingram`;
   private API_LIST_URL = `${this.apiUrlRender}/advance-products/all-products`;
   private API_CATEGORY_URL = `${this.apiUrlRender}/categories`;
@@ -279,7 +279,7 @@ export class ProductsService implements OnInit {
 
   ngOnInit(): void {
     // Aquí podrías inicializar algo si es necesario
-    this.getAllCategories();
+    this.getAllProducts();
   }
 
   get getProductos() {
@@ -307,27 +307,27 @@ export class ProductsService implements OnInit {
    * @param delayTime El tiempo de espera entre emisiones de lotes (en ms, opcional, por defecto es 500ms).
    * @returns Un Observable que emite arrays de productos de forma progresiva.
    */
-  loadAllProductsProgressively(
-    batchSize: number = 10,
-    delayTime: number = 500
-  ): Observable<ApiDetailsResponse<ProductAdvance>[]> {
-    return this.http
-      .get<ApiDetailsResponse<ProductAdvance>[]>(this.API_LIST_URL)
-      .pipe(
-        // Convertir el array de productos inicial en un Observable
-        concatMap((allProducts) => from(allProducts)),
-        // Agrupar los productos en lotes
-        bufferCount(batchSize),
-        // Emitir cada lote con un retraso
-        concatMap((batch) => from([batch]).pipe(delay(delayTime))),
-        // Acumular los lotes emitidos en el BehaviorSubject
-        scan((acc, batch) => {
-          const updatedProducts = [...acc, ...batch];
-          this._allProducts$.next(updatedProducts);
-          return updatedProducts;
-        }, [] as ApiDetailsResponse<ProductAdvance>[])
-      );
-  }
+  // loadAllProductsProgressively(
+  //   batchSize: number = 10,
+  //   delayTime: number = 500
+  // ): Observable<ApiDetailsResponse<ProductAdvance>[]> {
+  //   return this.http
+  //     .get<ApiDetailsResponse<ProductAdvance>[]>(this.API_LIST_URL)
+  //     .pipe(
+  //       // Convertir el array de productos inicial en un Observable
+  //       concatMap((allProducts) => from(allProducts)),
+  //       // Agrupar los productos en lotes
+  //       bufferCount(batchSize),
+  //       // Emitir cada lote con un retraso
+  //       concatMap((batch) => from([batch]).pipe(delay(delayTime))),
+  //       // Acumular los lotes emitidos en el BehaviorSubject
+  //       scan((acc, batch) => {
+  //         const updatedProducts = [...acc, ...batch];
+  //         this._allProducts$.next(updatedProducts);
+  //         return updatedProducts;
+  //       }, [] as ApiDetailsResponse<ProductAdvance>[])
+  //     );
+  // }
 
   /**
    * Devuelve un Observable con la lista completa de productos (se carga de una vez).
@@ -336,11 +336,5 @@ export class ProductsService implements OnInit {
    */
   getAllProducts(): Observable<ProductoFinal[]> {
     return this.http.get<ProductoFinal[]>(this.API_LIST_URL);
-  }
-
-  getAllCategories(): Observable<CategoryResponse> {
-    const cats = this.http.get<CategoryResponse>(this.API_CATEGORY_URL);
-    this.categorias = cats;
-    return cats;
   }
 }

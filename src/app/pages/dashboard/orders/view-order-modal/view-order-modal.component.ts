@@ -46,6 +46,20 @@ export class ViewOrderModalComponent implements OnInit {
     //     this.isLoading = false;
     //   },
     // });
+
+    this.order.productos.forEach((sku) => {
+      this.ordersService.searchProductBySku(sku).subscribe({
+        next: (product) => {
+          this.orderProducts.push(product);
+        },
+        error: (err) => {
+          console.error('Error cargando el producto:', err);
+        },
+        complete: () => {
+          this.isLoading = false;
+        },
+      });
+    });
   }
 
   // Getter para obtener la clase de la insignia de estado dinámicamente

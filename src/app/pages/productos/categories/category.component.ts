@@ -79,21 +79,19 @@ export class CategoryMenuComponent implements OnInit {
   constructor(private categoryService: CategoriesService) {}
 
   ngOnInit(): void {
-    this.getCategories();
+    this.categoryService.categorias$.subscribe(cats => {
+    console.log('Categorías:', cats);
+    this.categories = cats;
+  });
   }
 
   /**
    * Obtiene las categorías desde el servicio.
    */
   getCategories(): void {
-    this.categoryService.getAllCategories().subscribe({
-      next: (response: CategoryResponse) => {
-        this.categories = response.catalog;
-      },
-      error: (err) => {
-        console.error('Error fetching categories:', err);
-        this.categories = [];
-      }
+    this.categoryService.categorias$.subscribe(cats => {
+      console.log('Categorías:', cats);
+      this.categories = cats;
     });
   }
 

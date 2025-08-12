@@ -155,7 +155,7 @@ export class OrdersComponent implements OnInit {
     this.applyFilters();
   }
 
-  handleCreateOrder(newOrderData: Omit<Order, '_id'>): void {
+  handleCreateOrder(newOrderData: Omit<Order, 'id'>): void {
     this.ordersService.createOrder(newOrderData).subscribe({
       next: () => {
         this.loadOrders(); // Recargar para ver la nueva orden

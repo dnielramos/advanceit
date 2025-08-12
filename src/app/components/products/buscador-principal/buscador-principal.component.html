@@ -1,5 +1,6 @@
 <div class="bg-white z-60 w-full px-4 py-4 shadow-md">
 
+  <!-- Logo y barra de búsqueda con el input de búsqueda -->
   <div class="grid lg:flex">
     <!-- Logo -->
     <div class="flex items-center transition-opacity ease-in-out mr-2 ">
@@ -29,6 +30,8 @@
         title="Regresar al inicio"></fa-icon>
     </div>
   </div>
+
+  <!-- Navigation all categories and more -->
   <div class="px-2 flex gap-1 justify-between items-center">
     <div class="flex items-center gap-1">
       <svg class="lg:text-2xl" (click)="onMenucategories()" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
@@ -45,7 +48,7 @@
     </div>
   </div>
 
-  <!-- //sugerencias -->
+  <!-- //sugerencias con filtros funcionales -->
   <div *ngIf="inputFocused" (mouseenter)="onMouseEnterSuggestions()"
      (mouseleave)="onMouseLeaveSuggestions()" class="h-82 animate__animated animate__fadeIn bg-purple-50 rounded-2xl scroll-purple">
 

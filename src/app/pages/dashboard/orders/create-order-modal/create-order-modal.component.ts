@@ -1,10 +1,20 @@
+/*
+================================================================
+/src/app/components/orders/create-order-modal/create-order-modal.component.ts
+================================================================
+Lógica del componente actualizada para funcionar con el nuevo OrdersService.
+*/
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { OrdersService, Order, Product } from '../../../../services/orders.service';
-import { NexsysProduct } from '../../../../models/Productos';
+// Se importan las interfaces actualizadas del servicio
+import {
+  OrdersService,
+  Order,
+  Product,
+} from '../../../../services/orders.service';
 
 @Component({
   selector: 'app-create-order-modal',
@@ -14,7 +24,8 @@ import { NexsysProduct } from '../../../../models/Productos';
 })
 export class CreateOrderModalComponent {
   @Output() close = new EventEmitter<void>();
-  @Output() createOrder = new EventEmitter<Omit<Order, '_id'>>();
+  // ACTUALIZADO: El tipo de la orden emitida ahora usa 'id' en lugar de '_id'
+  @Output() createOrder = new EventEmitter<Omit<Order, 'id'>>();
 
   // --- Iconos ---
   faTimes = faTimes;
@@ -26,31 +37,43 @@ export class CreateOrderModalComponent {
   newProductInput = '';
   productSearchResult: Product | null = null;
   productSearchError = '';
+  isSearching = false; // Añadido para feedback al usuario
 
   constructor(private ordersService: OrdersService) {}
 
-  // --- Lógica de Búsqueda de Productos ---
+  // --- Lógica de Búsqueda de Productos (SIMPLIFICADA) ---
   searchProduct(): void {
     this.productSearchResult = null;
     this.productSearchError = '';
-    if (!this.newProductInput.trim()) return;
+    if (!this.newProductInput.trim()) {
+      return;
+    }
 
-    this.ordersService.searchProductBySku(this.newProductInput.trim()).subscribe({
-      next: (product) => {
-        if (product?.['data'].return) {
-          this.productSearchResult = this.mapNexsysProductToProduct(product['data'].return[0]);
-        } else {
-          this.productSearchError = 'Producto no encontrado';
-        }
-      },
-      error: () => {
-        this.productSearchError = 'Producto no encontrado o error en la búsqueda.';
-      },
-    });
+    this.isSearching = true;
+    this.ordersService
+      .searchProductBySku(this.newProductInput.trim())
+      .subscribe({
+        next: (product) => {
+          // El servicio ahora devuelve el objeto Product directamente, no hay necesidad de mapear.
+          console.log(product);
+          this.productSearchResult = product;
+          this.isSearching = false;
+        },
+        error: (err) => {
+          // El servicio ya maneja el error, solo lo mostramos.
+          this.productSearchError =
+            'Producto no encontrado o error en la búsqueda.';
+          this.isSearching = false;
+          console.error(err);
+        },
+      });
   }
 
   addProductToOrder(product: Product): void {
-    this.newOrderProducts.push(product);
+    // Evita añadir productos duplicados
+    if (!this.newOrderProducts.some((p) => p.sku === product.sku)) {
+      this.newOrderProducts.push(product);
+    }
     this.newProductInput = '';
     this.productSearchResult = null;
     this.productSearchError = '';
@@ -60,8 +83,9 @@ export class CreateOrderModalComponent {
     this.newOrderProducts.splice(index, 1);
   }
 
+
   calculateTotal(): number {
-    return this.newOrderProducts.reduce((acc, p) => acc + (p.precio || 0), 0);
+    return this.newOrderProducts.reduce((acc, p) => acc + (p["price"] || 0), 0);
   }
 
   // --- Lógica para Crear y Emitir la Orden ---
@@ -72,52 +96,37 @@ export class CreateOrderModalComponent {
     }
 
     const { fecha, hora } = this.getCurrentDateTime();
-    const newOrderData: Omit<Order, '_id'> = {
+    // ACTUALIZADO: El tipo de la nueva orden coincide con Omit<Order, 'id'>
+    const newOrderData: Omit<Order, 'id'> = {
       numeroOrden: this.generateOrderNumber(),
       fecha,
       hora,
       estadoPago: 'pendiente',
       precioTotal: this.calculateTotal(),
-      productos: this.mapNexsysProductsToSkus(this.newOrderProducts),
+      // El método para obtener los SKUs sigue siendo válido
+      productos: this.newOrderProducts.map((product) => product.sku),
       cliente: this.newOrderClient.trim(),
-      shippingNo: `SH-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+      shippingNo: `SH-${Math.floor(Math.random() * 1000)
+        .toString()
+        .padStart(3, '0')}`,
       notas: this.newOrderNote.trim(),
     };
 
     this.createOrder.emit(newOrderData);
+    this.close.emit(); // Cierra el modal después de emitir
   }
 
-  // --- Métodos Privados de Ayuda ---
-  private mapNexsysProductToProduct(nexsysProduct: NexsysProduct): Product {
-    return {
-      nombre: nexsysProduct.name,
-      sku: nexsysProduct.sku,
-      precio: nexsysProduct.price,
-      _id: nexsysProduct.sku,
-      category: nexsysProduct.category,
-      currency: nexsysProduct.currency,
-      image: nexsysProduct.image,
-      inventory: nexsysProduct.inventory,
-      long_description: nexsysProduct.long_description,
-      mark: nexsysProduct.mark,
-      parent: nexsysProduct.parent,
-      short_description: nexsysProduct.short_description,
-      tax_excluded: nexsysProduct.tax_excluded,
-    };
-  }
-
-  private mapNexsysProductsToSkus(nexsysProducts: Product[]): string[] {
-    return nexsysProducts.map((product) => product.sku);
-  }
-
+  // --- Métodos Privados de Ayuda (SIN CAMBIOS) ---
   private generateOrderNumber(): string {
-    return `SH-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
+    return `SH-${Math.floor(Math.random() * 100000)
+      .toString()
+      .padStart(5, '0')}`;
   }
 
   private getCurrentDateTime(): { fecha: string; hora: string } {
     const now = new Date();
-    const fecha = now.toISOString().split('T')[0];
-    const hora = now.toTimeString().split(' ')[0];
+    const fecha = now.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    const hora = now.toTimeString().split(' ')[0]; // Formato HH:MM:SS
     return { fecha, hora };
   }
 }

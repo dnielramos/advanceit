@@ -1,57 +1,115 @@
 // src/app/services/orders.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
+// Interfaces para tipado fuerte
 export interface Product {
-  _id?: string;
+  _id?: string; // O el identificador que uses
   nombre: string;
   sku: string;
   precio: number;
-  [key: string]: any;
+  [key: string]: any; // Para otras propiedades
 }
 
 export interface Order {
-  id?: string;
+  id: string; // Cambiado de opcional a requerido para consistencia
   numeroOrden: string;
   fecha: string;
   hora: string;
   estadoPago: 'pagado' | 'no_pagado' | 'pendiente' | 'cancelado';
   precioTotal: number;
-  productos: string[];
+  productos: string[]; // Array de SKUs
   cliente: string;
   shippingNo: string;
-  notas: string;
+  notas?: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OrdersService {
-
-  private baseURL = 'https://advance-genai.onrender.com'
-  // private apiUrl = 'https://advance-genai.onrender.com/orders';
-  private apiUrl = `${this.baseURL}/orders`;
-  private productSearchUrl = `${this.baseURL}/nexys/by-sku`;
+  // Es una buena práctica definir la URL base en los environments, pero esto funciona.
+  // private readonly baseURL = 'https://advance-genai.onrender.com';
+  private baseURL = 'http://localhost:3002';
+  private readonly apiUrl = `${this.baseURL}/orders`;
+  private readonly productSearchUrl = `${this.baseURL}/nexys/by-sku`; // Asumo que esta ruta existe
 
   constructor(private http: HttpClient) {}
 
+  // --- Métodos para Órdenes ---
+
   getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.apiUrl);
+    return this.http
+      .get<Order[]>(this.apiUrl)
+      .pipe(catchError(this.handleError));
   }
 
-  searchProductBySku(sku: string): Observable<Product | null> {
-    return this.http.get<Product | null>(`${this.productSearchUrl}?sku=${sku}`);
+  getOrderById(id: string): Observable<Order> {
+    return this.http
+      .get<Order>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
   }
 
-  createOrder(order: Partial<Order>): Observable<Order> {
-    return this.http.post<Order>(this.apiUrl, order);
+  createOrder(order: Omit<Order, 'id'>): Observable<Order> {
+    return this.http
+      .post<Order>(this.apiUrl, order)
+      .pipe(catchError(this.handleError));
   }
 
-  updateOrder(order: Partial<Order>): Observable<Order> {
-    if (!order.id) {
-      throw new Error('Order ID is required for updating an order');
-    }
-    return this.http.put<Order>(`${this.apiUrl}/${order.id}`, order);
+  updateOrder(
+    id: string,
+    order: Partial<Omit<Order, 'id'>>
+  ): Observable<Order> {
+    return this.http
+      .put<Order>(`${this.apiUrl}/${id}`, order)
+      .pipe(catchError(this.handleError));
+  }
+
+  updateOrderStatus(
+    id: string,
+    status: 'pagado' | 'no_pagado' | 'pendiente' | 'cancelado'
+  ): Observable<Order> {
+    return this.http
+      .patch<Order>(`${this.apiUrl}/${id}/status`, { status })
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteOrder(id: string): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // --- Métodos para Productos relacionados a una Orden ---
+
+  getOrderProducts(orderId: string): Observable<Product[]> {
+    return this.http
+      .get<Product[]>(`${this.apiUrl}/${orderId}/products`)
+      .pipe(catchError(this.handleError));
+  }
+
+  searchProductBySku(sku: string): Observable<Product> {
+    return this.http.get<any>(`${this.productSearchUrl}?sku=${sku}`).pipe(
+      map((response) => {
+        // Validar estructura de respuesta
+        if (response?.data?.return?.length > 0) {
+          return response.data.return[0] as Product;
+        }
+        throw new Error('Producto no encontrado');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  // --- Manejo de Errores ---
+  private handleError(error: any) {
+    console.error('Ocurrió un error en la llamada API:', error);
+    // Aquí podrías transformar el error para que sea más amigable al usuario
+    return throwError(
+      () =>
+        new Error('Algo salió mal; por favor, inténtalo de nuevo más tarde.')
+    );
   }
 }

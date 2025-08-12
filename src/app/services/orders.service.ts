@@ -47,4 +47,11 @@ export class OrdersService {
   createOrder(order: Partial<Order>): Observable<Order> {
     return this.http.post<Order>(this.apiUrl, order);
   }
+
+  updateOrder(order: Partial<Order>): Observable<Order> {
+    if (!order.id) {
+      throw new Error('Order ID is required for updating an order');
+    }
+    return this.http.put<Order>(`${this.apiUrl}/${order.id}`, order);
+  }
 }

@@ -37,7 +37,8 @@ export class CreateUserComponent {
   faUserPlus = faUserPlus;
 
   // URL de tu API de NestJS. Es mejor poner esto en los archivos de environment.
-  private apiUrl = 'http://localhost:3002/auth/register'; // Reemplaza 3000 con tu puerto
+  private baseURL = 'https://advance-genai.onrender.com';
+  private apiUrl = `${this.baseURL}/auth/register`;
 
   onSubmit(form: NgForm): void {
     if (form.invalid) {

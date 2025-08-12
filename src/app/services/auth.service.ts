@@ -30,8 +30,10 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
+
   // URL del endpoint para validar el token
-  private readonly validationUrl = 'http://localhost:3002/auth/profile'; // <-- ¡Verifica tu puerto!
+  private baseURL = 'https://advance-genai.onrender.com';
+  private readonly validationUrl = `${this.baseURL}/auth/profile`; // <-- ¡Verifica tu puerto!
 
   constructor() {
     this.loadTokenOnStart();

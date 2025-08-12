@@ -226,8 +226,9 @@ export class LoginComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private baseURL = 'https://advance-genai.onrender.com'
 
-  private readonly apiUrl = 'http://localhost:3002/auth/login';
+  private readonly apiUrl = `${this.baseURL}/auth/login`;
 
   constructor(library: FaIconLibrary) {
     // 3. Agrega todos los íconos a la librería

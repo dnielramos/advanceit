@@ -80,7 +80,7 @@ export class CreateOrderModalComponent {
       precioTotal: this.calculateTotal(),
       productos: this.mapNexsysProductsToSkus(this.newOrderProducts),
       cliente: this.newOrderClient.trim(),
-      shippingNo: `ENVIO-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+      shippingNo: `SH-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
       notas: this.newOrderNote.trim(),
     };
 

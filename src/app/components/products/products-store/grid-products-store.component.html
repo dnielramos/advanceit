@@ -1,22 +1,29 @@
-
 <div class="min-h-screen bg-gradient-to-r from-white to-purple-50 py-8">
   <div class="container mx-auto px-4">
     <div class="flex flex-col md:flex-row gap-8">
       <div class="w-full">
+        <!-- El mensaje de conteo de productos ya no es tan relevante con el infinite scroll,
+             pero se puede adaptar para mostrar el total una vez que se carga. -->
         <div class="mb-4 text-gray-700">
           <p>
-            Mostrando {{ productosFiltrados.length }} resultados de
-            {{ productos.length }} productos.
+            Explora nuestros productos de tecnología.
           </p>
         </div>
 
+        <!-- El grid ahora itera sobre el Observable 'productos$' -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <app-product-advance *ngFor="let p of filteredProducts()" [producto]="p"
-            (agregarAlCarrito)="addToCart($event)" />
+          <app-product-advance
+            *ngFor="let p of productos$ | async"
+            [producto]="p"
+            (agregarAlCarrito)="addToCart($event)"
+          />
         </div>
 
-        <!-- Sentinel invisible para IntersectionObserver -->
-        <div #sentinel class="h-1 w-full"></div>
+        <!-- Sentinel para el IntersectionObserver -->
+        <!-- Mantenemos la referencia #sentinel y un mensaje de carga. -->
+        <div #sentinel class="h-10 w-full flex items-center justify-center my-8">
+          <span class="text-gray-500 text-lg">Cargando más productos...</span>
+        </div>
       </div>
     </div>
   </div>

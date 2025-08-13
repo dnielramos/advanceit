@@ -19,20 +19,21 @@ import { Observable } from 'rxjs';
   selector: 'app-grid-products-store',
   standalone: true,
   imports: [CommonModule, ProductAdvanceComponent],
-  template: `
-    <div
-      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4"
-    >
-      <app-product-advance
-        *ngFor="let producto of productos$ | async"
-        [producto]="producto"
-        (añadirAlCarrito)="addToCart($event)"
-      ></app-product-advance>
-    </div>
-    <div #sentinel class="h-10 w-full text-center py-4">
-      <p class="text-gray-500">Cargando más productos...</p>
-    </div>
-  `,
+  templateUrl: './grid-products-store.component.html',
+  // template: `
+  //   <div
+  //     class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4"
+  //   >
+  //     <app-product-advance
+  //       *ngFor="let producto of productos$ | async"
+  //       [producto]="producto"
+  //       (añadirAlCarrito)="addToCart($event)"
+  //     ></app-product-advance>
+  //   </div>
+  //   <div #sentinel class="h-10 w-full text-center py-4">
+  //     <p class="text-gray-500">Cargando más productos...</p>
+  //   </div>
+  // `,
 })
 export class GridProductsStoreComponent
   implements OnInit, AfterViewInit, OnDestroy

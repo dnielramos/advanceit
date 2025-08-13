@@ -69,7 +69,7 @@ export class CartComponent implements OnInit {
   }
 
   createOrder(): void {
-    const productosSKU = this.cartItems.map((item) => item.product.sku);
+    const productosSKU = this.cartItems.map((item) => item.product.SKU);
     const numeroOrden = 'ORD-' + Date.now(); // Puedes ajustar esta lógica
     const now = new Date();
     const fecha = now.toISOString().split('T')[0]; // yyyy-mm-dd

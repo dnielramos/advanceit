@@ -38,7 +38,7 @@
         <div class="mt-2 flex items-center">
           <span class="text-purple-600 font-bold">${{ item.product.precio }}</span>
           <span class="mx-2">•</span>
-          <span class="text-gray-600">Subtotal: ${{ item.product.precio * item.quantity }}</span>
+          <span class="text-gray-600">Subtotal: ${{ item.product.precio ?? 0 * item.quantity }}</span>
         </div>
       </div>
     </div>

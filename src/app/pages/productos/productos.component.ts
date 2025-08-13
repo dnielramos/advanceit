@@ -39,7 +39,7 @@ import { SanitizeImageUrlPipe } from '../../pipes/sanitize-image-url.pipe';
 import { ViewChild, ElementRef } from '@angular/core';
 import { BrandService } from '../../services/brand.service';
 import { CertificateSliderComponent } from '../../shared/certificate-slider/certificate-slider.component';
-import { GridProductsStoreComponent } from '../../components/products/products-store/products-store.component';
+import { GridProductsStoreComponent } from '../../components/products/products-store/grid-products-store.component';
 import { SlideProductStoreComponent } from '../../components/products/slide-product-store/slide-product-store.component';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 import { InfoLoginComponent } from './info-login/info-login.component';
@@ -136,11 +136,10 @@ export class ProductosComponent implements OnInit {
   faChevronRight = faChevronRight;
 
   // Arrays de filtros disponibles
-  categorias: string[] = ['Computadoras', 'Accesorios', 'Monitores'];
-  marcas: string[] = ['Dell'];
+  // categorias: string[] = ['Computadoras', 'Accesorios', 'Monitores'];
+  // marcas: string[] = ['Dell'];
 
   productos: ProductoFinal[] = PRODUCTOS_DEFAULT;
-
   productosFavorites: ProductoFinal[] = PRODUCTOS_DEFAULT;
 
   @ViewChild('favoritesContainer')

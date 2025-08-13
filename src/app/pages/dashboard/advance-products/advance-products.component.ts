@@ -1,4 +1,3 @@
-// product-catalog.component.ts
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,56 +11,9 @@ import {
   faFilter,
 } from '@fortawesome/free-solid-svg-icons';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { ApiDetailsResponse, ProductAdvance } from '../../../models/ingram'; // Asegúrate de que ProductAdvance sea compatible o ajusta.
 import { Subscription } from 'rxjs';
 import { ProductsService } from '../../../services/product.service';
-
-interface Product {
-  _sku: string;
-  product: {
-    id: string;
-    SKU: string;
-    nombre: string;
-    descripcion: string;
-    precio: number;
-    descuentos: boolean;
-    estado: string;
-    disponibilidad: boolean;
-    imagen: string;
-    marca: string;
-    categoria: string;
-    cantidad: number;
-    warehouse?: string; // Hago opcional porque no está en tus datos de ejemplo de API
-    warehouseId?: string; // Hago opcional porque no está en tus datos de ejemplo de API
-    precioRetail?: number; // Hago opcional porque no está en tus datos de ejemplo de API
-    etiquetas: string[];
-  };
-  details?: {
-    titulo?: string;
-    categorias?: string[];
-    descripcion?: string;
-    imagenes?: string[];
-    etiquetas?: string;
-    especificaciones_tecnicas?: Record<string, any>;
-    garantia_e_informacion_adicional?: Record<string, string>;
-  };
-}
-
-// Interfaz para el formato de los datos que realmente estás recibiendo de la API
-interface FlatProductApi {
-  id: string;
-  sku: string;
-  cantidad: string; // Puede ser string o number, ajusta según necesidad en el servicio
-  estado: string;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  imagen: string;
-  marca: string;
-  categoria: string;
-  caracteristicas: string[];
-  etiquetas: string[];
-}
+import { ProductoFinal } from '../../../models/Productos'; // Interfaz correcta ya en uso
 
 @Component({
   selector: 'app-advance-product',
@@ -110,16 +62,15 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
   faFilter = faFilter;
 
   // Datos
-  allProducts: Product[] = [];
-  filteredProducts = signal<Product[]>([]);
+  allProducts: ProductoFinal[] = [];
+  filteredProducts = signal<ProductoFinal[]>([]);
 
-  // apiDetailsResponse: ApiDetailsResponse<ProductAdvance>[] = []; // Ya no parece ser necesaria con el nuevo formato.
   private productsSubscription?: Subscription;
 
-  constructor(private advanceProductService: ProductsService) {}
+  constructor(private productsService: ProductsService) {}
 
   // Estados UI
-  searchTerm : string = '';
+  searchTerm: string = '';
   selectedCategories: string[] = [];
   selectedBrands: string[] = [];
   showCategoryFilter = signal(false);
@@ -133,25 +84,17 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
     'Envío gratis en compras superiores a $100',
     '¡Encuentra el producto perfecto para ti!',
     '¡Bienvenido a la mejor tienda de tecnología!',
-    'Tecnología de vanguardia a precios increíbles',
-    '¡Compra ahora y recibe tu producto mañana!',
-    'La calidad que buscas, al precio que deseas',
   ];
   welcomeMessage = signal('');
 
   ngOnInit() {
     this.loadProducts();
     this.setRandomWelcomeMessage();
-
-    setInterval(() => {
-      this.setRandomWelcomeMessage();
-    }, 5000);
+    setInterval(() => this.setRandomWelcomeMessage(), 5000);
   }
 
   ngOnDestroy(): void {
-    if (this.productsSubscription) {
-      this.productsSubscription.unsubscribe();
-    }
+    this.productsSubscription?.unsubscribe();
   }
 
   setRandomWelcomeMessage() {
@@ -160,82 +103,46 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
   }
 
   loadProducts(): void {
-    this.productsSubscription = this.advanceProductService
+    this.productsSubscription = this.productsService
       .getAllProducts()
       .subscribe({
-        next: (batchOfProducts: FlatProductApi[]) => {
-          // Mapeamos los datos recibidos al formato 'Product'
-          const mappedProducts: Product[] = batchOfProducts.map((p ) => ({
-            _sku: p.sku,
-            product: {
-              id: p.id,
-              SKU: p.sku,
-              nombre: p.nombre,
-              descripcion: p.descripcion,
-              precio: p.precio,
-              descuentos: false, // Asumiendo false, ya que no está en el formato plano
-              estado: p.estado,
-              disponibilidad: p.estado === 'available', // Basado en el estado
-              imagen: p.imagen,
-              marca: p.marca,
-              categoria: p.categoria,
-              cantidad: parseFloat(p.cantidad), // Convertir a number
-              etiquetas: p.etiquetas || [],
-            },
-            details: {
-              titulo: p.nombre,
-              categorias: [p.categoria], // Puedes expandir esto si las categorías vienen de forma más granular
-              descripcion: p.descripcion,
-              imagenes: [p.imagen], // Puedes añadir más imágenes si tu API las proporciona
-              etiquetas: p.etiquetas.join(', '), // Unir las etiquetas en un string si es necesario
-              // No hay especificaciones_tecnicas ni garantia_e_informacion_adicional en el formato plano
-            },
-          }));
-
-          this.allProducts = mappedProducts;
+        next: (res: ProductoFinal[]) => {
+          this.allProducts = res;
           this.filteredProducts.set([...this.allProducts]);
-          console.log(
-            'Lote de productos recibido y mapeado:',
-            this.allProducts
-          );
+          console.log('Productos cargados:', this.allProducts);
 
+          // Inicializar el índice de la imagen activa para cada producto
           this.allProducts.forEach((product) => {
-            this.activeImageIndexes[product._sku] = 0;
+            this.activeImageIndexes[product.SKU] = 0;
           });
         },
-        error: (error) => {
-          console.error('Error al cargar los productos:', error);
-        },
-        complete: () => {
-          console.log('Todos los productos cargados.');
-        },
+        error: (error) => console.error('Error al cargar los productos:', error),
+        complete: () => console.log('Carga de productos completada.'),
       });
   }
 
   // Métodos para manejar filtros
   filterProducts() {
     let results = [...this.allProducts];
+    const term = this.searchTerm.toLowerCase().trim();
 
     // Filtrar por término de búsqueda
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase().trim();
+    if (term) {
       results = results.filter((item) => {
         const title = this.getProductTitle(item).toLowerCase();
         const description = this.getProductDescription(item).toLowerCase();
-        const brand = item.product.marca.toLowerCase();
-        const sku = item.product.SKU.toLowerCase();
-        // const categories = this.getProductCategories(item).map((cat) =>
-        //   cat.toLowerCase()
-        // );
-        // const tags = this.getProductTags(item).map((tag) => tag.toLowerCase());
+        const brand = item.marca.toLowerCase();
+        const sku = item.SKU.toLowerCase();
+        const categories = this.getProductCategories(item).map((cat) => cat.toLowerCase());
+        const tags = this.getProductTags(item).map((tag) => tag.toLowerCase());
 
         return (
           title.includes(term) ||
           description.includes(term) ||
           brand.includes(term) ||
-          sku.includes(term)
-          // categories.some((cat) => cat.includes(term)) ||
-          // tags.some((tag) => tag.includes(term))
+          sku.includes(term) ||
+          categories.some((cat) => cat.includes(term)) ||
+          tags.some((tag) => tag.includes(term))
         );
       });
     }
@@ -251,7 +158,7 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
     // Filtrar por marcas seleccionadas
     if (this.selectedBrands.length > 0) {
       results = results.filter((item) =>
-        this.selectedBrands.includes(item.product.marca)
+        this.selectedBrands.includes(item.marca)
       );
     }
 
@@ -277,12 +184,9 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
 
   uniqueCategories(): string[] {
     const categoriesSet = new Set<string>();
-
     this.allProducts.forEach((item) => {
-      const categories = this.getProductCategories(item);
-      categories.forEach((cat) => categoriesSet.add(cat));
+      this.getProductCategories(item).forEach((cat) => categoriesSet.add(cat));
     });
-
     return Array.from(categoriesSet);
   }
 
@@ -311,11 +215,9 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
 
   uniqueBrands(): string[] {
     const brandsSet = new Set<string>();
-
     this.allProducts.forEach((item) => {
-      brandsSet.add(item.product.marca);
+      if (item.marca) brandsSet.add(item.marca);
     });
-
     return Array.from(brandsSet);
   }
 
@@ -334,24 +236,19 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
     this.filterProducts();
   }
 
-  // Métodos para manejar las imágenes
-  getProductImages(product: Product): string[] {
-    // Si hay imágenes en details, usar esas, sino usar la imagen del product
-    if (product.details?.imagenes && product.details.imagenes.length > 0) {
-      return product.details.imagenes;
-    }
-    return [product.product.imagen];
+  // Métodos para manejar las imágenes (ADAPTADOS)
+  getProductImages(product: ProductoFinal): string[] {
+    // Combina la imagen principal con las de la galería, filtrando valores nulos o vacíos.
+    return [product.imagen, ...(product.galleryImages || [])].filter(Boolean);
   }
 
-  hasMultipleImages(product: Product): boolean {
+  hasMultipleImages(product: ProductoFinal): boolean {
     return this.getProductImages(product).length > 1;
   }
 
-  getImagesArray(product: Product): number[] {
+  getImagesArray(product: ProductoFinal): number[] {
     const imagesLength = this.getProductImages(product).length;
-    return Array(imagesLength)
-      .fill(0)
-      .map((_, i) => i);
+    return Array(imagesLength).fill(0).map((_, i) => i);
   }
 
   setActiveImage(sku: string, index: number) {
@@ -362,35 +259,31 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
     return this.activeImageIndexes[sku] || 0;
   }
 
-  getActiveImage(product: Product): string {
+  getActiveImage(product: ProductoFinal): string {
     const images = this.getProductImages(product);
-    const index = this.getCurrentImageIndex(product._sku);
-    return images[index];
+    const index = this.getCurrentImageIndex(product.SKU); // Usar SKU en mayúsculas
+    return images[index] || product.imagen || 'assets/placeholder.png'; // Fallback a imagen por defecto
   }
 
-  // Métodos para obtener información del producto (con fallbacks)
-  getProductTitle(product: Product): string {
-    return product.product.nombre || product.details?.titulo || 'Producto sin título';
+  // Métodos para obtener información del producto (SIMPLIFICADOS)
+  getProductTitle(product: ProductoFinal): string {
+    return product.nombre || 'Producto sin título';
   }
 
-  getProductDescription(product: Product): string {
-    return product.details?.descripcion || product.product.descripcion;
+  getProductDescription(product: ProductoFinal): string {
+    return product.descripcion || 'Sin descripción disponible.';
   }
 
-  getProductCategories(product: Product): string[] {
-    if (product.details?.categorias && product.details.categorias.length > 0) {
-      return product.details.categorias;
-    }
-    return [product.product.categoria];
+  getProductCategories(product: ProductoFinal): string[] {
+    // Combina categoría y subcategoría en un solo array
+    const cats = [];
+    if (product.categoria) cats.push(product.categoria);
+    if (product.subcategoria) cats.push(product.subcategoria);
+    return cats;
   }
 
-  getProductTags(product: Product): string[] {
-    if (product.details?.etiquetas) {
-      // Si es un string, convertirlo a array
-      if (typeof product.details.etiquetas === 'string') {
-        return product.details.etiquetas.split(',').map((tag) => tag.trim());
-      }
-    }
-    return product.product.etiquetas || [];
+  getProductTags(product: ProductoFinal): string[] {
+    // La nueva interfaz ya provee un array de strings
+    return product.etiquetas || [];
   }
 }

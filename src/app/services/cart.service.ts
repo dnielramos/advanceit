@@ -77,7 +77,7 @@ export class CartService {
 
   // Calcular total
   getTotal(): number {
-    return this.cartItems.reduce((sum, item) => sum + (item.product.precio * item.quantity), 0);
+    return this.cartItems.reduce((sum, item) => sum + ((item.product.precio ?? 0) * item.quantity), 0);
   }
 
   // Persistir en localStorage

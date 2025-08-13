@@ -34,8 +34,8 @@
     </p>
 
     <ul class="p-4 text-gray-500 text-xs">
-      <li *ngFor="let c of producto.caracteristicas">
-        ✔ {{ c }}
+      <li *ngFor="let c of producto.especificaciones_tecnicas | keyvalue">
+        ✔ {{ c.value }}
       </li>
     </ul>
 

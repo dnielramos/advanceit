@@ -4,6 +4,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling';
+import {
   faShoppingCart,
   faEye,
   faHome,
@@ -52,6 +56,7 @@ import { AuthService, Role } from '../../services/auth.service';
   standalone: true,
   imports: [
     CommonModule,
+    ScrollingModule,
     FormsModule,
     AngularToastifyModule,
     FontAwesomeModule,
@@ -86,6 +91,9 @@ import { AuthService, Role } from '../../services/auth.service';
 })
 export class ProductosComponent implements OnInit {
   createUser: boolean = false;
+
+  @ViewChild(CdkVirtualScrollViewport, { static: false })
+  viewport!: CdkVirtualScrollViewport;
 
   onOutregister() {
     this.createUser = !this.createUser;
@@ -136,7 +144,6 @@ export class ProductosComponent implements OnInit {
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
 
-
   islogged: boolean = false;
 
   // Arrays de filtros disponibles
@@ -165,12 +172,14 @@ export class ProductosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.islogged = this.authService.hasRole(Role.User);
     this.productService.allProducts$.subscribe((productos) => {
       this.productos = productos;
       this.productosFavorites = productos;
-      console.log('Productos cargados en el componente de products:', this.productos);
+      console.log(
+        'Productos cargados en el componente de products:',
+        this.productos
+      );
     });
     this.loadMarkInFavorites();
     // Cambiamos el mensaje de bienvenida cada 8 segundos
@@ -192,15 +201,27 @@ export class ProductosComponent implements OnInit {
     });
   }
 
-  scrollFavorites(direction: 'left' | 'right') {
-    const container = this.favoritesContainer?.nativeElement;
-    if (!container) return;
+  // Un método para trackear por índice
+  trackByIndex(index: number, item: any): number {
+    return index;
+  }
 
-    const scrollAmount = 300;
-    container.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth',
-    });
+  scrollFavorites(direction: 'left' | 'right') {
+    // Definimos el ancho de un solo producto, debe coincidir con itemSize en el HTML
+    const itemWidth = 250;
+    const currentOffset = this.viewport.measureScrollOffset();
+    const viewportWidth = this.viewport.getViewportSize(); // Devuelve el número de ítems visibles
+
+    let scrollAmount = itemWidth; // Cantidad a desplazar por cada click
+
+    if (direction === 'right') {
+      this.viewport.scrollToOffset(currentOffset + scrollAmount, 'smooth');
+    } else {
+      this.viewport.scrollToOffset(
+        Math.max(0, currentOffset - scrollAmount),
+        'smooth'
+      );
+    }
   }
 
   setRandomWelcomeMessage() {
@@ -295,8 +316,7 @@ export class ProductosComponent implements OnInit {
   }
 
   onComprarProductos(product: ProductoFinal | null): void {
-
-    if(this.authService.hasRole(Role.User) && product) {
+    if (this.authService.hasRole(Role.User) && product) {
       this.addToCart(product);
     } else {
       this.comprarProductos = !this.comprarProductos;
@@ -315,9 +335,7 @@ export class ProductosComponent implements OnInit {
   }
 
   handleCreate(): void {
-    console.log(
-      'El usuario quiere registrarse.'
-    );
+    console.log('El usuario quiere registrarse.');
     this.onComprarProductos(null);
     this.createUser = true;
   }

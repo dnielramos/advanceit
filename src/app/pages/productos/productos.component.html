@@ -24,25 +24,25 @@
 
   <app-slider-product></app-slider-product>
 
-  <h1 class="text-center text-gray-900 font-oswald text-4xl my-4">
-    Productos Destacados
-  </h1>
 
-  <div class="relative px-8 py-2 bg-purple-50 rounded-2xl m-2 scroll-purple">
-    <!-- Botón retroceder -->
+  <div *ngIf="productosFavorites.length > 0" class="relative px-8 py-2 bg-purple-50 rounded-2xl m-2 scroll-purple">
+    <h1 class="text-center text-gray-900 font-oswald text-4xl my-4">
+      Productos Destacados
+    </h1>
     <button (click)="scrollFavorites('left')"
       class="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-purple-100 rounded-full p-2 shadow-md hover:bg-gray-100">
       <fa-icon [icon]="faChevronLeft"></fa-icon>
     </button>
 
-    <!-- Contenedor de productos favoritos -->
-    <section #favoritesContainer class="flex max-w-screen overflow-x-auto my-4 gap-4 rounded-md scroll-smooth">
-      @for (item of productosFavorites; track $index) {
-      <app-product-advance (agregarAlCarrito)="onComprarProductos(item)" [producto]="item"></app-product-advance>
-      }
-    </section>
+    <cdk-virtual-scroll-viewport #favoritesContainer class="w-full h-[550px] my-4 gap-4" orientation="horizontal"
+      itemSize="250">
+      <div class="flex items-center gap-4">
+        <app-product-advance *cdkVirtualFor="let item of productosFavorites; trackBy: trackByIndex"
+          (agregarAlCarrito)="onComprarProductos(item)" [producto]="item">
+        </app-product-advance>
+      </div>
+    </cdk-virtual-scroll-viewport>
 
-    <!-- Botón avanzar -->
     <button (click)="scrollFavorites('right')"
       class="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-purple-100 rounded-full p-2 shadow-md hover:bg-gray-100">
       <fa-icon [icon]="faChevronRight"></fa-icon>
@@ -52,7 +52,7 @@
   <app-brand-slider></app-brand-slider>
 
   <div class="bg-gray-50 my-4 py-4">
-    <h1 class="text-center text-gray-900 text-4xl font-extrabold mt-2 my-4">
+    <h1 class="text-center text-gray-900 text-4xl font-extrabold mt-2 my-4 z-99">
       Productos Comprados recientemente
     </h1>
 

@@ -45,6 +45,7 @@ import { AngularToastifyModule, ToastService } from 'angular-toastify';
 import { InfoLoginComponent } from './info-login/info-login.component';
 import { CreateUserComponent } from '../../components/users/create-user/create-user.component';
 import { PRODUCTOS_DEFAULT } from '../../constants/default-products';
+import { AuthService, Role } from '../../services/auth.service';
 
 @Component({
   selector: 'app-productos',
@@ -150,6 +151,7 @@ export class ProductosComponent implements OnInit {
     private router: Router,
     private cartService: CartService,
     private productService: ProductsService,
+    private authService: AuthService,
     private brandService: BrandService,
     private toastService: ToastService
   ) {
@@ -287,8 +289,14 @@ export class ProductosComponent implements OnInit {
     }
   }
 
-  onComprarProductos(): void {
-    this.comprarProductos = !this.comprarProductos;
+  onComprarProductos(product: ProductoFinal | null): void {
+
+    if(this.authService.hasRole(Role.User) && product) {
+      this.addToCart(product);
+    } else {
+      this.comprarProductos = !this.comprarProductos;
+    }
+
     const html = document.documentElement;
     const body = document.body;
 
@@ -305,7 +313,7 @@ export class ProductosComponent implements OnInit {
     console.log(
       'El usuario quiere registrarse.'
     );
-    this.onComprarProductos();
+    this.onComprarProductos(null);
     this.createUser = true;
   }
 
@@ -313,7 +321,7 @@ export class ProductosComponent implements OnInit {
     console.log(
       'El usuario quiere iniciar sesión. Redirigiendo a la página de login...'
     );
-    this.onComprarProductos();
+    this.onComprarProductos(null);
     this.router.navigate(['/in']);
   }
 }

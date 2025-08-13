@@ -12,18 +12,13 @@ import {
   faLock,
   faCircleCheck,
 } from '@fortawesome/free-solid-svg-icons'; // <-- 1. Importa el ícono de check
-import { AuthService } from '../../services/auth.service';
+import { AuthService, Role } from '../../services/auth.service';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    FaIconComponent,
-    AngularToastifyModule,
-  ],
+  imports: [CommonModule, FormsModule, FaIconComponent, AngularToastifyModule],
   template: `
     <div
       class="hero-sectionS mt-10 flex bg-linear-to-b from-white to-purple-200 items-center justify-center"
@@ -226,7 +221,7 @@ export class LoginComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
-  private baseURL = 'https://advance-genai.onrender.com'
+  private baseURL = 'https://advance-genai.onrender.com';
 
   private readonly apiUrl = `${this.baseURL}/auth/login`;
 
@@ -257,10 +252,16 @@ export class LoginComponent {
           form.resetForm();
           this.loginSuccess = true;
 
-          // Configura la redirección después de 3 segundos
-          setTimeout(() => {
-            this.router.navigate(['/dashboard']);
-          }, 3000);
+          if (this.authService.hasRole(Role.Admin)) {
+            setTimeout(() => {
+              this.router.navigate(['/dashboard']);
+            }, 2000);
+          } else if (this.authService.hasRole(Role.User)) {
+            setTimeout(() => {
+              this.toastService.success('Bienvenido a la sección de productos');
+              this.router.navigate(['/productos']);
+            }, 2000);
+          }
         },
         error: (err) => {
           console.error('Error durante el inicio de sesión:', err);

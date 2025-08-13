@@ -65,7 +65,7 @@ export class BuscadorPrincipalComponent implements OnInit {
     '¿En que podemos ayudarte?',
     '¿Qué estás buscando?',
     'Estamos para ayudarte',
-    'Busca por nombre'
+    'Busca por nombre',
   ];
   welcomeMessage = signal('¡Hola!  ¿En qué puedo ayudarte hoy?');
   productsFromDB: any[] = [];
@@ -95,7 +95,7 @@ export class BuscadorPrincipalComponent implements OnInit {
   private productosOriginales: ProductoFinal[] = [];
 
   // Lista de productos que se muestra en la UI y se filtra
-  productos : ProductoFinal[] = [];
+  productos: ProductoFinal[] = [];
 
   constructor(private brandService: BrandService) {}
 
@@ -152,7 +152,7 @@ export class BuscadorPrincipalComponent implements OnInit {
 
     // --- CAMBIO 2: Guardamos la lista procesada en AMBOS arreglos ---
     this.productosOriginales = processedProducts; // La lista maestra que no se toca
-    this.productos = processedProducts;           // La lista que se va a mostrar y filtrar
+    this.productos = processedProducts; // La lista que se va a mostrar y filtrar
   }
 
   setRandomWelcomeMessage() {

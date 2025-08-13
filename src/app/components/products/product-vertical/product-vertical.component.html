@@ -1,5 +1,5 @@
 <div
-  class="bg-gray-100 rounded-xl shadow overflow-hidden transform transition-transform hover:scale-101 flex flex-col md:flex-row"
+  class="bg-gray-50 rounded-xl border-2 border-gray-200 overflow-hidden md:min-w-4xl md:max-w-4xl transform transition-transform hover:scale-101 flex flex-col md:flex-row"
   [ngClass]="{ 'md:flex-row-reverse': !imagenIzquierda, 'md:flex-row': imagenIzquierda }"
 >
   <!-- Contenedor de imagen y logo -->
@@ -10,14 +10,14 @@
     >
       <!-- Imagen del producto -->
       <img
-        [src]="producto.imagen"
+        [src]="producto.imagen | sanitizeImageUrl"
         [alt]="producto.nombre"
         class="w-full h-48 md:h-60 object-contain max-w-xs"
       />
 
       <!-- Logo de la marca -->
       <img
-        [src]="producto.marca"
+        [src]="'assets/logos/' + producto.marca.toLocaleLowerCase().trim() + '.png' | sanitizeImageUrl"
         [alt]="'Marca: ' + producto.marca"
         class="h-12 w-auto object-contain"
       />
@@ -47,7 +47,7 @@
     </div>
 
     <div class="flex flex-wrap gap-2 mb-4">
-      <span *ngFor="let tag of producto.etiquetas"
+      <span *ngFor="let tag of safeEtiquetas"
         class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full">
         <fa-icon [icon]="faTag"></fa-icon>
         {{ tag }}

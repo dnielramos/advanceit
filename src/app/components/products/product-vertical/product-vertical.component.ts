@@ -13,10 +13,11 @@ import {
 import { ProductoFinal } from '../../../models/Productos';
 import { RouterLink } from '@angular/router';
 import { AuthService, Role } from '../../../services/auth.service';
+import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 
 @Component({
   selector: 'app-product-vertical',
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, SanitizeImageUrlPipe],
   templateUrl: './product-vertical.component.html',
 })
 export class ProductVerticalComponent {
@@ -34,6 +35,28 @@ export class ProductVerticalComponent {
 
   addToCart(producto: ProductoFinal) {
     this.agregarAlCarrito.emit(producto);
+  }
+
+  /**
+   * ESTE ES EL GETTER DE LA SOLUCIÓN
+   * Se asegura de que las etiquetas siempre sean un array iterable.
+   */
+  get safeEtiquetas(): string[] {
+    const etiquetas = this.producto.etiquetas;
+
+    // Caso 1: Los datos vienen como un string que parece un array (el error actual)
+    if (typeof etiquetas === 'string') {
+      try {
+        const parsed = JSON.parse(etiquetas);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        // Si no se puede parsear, devolvemos un array vacío para no romper la app
+        return [];
+      }
+    }
+
+    // Caso 2: Los datos vienen correctamente como un array (o son nulos/indefinidos)
+    return Array.isArray(etiquetas) ? etiquetas : [];
   }
 
   faShoppingCart = faShoppingCart;

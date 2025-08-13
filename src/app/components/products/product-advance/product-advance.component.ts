@@ -13,6 +13,7 @@ import {
 import { ProductoFinal } from '../../../models/Productos';
 import { RouterLink } from '@angular/router';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
+import { AuthService, Role } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-product-advance',
@@ -24,6 +25,8 @@ export class ProductAdvanceComponent {
   @Input() producto!: ProductoFinal;
   @Output() agregarAlCarrito = new EventEmitter<ProductoFinal>();
 
+  logged: boolean = true;
+
   faShoppingCart = faShoppingCart;
   faEye = faEye;
   faSearch = faSearch;
@@ -31,6 +34,10 @@ export class ProductAdvanceComponent {
   faTag = faTag;
   faCopririgth = faCopyright;
   faCodeBranch = faCodeBranch;
+
+  constructor(private authService: AuthService) {
+    this.logged = this.authService.hasRole(Role.User);
+  }
 
   addToCart(producto: ProductoFinal) {
     this.agregarAlCarrito.emit(producto);

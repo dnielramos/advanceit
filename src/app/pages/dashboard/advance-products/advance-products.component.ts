@@ -12,7 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Subscription } from 'rxjs';
-import { ProductsService } from '../../../services/product.service';
+import { ApiGetAllProductsResponse, ProductsService } from '../../../services/product.service';
 import { ProductoFinal } from '../../../models/Productos'; // Interfaz correcta ya en uso
 
 @Component({
@@ -106,8 +106,8 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
     this.productsSubscription = this.productsService
       .getAllProducts()
       .subscribe({
-        next: (res: ProductoFinal[]) => {
-          this.allProducts = res;
+        next: (res: ApiGetAllProductsResponse) => {
+          this.allProducts = res.products;
           this.filteredProducts.set([...this.allProducts]);
           console.log('Productos cargados:', this.allProducts);
 

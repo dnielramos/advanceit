@@ -1,70 +1,66 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { from, Observable, concat, BehaviorSubject } from 'rxjs';
-import { bufferCount, concatMap, map, scan, delay } from 'rxjs/operators';
-
-// Asegúrate de que la ruta al modelo sea correcta
-import { ApiDetailsResponse, ProductAdvance } from '../models/ingram';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { ProductoFinal } from '../models/Productos';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
 import { PRODUCTOS_DEFAULT } from '../constants/default-products';
 
-interface SaveBatchResponse {
-  message: string;
-}
-
-export interface CategoryResponse {
-  catalog: GroupedCategory[];
-}
-
-export interface GroupedCategory {
-  category: string;
-  subCategories: string[];
-  [key: string] : any;
+// Interfaz para la respuesta completa de la API
+export interface ApiGetAllProductsResponse {
+  products: ProductoFinal[];
+  total: number;
 }
 
 @Injectable({ providedIn: 'root' })
-export class ProductsService implements OnInit {
-  private readonly apiUrlRender = ENVIRONMENT.apiUrlRender; // URL de tu API NestJS
-  private API_PRODUCTS_URL = `${this.apiUrlRender}/advance-products/ingram`;
+export class ProductsService {
+  private readonly apiUrlRender = ENVIRONMENT.apiUrlRender;
   private API_LIST_URL = `${this.apiUrlRender}/advance-products/all`;
-  private API_CATEGORY_URL = `${this.apiUrlRender}/categories`;
-  categorias: any = [];
 
-  // BehaviorSubject para emitir el array de productos de forma progresiva
-  private _allProducts$ = new BehaviorSubject<
-    ApiDetailsResponse<ProductAdvance>[]
-  >([]);
-  public allProducts$: Observable<ApiDetailsResponse<ProductAdvance>[]> =
-    this._allProducts$.asObservable();
+  private _allProducts$ = new BehaviorSubject<ProductoFinal[]>([]);
+  public allProducts$: Observable<ProductoFinal[]> = this._allProducts$.asObservable();
 
-  productos: ProductoFinal[] = [];
+  // Puedes hacer estas propiedades privadas si solo se modifican dentro del servicio
+  private _productos: ProductoFinal[] = [];
+  private _productosFavorites: ProductoFinal[] = [];
 
-  productosFavorites: ProductoFinal[] = [];
+  constructor(private http: HttpClient) {
+    this.loadInitialProducts();
+  }
 
-  constructor(private http: HttpClient) {}
+  private loadInitialProducts(): void {
+    // Nos suscribimos para ejecutar la petición
+    this.getAllProducts().subscribe((response) => {
+      // Es buena práctica verificar que la respuesta y la propiedad existan
+      if (response && response.products) {
+        this._productos = response.products;
+        this._allProducts$.next(this._productos); // Emitimos los productos al BehaviorSubject
 
-  ngOnInit(): void {
-    this.getAllProducts().subscribe((productos) => {
-      this.productos = productos;
-      this.productosFavorites = productos.filter((p) => p.marca.includes("dell"));
+        console.log('✅ Productos cargados y emitidos:', this._productos);
+
+        // Lógica de favoritos
+        const dellProducts = this._productos.filter((p) => p.marca.toLowerCase().includes("dell"));
+        this._productosFavorites = dellProducts.length > 0 ? dellProducts : PRODUCTOS_DEFAULT;
+      } else {
+        console.error('La respuesta de la API no tiene el formato esperado:', response);
+      }
     });
   }
 
+  /**
+   * Devuelve un Observable que, al suscribirse, emite la respuesta completa de la API.
+   */
+  getAllProducts(): Observable<ApiGetAllProductsResponse> {
+    // 1. Especifica el tipo correcto en la petición http.get.
+    // 2. No hagas console.log aquí, ya que solo imprimirías el Observable.
+    return this.http.get<ApiGetAllProductsResponse>(this.API_LIST_URL);
+  }
+
+  // Getters públicos para acceder a los datos desde los componentes
   get getProductos() {
-    return this.productos;
+    return this._productos;
   }
 
   get getFavoritesProducts() {
-    return this.productosFavorites;
-  }
-
-  /**
-   * Devuelve un Observable con la lista completa de productos (se carga de una vez).
-   * Útil si la carga progresiva ya se ha completado o para otros casos de uso.
-   * @returns Un Observable con el array completo de productos.
-   */
-  getAllProducts(): Observable<ProductoFinal[]> {
-    return this.http.get<ProductoFinal[]>(this.API_LIST_URL);
+    return this._productosFavorites;
   }
 }

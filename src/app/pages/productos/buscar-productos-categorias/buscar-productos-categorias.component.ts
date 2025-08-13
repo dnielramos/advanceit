@@ -47,7 +47,7 @@ export class BuscarProductosCategoriasComponent implements OnInit {
               .getAllProducts()
               .pipe(
                 map((allProducts) =>
-                  allProducts.filter(
+                  allProducts.products.filter(
                     (p) =>
                       p.categoria.toLowerCase() === this.category?.toLowerCase()
                   )
@@ -61,7 +61,7 @@ export class BuscarProductosCategoriasComponent implements OnInit {
           // Asegúrate de que las marcas estén cargadas en el BrandService antes de mapear
           const brands = this.brandService.brands || [];
 
-          return products.map((producto) => {
+          return products.map((producto: any) => {
             const brand = brands.find(
               (b) =>
                 b.name.trim().toLowerCase() ===

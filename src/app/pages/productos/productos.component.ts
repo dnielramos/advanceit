@@ -139,7 +139,7 @@ export class ProductosComponent implements OnInit {
   // categorias: string[] = ['Computadoras', 'Accesorios', 'Monitores'];
   // marcas: string[] = ['Dell'];
 
-  productos: ProductoFinal[] = PRODUCTOS_DEFAULT;
+  productos: ProductoFinal[] = [];
   productosFavorites: ProductoFinal[] = PRODUCTOS_DEFAULT;
 
   @ViewChild('favoritesContainer')
@@ -147,8 +147,6 @@ export class ProductosComponent implements OnInit {
   filteredProducts = signal<ProductoFinal[]>([]);
 
   constructor(
-    private nexsysService: NexsysApiService,
-    private ingramService: IngramService,
     private router: Router,
     private cartService: CartService,
     private productService: ProductsService,
@@ -162,7 +160,11 @@ export class ProductosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.productService.allProducts$.subscribe((productos) => {
+      this.productos = productos;
+      this.productosFavorites = productos;
+      console.log('Productos cargados en el componente de products:', this.productos);
+    });
     this.loadMarkInFavorites();
     // Cambiamos el mensaje de bienvenida cada 8 segundos
     setInterval(() => {

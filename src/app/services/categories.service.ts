@@ -2,15 +2,25 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { CategoryResponse, GroupedCategory } from './product.service';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
 
+export interface CategoryResponse {
+  catalog: GroupedCategory[];
+}
+
+export interface GroupedCategory {
+  category: string;
+
+  subCategories: string[];
+
+  [key: string]: any;
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CategoriesService {
-
-  private baseApi =   ENVIRONMENT.apiUrlRender;
+  private baseApi = ENVIRONMENT.apiUrlRender;
   private apiUrl = `${this.baseApi}/categories`; // Cambia por tu URL real
 
   // Estado reactivo
@@ -29,16 +39,19 @@ export class CategoriesService {
     // Si ya hay datos cargados, no vuelve a pedir
     if (this.categoriasSubject.getValue().length > 0) return;
 
-    this.http.get<CategoryResponse>(this.apiUrl).pipe(
-      tap((response: CategoryResponse) => {
-        this.categoriasSubject.next(response.catalog.sort() || []);
-      }),
-      catchError((err) => {
-        console.error('Error fetching categories:', err);
-        this.categoriasSubject.next([]);
-        return throwError(() => err);
-      })
-    ).subscribe();
+    this.http
+      .get<CategoryResponse>(this.apiUrl)
+      .pipe(
+        tap((response: CategoryResponse) => {
+          this.categoriasSubject.next(response.catalog.sort() || []);
+        }),
+        catchError((err) => {
+          console.error('Error fetching categories:', err);
+          this.categoriasSubject.next([]);
+          return throwError(() => err);
+        })
+      )
+      .subscribe();
   }
 
   /**

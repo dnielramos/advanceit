@@ -4,7 +4,7 @@ import { Router } from '@angular/router'; // Importa el Router
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faChevronRight, faArrowLeft, faCopyright } from '@fortawesome/free-solid-svg-icons';
 import { CategoriesService } from '../../../services/categories.service';
-import { GroupedCategory } from '../../../services/product.service';
+import { GroupedCategory } from '../../../services/categories.service';
 
 @Component({
   selector: 'app-category-menu',

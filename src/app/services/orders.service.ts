@@ -35,8 +35,8 @@ interface ApiNexsysResponse {
 })
 export class OrdersService {
   // Es una buena práctica definir la URL base en los environments, pero esto funciona.
-  // private readonly baseURL = 'https://advance-genai.onrender.com';
-  private baseURL = 'http://localhost:3002';
+  private readonly baseURL = 'https://advance-genai.onrender.com';
+  // private baseURL = 'http://localhost:3002';
   private readonly apiUrl = `${this.baseURL}/orders`;
   private readonly productSearchUrl = `${this.baseURL}/nexys/by-sku`; // Asumo que esta ruta existe
 

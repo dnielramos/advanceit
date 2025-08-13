@@ -65,6 +65,7 @@ export const landingRoutes = [
           ),
       },
        { path: 'productos/chat', loadComponent: () => import('../pages/luki/luki.component').then(m => m.LukiComponent) },
+       { path: 'productos/orders', loadComponent: () => import('../pages/dashboard/orders/orders.component').then(m => m.OrdersComponent) },
        { path: 'productos/:category', loadComponent: () => import('../pages/productos/buscar-productos-categorias/buscar-productos-categorias.component').then(m => m.BuscarProductosCategoriasComponent) },
 
       { path: 'nuestra-historia', loadComponent: () => import('../pages/nosotros/ourhistory/ourhistory.component').then(m => m.OurhistoryComponent) },

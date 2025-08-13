@@ -4,7 +4,7 @@
   <app-buscador-principal (showCategoriesMenu)="onMenucategories()"></app-buscador-principal>
 
   <!-- t+item de carrito -->
-  <div *ngIf="cartItemCount > 0"
+  <div *ngIf="cartItemCount > 0 && islogged"
     class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
     <a routerLink="/productos/cart" class="relative flex items-center justify-center w-full h-full">
       <span
@@ -55,7 +55,7 @@
     Productos Comprados recientemente
   </h1>
 
-  <!-- <section class="flex my-2 gap-2 p-4 m-4 rounded-md">
+  <section class="flex my-2 gap-2 p-4 m-4 rounded-md">
     <app-product-vertical (agregarAlCarrito)="addToCart($event)"
       [producto]="productosFavorites[2]"></app-product-vertical>
   </section>
@@ -70,7 +70,7 @@
   <section class="flex my-4 gap-4 p-4 m-4 rounded-md">
     <app-product-vertical (agregarAlCarrito)="addToCart($event)" [producto]="productosFavorites[3]"
       [imagenIzquierda]="false"></app-product-vertical>
-  </section> -->
+  </section>
 
   <h1 class="text-center text-gray-900 text-4xl font-extrabold my-4">
     Distribuidores autorizados de las mejores marcas

@@ -25,12 +25,14 @@ import {
   faChevronLeft,
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ProductoFinal } from '../../../models/Productos';
 import { TrmComponent } from '../../navbar/trm/trm.component';
 import { BrandService } from '../../../services/brand.service';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { PRODUCTOS_DEFAULT } from '../../../constants/default-products';
+import { ProductsService } from '../../../services/product.service';
+import { AuthService, Role } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-buscador-principal',
@@ -91,16 +93,28 @@ export class BuscadorPrincipalComponent implements OnInit {
   faChevronRight = faChevronRight;
   @Output() showCategoriesMenu = new EventEmitter<void>();
 
+  islogged: boolean = false;
+
   // --- CAMBIO 1: Añadir un arreglo para guardar los productos originales ---
   private productosOriginales: ProductoFinal[] = [];
 
   // Lista de productos que se muestra en la UI y se filtra
   productos: ProductoFinal[] = [];
 
-  constructor(private brandService: BrandService) {}
+  constructor(
+    private brandService: BrandService,
+    private productService: ProductsService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   inputFocused = false;
   hoveringSuggestions = false;
+
+  onShowOrders(): void {
+    console.log('Show Orders clicked');
+    this.router.navigate(['/productos/orders']);
+  }
 
   onInputFocus(): void {
     this.inputFocused = true;
@@ -134,12 +148,23 @@ export class BuscadorPrincipalComponent implements OnInit {
   favoritesContainer!: ElementRef<HTMLDivElement>;
 
   ngOnInit(): void {
+
+    this.islogged = this.authService.hasRole(Role.User);
+
     setInterval(() => {
       this.setRandomWelcomeMessage();
     }, 3000);
 
+    this.productService.allProducts$.subscribe((productos) => {
+      this.productos = productos;
+      console.log(
+        'Productos cargados en el componente de products:',
+        this.productos
+      );
+    });
+
     // Procesamos los productos iniciales
-    const processedProducts = PRODUCTOS_DEFAULT.map((producto) => {
+    const processedProducts = this.productos.map((producto) => {
       const brand = this.brandService.brands.find(
         (b) =>
           b.name.trim().toLowerCase() === producto.marca.trim().toLowerCase()

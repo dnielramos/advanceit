@@ -136,6 +136,9 @@ export class ProductosComponent implements OnInit {
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
 
+
+  islogged: boolean = false;
+
   // Arrays de filtros disponibles
   // categorias: string[] = ['Computadoras', 'Accesorios', 'Monitores'];
   // marcas: string[] = ['Dell'];

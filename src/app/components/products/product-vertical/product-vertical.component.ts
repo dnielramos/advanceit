@@ -12,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { ProductoFinal } from '../../../models/Productos';
 import { RouterLink } from '@angular/router';
+import { AuthService, Role } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-product-vertical',
@@ -24,6 +25,12 @@ export class ProductVerticalComponent {
   @Input() productosFiltrados: ProductoFinal[] = [];
   @Input() producto!: ProductoFinal;
   @Output() agregarAlCarrito = new EventEmitter<ProductoFinal>();
+
+  islogged: boolean = false;
+
+  constructor(private authService: AuthService) {
+    this.islogged = this.authService.hasRole(Role.User);
+  }
 
   addToCart(producto: ProductoFinal) {
     this.agregarAlCarrito.emit(producto);

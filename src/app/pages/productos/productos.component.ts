@@ -165,6 +165,8 @@ export class ProductosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.islogged = this.authService.hasRole(Role.User);
     this.productService.allProducts$.subscribe((productos) => {
       this.productos = productos;
       this.productosFavorites = productos;

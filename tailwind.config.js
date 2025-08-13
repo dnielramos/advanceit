@@ -5,15 +5,20 @@ export const content = [
 ]
 export const theme = {
   extend: {
-      keyframes: {
-        ripple: {
-          '0%': { transform: 'scale(1)', opacity: '1' },
-          '100%': { transform: 'scale(3)', opacity: '0' },
-        },
+    fontFamily: {
+      montserrat: ['Montserrat', 'sans-serif'],
+      oswald: ['Oswald'],
+      poppins: ['Poppins', 'sans-serif'],
+    },
+    keyframes: {
+      ripple: {
+        '0%': { transform: 'scale(1)', opacity: '1' },
+        '100%': { transform: 'scale(3)', opacity: '0' },
       },
-      animation: {
-        ripple: 'ripple 1s ease-out forwards',
-      },
+    },
+    animation: {
+      ripple: 'ripple 1s ease-out forwards',
+    },
     colors: {
       orange: {
         600: '#F98A37',

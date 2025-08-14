@@ -183,9 +183,9 @@ export class ProductosComponent implements OnInit {
     });
     this.loadMarkInFavorites();
     // Cambiamos el mensaje de bienvenida cada 8 segundos
-    setInterval(() => {
-      this.setRandomWelcomeMessage();
-    }, 3000);
+    // setInterval(() => {
+    //   this.setRandomWelcomeMessage();
+    // }, 3000);
   }
 
   loadMarkInFavorites() {

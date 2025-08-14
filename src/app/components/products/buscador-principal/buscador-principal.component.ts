@@ -147,8 +147,8 @@ export class BuscadorPrincipalComponent implements OnInit {
   @ViewChild('favoritesContainer')
   favoritesContainer!: ElementRef<HTMLDivElement>;
 
-  ngOnInit(): void {
 
+  ngOnInit(): void {
     this.islogged = this.authService.hasRole(Role.User);
 
     setInterval(() => {
@@ -157,27 +157,16 @@ export class BuscadorPrincipalComponent implements OnInit {
 
     this.productService.allProducts$.subscribe((productos) => {
       this.productos = productos;
+      this.productosOriginales = productos;
       console.log(
         'Productos cargados en el componente de products:',
         this.productos
       );
     });
 
-    // Procesamos los productos iniciales
-    const processedProducts = this.productos.map((producto) => {
-      const brand = this.brandService.brands.find(
-        (b) =>
-          b.name.trim().toLowerCase() === producto.marca.trim().toLowerCase()
-      );
-      return {
-        ...producto,
-        marca: brand ? brand.url : producto.marca,
-      };
-    });
-
     // --- CAMBIO 2: Guardamos la lista procesada en AMBOS arreglos ---
-    this.productosOriginales = processedProducts; // La lista maestra que no se toca
-    this.productos = processedProducts; // La lista que se va a mostrar y filtrar
+    this.productosOriginales = this.productos; // La lista maestra que no se toca
+    this.productos = this.productos; // La lista que se va a mostrar y filtrar
   }
 
   setRandomWelcomeMessage() {
@@ -189,6 +178,8 @@ export class BuscadorPrincipalComponent implements OnInit {
   filterProducts() {
     // --- CAMBIO 3: Siempre empezamos a filtrar desde la lista ORIGINAL ---
     let filteredList = this.productosOriginales;
+
+    console.log('termino a buscar: ', this.searchTerm);
 
     // Aplicamos el filtro por término de búsqueda.
     if (this.searchTerm && this.searchTerm.trim() !== '') {

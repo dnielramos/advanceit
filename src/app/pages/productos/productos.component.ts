@@ -320,17 +320,16 @@ export class ProductosComponent implements OnInit {
       this.addToCart(product);
     } else {
       this.comprarProductos = !this.comprarProductos;
-    }
+      const html = document.documentElement;
+      const body = document.body;
 
-    const html = document.documentElement;
-    const body = document.body;
-
-    if (this.comprarProductos) {
-      html.classList.add('no-scroll');
-      body.classList.add('no-scroll');
-    } else {
-      html.classList.remove('no-scroll');
-      body.classList.remove('no-scroll');
+      if (this.comprarProductos) {
+        html.classList.add('no-scroll');
+        body.classList.add('no-scroll');
+      } else {
+        html.classList.remove('no-scroll');
+        body.classList.remove('no-scroll');
+      }
     }
   }
 

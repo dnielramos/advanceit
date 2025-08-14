@@ -57,19 +57,19 @@
     </h1>
 
     <section class="flex justify-center my-2 gap-2 p-4 m-4 rounded-md">
-      <app-product-vertical (agregarAlCarrito)="addToCart($event)"
+      <app-product-vertical (agregarAlCarrito)="onComprarProductos($event)"
         [producto]="productosFavorites[2]"></app-product-vertical>
     </section>
     <section class="flex justify-center my-4 gap-2 p-4 m-4 rounded-md">
-      <app-product-vertical (agregarAlCarrito)="addToCart($event)" [producto]="productosFavorites[5]"
+      <app-product-vertical (agregarAlCarrito)="onComprarProductos($event)" [producto]="productosFavorites[5]"
         [imagenIzquierda]="false"></app-product-vertical>
     </section>
     <section class="flex justify-center my-4 gap-4 p-4 m-4 rounded-md">
-      <app-product-vertical (agregarAlCarrito)="addToCart($event)"
+      <app-product-vertical (agregarAlCarrito)="onComprarProductos($event)"
         [producto]="productosFavorites[4]"></app-product-vertical>
     </section>
     <section class="flex justify-center my-4 gap-4 p-4 m-4 rounded-md">
-      <app-product-vertical (agregarAlCarrito)="addToCart($event)" [producto]="productosFavorites[3]"
+      <app-product-vertical (agregarAlCarrito)="onComprarProductos($event)" [producto]="productosFavorites[3]"
         [imagenIzquierda]="false"></app-product-vertical>
     </section>
   </div>
@@ -87,7 +87,7 @@
     Todos los productos
   </h1>
   <!-- productos -->
-  <app-grid-products-store (añadirAlCarrito)="addToCart($event)"></app-grid-products-store>
+  <app-grid-products-store (añadirAlCarrito)="onComprarProductos($event)"></app-grid-products-store>
 
   <!-- componente de categorias -->
   <div *ngIf="menuCategories" class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden"

@@ -29,7 +29,7 @@ export interface PaginatedProductsResponse {
 
 @Injectable({ providedIn: 'root' })
 export class ProductsService {
-  private readonly apiUrlRender = 'http://localhost:3002';
+  private readonly apiUrlRender = ENVIRONMENT.apiUrlRender;
   private API_ALL_URL = `${this.apiUrlRender}/advance-products/all`;
   // New URL for paginated products
   private API_PAGINATED_URL = `${this.apiUrlRender}/advance-products/all-paginated`;

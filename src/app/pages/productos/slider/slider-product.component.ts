@@ -1,19 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'app-slider-product',
   templateUrl: './slider-product.component.html',
+  standalone: true,
   imports: [CommonModule]
 })
 export class SliderProductComponent implements AfterViewInit {
   currentSlide = 0;
 
-  @ViewChild('videoFondo', { static: true }) videoRef!: ElementRef<HTMLVideoElement>;
+  @ViewChildren('videoFondo') videoRefs!: QueryList<ElementRef<HTMLVideoElement>>;
 
   ngAfterViewInit() {
-    const video = this.videoRef.nativeElement;
-    video.playbackRate = 0.5; // 🔹 Más lento (0.5 = 50% velocidad)
+    this.playAndSlowCurrentVideo();
+    this.videoRefs.changes.subscribe(() => {
+      this.playAndSlowCurrentVideo();
+    });
   }
 
   banners = [
@@ -25,27 +28,6 @@ export class SliderProductComponent implements AfterViewInit {
       background: 'url(banners/background.jpeg)',
       video: 'banners/videobanner.webm'
     },
-    // {
-    //   title: 'Gaming Power Unleashed',
-    //   description: 'Equip your setup with the best gaming hardware.',
-    //   buttonText: 'Explore',
-    //   image: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
-    //   background: 'linear-gradient(to right, #141e30, #243b55)'
-    // },
-    // {
-    //   title: 'Student Essentials',
-    //   description: 'Affordable and powerful laptops for study and productivity.',
-    //   buttonText: 'View Offers',
-    //   image: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
-    //   background: 'linear-gradient(to right, #56ccf2, #2f80ed)'
-    // },
-    // {
-    //   title: 'Designer’s Choice',
-    //   description: 'High-resolution screens and powerful GPUs for creatives.',
-    //   buttonText: 'Get Inspired',
-    //   image: '/products/notebook-latitude-14-7450-t-gray-gallery-1.avif',
-    //   background: 'linear-gradient(to right, #ff4e50, #f9d423)'
-    // },
     {
       title: 'Dell Latitude 14 5440',
       description: 'Equipo portátil de alta gama con procesadores Intel Core de última generación.',
@@ -56,15 +38,32 @@ export class SliderProductComponent implements AfterViewInit {
     }
   ];
 
+  playAndSlowCurrentVideo() {
+    if (this.videoRefs && this.videoRefs.length > 0) {
+      this.videoRefs.forEach((videoRef, index) => {
+        const video = videoRef.nativeElement;
+        if (index === this.currentSlide) {
+          video.playbackRate = 0.5;
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+    }
+  }
+
   prevSlide() {
     this.currentSlide = (this.currentSlide - 1 + this.banners.length) % this.banners.length;
+    this.playAndSlowCurrentVideo();
   }
 
   nextSlide() {
     this.currentSlide = (this.currentSlide + 1) % this.banners.length;
+    this.playAndSlowCurrentVideo();
   }
 
   goToSlide(index: number) {
     this.currentSlide = index;
+    this.playAndSlowCurrentVideo();
   }
 }

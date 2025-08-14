@@ -33,12 +33,14 @@ import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { PRODUCTOS_DEFAULT } from '../../../constants/default-products';
 import { ProductsService } from '../../../services/product.service';
 import { AuthService, Role } from '../../../services/auth.service';
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-buscador-principal',
   standalone: true,
   imports: [
     CommonModule,
+    ScrollingModule,
     FormsModule,
     FontAwesomeModule,
     RouterLink,
@@ -110,6 +112,30 @@ export class BuscadorPrincipalComponent implements OnInit {
 
   inputFocused = false;
   hoveringSuggestions = false;
+
+   // Importante: Referencia al CdkVirtualScrollViewport
+  @ViewChild(CdkVirtualScrollViewport, { static: false })
+  viewport!: CdkVirtualScrollViewport;
+
+   // Un método para trackear por índice
+  trackByIndex(index: number, item: any): number {
+    return index;
+  }
+
+  scrollFavorites(direction: 'left' | 'right') {
+    // Definimos el ancho de un solo producto, debe coincidir con itemSize en el HTML
+    const itemWidth = 250;
+    const currentOffset = this.viewport.measureScrollOffset();
+    const viewportWidth = this.viewport.getViewportSize(); // Devuelve el número de ítems visibles
+
+    let scrollAmount = itemWidth; // Cantidad a desplazar por cada click
+
+    if (direction === 'right') {
+      this.viewport.scrollToOffset(currentOffset + scrollAmount, 'smooth');
+    } else {
+      this.viewport.scrollToOffset(Math.max(0, currentOffset - scrollAmount), 'smooth');
+    }
+  }
 
   onShowOrders(): void {
     console.log('Show Orders clicked');
@@ -200,14 +226,14 @@ export class BuscadorPrincipalComponent implements OnInit {
     this.showCategoriesMenu.emit();
   }
 
-  scrollFavorites(direction: 'left' | 'right') {
-    const container = this.favoritesContainer?.nativeElement;
-    if (!container) return;
+  // scrollFavorites(direction: 'left' | 'right') {
+  //   const container = this.favoritesContainer?.nativeElement;
+  //   if (!container) return;
 
-    const scrollAmount = 300;
-    container.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth',
-    });
-  }
+  //   const scrollAmount = 300;
+  //   container.scrollBy({
+  //     left: direction === 'left' ? -scrollAmount : scrollAmount,
+  //     behavior: 'smooth',
+  //   });
+  // }
 }

@@ -1,11 +1,11 @@
 <div class="container mx-auto px-4 py-6">
   <!-- Encabezado dinámico -->
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-      <fa-icon [icon]="faAnglesRight"></fa-icon>
+    <h1 class="text-md md:text-2xl font-bold text-gray-600 flex items-center gap-2">
+      <fa-icon [icon]="faAnglesRight" class="text-purple-500"></fa-icon>
       {{ tituloVista }}
     </h1>
-    <p class="text-gray-500">
+    <p class="text-gray-500 text-xs">
       Mostrando {{ productos.length }} productos
       <span *ngIf="categoria">en "{{ categoria }}"</span>
       <span *ngIf="subcategoria"> › "{{ subcategoria }}"</span>

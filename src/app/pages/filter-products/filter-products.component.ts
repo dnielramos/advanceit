@@ -17,6 +17,7 @@ import { ProductoFinal } from '../../models/Productos';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
+import { ENVIRONMENT } from '../../../enviroments/enviroment';
 
 // Interfaz para la respuesta paginada del API
 interface PagedProductsResponse {
@@ -41,7 +42,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   faShoppingCart = faShoppingCart;
   faCheckCircle = faCheckCircle;
   faAnglesRight = faAnglesRight;
-  API_URL = 'http://localhost:3002'; // Cambia esto según tu configuración
+  API_URL = ENVIRONMENT.apiUrlRender; // Cambia esto según tu configuración
   categoria: string = '';
   subcategoria: string = '';
   tituloVista: string = '';

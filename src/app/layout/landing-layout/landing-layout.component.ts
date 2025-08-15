@@ -4,10 +4,11 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { ContextService } from '../../services/context.service';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { BuscadorPrincipalComponent } from "../../components/products/buscador-principal/buscador-principal.component";
 
 @Component({
   selector: 'app-landing-layout',
-  imports: [NavbarComponent, RouterOutlet, CommonModule],
+  imports: [NavbarComponent, RouterOutlet, CommonModule, BuscadorPrincipalComponent],
   templateUrl: './landing-layout.component.html',
 })
 export class LandingLayoutComponent implements OnInit {

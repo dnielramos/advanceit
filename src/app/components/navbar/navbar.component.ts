@@ -2,10 +2,7 @@ import { NgClass, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faShoppingCart,
-  faLanguage,
-} from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faLanguage } from '@fortawesome/free-solid-svg-icons';
 import { MobileMenuComponent } from './mobile-menu/mobile-menu.component';
 import { TitleMegaMenuComponent } from '../../utils/title-mega-menu/title-mega-menu.component';
 import { TrmComponent } from './trm/trm.component';
@@ -13,6 +10,7 @@ import { NavbarSectionsComponent } from './navbar-sections/navbar-sections.compo
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ContextService } from '../../services/context.service';
 import { filter } from 'rxjs/operators';
+import { BuscadorPrincipalComponent } from "../products/buscador-principal/buscador-principal.component";
 
 @Component({
   selector: 'app-navbar',
@@ -25,27 +23,61 @@ import { filter } from 'rxjs/operators';
     NgIf,
     TrmComponent,
     NavbarSectionsComponent,
-    TranslatePipe
-  ],
+    TranslatePipe,
+    BuscadorPrincipalComponent
+],
   templateUrl: './navbar.component.html',
 })
-export class NavbarComponent{
+export class NavbarComponent {
   faGlobe = faLanguage;
   // faUser = faUser;
   // faHome = faHome;
   faShoppingCart = faShoppingCart;
   textIdiom = 'es';
-  idiom = 'English'
+  idiom = 'English';
 
-  constructor(private translate: TranslateService, private contextService: ContextService) {
+  constructor(
+    private translate: TranslateService,
+    private contextService: ContextService,
+    private router: Router
+  ) {
     this.translate.addLangs(['es', 'en']);
     this.translate.setDefaultLang('es');
     this.translate.use('es');
   }
 
+  showNav = false;
+
+  ngOnInit(): void {
+    // 1. Comprobación inicial al cargar
+    const currentUrl = this.router.url;
+    const isProductPage =
+      currentUrl.startsWith('/productos') || currentUrl.startsWith('/in');
+    this.contextService.setNavVisibility(!isProductPage);
+
+    // Escucha cambios de ruta
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        const currentUrl = event.urlAfterRedirects;
+
+        // Si la ruta es /productos, ocultar el navbar
+        const isProductPageOrLogin =
+          currentUrl.startsWith('/productos') || currentUrl.startsWith('/in');
+        this.contextService.setNavVisibility(!isProductPageOrLogin);
+      });
+
+    // Suscribirse al observable de visibilidad
+    this.contextService.nav$.subscribe((value) => {
+      this.showNav = value;
+    });
+  }
+
   cambiarIdioma() {
     this.textIdiom == 'es' ? (this.textIdiom = 'en') : (this.textIdiom = 'es');
-    this.textIdiom == 'es' ? (this.idiom = 'English') : (this.idiom = 'Español');
+    this.textIdiom == 'es'
+      ? (this.idiom = 'English')
+      : (this.idiom = 'Español');
     this.translate.use(this.textIdiom);
   }
 

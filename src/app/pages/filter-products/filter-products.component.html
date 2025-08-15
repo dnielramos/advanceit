@@ -14,18 +14,8 @@
 
   <!-- Lista de productos -->
   <div *ngIf="productos.length > 0" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    <div *ngFor="let producto of productos" class="border rounded-lg p-4 shadow hover:shadow-lg transition">
-      <img [src]="producto.imagen" [alt]="producto.nombre" class="w-full h-40 object-cover mb-4 rounded" />
-      <h2 class="font-semibold text-lg">{{ producto.nombre }}</h2>
-      <p class="text-gray-600 text-sm mb-2">{{ producto.descripcion }}</p>
-      <p class="font-bold text-blue-600 mb-3">
-        ${{ producto.precio | number : '1.0-0' }}
-      </p>
-      <button
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center justify-center gap-2">
-        <fa-icon [icon]="faShoppingCart"></fa-icon> Agregar al carrito
-      </button>
-    </div>
+
+    <app-product-advance *ngFor="let producto of productos" [producto]="producto"></app-product-advance>
   </div>
 
   <!-- Loader para la primera carga y para scroll infinito -->

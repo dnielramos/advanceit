@@ -16,6 +16,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProductoFinal } from '../../models/Productos';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
 
 // Interfaz para la respuesta paginada del API
 interface PagedProductsResponse {
@@ -31,7 +32,7 @@ interface PagedProductsResponse {
 @Component({
   selector: 'app-filter-products',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, ProductAdvanceComponent],
   templateUrl: './filter-products.component.html',
 })
 export class FilterProductsComponent implements OnInit, OnDestroy {
@@ -48,46 +49,39 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   paginaActual: number = 1;
   totalPaginas: number = 0;
   hayMasProductos: boolean = true;
-  private routeSubscription: Subscription | undefined;
+  private routeSubscription: Subscription | undefined; // Nuevas propiedades para guardar los parámetros de la URL sin capitalizar
+
+  private rawCategoryParam: string | null = null;
+  private rawSubcategoryParam: string | null = null;
 
   constructor(private http: HttpClient, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    // Escuchamos los cambios en los parámetros de la URL
     this.routeSubscription = this.route.paramMap.subscribe((params) => {
-      this.resetearEstado(); // Reinicia el estado cada vez que cambian los parámetros
-      const categoryParam = params.get('categoria');
-      const subcategoryParam = params.get('subcategoria');
+      this.resetearEstado();
+      this.rawCategoryParam = params.get('categoria');
+      this.rawSubcategoryParam = params.get('subcategoria');
 
-      if (subcategoryParam) {
-        this.subcategoria = this.capitalizar(subcategoryParam);
-        this.categoria = this.capitalizar(categoryParam || '');
+      if (this.rawSubcategoryParam) {
+        this.subcategoria = this.capitalizar(this.rawSubcategoryParam);
+        this.categoria = this.capitalizar(this.rawCategoryParam || '');
         this.tituloVista = `${this.categoria} › ${this.subcategoria}`;
-        this.cargarProductos(
-          `by-subcategory/${encodeURIComponent(subcategoryParam)}`,
-        );
-      } else if (categoryParam) {
-        this.categoria = this.capitalizar(categoryParam);
+        this.cargarProductos();
+      } else if (this.rawCategoryParam) {
+        this.categoria = this.capitalizar(this.rawCategoryParam);
         this.subcategoria = '';
         this.tituloVista = this.categoria;
-        this.cargarProductos(
-          `by-category/${encodeURIComponent(categoryParam)}`,
-        );
+        this.cargarProductos();
       }
     });
   }
 
   ngOnDestroy(): void {
-    // Desuscribirse para evitar fugas de memoria
     this.routeSubscription?.unsubscribe();
   }
 
-  /**
-   * Escucha el evento de scroll para cargar más productos
-   */
   @HostListener('window:scroll', ['$event'])
   onScroll(): void {
-    // Calcula si el usuario ha llegado al final de la página
     const scrollPosition =
       window.pageYOffset || document.documentElement.scrollTop;
     const scrollHeight = document.documentElement.scrollHeight;
@@ -102,9 +96,6 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Reinicia el estado del componente.
-   */
   private resetearEstado(): void {
     this.productos = [];
     this.paginaActual = 1;
@@ -113,17 +104,29 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
     this.cargando = false;
   }
 
-  /**
-   * Carga la primera página de productos.
-   * @param endpoint El endpoint del API a consultar
-   */
-  private cargarProductos(endpoint: string): void {
+  private cargarProductos(): void {
     this.cargando = true;
+
+    let endpoint: string;
+    if (this.rawSubcategoryParam) {
+      endpoint = `by-subcategory/${encodeURIComponent(
+        this.rawSubcategoryParam
+      )}`;
+    } else {
+      endpoint = `by-category/${encodeURIComponent(
+        this.rawCategoryParam || ''
+      )}`;
+    }
+
     const params = new HttpParams()
       .set('page', this.paginaActual.toString())
-      .set('limit', 10); // Establece el límite de productos por página
+      .set('limit', 10);
+
     this.http
-      .get<PagedProductsResponse>(`http://localhost:3002/categories/${endpoint}`, { params })
+      .get<PagedProductsResponse>(
+        `http://localhost:3002/categories/${endpoint}`,
+        { params }
+      )
       .subscribe({
         next: (res) => {
           this.productos = res.products;
@@ -138,9 +141,6 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Carga la siguiente página de productos.
-   */
   private cargarMasProductos(): void {
     if (!this.hayMasProductos) {
       return;
@@ -148,23 +148,26 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
     this.paginaActual++;
     this.cargando = true;
 
-    // Determina el endpoint basado en el estado actual
     let endpoint: string;
-    let param: string;
-    if (this.subcategoria) {
-      endpoint = `by-subcategory/${this.subcategoria}`;
-      param = this.subcategoria;
+    if (this.rawSubcategoryParam) {
+      endpoint = `by-subcategory/${encodeURIComponent(
+        this.rawSubcategoryParam
+      )}`;
     } else {
-      endpoint = `by-category/${this.categoria}`;
-      param = this.categoria;
+      endpoint = `by-category/${encodeURIComponent(
+        this.rawCategoryParam || ''
+      )}`;
     }
 
     const params = new HttpParams()
       .set('page', this.paginaActual.toString())
-      .set('limit', 10);
+      .set('limit', 10); // Se ha eliminado el prefijo "/api" para que coincida con la ruta de la primera carga
 
     this.http
-      .get<PagedProductsResponse>(`http://localhost:3002/api/categories/${endpoint}`, { params })
+      .get<PagedProductsResponse>(
+        `http://localhost:3002/categories/${endpoint}`,
+        { params }
+      )
       .subscribe({
         next: (res) => {
           this.productos = this.productos.concat(res.products);

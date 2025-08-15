@@ -69,8 +69,8 @@ export class CategoryMenuComponent implements OnInit {
    */
   navigateToCategory(categoryName: string): void {
     if (categoryName) {
-      // Navega a la ruta, por ejemplo: /categories/Laptops
-      this.router.navigate(['/categories', categoryName]);
+      // Navega a la ruta, por ejemplo: /categorias/Laptops
+      this.router.navigate([`/categorias/${this.currentCategory?.category}`, categoryName]);
     }
   }
 }

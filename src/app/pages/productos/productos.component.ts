@@ -306,13 +306,13 @@ export class ProductosComponent implements OnInit {
     const html = document.documentElement;
     const body = document.body;
 
-    if (this.menuCategories) {
-      html.classList.add('no-scroll');
-      body.classList.add('no-scroll');
-    } else {
-      html.classList.remove('no-scroll');
-      body.classList.remove('no-scroll');
-    }
+    // if (this.menuCategories) {
+    //   html.classList.add('no-scroll');
+    //   body.classList.add('no-scroll');
+    // } else {
+    //   html.classList.remove('no-scroll');
+    //   body.classList.remove('no-scroll');
+    // }
   }
 
   onComprarProductos(product: ProductoFinal | null): void {

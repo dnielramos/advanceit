@@ -37,7 +37,7 @@ export interface ProductoFinal {
   precioRetail: number | string;
   etiquetas: string[];
   galleryImages: string[];
-  especificaciones_tecnicas?: Record<string, Record<string, string>>;
+  especificaciones_tecnicas?: string[];
   garantia_e_informacion_adicional?: Record<string, string>;
   [key: string]: any; // Permite propiedades adicionales
 }

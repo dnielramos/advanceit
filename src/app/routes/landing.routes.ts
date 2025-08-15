@@ -64,9 +64,17 @@ export const landingRoutes = [
             (m) => m.OrderSuccessComponent
           ),
       },
+       {
+        path: 'productos/orden-exitosa',
+        loadComponent: () =>
+          import('../components/orders/orden-exitosa.component').then(
+            (m) => m.OrderSuccessComponent
+          ),
+      },
        { path: 'productos/chat', loadComponent: () => import('../pages/luki/luki.component').then(m => m.LukiComponent) },
        { path: 'productos/orders', loadComponent: () => import('../pages/dashboard/orders/orders.component').then(m => m.OrdersComponent) },
-       { path: 'productos/:category', loadComponent: () => import('../pages/productos/buscar-productos-categorias/buscar-productos-categorias.component').then(m => m.BuscarProductosCategoriasComponent) },
+       { path: 'categorias/:categoria', loadComponent: () => import('../pages/filter-products/filter-products.component').then(m => m.FilterProductsComponent) },
+       { path: 'productos/:categoria/:subcategoria', loadComponent: () => import('../pages/filter-products/filter-products.component').then(m => m.FilterProductsComponent) },
 
       { path: 'nuestra-historia', loadComponent: () => import('../pages/nosotros/ourhistory/ourhistory.component').then(m => m.OurhistoryComponent) },
       { path: 'impacto-social', loadComponent: () => import('../pages/nosotros/impacto-social/impacto-social.component').then(m => m.ImpactoSocialComponent) },

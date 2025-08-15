@@ -29,21 +29,6 @@ export const PRODUCTOS_DEFAULT: ProductoFinal[] = [
       '/products/notebook-latitude-14-5440-nt-gray-gallery-1.avif',
       '/products/notebook-latitude-14-5440-nt-gray-gallery-3.avif'
     ],
-    especificaciones_tecnicas: {
-      Procesador: {
-        Modelo: 'Intel® Core™ Ultra 5 135U, vPro®',
-        Núcleos: '14',
-        Frecuencia: 'Hasta 5.2 GHz'
-      },
-      Pantalla: {
-        Tamaño: '14.0"',
-        Resolución: '1920x1080 Full HD'
-      },
-      Memoria: {
-        RAM: '16 GB DDR5',
-        Almacenamiento: '512 GB SSD'
-      }
-    },
     garantia_e_informacion_adicional: {
       Garantía: '3 años limitada',
       Soporte: 'Dell ProSupport'
@@ -77,21 +62,6 @@ export const PRODUCTOS_DEFAULT: ProductoFinal[] = [
       '/products/notebook-latitude-14-7450-t-gray-gallery-2.avif',
       '/products/notebook-latitude-14-7450-t-gray-gallery-3.avif'
     ],
-    especificaciones_tecnicas: {
-      Procesador: {
-        Modelo: 'Intel® Core™ Ultra 7 165U, vPro®',
-        Núcleos: '16',
-        Frecuencia: 'Hasta 5.4 GHz'
-      },
-      Pantalla: {
-        Tamaño: '14.0"',
-        Resolución: '1920x1200 FHD+'
-      },
-      Memoria: {
-        RAM: '16 GB LPDDR5X',
-        Almacenamiento: '256 GB SSD'
-      }
-    },
     garantia_e_informacion_adicional: {
       Garantía: '2 años',
       Convertible: 'Sí, modo tablet'
@@ -124,15 +94,6 @@ export const PRODUCTOS_DEFAULT: ProductoFinal[] = [
     galleryImages: [
       '/products/accessories-dell-wh5024-anc-bk-gallery-2.avif'
     ],
-    especificaciones_tecnicas: {
-      Conectividad: {
-        Tipo: 'Cable',
-        Compatibilidad: 'Win11/10, Mac OS'
-      },
-      Audio: {
-        Certificaciones: 'Microsoft Teams, Zoom'
-      }
-    },
     garantia_e_informacion_adicional: {
       Garantía: '3 años',
       Característica: 'Cancelación activa de ruido'
@@ -164,16 +125,6 @@ export const PRODUCTOS_DEFAULT: ProductoFinal[] = [
     galleryImages: [
       '/products/monitor-p2425h-black-gallery-1.avif'
     ],
-    especificaciones_tecnicas: {
-      Pantalla: {
-        Tipo: 'IPS',
-        Resolución: '1920x1080',
-        Tamaño: '23.8"'
-      },
-      Ergonomía: {
-        Ajustes: 'Altura, Inclinación, Giro, Pivot'
-      }
-    },
     garantia_e_informacion_adicional: {
       Garantía: '3 años',
       Montura: 'VESA'
@@ -206,15 +157,6 @@ export const PRODUCTOS_DEFAULT: ProductoFinal[] = [
     galleryImages: [
       '/products/dock-station-wd25-black-gallery-2.avif'
     ],
-    especificaciones_tecnicas: {
-      Energía: {
-        Dell: '100W',
-        Otros: '96W'
-      },
-      Conectividad: {
-        Ethernet: 'RJ45 2.5GbE'
-      }
-    },
     garantia_e_informacion_adicional: {
       Garantía: '3 años',
       Soporte: 'Ampliable a 5 años'
@@ -247,15 +189,6 @@ export const PRODUCTOS_DEFAULT: ProductoFinal[] = [
     galleryImages: [
       '/products/km7321w-xkb-02-gy.avif'
     ],
-    especificaciones_tecnicas: {
-      Conexión: {
-        Tipo: 'USB receptor inalámbrico',
-        DPI: '1000, 1600, 2400, 4000'
-      },
-      Teclado: {
-        Teclas: '12 programables (F1-F12)'
-      }
-    },
     garantia_e_informacion_adicional: {
       Garantía: '2 años',
       Batería: 'Hasta 36 meses'

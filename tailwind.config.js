@@ -9,6 +9,7 @@ export const theme = {
       montserrat: ['Montserrat', 'sans-serif'],
       oswald: ['Oswald'],
       poppins: ['Poppins', 'sans-serif'],
+      sans: ['Poppins', 'sans-serif'],
     },
     keyframes: {
       ripple: {

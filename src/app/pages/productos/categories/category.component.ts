@@ -67,10 +67,20 @@ export class CategoryMenuComponent implements OnInit {
    * Navega a la vista de productos para una categoría o subcategoría específica.
    * @param categoryName El nombre de la categoría o subcategoría.
    */
-  navigateToCategory(categoryName: string): void {
+  navigateToSubcategory(categoryName: string): void {
     if (categoryName) {
       // Navega a la ruta, por ejemplo: /categorias/Laptops
       this.router.navigate([`/categorias/${this.currentCategory?.category}`, categoryName]);
+    }
+  }
+  /**
+   * Navega a la vista de productos para una categoría o subcategoría específica.
+   * @param subcategoryName El nombre de la categoría o subcategoría.
+   */
+  navigateToCategory(subcategoryName: string): void {
+    if (subcategoryName) {
+      // Navega a la ruta, por ejemplo: /categorias/Laptops
+      this.router.navigate([`/categorias`, subcategoryName]);
     }
   }
 }

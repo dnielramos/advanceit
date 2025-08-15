@@ -52,7 +52,7 @@
 
         <!-- Cada subcategoría ahora es clickeable para navegar -->
         <li *ngFor="let sub of selectedCategory()?.subCategories"
-            (click)="navigateToCategory(sub)"
+            (click)="navigateToSubcategory(sub)"
             class="p-3 bg-gray-50 hover:bg-purple-100 rounded-lg cursor-pointer transition-colors text-gray-700">
           {{ sub }}
         </li>

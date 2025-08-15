@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProductoFinal } from '../../models/Productos';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
 
@@ -41,7 +41,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   faShoppingCart = faShoppingCart;
   faCheckCircle = faCheckCircle;
   faAnglesRight = faAnglesRight;
-
+  API_URL = 'http://localhost:3002'; // Cambia esto según tu configuración
   categoria: string = '';
   subcategoria: string = '';
   tituloVista: string = '';
@@ -54,7 +54,8 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   private rawCategoryParam: string | null = null;
   private rawSubcategoryParam: string | null = null;
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) {}
+  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router) {}
+
 
   ngOnInit(): void {
     this.routeSubscription = this.route.paramMap.subscribe((params) => {
@@ -96,6 +97,16 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
     }
   }
 
+   /**
+   * Navega a la ruta de la categoría principal.
+   * Se usará en el HTML para el enlace.
+   */
+  irACategoriaPrincipal(): void {
+    if (this.rawCategoryParam) {
+      this.router.navigate(['/categorias', this.rawCategoryParam]);
+    }
+  }
+
   private resetearEstado(): void {
     this.productos = [];
     this.paginaActual = 1;
@@ -124,7 +135,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
 
     this.http
       .get<PagedProductsResponse>(
-        `http://localhost:3002/categories/${endpoint}`,
+        `${this.API_URL}/categories/${endpoint}`,
         { params }
       )
       .subscribe({
@@ -165,7 +176,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
 
     this.http
       .get<PagedProductsResponse>(
-        `http://localhost:3002/categories/${endpoint}`,
+        `${this.API_URL}/categories/${endpoint}`,
         { params }
       )
       .subscribe({

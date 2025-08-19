@@ -10,7 +10,9 @@ import { NavbarSectionsComponent } from './navbar-sections/navbar-sections.compo
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ContextService } from '../../services/context.service';
 import { filter } from 'rxjs/operators';
-import { BuscadorPrincipalComponent } from "../products/buscador-principal/buscador-principal.component";
+import { BuscadorPrincipalComponent } from '../products/buscador-principal/buscador-principal.component';
+import { BuscadorNavbarComponent } from './buscador-navbar/buscador-navbar.component';
+import { CategoryMenuComponent } from '../../pages/productos/categories/category.component';
 
 @Component({
   selector: 'app-navbar',
@@ -24,8 +26,9 @@ import { BuscadorPrincipalComponent } from "../products/buscador-principal/busca
     TrmComponent,
     NavbarSectionsComponent,
     TranslatePipe,
-    BuscadorPrincipalComponent
-],
+    BuscadorNavbarComponent,
+    CategoryMenuComponent
+  ],
   templateUrl: './navbar.component.html',
 })
 export class NavbarComponent {
@@ -35,6 +38,7 @@ export class NavbarComponent {
   faShoppingCart = faShoppingCart;
   textIdiom = 'es';
   idiom = 'English';
+  menuCategories: boolean = false;
 
   constructor(
     private translate: TranslateService,
@@ -94,5 +98,20 @@ export class NavbarComponent {
     this.isMobileMenuOpen = false;
     console.log('CERRAR MENU');
     document.body.classList.remove('overflow-hidden');
+  }
+
+  onMenucategories(): void {
+    this.menuCategories = !this.menuCategories;
+
+    const html = document.documentElement;
+    const body = document.body;
+
+    // if (this.menuCategories) {
+    //   html.classList.add('no-scroll');
+    //   body.classList.add('no-scroll');
+    // } else {
+    //   html.classList.remove('no-scroll');
+    //   body.classList.remove('no-scroll');
+    // }
   }
 }

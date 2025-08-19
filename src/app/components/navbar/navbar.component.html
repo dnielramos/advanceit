@@ -1,26 +1,42 @@
-<nav
-  class="fixed top-0 mb-0 left-0 w-full bg-white lg:text-sm py-4 px-6 flex justify-between items-center shadow-md z-50">
+<nav class="fixed top-0 mb-0 left-0 w-full bg-white lg:text-sm flex justify-between items-center shadow-md z-50"
+  [ngClass]="{'py-4': showNav, 'px-4': showNav}">
   <!-- Logo -->
-  <div class="flex items-center transition-opacity ease-in-out  ">
+  <div *ngIf="showNav" class="flex items-center transition-opacity ease-in-out  ">
     <a routerLink="/">
-      <img src="logo.png" alt="Advance Technology Projects" class="h-10 " [ngClass]="isMobileMenuOpen ? 'opacity-0' : 'opacity-100'" />
+      <img src="logo.png" alt="Advance Technology Projects" class="h-10 "
+        [ngClass]="isMobileMenuOpen ? 'opacity-0' : 'opacity-100'" />
     </a>
   </div>
 
   <!-- Menú principal  -->
-  <app-navbar-sections [isMegaMenuOpen]="isMegaMenuOpen" [isMobileMenuOpen]="isMobileMenuOpen"></app-navbar-sections>
+  <app-navbar-sections *ngIf="showNav" [isMegaMenuOpen]="isMegaMenuOpen"
+    [isMobileMenuOpen]="isMobileMenuOpen"></app-navbar-sections>
+
+  <app-buscador-navbar (showCategoriesMenu)="onMenucategories()" *ngIf="!showNav"></app-buscador-navbar>
+
+  <!-- componente de categorias -->
+  <div *ngIf="menuCategories" (click)="onMenucategories()"
+    class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden">
+    <app-category-menu (click)="$event.stopPropagation()"></app-category-menu>
+    <div (click)="onMenucategories()" class="p-4 text-gray-50 font-bold text-2xl cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1.25em" height="1em" viewBox="0 0 640 512">
+        <path fill="currentColor"
+          d="M17.89 123.62L5.51 142.2c-14.2 21.3 1 49.8 26.59 49.8h74.26ZM576 413.42V224h-64v140l-128-99v-41h-53.08l-41.4-32H608c25.5 0 40.7-28.5 26.59-49.8l-85.29-128A32.18 32.18 0 0 0 522.6 0H117.42a31.87 31.87 0 0 0-26.61 14.2l-10.66 16L45.46 3.38A16 16 0 0 0 23 6.19L3.37 31.46a16 16 0 0 0 2.81 22.45l588.35 454.72a16 16 0 0 0 22.47-2.82l19.64-25.26a16 16 0 0 0-2.81-22.45ZM320 384H128V224H64v256a32 32 0 0 0 32 32h256a32 32 0 0 0 32-32v-73.41l-64-49.47Z" />
+      </svg>
+      <p class="text-xs">Cerrar</p>
+    </div>
+  </div>
 
   <!-- Botones de acción -->
-  <div class="flex md:space-x-4 items-center animate__animated animate__fadeInDown">
+  <div *ngIf="showNav" class="flex md:space-x-4 items-center animate__animated animate__fadeInDown">
 
-    <a
-    (click)="cambiarIdioma()"
-    class="text-xs md:sm hover:text-purple-800 text-gray-400 py-2 mr-4 rounded-md transition-colors">
-    <fa-icon [icon]="faGlobe" size="sm"></fa-icon>
-    <p class="ml-1 hidden md:inline-block">
-      {{idiom}}
-    </p>
-  </a>
+    <a (click)="cambiarIdioma()"
+      class="text-xs md:sm hover:text-purple-800 text-gray-400 py-2 mr-4 rounded-md transition-colors">
+      <fa-icon [icon]="faGlobe" size="sm"></fa-icon>
+      <p class="ml-1 hidden md:inline-block">
+        {{idiom}}
+      </p>
+    </a>
 
     <app-trm></app-trm>
 

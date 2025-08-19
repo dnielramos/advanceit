@@ -11,6 +11,7 @@ import {
   faShoppingCart,
   faCheckCircle,
   faAnglesRight,
+  faFilter
 } from '@fortawesome/free-solid-svg-icons';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProductoFinal } from '../../models/Productos';
@@ -47,6 +48,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   faShoppingCart = faShoppingCart;
   faCheckCircle = faCheckCircle;
   faAnglesRight = faAnglesRight;
+  faFilters = faFilter;
 
   private readonly API_URL = ENVIRONMENT.apiUrlRender;
 
@@ -116,13 +118,31 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
     this.routeSubscription?.unsubscribe();
   }
 
-  @HostListener('window:scroll')
-  onScroll(): void {
-    const scrollPosition =
-      window.pageYOffset || document.documentElement.scrollTop;
-    const scrollHeight = document.documentElement.scrollHeight;
-    const clientHeight = document.documentElement.clientHeight;
+  // @HostListener('window:scroll')
+  // onScroll(): void {
+  //   const scrollPosition =
+  //     window.pageYOffset || document.documentElement.scrollTop;
+  //   const scrollHeight = document.documentElement.scrollHeight;
+  //   const clientHeight = document.documentElement.clientHeight;
 
+  //   if (
+  //     scrollPosition + clientHeight >= scrollHeight - 300 &&
+  //     !this.cargando &&
+  //     this.hayMasProductos
+  //   ) {
+  //     this.cargarMasProductos();
+  //   }
+  // }
+
+  // AÑADIR ESTE NUEVO MÉTODO
+  onProductScroll(event: Event): void {
+    // Hacemos un type casting del target para acceder a sus propiedades de scroll
+    const target = event.target as HTMLElement;
+    const scrollPosition = target.scrollTop;
+    const scrollHeight = target.scrollHeight;
+    const clientHeight = target.clientHeight;
+
+    // La lógica es la misma, pero con las propiedades del elemento
     if (
       scrollPosition + clientHeight >= scrollHeight - 300 &&
       !this.cargando &&

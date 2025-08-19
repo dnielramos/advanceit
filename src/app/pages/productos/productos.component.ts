@@ -181,24 +181,7 @@ export class ProductosComponent implements OnInit {
         this.productos
       );
     });
-    this.loadMarkInFavorites();
-    // Cambiamos el mensaje de bienvenida cada 8 segundos
-    // setInterval(() => {
-    //   this.setRandomWelcomeMessage();
-    // }, 3000);
-  }
 
-  loadMarkInFavorites() {
-    this.productosFavorites = this.productosFavorites.map((producto) => {
-      const brand = this.brandService.brands.find(
-        (b) =>
-          b.name.trim().toLowerCase() === producto.marca.trim().toLowerCase()
-      );
-      return {
-        ...producto,
-        marca: brand ? brand.url : producto.marca, // si no se encuentra, deja el texto original
-      };
-    });
   }
 
   // Un método para trackear por índice

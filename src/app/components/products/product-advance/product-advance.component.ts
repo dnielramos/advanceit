@@ -14,10 +14,11 @@ import { ProductoFinal } from '../../../models/Productos';
 import { RouterLink } from '@angular/router';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { AuthService, Role } from '../../../services/auth.service';
+import { LogoPipe } from '../../../pipes/logo.pipe';
 
 @Component({
   selector: 'app-product-advance',
-  imports: [CommonModule, FontAwesomeModule, SanitizeImageUrlPipe],
+  imports: [CommonModule, FontAwesomeModule, SanitizeImageUrlPipe, LogoPipe],
   templateUrl: './product-advance.component.html',
 })
 export class ProductAdvanceComponent {

@@ -6,7 +6,7 @@
   <!-- Marca (logo) con posicionamiento absoluto y máscara blanca -->
   <div class="absolute top-2 right-2 z-10">
     <div class="bg-white rounded-2xl p-2 inline-flex items-center justify-center">
-      <img [src]="'assets/logos/' + producto.marca.toLocaleLowerCase().trim() + '.png' | sanitizeImageUrl" [alt]="'Marca: ' + producto.marca"
+      <img [src]="producto.marca | logo" [alt]="'Marca: ' + producto.marca"
         class="h-12 w-auto object-contain" />
     </div>
   </div>

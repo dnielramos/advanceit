@@ -11,15 +11,20 @@ import {
   faShoppingCart,
   faCheckCircle,
   faAnglesRight,
-  faFilter
+  faFilter,
 } from '@fortawesome/free-solid-svg-icons';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProductoFinal } from '../../models/Productos';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
 import { ENVIRONMENT } from '../../../enviroments/enviroment';
 import { SkeletonFilterProductComponent } from './skeleton-lfilter-product/skeleton-filter-product.component';
+import { InfoLoginComponent } from '../productos/info-login/info-login.component';
+import { AngularToastifyModule, ToastService } from 'angular-toastify';
+import { AuthService, Role } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
+import { CreateUserComponent } from '../../components/users/create-user/create-user.component';
 
 interface PagedProductsResponse {
   products: ProductoFinal[];
@@ -40,7 +45,16 @@ interface CategoryResponse {
 @Component({
   selector: 'app-filter-products',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, ProductAdvanceComponent, SkeletonFilterProductComponent],
+  imports: [
+    CommonModule,
+    FontAwesomeModule,
+    ProductAdvanceComponent,
+    SkeletonFilterProductComponent,
+    RouterModule,
+    InfoLoginComponent,
+    AngularToastifyModule,
+    CreateUserComponent,
+  ],
   templateUrl: './filter-products.component.html',
 })
 export class FilterProductsComponent implements OnInit, OnDestroy {
@@ -50,6 +64,11 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   faCheckCircle = faCheckCircle;
   faAnglesRight = faAnglesRight;
   faFilters = faFilter;
+
+  comprarProductos = false;
+  createUser: boolean = false;
+  islogged: boolean = false;
+  cartItemCount: number = 0;
 
   private readonly API_URL = ENVIRONMENT.apiUrlRender;
 
@@ -75,10 +94,19 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private router: Router
-  ) {}
+    private router: Router,
+    private toastService: ToastService,
+    private authService: AuthService,
+    private cartService: CartService
+  ) {
+    // En el constructor de NavbarComponent
+    cartService.getCart().subscribe((items) => {
+      this.cartItemCount = items.length;
+    });
+  }
 
   ngOnInit(): void {
+    this.islogged = this.authService.hasRole(Role.User);
     this.cargarCategorias();
 
     this.routeSubscription = this.route.paramMap.subscribe((params) => {
@@ -117,6 +145,62 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
+  }
+
+  addToCart(product: ProductoFinal): void {
+    if (this.cartService.addToCart(product)) {
+      this.toastService.success(`${product.nombre} añadido al carrito`);
+    } else {
+      this.toastService.error(`NO pude añadir ${product.nombre} al carrito`);
+    }
+    // alert(`${product.nombre} añadido al carrito`);
+  }
+
+  onComprarProductos(product: ProductoFinal | null): void {
+    if (this.authService.hasRole(Role.User) && product) {
+      this.addToCart(product);
+    } else {
+      this.comprarProductos = !this.comprarProductos;
+      const html = document.documentElement;
+      const body = document.body;
+
+      if (this.comprarProductos) {
+        html.classList.add('no-scroll');
+        body.classList.add('no-scroll');
+      } else {
+        html.classList.remove('no-scroll');
+        body.classList.remove('no-scroll');
+      }
+    }
+  }
+
+  handleCreate(): void {
+    console.log('El usuario quiere registrarse.');
+    this.onComprarProductos(null);
+    this.createUser = true;
+  }
+
+  handleLogin(): void {
+    console.log(
+      'El usuario quiere iniciar sesión. Redirigiendo a la página de login...'
+    );
+    this.onComprarProductos(null);
+    this.router.navigate(['/in']);
+  }
+
+  onOutregister() {
+    this.createUser = !this.createUser;
+
+    const html = document.documentElement;
+    const body = document.body;
+
+    if (this.comprarProductos) {
+      html.classList.add('no-scroll');
+      body.classList.add('no-scroll');
+    } else {
+      html.classList.remove('no-scroll');
+      body.classList.remove('no-scroll');
+    }
   }
 
   // @HostListener('window:scroll')
@@ -250,16 +334,9 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
       // "Todas"
       this.router.navigate(['/categorias']);
     } else if (sub) {
-      this.router.navigate([
-        '/categorias',
-        cat,
-        sub,
-      ]);
+      this.router.navigate(['/categorias', cat, sub]);
     } else {
-      this.router.navigate([
-        '/categorias',
-        cat,
-      ]);
+      this.router.navigate(['/categorias', cat]);
     }
   }
 }

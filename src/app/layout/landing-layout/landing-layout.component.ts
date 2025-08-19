@@ -8,7 +8,7 @@ import { BuscadorPrincipalComponent } from "../../components/products/buscador-p
 
 @Component({
   selector: 'app-landing-layout',
-  imports: [NavbarComponent, RouterOutlet, CommonModule, BuscadorPrincipalComponent],
+  imports: [NavbarComponent, RouterOutlet, CommonModule],
   templateUrl: './landing-layout.component.html',
 })
 export class LandingLayoutComponent implements OnInit {

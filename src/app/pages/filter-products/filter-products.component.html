@@ -1,39 +1,60 @@
-<div class="container mx-auto px-4 py-6">
-  <!-- Encabezado dinámico -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-      <fa-icon [icon]="faAnglesRight"></fa-icon>
-      <a *ngIf="subcategoria" (click)="irACategoriaPrincipal()" class="text-blue-600 hover:underline cursor-pointer">
-        {{ categoria }}
-      </a>
-      <span *ngIf="!subcategoria"> {{ categoria }}</span>
-      <span *ngIf="subcategoria" class="text-gray-800"> › {{ subcategoria }}</span>
-    </h1>
-    <p class="text-gray-500">
-      Mostrando {{ productos.length }} productos
-      <span *ngIf="categoria">en "{{ categoria }}"</span>
-      <span *ngIf="subcategoria"> › "{{ subcategoria }}"</span>
-    </p>
-  </div>
+<div class="flex gap-6 mt-10">
+  <!-- Filtros -->
+  <aside class="w-64 bg-gray-50 border rounded-lg p-4">
+    <h3 class="text-lg font-semibold mb-4">Filtros</h3>
+    <ul class="space-y-2">
+      <li>
+        <button
+          class="w-full text-left px-2 py-1 rounded hover:bg-gray-200"
+          [class.font-bold]="modoTodos"
+          (click)="seleccionarFiltro(null)"
+        >
+          Todas
+        </button>
+      </li>
 
-  <!-- Lista de productos -->
-  <div *ngIf="productos.length > 0" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <li *ngFor="let cat of categorias">
+        <div class="font-medium text-gray-700">
+          {{ cat.category }}
+        </div>
+        <ul class="ml-3 mt-1 space-y-1">
+          <li>
+            <button
+              class="text-sm text-left px-2 py-1 rounded hover:bg-gray-200"
+              [class.font-bold]="seleccionCategoria === cat.category && !seleccionSubcategoria"
+              (click)="seleccionarFiltro(cat.category)"
+            >
+              Todos en {{ cat.category }}
+            </button>
+          </li>
+          <li *ngFor="let sub of cat.subCategories">
+            <button
+              class="text-sm text-left px-2 py-1 rounded hover:bg-gray-200"
+              [class.font-bold]="
+                seleccionCategoria === cat.category &&
+                seleccionSubcategoria === sub
+              "
+              (click)="seleccionarFiltro(cat.category, sub)"
+            >
+              {{ sub }}
+            </button>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </aside>
 
-    <app-product-advance *ngFor="let producto of productos" [producto]="producto"></app-product-advance>
-  </div>
+  <!-- Productos -->
+  <div class="flex-1">
+    <h2 class="text-2xl font-bold mb-6">{{ tituloVista }}</h2>
 
-  <!-- Loader para la primera carga y para scroll infinito -->
-  <div *ngIf="cargando" class="text-center py-10 text-gray-500">
-    Cargando productos...
-  </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <app-product-advance
+        *ngFor="let producto of productos"
+        [producto]="producto"
+      ></app-product-advance>
+    </div>
 
-  <!-- Sin resultados -->
-  <div *ngIf="!cargando && productos.length === 0" class="text-center text-gray-500 py-10">
-    No hay productos disponibles para esta selección.
-  </div>
-
-  <!-- Mensaje al final de la paginación -->
-  <div *ngIf="!hayMasProductos && productos.length > 0" class="text-center text-gray-400 py-4">
-    ¡Has llegado al final del catálogo!
+    <div *ngIf="cargando" class="text-center py-6">Cargando...</div>
   </div>
 </div>

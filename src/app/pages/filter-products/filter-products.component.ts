@@ -19,6 +19,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
 import { ENVIRONMENT } from '../../../enviroments/enviroment';
+import { SkeletonFilterProductComponent } from './skeleton-lfilter-product/skeleton-filter-product.component';
 
 interface PagedProductsResponse {
   products: ProductoFinal[];
@@ -39,7 +40,7 @@ interface CategoryResponse {
 @Component({
   selector: 'app-filter-products',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, ProductAdvanceComponent],
+  imports: [CommonModule, FontAwesomeModule, ProductAdvanceComponent, SkeletonFilterProductComponent],
   templateUrl: './filter-products.component.html',
 })
 export class FilterProductsComponent implements OnInit, OnDestroy {
@@ -134,7 +135,6 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   //   }
   // }
 
-  // AÑADIR ESTE NUEVO MÉTODO
   onProductScroll(event: Event): void {
     // Hacemos un type casting del target para acceder a sus propiedades de scroll
     const target = event.target as HTMLElement;

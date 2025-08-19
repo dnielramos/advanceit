@@ -1,4 +1,5 @@
 <div class="flex gap-6 mt-5 h-[85vh]">
+  <!-- ASIDE (Sin cambios) -->
   <aside class="w-64 bg-gray-50 border-purple-100 rounded-lg p-4 overflow-y-auto scroll-purple">
     <h3 class="text-lg font-extrabold mb-4 sticky -top-5 bg-gray-50 p-2 text-purple-600">Filtros</h3>
     <ul class="space-y-2">
@@ -16,16 +17,16 @@
         <ul class="ml-3 mt-1 space-y-1">
           <li>
             <button class="text-sm text-left px-2 py-1 rounded hover:bg-gray-200" [class.font-bold]="
-                seleccionCategoria === cat.category && !seleccionSubcategoria
-              " (click)="seleccionarFiltro(cat.category)">
+              seleccionCategoria === cat.category && !seleccionSubcategoria
+            " (click)="seleccionarFiltro(cat.category)">
               Todos en {{ cat.category }}
             </button>
           </li>
           <li *ngFor="let sub of cat.subCategories">
             <button class="text-sm text-left px-2 py-1 rounded hover:bg-gray-200" [class.font-bold]="
-                seleccionCategoria === cat.category &&
-                seleccionSubcategoria === sub
-              " (click)="seleccionarFiltro(cat.category, sub)">
+              seleccionCategoria === cat.category &&
+              seleccionSubcategoria === sub
+            " (click)="seleccionarFiltro(cat.category, sub)">
               {{ sub }}
             </button>
           </li>
@@ -34,18 +35,23 @@
     </ul>
   </aside>
 
-  <div class="flex-1 mt-2 overflow-y-auto " (scroll)="onProductScroll($event)">
-
+  <div class="flex-1 mt-2 overflow-y-auto" (scroll)="onProductScroll($event)">
     <div class="flex justify-between px-4 sticky -top-1 z-10 p-2 bg-white">
-      <h2 class="text-2xl font-bold mb-6">{{ tituloVista }}</h2>
+      <h2 class="text-md font-bold mb-6">{{ tituloVista }}</h2>
       <h2 class="text-sm mb-6 text-purple-500">Ocultar filtros <fa-icon [icon]="faFilters"></fa-icon></h2>
-
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+    <!-- 1. SKELETON LOADER -->
+    <!-- Se muestra solo cuando 'cargando' es true -->
+    <!-- Repetimos el componente varias veces para simular la cuadrícula de carga -->
+    <div *ngIf="cargando" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <app-skeleton-filter-product *ngFor="let i of [1, 2, 3, 4, 5, 6]"></app-skeleton-filter-product>
+    </div>
+
+    <!-- Se muestra solo cuando 'cargando' es false -->
+    <div *ngIf="!cargando" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <app-product-advance *ngFor="let producto of productos" [producto]="producto"></app-product-advance>
     </div>
-
-    <div *ngIf="cargando" class="text-center py-6">Cargando...</div>
   </div>
 </div>

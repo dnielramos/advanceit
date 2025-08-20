@@ -3,15 +3,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { ProductoFinal } from '../models/Productos';
 
-// Interfaces para tipado fuerte
-export interface Product {
-  _id?: string; // O el identificador que uses
-  nombre: string;
-  sku: string;
-  precio: number;
-  [key: string]: any; // Para otras propiedades
-}
+// // Interfaces para tipado fuerte
+// export interface Product {
+//   _id?: string; // O el identificador que uses
+//   nombre: string;
+//   sku: string;
+//   precio: number;
+//   [key: string]: any; // Para otras propiedades
+// }
 
 export interface Order {
   id: string; // Cambiado de opcional a requerido para consistencia
@@ -27,7 +28,7 @@ export interface Order {
 }
 
 interface ApiNexsysResponse {
-  return: Product[];
+  return: ProductoFinal[];
 }
 
 @Injectable({
@@ -38,7 +39,7 @@ export class OrdersService {
   private readonly baseURL = 'https://advance-genai.onrender.com';
   // private baseURL = 'http://localhost:3002';
   private readonly apiUrl = `${this.baseURL}/orders`;
-  private readonly productSearchUrl = `${this.baseURL}/nexys/by-sku`; // Asumo que esta ruta existe
+  private readonly productSearchUrl = `${this.baseURL}/advance-products/by-sku`; // Asumo que esta ruta existe
 
   constructor(private http: HttpClient) {}
 
@@ -94,12 +95,14 @@ export class OrdersService {
       .pipe(catchError(this.handleError));
   }
 
-  searchProductBySku(sku: string): Observable<Product> {
+  searchProductBySku(sku: string): Observable<ProductoFinal> {
     return this.http.get<any>(`${this.productSearchUrl}?sku=${sku}`).pipe(
       map((response) => {
+
+        console.log('Respuesta de búsqueda de producto por SKU:', response);
         // Validar estructura de respuesta
-        if (response?.data?.return?.length > 0) {
-          return response.data.return[0] as Product;
+        if (response) {
+          return response as ProductoFinal;
         }
         throw new Error('Producto no encontrado');
       }),

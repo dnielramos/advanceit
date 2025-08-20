@@ -5,8 +5,8 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import {
   OrdersService,
   Order,
-  Product,
 } from '../../../../services/orders.service';
+import { ProductoFinal } from '../../../../models/Productos';
 
 @Component({
   selector: 'app-view-order-modal',
@@ -22,7 +22,7 @@ export class ViewOrderModalComponent implements OnInit {
   faTimes = faTimes;
 
   // --- Estado Local ---
-  orderProducts: Product[] = [];
+  orderProducts: ProductoFinal[] = [];
   isLoading = true;
 
   constructor(private ordersService: OrdersService) {}
@@ -42,6 +42,7 @@ export class ViewOrderModalComponent implements OnInit {
     this.order.productos.forEach((sku) => {
       this.ordersService.searchProductBySku(sku).subscribe({
         next: (product) => {
+          console.log('Producto encontrado desde view order:', product);
           this.orderProducts.push(product);
         },
         error: (err) => {

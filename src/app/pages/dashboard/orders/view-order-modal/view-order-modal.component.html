@@ -45,10 +45,10 @@
           <li *ngFor="let product of orderProducts"
             class="flex justify-between items-center bg-slate-50 p-3 rounded-md">
             <div>
-              <p class="font-semibold text-slate-800">{{ product["name"] }}</p>
-              <p class="text-xs text-slate-500">SKU: {{ product.sku }}</p>
+              <p class="font-semibold text-slate-800">{{ product.nombre }}</p>
+              <p class="text-xs text-slate-500">SKU: {{ product.SKU }}</p>
             </div>
-            <p class="font-bold text-slate-700">${{ product["price"] | number:'1.2-2' }}</p>
+            <p class="font-bold text-slate-700">${{ product.precio| number:'1.2' }}</p>
           </li>
         </ul>
       </div>

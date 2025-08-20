@@ -13,8 +13,8 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import {
   OrdersService,
   Order,
-  Product,
 } from '../../../../services/orders.service';
+import { ProductoFinal } from '../../../../models/Productos';
 
 @Component({
   selector: 'app-create-order-modal',
@@ -33,9 +33,9 @@ export class CreateOrderModalComponent {
   // --- Estado interno del formulario ---
   newOrderClient = '';
   newOrderNote = '';
-  newOrderProducts: Product[] = [];
+  newOrderProducts: ProductoFinal[] = [];
   newProductInput = '';
-  productSearchResult: Product | null = null;
+  productSearchResult: ProductoFinal | null = null;
   productSearchError = '';
   isSearching = false; // Añadido para feedback al usuario
 
@@ -69,9 +69,9 @@ export class CreateOrderModalComponent {
       });
   }
 
-  addProductToOrder(product: Product): void {
+  addProductToOrder(product: ProductoFinal): void {
     // Evita añadir productos duplicados
-    if (!this.newOrderProducts.some((p) => p.sku === product.sku)) {
+    if (!this.newOrderProducts.some((p) => p.SKU === product.SKU)) {
       this.newOrderProducts.push(product);
     }
     this.newProductInput = '';
@@ -104,7 +104,7 @@ export class CreateOrderModalComponent {
       estadoPago: 'pendiente',
       precioTotal: this.calculateTotal(),
       // El método para obtener los SKUs sigue siendo válido
-      productos: this.newOrderProducts.map((product) => product.sku),
+      productos: this.newOrderProducts.map((product) => product.SKU),
       cliente: this.newOrderClient.trim(),
       shippingNo: `SH-${Math.floor(Math.random() * 1000)
         .toString()

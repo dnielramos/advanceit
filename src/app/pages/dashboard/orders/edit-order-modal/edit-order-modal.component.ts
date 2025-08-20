@@ -3,11 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import {
-  OrdersService,
-  Order,
-  Product,
-} from '../../../../services/orders.service';
+import { OrdersService, Order } from '../../../../services/orders.service';
+import { ProductoFinal } from '../../../../models/Productos';
 
 @Component({
   selector: 'app-edit-order-modal',
@@ -30,11 +27,11 @@ export class EditOrderModalComponent implements OnInit {
   // Hacemos una copia para editarla sin afectar el objeto original hasta guardar
   editableOrder!: Order;
   // La lista de productos es más compleja, la manejaremos por separado
-  orderProducts: Product[] = [];
+  orderProducts: ProductoFinal[] = [];
 
   // Para la búsqueda de nuevos productos
   newProductInput = '';
-  productSearchResult: Product | null = null;
+  productSearchResult: ProductoFinal | null = null;
   productSearchError = '';
 
   isLoadingProducts = true; // Indicador para la carga inicial de productos
@@ -57,9 +54,7 @@ export class EditOrderModalComponent implements OnInit {
         console.log('Respuesta cruda de la API:', response);
 
         // Si la API trae 'return' como propiedad con los productos
-        this.orderProducts = Array.isArray(response)
-          ? response
-          : [];
+        this.orderProducts = Array.isArray(response) ? response : [];
 
         console.log('Productos en la orden procesados:', this.orderProducts);
 
@@ -76,7 +71,7 @@ export class EditOrderModalComponent implements OnInit {
 
   recalculateTotal(): void {
     this.editableOrder.precioTotal = this.orderProducts.reduce(
-      (acc, p) => acc + (p["price"] || 0),
+      (acc, p) => acc + (p['price'] || 0),
       0
     );
   }
@@ -86,9 +81,9 @@ export class EditOrderModalComponent implements OnInit {
     // ... (La lógica es idéntica al CreateOrderModalComponent)
   }
 
-  addProductToOrder(product: Product): void {
+  addProductToOrder(product: ProductoFinal): void {
     // Evitar duplicados
-    if (!this.orderProducts.some((p) => p.sku === product.sku)) {
+    if (!this.orderProducts.some((p) => p.SKU === product.SKU)) {
       this.orderProducts.push(product);
       this.recalculateTotal();
     }
@@ -104,10 +99,9 @@ export class EditOrderModalComponent implements OnInit {
   // --- Acción Final ---
   submitSaveChanges(): void {
     // Actualizar el array de SKUs en la orden a guardar
-    this.editableOrder.productos = this.orderProducts.map((p) => p.sku);
+    this.editableOrder.productos = this.orderProducts.map((p) => p.SKU);
 
     // Emitir la orden completamente actualizada
     this.save.emit(this.editableOrder);
   }
-
 }

@@ -44,7 +44,8 @@ import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrollin
     FormsModule,
     FontAwesomeModule,
     RouterLink,
-    SanitizeImageUrlPipe
+    SanitizeImageUrlPipe,
+    TrmComponent
   ],
   templateUrl: './buscador-navbar.component.html',
   styles: [
@@ -173,6 +174,7 @@ export class BuscadorNavbarComponent implements OnInit {
 
 
   ngOnInit(): void {
+
     this.islogged = this.authService.hasRole(Role.User);
 
     setInterval(() => {

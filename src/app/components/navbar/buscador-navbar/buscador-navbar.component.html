@@ -3,48 +3,70 @@
   <!-- Logo y barra de búsqueda con el input de búsqueda -->
   <div class="grid lg:flex">
     <!-- Logo -->
-    <div class="flex items-center transition-opacity ease-in-out mr-2 ">
+    <div class="flex items-center justify-between transition-opacity ease-in-out mr-2 ">
       <a routerLink="/">
         <img src="logo.png" alt="Advance Technology Projects" class="h-8 lg:h-11" />
       </a>
+      <div class="flex md:hidden items-center gap-2">
+        <fa-icon [icon]="faChat" class="text-slate-500 lg:text-2xl"></fa-icon>
+        <fa-icon [icon]="faHome" routerLink="/" class="text-slate-500 hover:text-purple-500 cursor-pointer lg:text-2xl"
+          title="Regresar al inicio"></fa-icon>
+        <p></p>
+      </div>
     </div>
     <!-- input -->
-    <div class="container my-2 mx-auto max-w-5xl">
+    <div class="container my-2 mx-auto max-w-4xl">
       <div class="relative">
         <input type="text" [(ngModel)]="searchTerm" (input)="filterProducts()" (focus)="onInputFocus()"
           (blur)="onInputBlur()" placeholder="{{welcomeMessage()}}"
-          class="w-full px-6 py-4 rounded-full border border-gray-300 shadow-xl shadow-purple-50 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-lg outline-none" />
+          class="w-full px-6 py-4 rounded-full border border-purple-300 shadow-md shadow-purple-100 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-lg outline-none" />
         <fa-icon [icon]="faSearch"
           class="absolute right-6 top-1/2 transform -translate-y-1/2 text-purple-500 text-xl"></fa-icon>
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
-      <fa-icon [icon]="faChat" class="text-gray-300 lg:text-2xl"></fa-icon>
-      <fa-icon [icon]="faHome" routerLink="/" class="text-gray-300 hover:text-purple-500 cursor-pointer lg:text-2xl"
-        title="Regresar al inicio"></fa-icon>
+    <div class="xl:flex items-center text-slate-500 hidden gap-2">
+      <!-- <fa-icon [icon]="faChat" class="text-slate-500 lg:text-2xl"></fa-icon> -->
+      <!-- <fa-icon [icon]="faHome" routerLink="/" class="text-slate-500 hover:text-purple-500 cursor-pointer lg:text-2xl"
+        title="Regresar al inicio"></fa-icon> -->
+      <svg routerLink="/productos/chat" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+      </svg>
+
+      <svg routerLink="/" class="text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+
+
+      <p></p>
     </div>
   </div>
 
   <!-- Navigation all categories and more -->
   <div class="px-2 flex gap-1 justify-between items-center">
-    <div class="flex items-center gap-1">
-      <svg class="lg:text-2xl" (click)="onMenucategories()" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-        viewBox="0 0 32 32">
-        <path fill="currentColor"
-          d="M14 25h14v2H14zm-6.83 1l-2.58 2.58L6 30l4-4l-4-4l-1.42 1.41zM14 15h14v2H14zm-6.83 1l-2.58 2.58L6 20l4-4l-4-4l-1.42 1.41zM14 5h14v2H14zM7.17 6L4.59 8.58L6 10l4-4l-4-4l-1.42 1.41z" />
-      </svg>
-      <h1 (click)="onMenucategories()" class="text-slate-500 text-sm hover:text-purple-500 hover:cursor-pointer">
-        Todas las categorias</h1>
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1">
+        <svg class="lg:text-2xl" (click)="onMenucategories()" xmlns="http://www.w3.org/2000/svg" width="1em"
+          height="1em" viewBox="0 0 32 32">
+          <path fill="currentColor"
+            d="M14 25h14v2H14zm-6.83 1l-2.58 2.58L6 30l4-4l-4-4l-1.42 1.41zM14 15h14v2H14zm-6.83 1l-2.58 2.58L6 20l4-4l-4-4l-1.42 1.41zM14 5h14v2H14zM7.17 6L4.59 8.58L6 10l4-4l-4-4l-1.42 1.41z" />
+        </svg>
+        <h1 (click)="onMenucategories()" class="text-slate-800 text-sm hover:text-purple-500 hover:cursor-pointer">
+          Todas las categorias</h1>
+      </div>
+      <button class="text-slate-800 bg-purple-50 rounded-full text-sm hover:text-purple-500 hover:cursor-pointer p-2" (click)="onShowOrders()">
+        <fa-icon [icon]="faShop"></fa-icon>
+        Ver Ordenes
+      </button>
     </div>
 
-    <button *ngIf="islogged" class="text-slate-500 text-sm hover:text-purple-500 hover:cursor-pointer p-2"
-      (click)="onShowOrders()">
-      <fa-icon [icon]="faShop"></fa-icon>
-      Ver Ordenes
-    </button>
-    <div class="hidden items-center lg:flex">
-      TRM
+
+    <div class="items-center lg:flex">
+      <app-trm></app-trm>
     </div>
   </div>
 

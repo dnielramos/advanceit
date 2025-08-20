@@ -58,7 +58,7 @@
         <h1 (click)="onMenucategories()" class="text-slate-800 text-sm hover:text-purple-500 hover:cursor-pointer">
           Todas las categorias</h1>
       </div>
-      <button class="text-slate-800 bg-purple-50 rounded-full text-sm hover:text-purple-500 hover:cursor-pointer p-2" (click)="onShowOrders()">
+      <button *ngIf="islogged" class="text-slate-800 bg-purple-50 rounded-full text-sm hover:text-purple-500 hover:cursor-pointer p-2" (click)="onShowOrders()">
         <fa-icon [icon]="faShop"></fa-icon>
         Ver Ordenes
       </button>

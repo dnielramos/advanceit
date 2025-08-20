@@ -1,8 +1,9 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPen, faEye, faCheckSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '../../../../services/orders.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-order-card',
@@ -10,12 +11,27 @@ import { Order } from '../../../../services/orders.service';
   imports: [CommonModule, FontAwesomeModule, NgClass],
   templateUrl: './order-card.component.html',
 })
-export class OrderCardComponent {
+export class OrderCardComponent implements OnDestroy{
   @Input() order!: Order;
   @Output() markAsPaid = new EventEmitter<Order>();
   @Output() view = new EventEmitter<Order>();
   @Output() edit = new EventEmitter<Order>();
   @Output() delete = new EventEmitter<Order>();
+  isLoggedIn: boolean = false;
+  private isLoggedInSubscription: any;
+
+  constructor(private authService: AuthService) {
+    this.isLoggedInSubscription = this.authService.isLoggedIn$.subscribe(isLoggedIn => {
+      this.isLoggedIn = isLoggedIn;
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar suscripciones si es necesario
+    if (this.isLoggedInSubscription) {
+      this.isLoggedInSubscription.unsubscribe();
+    }
+  }
 
   // Iconos
   faPen = faPen;

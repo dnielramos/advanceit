@@ -55,8 +55,7 @@ export class NavbarComponent {
   ngOnInit(): void {
     // 1. Comprobación inicial al cargar
     const currentUrl = this.router.url;
-    const isProductPage =
-      currentUrl.startsWith('/productos') || currentUrl.startsWith('/in');
+    const isProductPage = currentUrl.startsWith('/productos');
     this.contextService.setNavVisibility(!isProductPage);
 
     // Escucha cambios de ruta
@@ -66,8 +65,7 @@ export class NavbarComponent {
         const currentUrl = event.urlAfterRedirects;
 
         // Si la ruta es /productos, ocultar el navbar
-        const isProductPageOrLogin =
-          currentUrl.startsWith('/productos') || currentUrl.startsWith('/in');
+        const isProductPageOrLogin = currentUrl.startsWith('/productos');
         this.contextService.setNavVisibility(!isProductPageOrLogin);
       });
 

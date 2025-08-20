@@ -1,7 +1,7 @@
 /*====================================================*/
-/* SIDEBAR COMPONENT (sidebar.component.ts)      */
+/* SIDEBAR COMPONENT (sidebar.component.ts)           */
 /*====================================================*/
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -14,6 +14,8 @@ import {
   faChevronDown,
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from '../../../services/auth.service'; // Asegúrate que la ruta sea correcta
+import { Subscription } from 'rxjs';
 
 // Interfaz para definir la estructura de cada item del menú
 interface MenuItem {
@@ -22,6 +24,7 @@ interface MenuItem {
   icon: any;
   routerLink?: string;
   subItems?: SubMenuItem[];
+  requiresAuth?: boolean; // Propiedad para controlar la visibilidad
 }
 
 // Interfaz para los sub-items
@@ -35,11 +38,6 @@ interface SubMenuItem {
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, FontAwesomeModule],
   template: `
-    <!--
-      NOTA: Asegúrate de tener Animate.css incluido en tu proyecto para que las animaciones funcionen.
-      Puedes añadirlo en tu index.html:
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    -->
     <div
       class="transition-all flex flex-col py-2 shadow-md h-full bg-white"
       [ngClass]="{
@@ -49,7 +47,6 @@ interface SubMenuItem {
       (mouseenter)="onMouseEnter()"
       (mouseleave)="onMouseLeave()"
     >
-      <!-- Logo Header -->
       <div
         class="flex py-2 items-center px-4 space-x-2"
         [ngClass]="{ 'opacity-0': isToggleSidebarDesktop }"
@@ -57,25 +54,22 @@ interface SubMenuItem {
         <img class="h-10" src="logo.png" alt="Logo" />
       </div>
 
-      <!-- User Profile -->
       <div class="px-4 py-2 flex items-center space-x-3">
         <img
-          src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg"
+          src="https://media.licdn.com/dms/image/v2/D4E03AQFDztdvDENj0g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1683622382036?e=1758758400&v=beta&t=nMNysUkiWLXygvz_kaCK_t3gQ4qsTTkY-Y0HbX9LBgI"
           alt="User Avatar"
           class="w-10 h-10 rounded-full"
         />
         <div class="leading-tight pt-2" *ngIf="!isToggleSidebarDesktop">
           <p class="font-semibold text-gray-700 text-sm">Arturo Esguerra</p>
-          <p class="text-xs text-purple-600">CEO / Administrator</p>
+          <p class="text-xs text-purple-600">CEO / Advance IT</p>
         </div>
       </div>
 
       <hr class="my-2 border-t border-gray-200" />
 
-      <!-- Navigation Menu -->
       <nav class="flex-1 overflow-y-auto px-2">
         <ng-container *ngFor="let item of menuItems">
-          <!-- Item sin dropdown -->
           <a
             *ngIf="!item.subItems"
             [routerLink]="item.routerLink"
@@ -86,7 +80,6 @@ interface SubMenuItem {
             <span *ngIf="!isToggleSidebarDesktop" class="text-gray-800 font-semibold text-sm">{{ item.label }}</span>
           </a>
 
-          <!-- Item CON dropdown -->
           <div *ngIf="item.subItems" class="mt-2">
             <button
               (click)="toggleDropdown(item.key)"
@@ -121,8 +114,7 @@ interface SubMenuItem {
         </ng-container>
       </nav>
 
-      <!-- Footer/Settings Link -->
-      <div *ngIf="!isToggleSidebarDesktop" class="p-4 mt-auto">
+      <!-- <div *ngIf="!isToggleSidebarDesktop" class="p-4 mt-auto">
         <a
           routerLink="/dashboard/settings"
           routerLinkActive="text-purple-600"
@@ -131,81 +123,92 @@ interface SubMenuItem {
           <fa-icon [icon]="faGears" class="text-gray-500"></fa-icon>
           <span>Configuración</span>
         </a>
-      </div>
+      </div> -->
     </div>
   `,
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit, OnDestroy {
   // Icon mapping
   faTachometerAlt = faTachometerAlt;
   faChevronDown = faChevronDown;
   faChevronRight = faChevronRight;
   faGears = faGears;
 
+  private authSubscription!: Subscription;
+
   // Inputs & Outputs
   @Input() isToggleSidebarDesktop: boolean = false;
   @Output() changeWithSideBar = new EventEmitter<void>();
 
-  // State for controlling which dropdown is open.
-  // The key is the menu item's key, value is boolean (open/closed).
   public openDropdowns: { [key: string]: boolean } = {};
+  public menuItems: MenuItem[] = []; // Se inicializa vacío y se construye dinámicamente
 
-  // Define the sidebar structure dynamically.
-  // This makes it easier to add, remove, or reorder items.
-  public menuItems: MenuItem[] = [
-    {
-      key: 'dashboard',
-      label: 'Dashboard',
-      icon: faTachometerAlt,
-      routerLink: '/dashboard/home',
-    },
-    {
-      key: 'proveedores',
-      label: 'Proveedores',
-      icon: faCube,
-      subItems: [
-        { label: 'Ingram', routerLink: '/dashboard/add-ingram-products' },
-        { label: 'Nexsys', routerLink: '/dashboard/add-nexsys-products' },
-      ],
-    },
-    {
-      key: 'aplicacion',
-      label: 'Aplicación',
-      icon: faIcons,
-      subItems: [
-        { label: 'Productos', routerLink: '/dashboard/advance-products' },
-      ],
-    },
-    {
-      key: 'ordenes',
-      label: 'Órdenes',
-      icon: faDatabase,
-      subItems: [
-        { label: 'Ver Órdenes', routerLink: '/dashboard/orders' },
-      ],
-    },
-  ];
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    // Nos suscribimos al estado de login del servicio de autenticación
+    this.authSubscription = this.authService.isLoggedIn$.subscribe(isLoggedIn => {
+      this.buildMenu(isLoggedIn);
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Limpiamos la suscripción para evitar fugas de memoria
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
+
+  private buildMenu(isLoggedIn: boolean): void {
+    const allMenuItems: MenuItem[] = [
+      {
+        key: 'dashboard',
+        label: 'Dashboard',
+        icon: faTachometerAlt,
+        routerLink: '/dashboard/home',
+      },
+      // {
+      //   key: 'proveedores',
+      //   label: 'Proveedores',
+      //   icon: faCube,
+      //   requiresAuth: true, // Este item necesita que el usuario esté logueado
+      //   subItems: [
+      //     { label: 'Ingram', routerLink: '/dashboard/add-ingram-products' },
+      //     { label: 'Nexsys', routerLink: '/dashboard/add-nexsys-products' },
+      //   ],
+      // },
+      {
+        key: 'aplicacion',
+        label: 'Aplicación',
+        icon: faIcons,
+        subItems: [
+          { label: 'Productos', routerLink: '/dashboard/advance-products' },
+        ],
+      },
+      {
+        key: 'ordenes',
+        label: 'Órdenes',
+        icon: faDatabase,
+        subItems: [
+          { label: 'Ver Órdenes', routerLink: '/dashboard/orders' },
+        ],
+      },
+    ];
+
+    // Filtramos los items del menú basados en el estado de login
+    this.menuItems = allMenuItems.filter(item => !item.requiresAuth || isLoggedIn);
+  }
 
   private wasCollapsedOnHover: boolean = false;
 
-  /**
-   * Toggles the visibility of a specific dropdown menu.
-   * @param menuKey The unique key of the menu to toggle.
-   */
   toggleDropdown(menuKey: string): void {
-    // Closes all other dropdowns to ensure only one is open at a time.
     const currentState = this.openDropdowns[menuKey];
     Object.keys(this.openDropdowns).forEach(key => {
         this.openDropdowns[key] = false;
     });
-    // Toggles the state of the clicked dropdown.
     this.openDropdowns[menuKey] = !currentState;
   }
 
-  /**
-   * Handles the mouse entering the sidebar area.
-   * Expands the sidebar if it was collapsed.
-   */
   onMouseEnter(): void {
     if (this.isToggleSidebarDesktop) {
       this.isToggleSidebarDesktop = false;
@@ -214,10 +217,6 @@ export class SidebarComponent {
     }
   }
 
-  /**
-   * Handles the mouse leaving the sidebar area.
-   * Collapses the sidebar if it was expanded on hover.
-   */
   onMouseLeave(): void {
     if (this.wasCollapsedOnHover) {
       this.isToggleSidebarDesktop = true;
@@ -227,9 +226,6 @@ export class SidebarComponent {
     }
   }
 
-  /**
-   * Closes all open dropdown menus.
-   */
   closeAllSubmenus(): void {
     this.openDropdowns = {};
   }

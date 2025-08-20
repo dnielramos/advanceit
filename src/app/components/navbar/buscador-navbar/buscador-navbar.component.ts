@@ -138,7 +138,7 @@ export class BuscadorNavbarComponent implements OnInit {
 
   onShowOrders(): void {
     console.log('Show Orders clicked');
-    this.router.navigate(['/productos/orders']);
+    this.router.navigate(['/dashboard/orders']);
   }
 
   onInputFocus(): void {

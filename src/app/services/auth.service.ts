@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -26,50 +26,55 @@ export class AuthService {
   private currentUserRole = new BehaviorSubject<Role | null>(null);
   public currentUserRole$ = this.currentUserRole.asObservable();
 
+  // <-- MODIFICADO: `isLoggedIn$` ahora se deriva de `currentUserRole$`
+  // Esto asegura que el estado de login es SIEMPRE consistente con el rol.
+  public isLoggedIn$: Observable<boolean>;
+
   // Inyección de dependencias moderna
   private http = inject(HttpClient);
   private router = inject(Router);
 
-
   // URL del endpoint para validar el token
   private baseURL = 'https://advance-genai.onrender.com';
-  private readonly validationUrl = `${this.baseURL}/auth/profile`; // <-- ¡Verifica tu puerto!
+  private readonly validationUrl = `${this.baseURL}/auth/profile`;
 
   constructor() {
+    // <-- AÑADIDO: Se crea el observable derivado en el constructor.
+    this.isLoggedIn$ = this.currentUserRole$.pipe(
+      map((role) => role !== null) // Si hay rol, está logueado (true), si es null, no lo está (false).
+    );
+
     this.loadTokenOnStart();
   }
 
   private loadTokenOnStart(): void {
     const token = this.getToken();
     if (token) {
-      // No confíes en el token, valídalo con el backend
+      // Al validar, se actualizará `currentUserRole`, y `isLoggedIn$` reaccionará automáticamente.
       this.validateToken().subscribe();
+    } else {
+      // Si no hay token al inicio, nos aseguramos de que el estado sea `null`.
+      this.currentUserRole.next(null);
     }
   }
 
-  /**
-   * El método clave: valida el token contra el backend.
-   * @returns Observable<boolean> - true si es válido, false si no.
-   */
   validateToken(): Observable<boolean> {
     const token = this.getToken();
     if (!token) {
-      return of(false); // Si no hay token, no es válido.
+      this.currentUserRole.next(null); // Asegura que el estado de rol sea nulo
+      return of(false);
     }
 
-    // El interceptor añadirá el token a esta llamada automáticamente
     return this.http.get<JwtPayload>(this.validationUrl).pipe(
       map((response) => {
-        // Si la llamada es exitosa (status 200), el token es válido.
-        // Actualizamos el rol con la información fresca del backend.
+        // Al actualizar el rol, `isLoggedIn$` emitirá `true` automáticamente.
         this.currentUserRole.next(response.role);
         return true;
       }),
       catchError((error) => {
-        // Si la llamada falla (status 401), el token es inválido.
         console.error('La validación del token falló', error);
-        this.logout(); // Limpia el token inválido
-        this.router.navigate(['/in']); // Redirige al login
+        this.logout(); // Logout limpiará el rol, y `isLoggedIn$` emitirá `false`.
+        this.router.navigate(['/in']);
         return of(false);
       })
     );
@@ -77,11 +82,13 @@ export class AuthService {
 
   handleLogin(token: string): void {
     localStorage.setItem('adtkn', token);
+    // Al decodificar y establecer el rol, `isLoggedIn$` emitirá `true` automáticamente.
     this.decodeAndStoreToken(token);
   }
 
   logout(): void {
     localStorage.removeItem('adtkn');
+    // Al poner el rol en `null`, `isLoggedIn$` emitirá `false` automáticamente.
     this.currentUserRole.next(null);
   }
 

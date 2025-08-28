@@ -1,54 +1,112 @@
-<div class="fixed inset-0 z-50 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center animate__animated animate__fadeIn">
-  <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg mx-4 transform transition-all animate__animated animate__zoomIn">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-2xl font-bold text-purple-700">Edit User</h3>
-      <button (click)="close()" class="text-gray-400 hover:text-gray-600 transition-colors">
-        <i class="fas fa-times fa-lg"></i>
+<div class="fixed inset-0 z-50 bg-gray-700 bg-opacity-60 flex items-center justify-center animate__animated animate__fadeIn">
+  <div
+    class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg mx-4 transform transition-all animate__animated animate__zoomIn max-h-[90vh] overflow-y-auto">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-2xl font-bold text-purple-700">Editar Usuario</h3>
+      <button (click)="close()" aria-label="Close modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <fa-icon [icon]="faTimes" size="lg"></fa-icon>
       </button>
     </div>
 
-    <form [formGroup]="editForm" (ngSubmit)="saveChanges()">
-      <div class="space-y-4 text-gray-700">
+    <!-- Form -->
+    <form [formGroup]="editForm" (ngSubmit)="saveChanges()" class="space-y-4 text-gray-700">
+
+      <!-- Name -->
+      <div>
+        <label class="block text-sm font-medium flex items-center gap-2">
+          <fa-icon [icon]="faUser" class="text-purple-500"></fa-icon> Nombre
+        </label>
+        <input formControlName="name" type="text"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:border-purple-500 focus:ring-purple-500">
+      </div>
+
+      <!-- Email (read-only) -->
+      <div>
+        <label class="block text-sm font-medium flex items-center gap-2">
+          <fa-icon [icon]="faEnvelope" class="text-purple-500"></fa-icon> Correo Electrónico
+        </label>
+        <input formControlName="email" type="email"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 bg-gray-100 cursor-not-allowed" readonly>
+      </div>
+
+      <!-- Address + City -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium">Name</label>
-          <input formControlName="name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+          <label class="block text-sm font-medium flex items-center gap-2">
+            <fa-icon [icon]="faMapMarkerAlt" class="text-purple-500"></fa-icon> Dirección
+          </label>
+          <input formControlName="address" type="text"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:border-purple-500 focus:ring-purple-500">
         </div>
         <div>
-          <label class="block text-sm font-medium">Email</label>
-          <input formControlName="email" type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed" readonly>
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Address</label>
-          <input formControlName="address" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Country</label>
-          <input formControlName="country" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium">City</label>
-          <input formControlName="city" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Company</label>
-          <input formControlName="company" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Picture URL</label>
-          <input formControlName="picture" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Telephone</label>
-          <input formControlName="telephone" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+          <label class="block text-sm font-medium flex items-center gap-2">
+            <fa-icon [icon]="faCity" class="text-purple-500"></fa-icon> Ciudad
+          </label>
+          <input formControlName="city" type="text"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:border-purple-500 focus:ring-purple-500">
         </div>
       </div>
 
+      <!-- Country + Company -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium flex items-center gap-2">
+            <fa-icon [icon]="faGlobe" class="text-purple-500"></fa-icon> País
+          </label>
+          <input formControlName="country" type="text"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:border-purple-500 focus:ring-purple-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium flex items-center gap-2">
+            <fa-icon [icon]="faBuilding" class="text-purple-500"></fa-icon> Empresa
+          </label>
+          <input formControlName="company" type="text"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:border-purple-500 focus:ring-purple-500">
+        </div>
+      </div>
+
+      <!-- Picture -->
+      <div>
+        <label class="block text-sm font-medium flex items-center gap-2">
+          <fa-icon [icon]="faImage" class="text-purple-500"></fa-icon> URL de la Imagen
+        </label>
+        <input formControlName="picture" type="text"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:border-purple-500 focus:ring-purple-500">
+      </div>
+
+      <!-- Telephone -->
+      <div>
+        <label class="block text-sm font-medium flex items-center gap-2">
+          <fa-icon [icon]="faPhone" class="text-purple-500"></fa-icon> Teléfono
+        </label>
+        <input formControlName="telephone" type="text"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:border-purple-500 focus:ring-purple-500">
+      </div>
+
+      <!-- Type (select) -->
+      <div>
+        <label class="block text-sm font-medium flex items-center gap-2">
+          <fa-icon [icon]="faUserTag" class="text-purple-500"></fa-icon> Rol
+        </label>
+        <select formControlName="type"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:border-purple-500 focus:ring-purple-500">
+          <option value="admin">Administrador</option>
+          <option value="cashier">Cajero</option>
+          <option value="user">Usuario</option>
+        </select>
+      </div>
+
+      <!-- Actions -->
       <div class="mt-6 flex justify-end space-x-4">
-        <button type="button" (click)="close()" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-full hover:bg-gray-400 transition-colors">
-          Cancel
+        <button type="button" (click)="close()"
+          class="bg-gray-300 text-gray-800 py-2 px-4 rounded-full hover:bg-gray-400 transition-colors">
+          Cancelar
         </button>
-        <button type="submit" [disabled]="editForm.invalid" class="bg-purple-500 text-white py-2 px-4 rounded-full hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          Save Changes
+        <button type="submit" [disabled]="editForm.invalid || !hasChanges"
+          class="bg-purple-500 text-white py-2 px-4 rounded-full hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Guardar Cambios
         </button>
       </div>
     </form>

@@ -193,6 +193,22 @@ export class SidebarComponent implements OnInit, OnDestroy {
           { label: 'Ver Órdenes', routerLink: '/dashboard/orders' },
         ],
       },
+      {
+        key: 'usuarios',
+        label: 'Usuarios',
+        icon: faDatabase,
+        // requiresAuth: true, // Este item necesita que el usuario esté logueado
+        subItems: [
+          { label: 'Ver Usuarios', routerLink: '/dashboard/users' },
+        ],
+      },
+      // {
+      //   key: 'configuracion',
+      //   label: 'Configuración',
+      //   icon: faGears,
+      //   routerLink: '/dashboard/settings',
+      //   // requiresAuth: true, // Este item necesita que el usuario esté logueado
+      // }
     ];
 
     // Filtramos los items del menú basados en el estado de login

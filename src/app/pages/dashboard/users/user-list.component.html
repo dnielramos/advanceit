@@ -1,43 +1,158 @@
-<div class="bg-gray-100 min-h-screen p-8">
+<div class="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
   <div class="container mx-auto">
-    <div class="bg-white rounded-2xl shadow-lg p-6">
-      <h2 class="text-3xl font-semibold mb-6 text-purple-700">Gestión de Usuarios</h2>
+    <div class="bg-white rounded-2xl shadow-xl p-6 flex flex-col h-[calc(100vh-4rem)]">
+      <!-- CABECERA -->
+      <header class="mb-6 pb-4 border-b border-gray-200">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <h2 class="text-3xl font-bold text-gray-800">
+            Gestión de Usuarios
+          </h2>
+          <div class="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
+            <!-- Búsqueda -->
+            <div class="relative flex-grow">
+              <input type="text" [ngModel]="state().searchTerm" (ngModelChange)="updateSearchTerm($event)"
+                placeholder="Buscar por nombre o email..."
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
 
-      <!-- Lista de usuarios -->
-      <div *ngIf="users.length > 0" class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        <div *ngFor="let user of users"
-          class="bg-gray-50 rounded-xl p-6 shadow-md transition-transform transform hover:scale-105 animate__animated animate__fadeIn">
-          <div class="flex items-center space-x-4">
-            <img [src]="user.picture || 'https://via.placeholder.com/150'" alt="User Profile Picture"
-              class="w-16 h-16 rounded-full object-cover border-2 border-purple-500">
-            <div>
-              <h3 class="text-xl font-bold text-gray-800">{{ user.name }}</h3>
-              <p class="text-gray-500">{{ user.email }}</p>
-              <p class="text-sm text-purple-600 font-medium">{{ user.type }}</p>
+              <fa-icon [icon]="faSearch" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
+            </div>
+
+            <!-- Vista Grid / Lista -->
+            <div class="flex items-center bg-gray-200 rounded-full p-1">
+              <button (click)="setViewMode('grid')" [ngClass]="
+                      state().viewMode === 'grid'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'text-gray-600 hover:bg-gray-300'
+                    " class="px-3 py-2 rounded-full transition-colors duration-300">
+                <fa-icon [icon]="faTh"></fa-icon>
+              </button>
+              <button (click)="setViewMode('list')" [ngClass]="
+                      state().viewMode === 'list'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'text-gray-600 hover:bg-gray-300'
+                    " class="px-3 py-2 rounded-full transition-colors duration-300">
+                <fa-icon [icon]="faList"></fa-icon>
+              </button>
             </div>
           </div>
-          <div class="mt-4 flex space-x-3">
-            <button (click)="viewUser(user)" aria-label="View user"
-              class="flex items-center space-x-2 bg-purple-500 text-white py-2 px-4 rounded-full hover:bg-purple-600 transition-colors">
-              <fa-icon [icon]="faEye"></fa-icon><span>Ver</span>
-            </button>
-            <button (click)="editUser(user)" aria-label="Edit user"
-              class="flex items-center space-x-2 bg-gray-600 text-white py-2 px-4 rounded-full hover:bg-gray-700 transition-colors">
-              <fa-icon [icon]="faPen"></fa-icon><span>Editar</span>
-            </button>
-          </div>
         </div>
-      </div>
+      </header>
 
-      <!-- Si no hay usuarios -->
-      <div *ngIf="users.length === 0" class="text-center text-gray-500 p-8">
-        <i class="fas fa-user-slash text-4xl mb-4 text-gray-400"></i>
-        <p>No hay usuarios registrados, Registra uno.</p>
-      </div>
+      <!-- CONTENIDO PRINCIPAL -->
+      <main class="flex-grow overflow-y-auto pr-2 custom-scrollbar">
+        <!-- Cargando -->
+        @if (state().loading) {
+        <div class="flex justify-center items-center h-full text-purple-600 animate-spin">
+          <fa-icon [icon]="faSpinner" size="3x"></fa-icon>
+        </div>
+        }
+
+        <!-- Error -->
+        @if (state().error) {
+        <div class="text-center text-red-500 p-8">
+          <p>Error al cargar los usuarios: {{ state().error }}</p>
+        </div>
+        }
+
+        <!-- Lista/Grid -->
+        @if (!state().loading && !state().error) { @if
+        (filteredUsers().length > 0) {
+
+        <!-- Grid -->
+        @if (state().viewMode === 'grid') {
+        <div class="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          @for (user of filteredUsers(); track user.id) {
+          <div
+            class="bg-white border border-gray-200 rounded-xl p-5 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 animate__animated animate__fadeIn">
+            <div class="flex items-center space-x-4">
+              <img [src]="
+                      user.picture ||
+                      'https://placehold.co/150x150/663399/FFFFFF?text=' +
+                        user.name.charAt(0)
+                    " alt="Foto de {{ user.name }}"
+                class="w-16 h-16 rounded-full object-cover border-2 border-purple-400" />
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-gray-900 truncate">
+                  {{ user.name }}
+                </h3>
+                <p class="text-sm text-gray-500 truncate">
+                  {{ user.email }}
+                </p>
+                <span
+                  class="text-xs font-semibold text-white bg-purple-500 px-2 py-0.5 rounded-full mt-1 inline-block">{{
+                  user.type }}</span>
+              </div>
+            </div>
+            <div class="mt-4 flex space-x-2">
+              <button (click)="viewUser(user)"
+                class="flex items-center space-x-2 bg-purple-500 text-white py-2 px-4 rounded-full hover:bg-purple-600 transition-colors text-sm font-semibold">
+                <fa-icon [icon]="faEye"></fa-icon><span>Ver</span>
+              </button>
+              <button (click)="editUser(user)"
+                class="flex items-center space-x-2 bg-gray-700 text-white py-2 px-4 rounded-full hover:bg-gray-800 transition-colors text-sm font-semibold">
+                <fa-icon [icon]="faPen"></fa-icon><span>Editar</span>
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- Lista -->
+        @if (state().viewMode === 'list') {
+        <div class="flex flex-col space-y-3">
+          @for (user of filteredUsers(); track user.id) {
+          <div
+            class="flex flex-wrap items-center bg-white border border-gray-200 rounded-lg p-3 shadow-sm transition-all duration-300 hover:bg-purple-50 hover:shadow-md animate__animated animate__fadeIn">
+            <img [src]="
+                    user.picture ||
+                    'https://placehold.co/150x150/663399/FFFFFF?text=' +
+                      user.name.charAt(0)
+                  " alt="Foto de {{ user.name }}" class="w-12 h-12 rounded-full object-cover mr-4" />
+            <div class="flex-1 min-w-[150px] mb-2 sm:mb-0">
+              <p class="font-semibold text-gray-800">{{ user.name }}</p>
+              <p class="text-sm text-gray-500">{{ user.email }}</p>
+            </div>
+            <div class="w-full sm:w-auto flex items-center justify-between">
+              <span class="text-xs font-semibold text-white bg-purple-500 px-2 py-0.5 rounded-full sm:mr-4">{{ user.type
+                }}</span>
+              <div class="flex space-x-2">
+                <button (click)="viewUser(user)"
+                  class="flex items-center space-x-2 bg-purple-500 text-white py-2 px-4 rounded-full hover:bg-purple-600 transition-colors text-sm font-semibold">
+                  <fa-icon [icon]="faEye"></fa-icon><span class="hidden sm:inline">Ver</span>
+                </button>
+                <button (click)="editUser(user)"
+                  class="flex items-center space-x-2 bg-gray-700 text-white py-2 px-4 rounded-full hover:bg-gray-800 transition-colors text-sm font-semibold">
+                  <fa-icon [icon]="faPen"></fa-icon><span class="hidden sm:inline">Editar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        } } @else {
+        <!-- Sin usuarios -->
+        <div
+          class="text-center text-gray-500 p-8 flex flex-col items-center justify-center h-full animate__animated animate__fadeIn">
+          <fa-icon [icon]="faUserSlash" class="text-5xl mb-4 text-gray-400"></fa-icon>
+          <p class="text-lg font-semibold">No se encontraron usuarios</p>
+          <p>
+            {{
+            state().searchTerm
+            ? 'Intenta con otro término de búsqueda.'
+            : 'No hay usuarios registrados.'
+            }}
+          </p>
+        </div>
+        } }
+      </main>
     </div>
   </div>
-
-  <!-- Modales -->
-  <app-user-view-modal *ngIf="showViewModal" [user]="selectedUser" (closeModal)="closeModal()"></app-user-view-modal>
-  <app-user-edit-modal *ngIf="showEditModal" [user]="selectedUser" (closeModal)="closeModal()"></app-user-edit-modal>
 </div>
+
+<!-- Modales -->
+@if (state().showViewModal) {
+<app-user-view-modal [user]="state().selectedUser" (closeModal)="closeModal()"></app-user-view-modal>
+} @if (state().showEditModal) {
+<app-user-edit-modal [user]="state().selectedUser" (closeModal)="closeModal(true)"></app-user-edit-modal>
+}

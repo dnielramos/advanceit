@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Role } from './auth.service';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 // DTOs (Data Transfer Objects) para tipar las peticiones
 export interface CreateUserDto {
@@ -32,7 +33,7 @@ export interface UpdatePasswordDto {
   providedIn: 'root'
 })
 export class UsersService {
-  private apiUrl = 'http://localhost:3002/users';
+  private apiUrl = `${ENVIRONMENT.apiUrlRender}/users`;
 
   constructor(private http: HttpClient) { }
 

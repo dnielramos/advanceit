@@ -206,7 +206,7 @@ import { AngularToastifyModule, ToastService } from 'angular-toastify';
 })
 export class LoginComponent {
   // --- Propiedades del Componente ---
-  credentials = { email: 'admin@admin.co', password: '12345678' };
+  credentials = { email: 'admin@advanceit.co', password: 'admin1234' };
   isLoading = false;
   forgotPassword = false;
   loginSuccess = false; // <-- 2. Nueva bandera para controlar la vista

@@ -14,6 +14,7 @@ import {
   faUserSlash,
   faSpinner,
   faTimes,
+  faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { UsersService } from '../../../services/users.service';
 import { UserViewModalComponent } from './user-view-modal/user-view-modal.component';
@@ -52,6 +53,7 @@ export class UserListComponent {
   faSearch = faSearch;
   faUserSlash = faUserSlash;
   faSpinner = faSpinner;
+  faUsers = faUsers;
 
   state = signal<UserState>({
     users: [],

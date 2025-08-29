@@ -1,17 +1,17 @@
-<div class="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
-  <div class="container mx-auto">
+<div class="bg-gray-100 font-sans">
+  <div class="container min-w-full">
     <div class="bg-white rounded-2xl shadow-xl p-6 flex flex-col h-[calc(100vh-4rem)]">
       <!-- CABECERA -->
       <header class="mb-6 pb-4 border-b border-gray-200">
         <div class="flex flex-wrap items-center justify-between gap-4">
-          <h2 class="text-3xl font-bold text-gray-800">
+          <h2 class="text-2xl font-extrabold text-gray-900">
             Gestión de Usuarios
           </h2>
           <div class="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
             <!-- Búsqueda -->
             <div class="relative flex-grow">
               <input type="text" [ngModel]="state().searchTerm" (ngModelChange)="updateSearchTerm($event)"
-                placeholder="Buscar por nombre o email..."
+                placeholder="Buscar nombre o email..."
                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
 
               <fa-icon [icon]="faSearch" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
@@ -86,10 +86,10 @@
             <div class="mt-4 flex space-x-2">
               <button (click)="viewUser(user)"
                 class="flex items-center space-x-2 bg-purple-500 text-white py-2 px-4 rounded-full hover:bg-purple-600 transition-colors text-sm font-semibold">
-                <fa-icon [icon]="faEye"></fa-icon><span>Ver</span>
+                <fa-icon [icon]="faEye"></fa-icon><span>Detalles</span>
               </button>
               <button (click)="editUser(user)"
-                class="flex items-center space-x-2 bg-gray-700 text-white py-2 px-4 rounded-full hover:bg-gray-800 transition-colors text-sm font-semibold">
+                class="flex items-center space-x-2 bg-gray-500 text-white py-2 px-4 rounded-full hover:bg-gray-800 transition-colors text-sm font-semibold">
                 <fa-icon [icon]="faPen"></fa-icon><span>Editar</span>
               </button>
             </div>

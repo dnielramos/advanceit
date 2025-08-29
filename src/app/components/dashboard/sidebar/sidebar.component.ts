@@ -8,6 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faTachometerAlt,
   faCube,
+  faUsers,
   faIcons,
   faDatabase,
   faGears,
@@ -133,6 +134,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   faChevronDown = faChevronDown;
   faChevronRight = faChevronRight;
   faGears = faGears;
+  faUsers = faUsers;
 
   private authSubscription!: Subscription;
 
@@ -178,8 +180,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
       //   ],
       // },
       {
-        key: 'aplicacion',
-        label: 'Aplicación',
+        key: 'tienda',
+        label: 'Tienda',
         icon: faIcons,
         subItems: [
           { label: 'Productos', routerLink: '/dashboard/advance-products' },
@@ -189,18 +191,20 @@ export class SidebarComponent implements OnInit, OnDestroy {
         key: 'ordenes',
         label: 'Órdenes',
         icon: faDatabase,
-        subItems: [
-          { label: 'Ver Órdenes', routerLink: '/dashboard/orders' },
-        ],
+        routerLink: '/dashboard/orders',
+        // subItems: [
+        //   { label: 'Ver Órdenes', routerLink: '/dashboard/orders' },
+        // ],
       },
       {
         key: 'usuarios',
         label: 'Usuarios',
-        icon: faDatabase,
+        icon: faUsers,
+        routerLink: '/dashboard/users'
         // requiresAuth: true, // Este item necesita que el usuario esté logueado
-        subItems: [
-          { label: 'Ver Usuarios', routerLink: '/dashboard/users' },
-        ],
+        // subItems: [
+        //   { label: 'Ver Usuarios', routerLink: '/dashboard/users' },
+        // ],
       },
       // {
       //   key: 'configuracion',

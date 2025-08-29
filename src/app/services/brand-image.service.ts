@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-export class BrandService {
+export class BrandImageService {
   brands = [
     {
       url: 'assets/logos/microsoft.png',

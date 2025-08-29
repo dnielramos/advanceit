@@ -13,6 +13,7 @@ import { filter } from 'rxjs/operators';
 import { BuscadorPrincipalComponent } from '../products/buscador-principal/buscador-principal.component';
 import { BuscadorNavbarComponent } from './buscador-navbar/buscador-navbar.component';
 import { CategoryMenuComponent } from '../../pages/productos/categories/category.component';
+import { BrandMenuComponent } from '../../pages/productos/brands/brand-menu.component';
 
 @Component({
   selector: 'app-navbar',
@@ -27,7 +28,8 @@ import { CategoryMenuComponent } from '../../pages/productos/categories/category
     NavbarSectionsComponent,
     TranslatePipe,
     BuscadorNavbarComponent,
-    CategoryMenuComponent
+    CategoryMenuComponent,
+    BrandMenuComponent,
   ],
   templateUrl: './navbar.component.html',
 })
@@ -39,6 +41,7 @@ export class NavbarComponent {
   textIdiom = 'es';
   idiom = 'English';
   menuCategories: boolean = false;
+  menuBrands: boolean = false;
 
   constructor(
     private translate: TranslateService,
@@ -111,5 +114,27 @@ export class NavbarComponent {
     //   html.classList.remove('no-scroll');
     //   body.classList.remove('no-scroll');
     // }
+  }
+
+  onMenuBrands(): void {
+    this.menuBrands = !this.menuBrands;
+
+    const html = document.documentElement;
+    const body = document.body;
+
+    // if (this.menuBrands) {
+    //   html.classList.add('no-scroll');
+    //   body.classList.add('no-scroll');
+    // } else {
+    //   html.classList.remove('no-scroll');
+    //   body.classList.remove('no-scroll');
+    // }
+  }
+
+  onShowOtherBrand(): void {
+    this.menuBrands = false;
+    this.menuCategories = false;
+
+    this.router.navigate(['/contacto']);
   }
 }

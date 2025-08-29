@@ -24,11 +24,12 @@ import {
   faShop,
   faChevronLeft,
   faChevronRight,
+  faBars,
 } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterLink } from '@angular/router';
 import { ProductoFinal } from '../../../models/Productos';
 import { TrmComponent } from '../../navbar/trm/trm.component';
-import { BrandService } from '../../../services/brand.service';
+import { BrandImageService } from '../../../services/brand-image.service';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { PRODUCTOS_DEFAULT } from '../../../constants/default-products';
 import { ProductsService } from '../../../services/product.service';
@@ -63,14 +64,14 @@ import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrollin
 export class BuscadorNavbarComponent implements OnInit {
   // Mensajes de bienvenida
   welcomeMessages = [
-    '¿Algún producto en específico?',
-    'Buscar por marca.',
-    '¿En que podemos ayudarte?',
+    '¿Algún producto especifico?',
+    'Escribe por ejemplo "Dell"',
+    'Busca por marca aquí.',
+    'Escribe aquí...',
     '¿Qué estás buscando?',
-    'Estamos para ayudarte',
-    'Busca por nombre',
+    'Busca por nombre aquí',
   ];
-  welcomeMessage = signal('¡Hola!  ¿En qué puedo ayudarte hoy?');
+  welcomeMessage = signal('¡Hola Bienvenido!');
   productsFromDB: any[] = [];
   productBySKU: any;
   paginatedProducts: any[] = [];
@@ -92,7 +93,9 @@ export class BuscadorNavbarComponent implements OnInit {
   faShop = faShop;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
+  faBars = faBars;
   @Output() showCategoriesMenu = new EventEmitter<void>();
+  @Output() showBrandsMenu = new EventEmitter<void>();
 
   islogged: boolean = false;
 
@@ -103,7 +106,7 @@ export class BuscadorNavbarComponent implements OnInit {
   productos: ProductoFinal[] = [];
 
   constructor(
-    private brandService: BrandService,
+    private brandService: BrandImageService,
     private productService: ProductsService,
     private authService: AuthService,
     private router: Router
@@ -224,6 +227,10 @@ export class BuscadorNavbarComponent implements OnInit {
 
   onMenucategories(): void {
     this.showCategoriesMenu.emit();
+  }
+
+  onMenuBrands(): void {
+    this.showBrandsMenu.emit();
   }
 
   // scrollFavorites(direction: 'left' | 'right') {

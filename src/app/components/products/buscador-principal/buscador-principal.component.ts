@@ -28,7 +28,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { ProductoFinal } from '../../../models/Productos';
 import { TrmComponent } from '../../navbar/trm/trm.component';
-import { BrandService } from '../../../services/brand.service';
+import { BrandImageService } from '../../../services/brand-image.service';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { PRODUCTOS_DEFAULT } from '../../../constants/default-products';
 import { ProductsService } from '../../../services/product.service';
@@ -104,7 +104,7 @@ export class BuscadorPrincipalComponent implements OnInit {
   productos: ProductoFinal[] = [];
 
   constructor(
-    private brandService: BrandService,
+    private brandService: BrandImageService,
     private productService: ProductsService,
     private authService: AuthService,
     private router: Router

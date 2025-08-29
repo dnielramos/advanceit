@@ -9,7 +9,7 @@ import { ProductoFinal } from '../../../models/Productos';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { AdvanceProductsComponent } from '../../dashboard/advance-products/advance-products.component';
 import { ProductAdvanceComponent } from '../../../components/products/product-advance/product-advance.component';
-import { BrandService } from '../../../services/brand.service';
+import { BrandImageService } from '../../../services/brand-image.service';
 // Importa las interfaces correctas
 
 @Component({
@@ -29,7 +29,7 @@ export class BuscarProductosCategoriasComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private productService: ProductsService,
-    private brandService : BrandService
+    private brandService : BrandImageService
   ) {}
 
   ngOnInit(): void {

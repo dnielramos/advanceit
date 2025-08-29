@@ -41,7 +41,7 @@ import { SimpleCtaComponent } from '../../components/inicio/simple-cta/simple-ct
 import { BuscadorPrincipalComponent } from '../../components/products/buscador-principal/buscador-principal.component';
 import { SanitizeImageUrlPipe } from '../../pipes/sanitize-image-url.pipe';
 import { ViewChild, ElementRef } from '@angular/core';
-import { BrandService } from '../../services/brand.service';
+import { BrandImageService } from '../../services/brand-image.service';
 import { CertificateSliderComponent } from '../../shared/certificate-slider/certificate-slider.component';
 import { GridProductsStoreComponent } from '../../components/products/products-store/grid-products-store.component';
 import { SlideProductStoreComponent } from '../../components/products/slide-product-store/slide-product-store.component';
@@ -160,7 +160,7 @@ export class ProductosComponent implements OnInit {
     private cartService: CartService,
     private productService: ProductsService,
     private authService: AuthService,
-    private brandService: BrandService,
+    private brandService: BrandImageService,
     private toastService: ToastService
   ) {
     // En el constructor de NavbarComponent

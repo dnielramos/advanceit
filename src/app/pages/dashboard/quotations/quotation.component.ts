@@ -1,18 +1,24 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Quotation, QuotationService } from '../../../services/quotation.service';
+import { QuotationService } from '../../../services/quotation.service';
 import { QuotationListComponent } from './quotation-list.component';
 import { QuotationDetailComponent } from './quotation-detail.component';
-import { QuotationEditComponent } from './quotation-edit.component';
+import { Quotation } from '../../../models/quotation.types';
 
 
 @Component({
   selector: 'app-quotation',
   standalone: true,
-  imports: [CommonModule, QuotationListComponent, QuotationDetailComponent, QuotationEditComponent],
+  imports: [CommonModule, QuotationListComponent],
   templateUrl: './quotation.component.html'
 })
 export class QuotationComponent {
+openEditModal($event: Event) {
+throw new Error('Method not implemented.');
+}
+openDetailsModal($event: Event) {
+throw new Error('Method not implemented.');
+}
   quotations = signal<Quotation[]>([]);
   selectedQuotation = signal<Quotation | null>(null);
   editingQuotation = signal<Quotation | null>(null);
@@ -22,7 +28,7 @@ export class QuotationComponent {
   }
 
   loadQuotations() {
-    this.quotationService.getAll().subscribe((data) => {
+    this.quotationService.findAll().subscribe((data) => {
       console.log('Quotaciones cargadas:', data);
       this.quotations.set(data);
     });

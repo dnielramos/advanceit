@@ -1,46 +1,117 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import {
+  CreateFullQuotationDto,
+  Quotation,
+  QuotationDetail,
+  UpdateQuotationDto,
+  QuotationStatus,
+} from '../models/quotation.types'; // Asegúrate de que este path sea correcto
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
-export interface QuotationDetail {
-  id: string;
-  productId: string;
-  quantity: number;
-  price: number;
-}
-
-export interface Quotation {
-  id: string;
-  clientName: string;
-  total: number;
-  expirationDate: string;
-  details: QuotationDetail[];
-}
-
+/**
+ * Servicio para la gestión de cotizaciones, interactuando con el backend.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class QuotationService {
-  private http = inject(HttpClient);
-  private API_URL = 'http://localhost:3002/quotations'; // ✅ cambia por tu backend real
+  private apiUrl = `${ENVIRONMENT.apiUrlRender}/quotations`;
 
-  getAll(): Observable<Quotation[]> {
-    return this.http.get<Quotation[]>(this.API_URL);
+  constructor(private http: HttpClient) {}
+
+  /**
+   * Maneja errores HTTP y lanza una excepción con un mensaje descriptivo.
+   * @param error El objeto de error HTTP.
+   * @returns Un Observable que lanza una excepción.
+   */
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'Ha ocurrido un error desconocido.';
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado del cliente o de la red
+      errorMessage = `Error del cliente: ${error.error.message}`;
+    } else {
+      // El backend devolvió un código de respuesta no exitoso.
+      if (error.status === 404) {
+        errorMessage = 'Recurso no encontrado. La cotización no existe.';
+      } else if (error.status === 409) {
+        errorMessage = 'Conflicto: No se puede actualizar una cotización expirada.';
+      } else if (error.status >= 500) {
+        errorMessage = 'Error del servidor. Inténtalo de nuevo más tarde.';
+      } else {
+        errorMessage = `Código de error: ${error.status}, mensaje: ${error.message}`;
+      }
+    }
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 
-  getById(id: string): Observable<Quotation> {
-    return this.http.get<Quotation>(`${this.API_URL}/${id}`);
+  /**
+   * Crea una nueva cotización con sus detalles.
+   * @param data Los datos completos de la cotización.
+   * @returns Un Observable de la cotización creada.
+   */
+  create(
+    data: CreateFullQuotationDto,
+  ): Observable<Quotation & { details: QuotationDetail[] }> {
+    return this.http
+      .post<Quotation & { details: QuotationDetail[] }>(this.apiUrl, data)
+      .pipe(catchError(this.handleError));
   }
 
-  create(quotation: Partial<Quotation>): Observable<Quotation> {
-    return this.http.post<Quotation>(this.API_URL, quotation);
+  /**
+   * Obtiene todas las cotizaciones existentes.
+   * @returns Un Observable con una lista de cotizaciones.
+   */
+  findAll(): Observable<Quotation[]> {
+    return this.http
+      .get<Quotation[]>(this.apiUrl)
+      .pipe(catchError(this.handleError));
   }
 
-  update(id: string, quotation: Partial<Quotation>): Observable<Quotation> {
-    return this.http.patch<Quotation>(`${this.API_URL}/${id}`, quotation);
+  /**
+   * Obtiene una cotización específica por su ID, incluyendo sus detalles.
+   * @param id El ID de la cotización.
+   * @returns Un Observable de la cotización.
+   */
+  findOne(id: string): Observable<Quotation & { details: QuotationDetail[] }> {
+    return this.http
+      .get<Quotation & { details: QuotationDetail[] }>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
   }
 
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/${id}`);
+  /**
+   * Actualiza una cotización y sus detalles por ID.
+   * @param id El ID de la cotización a actualizar.
+   * @param data Los datos actualizados.
+   * @returns Un Observable de la cotización actualizada.
+   */
+  update(
+    id: string,
+    data: CreateFullQuotationDto | UpdateQuotationDto,
+  ): Observable<Quotation & { details: QuotationDetail[] }> {
+    return this.http
+      .patch<Quotation & { details: QuotationDetail[] }>(`${this.apiUrl}/${id}`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Actualiza el estado de una cotización.
+   * @param id El ID de la cotización.
+   * @param status El nuevo estado.
+   * @param approvedBy (Opcional) El ID del usuario que aprueba.
+   * @returns Un Observable de la cotización con el estado actualizado.
+   */
+  updateStatus(
+    id: string,
+    status: QuotationStatus,
+    approvedBy?: string,
+  ): Observable<Quotation> {
+    const body = { status, approved_by: approvedBy };
+    return this.http
+      .patch<Quotation>(`${this.apiUrl}/${id}/status`, body)
+      .pipe(catchError(this.handleError));
   }
 }

@@ -1,0 +1,64 @@
+<form [formGroup]="quotationForm" (ngSubmit)="onSubmit()" class="flex flex-col space-y-6">
+  <h2 class="text-2xl font-bold text-gray-800">Crear Nueva Cotización</h2>
+  <hr class="border-gray-200" />
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label for="company_id" class="block text-sm font-medium text-gray-700">ID de Empresa</label>
+      <input type="text" id="company_id" formControlName="company_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+    </div>
+    <div>
+      <label for="user_id" class="block text-sm font-medium text-gray-700">ID de Usuario</label>
+      <input type="text" id="user_id" formControlName="user_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+    </div>
+    <div>
+      <label for="validity_days" class="block text-sm font-medium text-gray-700">Días de Validez</label>
+      <input type="number" id="validity_days" formControlName="validity_days" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+    </div>
+    <div>
+      <label for="term" class="block text-sm font-medium text-gray-700">Término</label>
+      <input type="text" id="term" formControlName="term" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 border-b pb-2 mt-4">Detalles de la Cotización</h3>
+  <div formArrayName="details" class="space-y-4">
+    <div *ngFor="let detail of details.controls; let i = index" [formGroupName]="i" class="p-4 border border-gray-200 rounded-md bg-gray-50 flex flex-col md:flex-row md:items-end md:space-x-4 animate__animated animate__fadeIn">
+      <div class="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Producto ID</label>
+          <input type="text" formControlName="product_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+          <input type="number" formControlName="quantity" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Precio</label>
+          <input type="number" formControlName="unit_price" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+        </div>
+      </div>
+      <div class="mt-4 md:mt-0">
+        <button (click)="removeDetail(i)" type="button" class="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded-full transition-colors duration-200" title="Eliminar ítem">
+          <fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" (click)="addDetail()" class="flex items-center justify-center w-full py-2 border-2 border-dashed border-gray-300 rounded-md text-gray-500 hover:text-purple-600 hover:border-purple-400 transition-colors duration-200">
+    <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Añadir Ítem
+  </button>
+
+  <div class="flex justify-end space-x-4 pt-6 border-t mt-6">
+    <button type="submit" [disabled]="quotationForm.invalid || isLoading" class="px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+      <div *ngIf="isLoading" class="flex items-center">
+        <fa-icon [icon]="['fas', 'spinner']" class="mr-2 animate-spin"></fa-icon>
+        Creando...
+      </div>
+      <div *ngIf="!isLoading">
+        <fa-icon [icon]="['fas', 'save']" class="mr-2"></fa-icon>Guardar Cotización
+      </div>
+    </button>
+  </div>
+</form>

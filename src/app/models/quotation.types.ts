@@ -42,6 +42,7 @@ export interface CreateQuotationDto {
   term: string;
   creation_mode: string;
   created_by: string;
+  total?: number;
 }
 
 export interface UpdateQuotationDto {

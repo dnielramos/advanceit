@@ -66,8 +66,11 @@
     <ng-container *ngIf="currentModal === 'details'">
       <app-quotation-detail [quotationId]="selectedQuotationId"></app-quotation-detail>
     </ng-container>
-    <ng-container *ngIf="currentModal === 'edit' || currentModal === 'create'">
+    <ng-container *ngIf="currentModal === 'edit'">
       <app-quotation-form [quotationId]="selectedQuotationId!" (onSave)="handleSave($event)"></app-quotation-form>
+    </ng-container>
+    <ng-container *ngIf="currentModal === 'create'">
+      <app-quotation-create (onQuotationCreated)="handleSave($event)"></app-quotation-create>
     </ng-container>
   </div>
 </div>

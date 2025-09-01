@@ -7,10 +7,11 @@ import { QuotationFormComponent } from './quotation-form.component';
 import { QuotationDetailComponent } from './quotation-detail.component';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { QuotationCreateComponent } from './quotation-create.component';
 
 
 @Component({
-  imports: [QuotationFormComponent, QuotationDetailComponent, CommonModule, FontAwesomeModule],
+  imports: [QuotationFormComponent, QuotationDetailComponent, QuotationCreateComponent, CommonModule, FontAwesomeModule],
   selector: 'app-quotation-list',
   templateUrl: './quotation-list.component.html',
 })

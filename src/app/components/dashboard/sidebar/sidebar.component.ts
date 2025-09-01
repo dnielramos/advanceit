@@ -14,6 +14,9 @@ import {
   faGears,
   faChevronDown,
   faChevronRight,
+  faTruckFast,
+  faHandshake,
+  faFileLines,
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../services/auth.service'; // Asegúrate que la ruta sea correcta
 import { Subscription } from 'rxjs';
@@ -135,6 +138,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   faChevronRight = faChevronRight;
   faGears = faGears;
   faUsers = faUsers;
+  faCube = faCube;
+  faHandshake = faHandshake;
+  faTruckFast = faTruckFast;
+  faFileLines = faFileLines;
 
   private authSubscription!: Subscription;
 
@@ -184,7 +191,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         label: 'Tienda',
         icon: faIcons,
         subItems: [
-          { label: 'Productos', routerLink: '/dashboard/advance-products' },
+          { label: 'Buscar productos', routerLink: '/dashboard/advance-products' },
         ],
       },
       {
@@ -197,10 +204,39 @@ export class SidebarComponent implements OnInit, OnDestroy {
         // ],
       },
       {
+        key: 'cotizaciones',
+        label: 'Cotizaciones',
+        icon: faFileLines,
+        routerLink: '/dashboard/cotizaciones',
+        // subItems: [
+        //   { label: 'Ver Órdenes', routerLink: '/dashboard/orders' },
+        // ],
+      },
+      {
         key: 'usuarios',
         label: 'Usuarios',
         icon: faUsers,
         routerLink: '/dashboard/users'
+        // requiresAuth: true, // Este item necesita que el usuario esté logueado
+        // subItems: [
+        //   { label: 'Ver Usuarios', routerLink: '/dashboard/users' },
+        // ],
+      },
+      {
+        key: 'empresas',
+        label: 'Empresas',
+        icon: faHandshake,
+        routerLink: '/dashboard/companies'
+        // requiresAuth: true, // Este item necesita que el usuario esté logueado
+        // subItems: [
+        //   { label: 'Ver Usuarios', routerLink: '/dashboard/users' },
+        // ],
+      },
+      {
+        key: 'logistica',
+        label: 'Logística',
+        icon: faTruckFast,
+        routerLink: '/dashboard/logistica'
         // requiresAuth: true, // Este item necesita que el usuario esté logueado
         // subItems: [
         //   { label: 'Ver Usuarios', routerLink: '/dashboard/users' },

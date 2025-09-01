@@ -43,6 +43,13 @@ export const dashboardRoutes: Routes = [
             (m) => m.UserListComponent
           ),
       },
+      {
+        path: 'companies',
+        loadComponent: () =>
+          import('../pages/dashboard/companies/company.component').then(
+            (m) => m.CompanyComponent
+          ),
+      },
 
       {
         path: 'advance-products',

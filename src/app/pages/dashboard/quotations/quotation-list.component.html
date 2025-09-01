@@ -33,16 +33,16 @@
       </div>
 
       <div class="flex justify-end space-x-2 mt-4">
-        <button (click)="openDetailsModal(q.id!)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Ver detalles">
+        <button (click)="openDetailsModal(q.id)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Ver detalles">
           <fa-icon [icon]="faEye"></fa-icon>
         </button>
-        <button (click)="openEditModal(q.id!)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Editar">
+        <button (click)="openEditModal(q.id)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Editar">
           <fa-icon [icon]="faEdit"></fa-icon>
         </button>
-        <button (click)="openStatusModal(q.id!)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Cambiar estado">
+        <button (click)="openStatusModal(q.id)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Cambiar estado">
           <fa-icon [icon]="faCheckCircle"></fa-icon>
         </button>
-        <button (click)="confirmDeletion(q.id!)" class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-colors duration-200" title="Eliminar">
+        <button (click)="confirmDeletion(q.id)" class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-colors duration-200" title="Eliminar">
           <fa-icon [icon]="faTrashAlt"></fa-icon>
         </button>
       </div>
@@ -67,7 +67,7 @@
       <app-quotation-detail [quotationId]="selectedQuotationId"></app-quotation-detail>
     </ng-container>
     <ng-container *ngIf="currentModal === 'edit' || currentModal === 'create'">
-      <app-quotation-form [quotationId]="selectedQuotationId" [isEditMode]="currentModal === 'edit'" (onSave)="handleSave($event)"></app-quotation-form>
+      <app-quotation-form [quotationId]="selectedQuotationId!" (onSave)="handleSave($event)"></app-quotation-form>
     </ng-container>
   </div>
 </div>

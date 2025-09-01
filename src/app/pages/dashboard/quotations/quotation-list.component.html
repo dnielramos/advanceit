@@ -1,0 +1,27 @@
+<div class="bg-white shadow rounded-xl p-4">
+  <table class="min-w-full text-left text-sm">
+    <thead class="text-gray-500 border-b">
+      <tr>
+        <th class="py-2">Cliente</th>
+        <th class="py-2">Total</th>
+        <th class="py-2">Expira</th>
+        <th class="py-2">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let q of quotations" class="border-b hover:bg-gray-50 transition">
+        <td>{{ q.clientName }}</td>
+        <td>\${{ q.total }}</td>
+        <td>{{ q.expirationDate | date }}</td>
+        <td class="flex gap-3">
+          <button (click)="view.emit(q)" class="text-purple-600 hover:text-purple-800">
+            <fa-icon [icon]="icons.faEye"></fa-icon>
+          </button>
+          <button (click)="edit.emit(q)" class="text-gray-600 hover:text-gray-800">
+            <fa-icon [icon]="icons.faPen"></fa-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

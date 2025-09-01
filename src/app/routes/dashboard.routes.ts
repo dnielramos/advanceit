@@ -50,6 +50,13 @@ export const dashboardRoutes: Routes = [
             (m) => m.CompanyComponent
           ),
       },
+      {
+        path: 'cotizaciones',
+        loadComponent: () =>
+          import('../pages/dashboard/quotations/quotation.component').then(
+            (m) => m.QuotationComponent
+          ),
+      },
 
       {
         path: 'advance-products',

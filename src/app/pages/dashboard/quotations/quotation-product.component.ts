@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faSearch,
-  faPlus, // Changed from faShoppingCart to faPlus
+  faPlus,
   faTag,
   faStore,
   faHeart,
   faFilter,
-  faTimes, // Added for the close button
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Subscription } from 'rxjs';
@@ -21,44 +21,49 @@ import { ProductoFinal } from '../../../models/Productos';
   standalone: true,
   imports: [CommonModule, FormsModule, FontAwesomeModule],
   template: `
-    <div *ngIf="isVisible" class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Seleccionar Productos</h5>
-          <button type="button" class="close-btn" (click)="close()">
-            <fa-icon [icon]="faTimes"></fa-icon>
+    <div
+      *ngIf="isVisible"
+      class="fixed inset-0 z-[1000] flex items-center justify-center bg-gray-900/50 backdrop-blur-sm"
+    >
+      <div
+        class="relative flex h-screen w-full flex-col rounded-lg bg-white p-4 shadow-2xl md:p-6 lg:rounded-none"
+      >
+        <div
+          class="sticky top-0 z-30 flex items-center justify-between border-b border-gray-200 bg-white/80 pb-4 backdrop-blur-sm mb-6"
+        >
+          <h5 class="text-xl font-bold text-gray-800 md:text-2xl">Seleccionar Productos</h5>
+          <button type="button" class="text-gray-500 hover:text-gray-700" (click)="close()">
+            <fa-icon [icon]="faTimes" class="text-2xl"></fa-icon>
           </button>
         </div>
 
-        <div class="sticky top-0 z-20 bg-white/80 backdrop-blur-sm shadow-md">
-          <div class="container mx-auto max-w-7xl px-4 py-4">
-            <div class="relative mb-4">
-              <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                (input)="filterProducts()"
-                placeholder="Busca por nombre, marca, SKU..."
-                class="w-full rounded-full border border-gray-300 px-6 py-4 pl-12 text-lg shadow-sm outline-none transition-shadow focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
-              />
-              <fa-icon
-                [icon]="faSearch"
-                class="absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-400"
-              ></fa-icon>
-            </div>
+        <div class="sticky top-[50px] z-20 w-full bg-white/80 py-4 backdrop-blur-sm">
+          <div class="relative">
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="filterProducts()"
+              placeholder="Busca por nombre, marca, SKU..."
+              class="w-full rounded-full border border-purple-300 px-6 py-3 pl-12 text-base shadow-sm outline-none transition-shadow duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 md:py-4 md:text-lg"
+            />
+            <fa-icon
+              [icon]="faSearch"
+              class="absolute left-5 top-1/2 -translate-y-1/2 text-lg text-gray-400 md:text-xl"
+            ></fa-icon>
           </div>
         </div>
 
-        <div class="modal-body container mx-auto max-w-7xl p-4 py-8 sm:p-8">
+        <div class="modal-body h-full overflow-y-auto pt-36">
           <div
             *ngIf="filteredProducts().length > 0; else noProducts"
-            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3"
           >
             <div
               *ngFor="let item of filteredProducts(); trackby: trackBySku"
               @fadeIn
               class="flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-shadow duration-300 hover:shadow-xl"
             >
-              <div class="group relative h-48 overflow-hidden bg-gray-100">
+              <div class="group relative h-36 overflow-hidden bg-gray-100 md:h-48">
                 <img
                   [src]="getActiveImage(item)"
                   [alt]="getProductTitle(item)"
@@ -66,7 +71,7 @@ import { ProductoFinal } from '../../../models/Productos';
                 />
               </div>
 
-              <div class="flex flex-grow flex-col p-5">
+              <div class="flex flex-grow flex-col p-4 md:p-5">
                 <div class="mb-2">
                   <span
                     class="text-xs font-medium text-purple-800"
@@ -74,7 +79,7 @@ import { ProductoFinal } from '../../../models/Productos';
                     {{ item.marca }}
                   </span>
                   <h3
-                    class="line-clamp-2 cursor-pointer text-lg font-semibold text-gray-800 hover:text-purple-700"
+                    class="line-clamp-2 cursor-pointer text-base font-semibold text-gray-800 hover:text-purple-700 md:text-lg"
                     title="{{ getProductTitle(item) }}"
                   >
                     {{ getProductTitle(item) }}
@@ -84,7 +89,7 @@ import { ProductoFinal } from '../../../models/Productos';
                 <div class="mt-auto">
                   <div class="flex items-center justify-between">
                     <div>
-                      <p class="text-xl font-bold text-gray-900">
+                      <p class="text-lg font-bold text-gray-900 md:text-xl">
                         {{
                           item.precio
                             ? (item.precio | currency : "USD" : "symbol" : "1.0-0")
@@ -98,7 +103,7 @@ import { ProductoFinal } from '../../../models/Productos';
                     <button
                       [disabled]="!item.disponibilidad"
                       (click)="selectProduct(item)"
-                      class="flex w-full items-center justify-center rounded-lg px-4 py-2 font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
+                      class="flex w-full items-center justify-center rounded-lg px-3 py-2 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-300 md:px-4 md:py-2 md:text-base"
                       [ngClass]="
                         item.disponibilidad
                           ? 'bg-purple-600 hover:bg-purple-700'
@@ -118,15 +123,15 @@ import { ProductoFinal } from '../../../models/Productos';
           </div>
 
           <ng-template #noProducts>
-            <div class="flex flex-col items-center py-20 text-center">
+            <div class="flex flex-col items-center py-10 text-center md:py-20">
               <fa-icon
                 [icon]="faSearch"
-                class="mb-4 text-6xl text-gray-300"
+                class="mb-4 text-5xl text-gray-300 md:text-6xl"
               ></fa-icon>
-              <h3 class="text-xl font-semibold text-gray-700">
+              <h3 class="text-lg font-semibold text-gray-700 md:text-xl">
                 No se encontraron productos
               </h3>
-              <p class="text-gray-500">
+              <p class="text-gray-500 text-sm md:text-base">
                 Intenta ajustar tu búsqueda o limpiar los filtros.
               </p>
             </div>
@@ -135,58 +140,7 @@ import { ProductoFinal } from '../../../models/Productos';
       </div>
     </div>
   `,
-  styles: `
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .modal-content {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 1200px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .modal-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #9ca3af;
-    }
-    .modal-body {
-      overflow-y: auto;
-      margin-top: 1rem;
-      padding-top: 0;
-      flex-grow: 1;
-    }
-    .container {
-      margin: 0;
-      padding: 0;
-    }
-  `,
+  styles: [],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -200,10 +154,6 @@ export class QuotationProductsComponent implements OnInit, OnDestroy {
   @Input() isVisible = false;
   @Output() productSelected = new EventEmitter<ProductoFinal>();
   @Output() closeModal = new EventEmitter<void>();
-
-  // ... (All your existing properties and methods from the original component go here) ...
-  // All your existing properties and methods from the original component go here.
-  // The only addition is the @Input and @Output properties, and the two new methods below.
 
   faSearch = faSearch;
   faPlus = faPlus;
@@ -421,7 +371,6 @@ export class QuotationProductsComponent implements OnInit, OnDestroy {
     return product.etiquetas || [];
   }
 
-  // New methods for the modal functionality
   selectProduct(product: ProductoFinal): void {
     this.productSelected.emit(product);
   }

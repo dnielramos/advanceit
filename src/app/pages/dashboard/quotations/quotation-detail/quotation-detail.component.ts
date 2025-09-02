@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { QuotationService } from '../../../services/quotation.service';
-import { Quotation, QuotationStatus } from '../../../models/quotation.types';
+import { QuotationService } from '../../../../services/quotation.service';
+import { Quotation, QuotationStatus } from '../../../../models/quotation.types';
 import { faSpinner, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { CommonModule } from '@angular/common';

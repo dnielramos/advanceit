@@ -1,8 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QuotationService } from '../../../services/quotation.service';
-import { QuotationListComponent } from './quotation-list.component';
-import { QuotationDetailComponent } from './quotation-detail.component';
+import { QuotationListComponent } from './quotation-list/quotation-list.component';
+import { QuotationDetailComponent } from '../quotations/quotation-detail/quotation-detail.component';
 import { Quotation } from '../../../models/quotation.types';
 
 

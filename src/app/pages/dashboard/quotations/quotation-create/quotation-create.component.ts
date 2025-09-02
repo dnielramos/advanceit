@@ -1,16 +1,16 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CreateFullQuotationDto, CreateQuotationDetailDto } from '../../../models/quotation.types';
-import { faPlus, faTrashAlt, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { QuotationService } from '../../../../services/quotation.service';
+import { CreateFullQuotationDto, CreateQuotationDetailDto } from '../../../../models/quotation.types';
+import { faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { QuotationService } from '../../../services/quotation.service';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-library.add(faPlus, faTrashAlt, faSave, faSpinner);
+library.add(faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight);
 
 @Component({
-  imports: [FontAwesomeModule, CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule],
   selector: 'app-quotation-create',
   templateUrl: './quotation-create.component.html',
 })
@@ -19,6 +19,7 @@ export class QuotationCreateComponent implements OnInit {
 
   quotationForm: FormGroup;
   isLoading = false;
+  currentStep = 1;
 
   constructor(
     private fb: FormBuilder,
@@ -30,13 +31,13 @@ export class QuotationCreateComponent implements OnInit {
       validity_days: [15, [Validators.required, Validators.min(1)]],
       term: ['30 días', Validators.required],
       creation_mode: ['web'],
-      created_by: ['usuario_web'], // Puedes obtener esto de un servicio de autenticación
-      details: this.fb.array([], [Validators.required, Validators.min(1)]) // Debe haber al menos un detalle
+      created_by: ['usuario_web'],
+      details: this.fb.array([], [Validators.required, Validators.min(1)])
     });
   }
 
   ngOnInit(): void {
-    this.addDetail(); // Añade un ítem por defecto para iniciar
+    this.addDetail();
   }
 
   get details(): FormArray {
@@ -49,7 +50,6 @@ export class QuotationCreateComponent implements OnInit {
       quantity: [1, [Validators.required, Validators.min(1)]],
       unit_price: [0, [Validators.required, Validators.min(0)]],
       discount: [0],
-      subtotal: [0],
       taxes: [0]
     });
   }
@@ -62,9 +62,58 @@ export class QuotationCreateComponent implements OnInit {
     this.details.removeAt(index);
   }
 
+  nextStep(): void {
+    if (this.isStepValid(this.currentStep)) {
+      this.currentStep++;
+    } else {
+      // Marcar los campos del paso actual como "tocados" para mostrar errores
+      if (this.currentStep === 1) {
+        this.markFormGroupTouched(this.quotationForm);
+      } else if (this.currentStep === 2) {
+        this.markFormArrayTouched(this.details);
+      }
+    }
+  }
+
+  prevStep(): void {
+    this.currentStep--;
+  }
+
+  isStepValid(step: number): boolean {
+    switch (step) {
+      case 1:
+        return this.quotationForm.get('company_id')?.valid && this.quotationForm.get('user_id')?.valid && this.quotationForm.get('validity_days')?.valid && this.quotationForm.get('term')?.valid || false;
+      case 2:
+        return this.details.valid && this.details.length > 0;
+      case 3:
+        return this.quotationForm.valid;
+      default:
+        return false;
+    }
+  }
+
+  markFormGroupTouched(formGroup: FormGroup | FormArray): void {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  markFormArrayTouched(formArray: FormArray): void {
+    formArray.controls.forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
   onSubmit(): void {
-    if (this.quotationForm.invalid) {
-      console.error('Formulario no válido. Revise los campos.');
+    if (this.currentStep !== 3 || this.quotationForm.invalid) {
+      console.error('Formulario no válido para el envío.');
+      this.markFormGroupTouched(this.quotationForm);
       return;
     }
 
@@ -74,7 +123,7 @@ export class QuotationCreateComponent implements OnInit {
     // Calcular subtotales y total antes de enviar
     const detailsWithSubtotal: CreateQuotationDetailDto[] = formValue.details.map((detail: any) => {
       const subtotal = (detail.quantity * detail.unit_price) - detail.discount;
-      return { ...detail, subtotal };
+      return { ...detail, subtotal, taxes: 0 }; // Asegúrate de incluir el campo taxes
     });
 
     const total = detailsWithSubtotal.reduce((sum, item) => sum + item.subtotal, 0);
@@ -86,8 +135,7 @@ export class QuotationCreateComponent implements OnInit {
         validity_days: formValue.validity_days,
         term: formValue.term,
         creation_mode: formValue.creation_mode,
-        created_by: formValue.created_by,
-        total: total // Añade el total calculado
+        created_by: formValue.created_by
       },
       details: detailsWithSubtotal
     };
@@ -97,7 +145,6 @@ export class QuotationCreateComponent implements OnInit {
         console.log('Cotización creada exitosamente:', response);
         this.isLoading = false;
         this.onQuotationCreated.emit();
-        // Opcional: limpiar el formulario o cerrarlo
       },
       error: (error) => {
         this.isLoading = false;

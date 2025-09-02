@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { QuotationService } from '../../../services/quotation.service';
-import { CreateFullQuotationDto } from '../../../models/quotation.types';
+import { QuotationService } from '../../../../services/quotation.service';
+import { CreateFullQuotationDto } from '../../../../models/quotation.types';
 import { faSave, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { Subscription } from 'rxjs';

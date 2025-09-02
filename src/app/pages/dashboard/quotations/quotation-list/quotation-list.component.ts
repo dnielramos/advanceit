@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { QuotationService } from '../../../services/quotation.service';
-import { Quotation, QuotationStatus } from '../../../models/quotation.types';
+import { QuotationService } from '../../../../services/quotation.service';
+import { Quotation, QuotationStatus } from '../../../../models/quotation.types';
 import { faPlus, faFileInvoice, faEye, faEdit, faCheckCircle, faTrashAlt, faTimes, faUser, faDollarSign, faCalendarAlt, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { QuotationFormComponent } from './quotation-form.component';
-import { QuotationDetailComponent } from './quotation-detail.component';
+import { QuotationFormComponent } from '../quotation-form/quotation-form.component';
+import { QuotationDetailComponent } from '../../quotations/quotation-detail/quotation-detail.component';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { QuotationCreateComponent } from './quotation-create.component';
+import { QuotationCreateComponent } from '../quotation-create/quotation-create.component';
 
 
 @Component({

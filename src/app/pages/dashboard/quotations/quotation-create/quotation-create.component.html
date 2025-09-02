@@ -2,21 +2,26 @@
 
   <div class="flex items-center justify-between text-gray-500 mb-6">
     <div class="flex-1 flex flex-col items-center">
-      <div [ngClass]="{'bg-purple-600': currentStep >= 1, 'bg-gray-300': currentStep < 1}" class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
+      <div [ngClass]="{'bg-purple-600': currentStep >= 1, 'bg-gray-300': currentStep < 1}"
+        class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
         1
       </div>
       <span class="text-sm mt-2">Usuario e Empresa</span>
     </div>
-    <div class="flex-1 border-t-2 transition-colors duration-300" [ngClass]="{'border-purple-600': currentStep >= 2, 'border-gray-300': currentStep < 2}"></div>
+    <div class="flex-1 border-t-2 transition-colors duration-300"
+      [ngClass]="{'border-purple-600': currentStep >= 2, 'border-gray-300': currentStep < 2}"></div>
     <div class="flex-1 flex flex-col items-center">
-      <div [ngClass]="{'bg-purple-600': currentStep >= 2, 'bg-gray-300': currentStep < 2}" class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
+      <div [ngClass]="{'bg-purple-600': currentStep >= 2, 'bg-gray-300': currentStep < 2}"
+        class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
         2
       </div>
       <span class="text-sm mt-2">Productos</span>
     </div>
-    <div class="flex-1 border-t-2 transition-colors duration-300" [ngClass]="{'border-purple-600': currentStep >= 3, 'border-gray-300': currentStep < 3}"></div>
+    <div class="flex-1 border-t-2 transition-colors duration-300"
+      [ngClass]="{'border-purple-600': currentStep >= 3, 'border-gray-300': currentStep < 3}"></div>
     <div class="flex-1 flex flex-col items-center">
-      <div [ngClass]="{'bg-purple-600': currentStep >= 3, 'bg-gray-300': currentStep < 3}" class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
+      <div [ngClass]="{'bg-purple-600': currentStep >= 3, 'bg-gray-300': currentStep < 3}"
+        class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
         3
       </div>
       <span class="text-sm mt-2">Confirmar</span>
@@ -30,23 +35,43 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label for="company_id" class="block text-sm font-medium text-gray-700">ID de Empresa</label>
-          <input type="text" id="company_id" formControlName="company_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
-          <div *ngIf="quotationForm.get('company_id')?.invalid && (quotationForm.get('company_id')?.dirty || quotationForm.get('company_id')?.touched)" class="text-red-500 text-sm mt-1">Campo requerido.</div>
+          <select id="company_id" formControlName="company_id" class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+            <option [ngValue]="''" disabled>-- Selecciona una empresa --</option>
+            <option *ngFor="let company of companies$ | async" [ngValue]="company.id">
+              {{ company.razon_social }}
+            </option>
+          </select>
+          <div
+            *ngIf="quotationForm.get('company_id')?.invalid && (quotationForm.get('company_id')?.dirty || quotationForm.get('company_id')?.touched)"
+            class="text-red-500 text-sm mt-1">Necesitas elegir una empresa.</div>
         </div>
         <div>
           <label for="user_id" class="block text-sm font-medium text-gray-700">ID de Usuario</label>
-          <input type="text" id="user_id" formControlName="user_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
-          <div *ngIf="quotationForm.get('user_id')?.invalid && (quotationForm.get('user_id')?.dirty || quotationForm.get('user_id')?.touched)" class="text-red-500 text-sm mt-1">Campo requerido.</div>
+          <select id="user_id" formControlName="user_id" class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+            <option [ngValue]="''" disabled>-- Selecciona un usuario --</option>
+            <option *ngFor="let user of users$ | async" [ngValue]="user.id">
+              {{ user.name }} ({{ user.email }})
+            </option>
+          </select>
+          <div
+            *ngIf="quotationForm.get('user_id')?.invalid && (quotationForm.get('user_id')?.dirty || quotationForm.get('user_id')?.touched)"
+            class="text-red-500 text-sm mt-1">Necesitas elegir un usuario.</div>
         </div>
         <div>
           <label for="validity_days" class="block text-sm font-medium text-gray-700">Días de Validez</label>
-          <input type="number" id="validity_days" formControlName="validity_days" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
-          <div *ngIf="quotationForm.get('validity_days')?.invalid && (quotationForm.get('validity_days')?.dirty || quotationForm.get('validity_days')?.touched)" class="text-red-500 text-sm mt-1">Campo requerido.</div>
+          <input type="number" id="validity_days" formControlName="validity_days"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+          <div
+            *ngIf="quotationForm.get('validity_days')?.invalid && (quotationForm.get('validity_days')?.dirty || quotationForm.get('validity_days')?.touched)"
+            class="text-red-500 text-sm mt-1">Campo requerido.</div>
         </div>
         <div>
           <label for="term" class="block text-sm font-medium text-gray-700">Término</label>
-          <input type="text" id="term" formControlName="term" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
-          <div *ngIf="quotationForm.get('term')?.invalid && (quotationForm.get('term')?.dirty || quotationForm.get('term')?.touched)" class="text-red-500 text-sm mt-1">Campo requerido.</div>
+          <input type="text" id="term" formControlName="term"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+          <div
+            *ngIf="quotationForm.get('term')?.invalid && (quotationForm.get('term')?.dirty || quotationForm.get('term')?.touched)"
+            class="text-red-500 text-sm mt-1">Campo requerido.</div>
         </div>
       </div>
     </div>
@@ -54,32 +79,45 @@
     <div *ngIf="currentStep === 2" class="animate__animated animate__fadeInRight">
       <h3 class="text-xl font-semibold text-gray-800 mb-4">Añadir Productos</h3>
       <div formArrayName="details" class="space-y-4">
-        <div *ngFor="let detail of details.controls; let i = index" [formGroupName]="i" class="p-4 border border-gray-200 rounded-md bg-gray-50 flex flex-col md:flex-row md:items-end md:space-x-4 animate__animated animate__fadeIn">
+        <div *ngFor="let detail of details.controls; let i = index" [formGroupName]="i"
+          class="p-4 border border-gray-200 rounded-md bg-gray-50 flex flex-col md:flex-row md:items-end md:space-x-4 animate__animated animate__fadeIn">
           <div class="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">Producto ID</label>
-              <input type="text" formControlName="product_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
-              <div *ngIf="details.at(i).get('product_id')?.invalid && (details.at(i).get('product_id')?.dirty || details.at(i).get('product_id')?.touched)" class="text-red-500 text-sm mt-1">Campo requerido.</div>
+              <input type="text" formControlName="product_id"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+              <div
+                *ngIf="details.at(i).get('product_id')?.invalid && (details.at(i).get('product_id')?.dirty || details.at(i).get('product_id')?.touched)"
+                class="text-red-500 text-sm mt-1">Campo requerido.</div>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Cantidad</label>
-              <input type="number" formControlName="quantity" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
-              <div *ngIf="details.at(i).get('quantity')?.invalid && (details.at(i).get('quantity')?.dirty || details.at(i).get('quantity')?.touched)" class="text-red-500 text-sm mt-1">Campo requerido y > 0.</div>
+              <input type="number" formControlName="quantity"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+              <div
+                *ngIf="details.at(i).get('quantity')?.invalid && (details.at(i).get('quantity')?.dirty || details.at(i).get('quantity')?.touched)"
+                class="text-red-500 text-sm mt-1">Campo requerido y > 0.</div>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Precio</label>
-              <input type="number" formControlName="unit_price" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
-              <div *ngIf="details.at(i).get('unit_price')?.invalid && (details.at(i).get('unit_price')?.dirty || details.at(i).get('unit_price')?.touched)" class="text-red-500 text-sm mt-1">Campo requerido y >= 0.</div>
+              <input type="number" formControlName="unit_price"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+              <div
+                *ngIf="details.at(i).get('unit_price')?.invalid && (details.at(i).get('unit_price')?.dirty || details.at(i).get('unit_price')?.touched)"
+                class="text-red-500 text-sm mt-1">Campo requerido y >= 0.</div>
             </div>
           </div>
           <div class="mt-4 md:mt-0">
-            <button (click)="removeDetail(i)" type="button" class="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded-full transition-colors duration-200" title="Eliminar ítem">
+            <button (click)="removeDetail(i)" type="button"
+              class="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded-full transition-colors duration-200"
+              title="Eliminar ítem">
               <fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>
             </button>
           </div>
         </div>
       </div>
-      <button type="button" (click)="addDetail()" class="flex items-center justify-center w-full py-2 border-2 border-dashed border-gray-300 rounded-md text-gray-500 hover:text-purple-600 hover:border-purple-400 transition-colors duration-200 mt-4">
+      <button type="button" (click)="addDetail()"
+        class="flex items-center justify-center w-full py-2 border-2 border-dashed border-gray-300 rounded-md text-gray-500 hover:text-purple-600 hover:border-purple-400 transition-colors duration-200 mt-4">
         <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Añadir Ítem
       </button>
     </div>
@@ -119,17 +157,20 @@
   </form>
 
   <div class="flex justify-between pt-6 border-t mt-6">
-    <button *ngIf="currentStep > 1" (click)="prevStep()" type="button" class="flex items-center px-4 py-2 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200">
+    <button *ngIf="currentStep > 1" (click)="prevStep()" type="button"
+      class="flex items-center px-4 py-2 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200">
       <fa-icon [icon]="['fas', 'arrow-left']" class="mr-2"></fa-icon> Anterior
     </button>
 
     <div class="flex-grow"></div>
 
-    <button *ngIf="currentStep < 3" (click)="nextStep()" type="button" [disabled]="!isStepValid(currentStep)" class="flex items-center px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+    <button *ngIf="currentStep < 3" (click)="nextStep()" type="button" [disabled]="!isStepValid(currentStep)"
+      class="flex items-center px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
       Siguiente <fa-icon [icon]="['fas', 'arrow-right']" class="ml-2"></fa-icon>
     </button>
 
-    <button *ngIf="currentStep === 3" (click)="onSubmit()" type="submit" [disabled]="isLoading" class="px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+    <button *ngIf="currentStep === 3" (click)="onSubmit()" type="submit" [disabled]="isLoading"
+      class="px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
       <div *ngIf="isLoading" class="flex items-center">
         <fa-icon [icon]="['fas', 'spinner']" class="mr-2 animate-spin"></fa-icon> Creando...
       </div>

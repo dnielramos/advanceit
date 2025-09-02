@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, throwError, Observable } from 'rxjs';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 // Interfaz de la entidad Company (ajústala si cambia en backend)
 export interface Company {
@@ -30,7 +31,7 @@ export type UpdateCompanyDto = Partial<CreateCompanyDto>;
 })
 export class CompaniesService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3002/companies'; // 🔑 Cambia a tu URL real (ej: render, railway, etc.)
+  private readonly baseUrl = `${ENVIRONMENT.apiUrlRender}/companies`; // 🔑 Cambia a tu URL real (ej: render, railway, etc.)
 
   /** Crear empresa */
   create(company: CreateCompanyDto): Observable<Company> {

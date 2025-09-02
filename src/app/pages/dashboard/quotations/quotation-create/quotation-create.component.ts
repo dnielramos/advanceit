@@ -6,6 +6,9 @@ import { faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight } from
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { Observable } from 'rxjs';
+import { CompaniesService } from '../../../../services/companies.service';
+import { UsersService } from '../../../../services/users.service';
 
 library.add(faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight);
 
@@ -17,13 +20,19 @@ library.add(faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight);
 export class QuotationCreateComponent implements OnInit {
   @Output() onQuotationCreated = new EventEmitter<void>();
 
+   users$: Observable<any[]> | undefined; // Observable para la lista de usuarios
+  companies$: Observable<any[]> | undefined; // Observable para la lista de empresas (asumiendo un servicio similar)
+
+
   quotationForm: FormGroup;
   isLoading = false;
   currentStep = 1;
 
   constructor(
     private fb: FormBuilder,
-    private quotationService: QuotationService
+    private quotationService: QuotationService,
+    private companiesService: CompaniesService,
+    private userService: UsersService
   ) {
     this.quotationForm = this.fb.group({
       company_id: ['', Validators.required],
@@ -38,6 +47,8 @@ export class QuotationCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.addDetail();
+    this.users$ = this.userService.getUsers();
+    this.companies$ = this.companiesService.findAll();
   }
 
   get details(): FormArray {

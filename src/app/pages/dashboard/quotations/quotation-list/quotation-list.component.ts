@@ -8,6 +8,7 @@ import { QuotationDetailComponent } from '../../quotations/quotation-detail/quot
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { QuotationCreateComponent } from '../quotation-create/quotation-create.component';
+import { Validators } from '@angular/forms';
 
 
 @Component({

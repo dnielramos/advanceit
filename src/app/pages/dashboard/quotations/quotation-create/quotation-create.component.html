@@ -91,6 +91,14 @@
                 class="text-red-500 text-sm mt-1">Campo requerido.</div>
             </div>
             <div>
+              <label class="block text-sm font-medium text-gray-700">Nombre</label>
+              <input type="text" formControlName="product_name"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+              <div
+                *ngIf="details.at(i).get('product_name')?.invalid && (details.at(i).get('product_name')?.dirty || details.at(i).get('product_name')?.touched)"
+                class="text-red-500 text-sm mt-1">Campo requerido.</div>
+            </div>
+            <div>
               <label class="block text-sm font-medium text-gray-700">Cantidad</label>
               <input type="number" formControlName="quantity"
                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
@@ -116,7 +124,7 @@
           </div>
         </div>
       </div>
-      <button type="button" (click)="addDetail()"
+      <button type="button" (click)="openProductModal()"
         class="flex items-center justify-center w-full py-2 border-2 border-dashed border-gray-300 rounded-md text-gray-500 hover:text-purple-600 hover:border-purple-400 transition-colors duration-200 mt-4">
         <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Añadir Ítem
       </button>
@@ -180,3 +188,8 @@
     </button>
   </div>
 </div>
+<app-quotation-products
+  [isVisible]="isProductModalVisible"
+  (productSelected)="onProductSelected($event)"
+  (closeModal)="onModalClose()">
+</app-quotation-products>

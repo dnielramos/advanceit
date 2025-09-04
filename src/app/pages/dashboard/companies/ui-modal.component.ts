@@ -38,13 +38,6 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
       </div>
     </div>
   `,
-  styles: [
-    `
-      :host {
-        display: contents;
-      }
-    `,
-  ],
 })
 export class UiModalComponent {
   @Input() title = '';

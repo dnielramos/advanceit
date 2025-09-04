@@ -26,6 +26,7 @@ import { Observable } from 'rxjs';
 import { CompaniesService } from '../../../../services/companies.service';
 import { UsersService } from '../../../../services/users.service';
 import { QuotationProductsComponent } from "../quotation-product.component";
+import { AuthService } from '../../../../services/auth.service';
 
 library.add(faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight);
 
@@ -43,22 +44,27 @@ export class QuotationCreateComponent implements OnInit {
   quotationForm: FormGroup;
   isLoading = false;
   currentStep = 1;
-
+  userId: string | null = null;
   isProductModalVisible = false; // Estado del modal
 
   constructor(
     private fb: FormBuilder,
     private quotationService: QuotationService,
     private companiesService: CompaniesService,
-    private userService: UsersService
+    private userService: UsersService,
+    private authService: AuthService
   ) {
+
+    this.userId = this.authService.getUserId();
+
+
     this.quotationForm = this.fb.group({
       company_id: ['', Validators.required],
       user_id: ['', Validators.required],
-      validity_days: [15, [Validators.required, Validators.min(1)]],
+      validity_days: [15, [Validators.required, Validators.min(1), Validators.max(30)]],
       term: ['30 días', Validators.required],
       creation_mode: ['web'],
-      created_by: ['usuario_web'],
+      created_by: [this.userId],
       details: this.fb.array([], [Validators.required, Validators.min(1)]),
     });
   }

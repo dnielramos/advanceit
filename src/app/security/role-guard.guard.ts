@@ -12,7 +12,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
 
   if (!authService.hasRole(expectedRoles)) {
     // Redirige a una página de 'no autorizado' o a la home
-    router.navigate(['/unauthorized']);
+    router.navigate(['/in']);
     return false;
   }
 

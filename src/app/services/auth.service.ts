@@ -30,6 +30,8 @@ export class AuthService {
   // Esto asegura que el estado de login es SIEMPRE consistente con el rol.
   public isLoggedIn$: Observable<boolean>;
 
+  public activeUser$: Observable<string> = of('');
+
   // Inyección de dependencias moderna
   private http = inject(HttpClient);
   private router = inject(Router);
@@ -80,6 +82,23 @@ export class AuthService {
     );
   }
 
+  getUserId(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.sub || decoded.userId || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+
+  getToken(): string | null {
+    return localStorage.getItem('adtkn');
+  }
+
   handleLogin(token: string): void {
     localStorage.setItem('adtkn', token);
     // Al decodificar y establecer el rol, `isLoggedIn$` emitirá `true` automáticamente.
@@ -92,13 +111,11 @@ export class AuthService {
     this.currentUserRole.next(null);
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('adtkn');
-  }
 
   private decodeAndStoreToken(token: string): void {
     try {
       const decodedToken = jwtDecode<JwtPayload>(token);
+      console.log('Token decodificado:', decodedToken);
       this.currentUserRole.next(decodedToken.role);
     } catch (error) {
       console.error('Error decodificando el token', error);

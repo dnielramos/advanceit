@@ -18,7 +18,7 @@ import { ENVIRONMENT } from '../../enviroments/enviroment';
   providedIn: 'root',
 })
 export class QuotationService {
-  private apiUrl = `${ENVIRONMENT.apiUrlRender}/quotations`;
+  private apiUrl = `http://localhost:3002/quotations`;
 
   constructor(private http: HttpClient) {}
 

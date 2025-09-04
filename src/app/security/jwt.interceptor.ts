@@ -5,17 +5,17 @@ import { AuthService } from '../services/auth.service';
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
+  const userId = authService.getUserId(); // <-- nuevo método en el servicio
 
-  // Si hay un token, clona la petición y añade la cabecera de autorización
   if (token) {
     const clonedReq = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'x-user-id': userId ?? ''   // por convención, cabeceras personalizadas con prefijo x-
       }
     });
     return next(clonedReq);
   }
 
-  // Si no hay token, deja pasar la petición original sin modificarla
   return next(req);
 };

@@ -95,6 +95,7 @@ throw new Error('Method not implemented.');
   handleSave(event: any): void {
     // Lógica para manejar el guardado, por ejemplo, cerrar el modal
     console.log('Cotización guardada:', event);
+    alert('Cotización guardada exitosamente. Hemos enviado un correo de confirmación.');
     this.closeModal();
   }
 

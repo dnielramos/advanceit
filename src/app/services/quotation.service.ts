@@ -10,6 +10,9 @@ import {
   QuotationStatus,
 } from '../models/quotation.types'; // Asegúrate de que este path sea correcto
 import { ENVIRONMENT } from '../../enviroments/enviroment';
+import { PopulatedQuotation } from '../models/quotation-populated';
+
+
 
 /**
  * Servicio para la gestión de cotizaciones, interactuando con el backend.
@@ -18,7 +21,7 @@ import { ENVIRONMENT } from '../../enviroments/enviroment';
   providedIn: 'root',
 })
 export class QuotationService {
-  private apiUrl = `http://localhost:3002/quotations`;
+  private apiUrl = `${ENVIRONMENT.apiUrlRender}/quotations`;
 
   constructor(private http: HttpClient) {}
 
@@ -70,6 +73,17 @@ export class QuotationService {
       .get<Quotation[]>(this.apiUrl)
       .pipe(catchError(this.handleError));
   }
+
+  /**
+   * Obtiene todas las cotizaciones "pobladas" (con datos de usuario y compañía).
+   * @returns Un Observable con una lista de cotizaciones pobladas.
+   */
+  findAllPopulated(): Observable<PopulatedQuotation[]> {
+    return this.http
+      .get<PopulatedQuotation[]>(`${this.apiUrl}`)
+      .pipe(catchError(this.handleError));
+  }
+
 
   /**
    * Obtiene una cotización específica por su ID, incluyendo sus detalles.

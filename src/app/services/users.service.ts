@@ -33,7 +33,7 @@ export interface UpdatePasswordDto {
   providedIn: 'root'
 })
 export class UsersService {
-  private apiUrl = `http://localhost:3002/users`;
+  private apiUrl = `${ENVIRONMENT.apiUrlRender}/users`;
 
   constructor(private http: HttpClient) { }
 

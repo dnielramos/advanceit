@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { QuotationCreateComponent } from '../quotation-create/quotation-create.component';
 import { Validators } from '@angular/forms';
+import { PopulatedQuotation } from '../../../../models/quotation-populated';
 
 
 @Component({
@@ -23,7 +24,7 @@ throw new Error('Method not implemented.');
 openStatusModal(arg0: any) {
 throw new Error('Method not implemented.');
 }
-  quotations: Quotation[] = [];
+  quotations: PopulatedQuotation[] = [];
   isLoading = true;
   isModalOpen = false;
   currentModal: 'create' | 'edit' | 'details' | 'status' | null = null;
@@ -52,7 +53,7 @@ throw new Error('Method not implemented.');
 
   fetchQuotations(): void {
     this.isLoading = true;
-    this.quotationService.findAll().subscribe({
+    this.quotationService.findAllPopulated().subscribe({
       next: (data) => {
         this.quotations = data;
         this.isLoading = false;

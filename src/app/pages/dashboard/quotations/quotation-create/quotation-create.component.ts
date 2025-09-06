@@ -47,6 +47,13 @@ export class QuotationCreateComponent implements OnInit {
   userId: string | null = null;
   isProductModalVisible = false; // Estado del modal
 
+  hoy: string = new Date().toISOString().split('T')[0];
+  expiration_date: string = new Date().toISOString().split('T')[0];
+
+  user: any = '';
+  company: any = '';
+  totalQuotation: number = 0;
+
   constructor(
     private fb: FormBuilder,
     private quotationService: QuotationService,
@@ -65,6 +72,7 @@ export class QuotationCreateComponent implements OnInit {
       term: ['30 días', Validators.required],
       creation_mode: ['web'],
       created_by: [this.userId],
+      expiration_date: [this.expiration_date],
       details: this.fb.array([], [Validators.required, Validators.min(1)]),
     });
   }
@@ -124,7 +132,27 @@ export class QuotationCreateComponent implements OnInit {
 
   nextStep(): void {
     if (this.isStepValid(this.currentStep)) {
+      if (!this.users$ || !this.companies$) {
+        return;
+      }
+
+      this.quotationForm.get('expiration_date')?.setValue(
+        new Date().toISOString().split('T')[0] + ' ' + this.quotationForm.get('validity_days')?.value + 'd'
+      );
+
+      this.users$.subscribe((user) => {
+        this.user = user.find((user) => user.id === this.quotationForm.get('user_id')?.value);
+      });
+
+      this.companies$.subscribe((company) => {
+        this.company = company.find((company) => company.id === this.quotationForm.get('company_id')?.value);
+      });
+
       this.currentStep++;
+
+      if(this.currentStep === 3){
+        this.totalQuotation = this.details.value.reduce((total: number, detail: any) => total + detail.quantity * detail.unit_price, 0);
+      }
     } else {
       // Marcar los campos del paso actual como "tocados" para mostrar errores
       if (this.currentStep === 1) {
@@ -224,50 +252,4 @@ export class QuotationCreateComponent implements OnInit {
     });
   }
 
-  // onSubmit(): void {
-  //   if (this.currentStep !== 3 || this.quotationForm.invalid) {
-  //     console.error('Formulario no válido para el envío.');
-  //     this.markFormGroupTouched(this.quotationForm);
-  //     return;
-  //   }
-
-  //   this.isLoading = true;
-  //   const formValue = this.quotationForm.getRawValue();
-
-  //   // Calcular subtotales y total antes de enviar
-  //   const detailsWithSubtotal: CreateQuotationDetailDto[] =
-  //     formValue.details.map((detail: any) => {
-  //       const subtotal = detail.quantity * detail.unit_price - detail.discount;
-  //       return { ...detail, subtotal, taxes: 0 }; // Asegúrate de incluir el campo taxes
-  //     });
-
-  //   const total = detailsWithSubtotal.reduce(
-  //     (sum, item) => sum + item.subtotal,
-  //     0
-  //   );
-
-  //   const payload: CreateFullQuotationDto = {
-  //     quotation: {
-  //       company_id: formValue.company_id,
-  //       user_id: formValue.user_id,
-  //       validity_days: formValue.validity_days,
-  //       term: formValue.term,
-  //       creation_mode: formValue.creation_mode,
-  //       created_by: formValue.created_by,
-  //     },
-  //     details: detailsWithSubtotal,
-  //   };
-
-  //   this.quotationService.create(payload).subscribe({
-  //     next: (response) => {
-  //       console.log('Cotización creada exitosamente:', response);
-  //       this.isLoading = false;
-  //       this.onQuotationCreated.emit();
-  //     },
-  //     error: (error) => {
-  //       this.isLoading = false;
-  //       console.error('Error al crear la cotización:', error);
-  //     },
-  //   });
-  // }
 }

@@ -6,7 +6,7 @@
         class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
         1
       </div>
-      <span class="text-sm mt-2">Usuario e Empresa</span>
+      <span class="text-sm mt-2">Usuarios</span>
     </div>
     <div class="flex-1 border-t-2 transition-colors duration-300"
       [ngClass]="{'border-purple-600': currentStep >= 2, 'border-gray-300': currentStep < 2}"></div>
@@ -24,7 +24,7 @@
         class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
         3
       </div>
-      <span class="text-sm mt-2">Confirmar</span>
+      <span class="text-sm mt-2">Confirma</span>
     </div>
   </div>
 
@@ -35,7 +35,8 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label for="company_id" class="block text-sm font-medium text-gray-700">ID de Empresa</label>
-          <select id="company_id" formControlName="company_id" class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+          <select id="company_id" formControlName="company_id"
+            class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
             <option [ngValue]="''" disabled>-- Selecciona una empresa --</option>
             <option *ngFor="let company of companies$ | async" [ngValue]="company.id">
               {{ company.razon_social }}
@@ -47,7 +48,8 @@
         </div>
         <div>
           <label for="user_id" class="block text-sm font-medium text-gray-700">ID de Usuario</label>
-          <select id="user_id" formControlName="user_id" class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+          <select id="user_id" formControlName="user_id"
+            class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
             <option [ngValue]="''" disabled>-- Selecciona un usuario --</option>
             <option *ngFor="let user of users$ | async" [ngValue]="user.id">
               {{ user.name }} ({{ user.email }})
@@ -134,15 +136,30 @@
     <div *ngIf="currentStep === 3" class="animate__animated animate__fadeInRight">
       <h3 class="text-xl font-semibold text-gray-800 mb-4">Revisar y Confirmar</h3>
       <div class="space-y-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
-        <h4 class="font-bold text-gray-700">Datos de la Cotización:</h4>
+
+        <div class="flex items-center justify-center mb-2">
+          <img src="logo.png" alt="logo-advance" class="w-34 h-14 object-contain">
+        </div>
+        <div class="flex flex-col items-center mb-4">
+          <p class="text-gray-700">Advance Technology Projects</p>
+          <p class="text-gray-700">NIT - 900562155</p>
+          <p class="text-gray-700">www.advanceit.co</p>
+        </div>
+        <div class="flex justify-between items-center mb-4">
+          <p class="text-gray-700">Hoy es {{ hoy }}</p>
+        </div>
+        <h4 class=" font-bold text-gray-700">Los datos de la Cotización:</h4>
         <ul class="text-gray-600 space-y-1">
-          <li><strong>Empresa ID:</strong> {{ quotationForm.value.company_id }}</li>
-          <li><strong>Usuario ID:</strong> {{ quotationForm.value.user_id }}</li>
+          <li><strong>Razon Social:</strong> {{ company?.razon_social }}</li>
+          <li><strong>Usuario:</strong> {{ user?.name }}</li>
           <li><strong>Días de Validez:</strong> {{ quotationForm.value.validity_days }}</li>
+          <li><strong>Fecha de vencimiento:</strong> {{ quotationForm.value.expiration_date }}</li>
           <li><strong>Término:</strong> {{ quotationForm.value.term }}</li>
+          <li><strong>Tipo de pago:</strong> {{ quotationForm.value.company_id ? 'Cupo credito' :
+            'Contado/Transferencia' }}</li>
         </ul>
 
-        <h4 class="font-bold text-gray-700 mt-4">Productos:</h4>
+        <h4 class="font-bold text-gray-700 mt-4">Los productos de la cotización:</h4>
         <div class="overflow-x-auto">
           <table class="min-w-full text-sm text-left text-gray-500">
             <thead class="text-xs text-gray-700 uppercase bg-gray-100">
@@ -160,6 +177,7 @@
               </tr>
             </tbody>
           </table>
+          <p class="text-purple-600 font-bold text-lg m-4">Total: ${{ totalQuotation | number:'1.2-2' }}</p>
         </div>
       </div>
     </div>
@@ -189,8 +207,6 @@
     </button>
   </div>
 </div>
-<app-quotation-products
-  [isVisible]="isProductModalVisible"
-  (productSelected)="onProductSelected($event)"
+<app-quotation-products [isVisible]="isProductModalVisible" (productSelected)="onProductSelected($event)"
   (closeModal)="onModalClose()">
 </app-quotation-products>

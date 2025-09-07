@@ -27,6 +27,7 @@ import { CompaniesService } from '../../../../services/companies.service';
 import { UsersService } from '../../../../services/users.service';
 import { QuotationProductsComponent } from "../quotation-product.component";
 import { AuthService } from '../../../../services/auth.service';
+import { CreationMode } from '../../../../models/creation-mode';
 
 library.add(faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight);
 
@@ -69,8 +70,8 @@ export class QuotationCreateComponent implements OnInit {
       company_id: ['', Validators.required],
       user_id: ['', Validators.required],
       validity_days: [15, [Validators.required, Validators.min(1), Validators.max(30)]],
-      term: ['30 días', Validators.required],
-      creation_mode: ['web'],
+      term: ['30', Validators.required],
+      creation_mode: [CreationMode.Panel, Validators.required],
       created_by: [this.userId],
       expiration_date: [this.expiration_date],
       details: this.fb.array([], [Validators.required, Validators.min(1)]),
@@ -93,23 +94,57 @@ export class QuotationCreateComponent implements OnInit {
 
   // Método para manejar el producto seleccionado
   onProductSelected(product: any): void {
-    console.log('Producto agregado:', product);
-    const detailGroup = this.fb.group({
-      product_id: [product.id, Validators.required],
-      product_name: [product.nombre], // Opcional, para mostrar en la UI
-      quantity: [1, [Validators.required, Validators.min(1)]],
-      unit_price: [
-        product.precio,
-        [Validators.required, Validators.min(0)],
-      ],
-      discount: [0],
-      taxes: [0],
-    });
-    this.details.push(detailGroup);
+    // Busca si el producto ya existe en los controles del FormArray
+    const existingDetailIndex = this.details.controls.findIndex(
+      (control) => control.get('product_id')?.value === product.id
+    );
+  
+    if (existingDetailIndex !== -1) {
+      // ---- ESTA ES LA PARTE CORREGIDA ----
+  
+      // 1. Obtiene el FormGroup específico en ese índice.
+      const detailGroup = this.details.at(existingDetailIndex) as FormGroup;
+  
+      // 2. Obtiene la cantidad actual de ese FormGroup.
+      const currentQuantity = detailGroup.get('quantity')?.value;
+  
+      // 3. Usa patchValue para actualizar la cantidad. Esto actualiza el modelo y la vista.
+      detailGroup.patchValue({
+        quantity: currentQuantity + 1,
+      });
+  
+      alert(`Se actualizó la cantidad para el producto ${product.nombre}`);
+  
+    } else {
+      // Si el producto no existe, se agrega uno nuevo (esta parte ya estaba bien).
+      const detailGroup = this.fb.group({
+        product_id: [product.id, Validators.required],
+        product_name: [product.nombre], // Opcional, para mostrar en la UI
+        quantity: [1, [Validators.required, Validators.min(1)]],
+        unit_price: [product.precio, [Validators.required, Validators.min(0)]],
+        discount: [0],
+        taxes: [0],
+      });
+      this.details.push(detailGroup);
+      alert(`${product.nombre} agregado exitosamente`);
+    }
+    
+    // Opcional: Llama a un método para recalcular totales cada vez que se modifica.
+    this.calculateTotal(); 
   }
-
+  
+  // Método auxiliar para calcular el total (opcional pero recomendado)
+  calculateTotal(): void {
+    this.totalQuotation = this.details.value.reduce(
+      (total: number, detail: any) => total + detail.quantity * detail.unit_price, 
+      0
+    );
+  }
+  
+  // Asegúrate de llamar calculateTotal() también en removeDetail()
   removeDetail(index: number): void {
     this.details.removeAt(index);
+    this.calculateTotal(); // <-- Añadir aquí
   }
 
   get details(): FormArray {

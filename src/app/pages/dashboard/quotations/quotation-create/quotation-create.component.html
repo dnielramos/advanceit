@@ -1,4 +1,4 @@
-<div class="flex flex-col space-y-6 animate__animated animate__fadeIn">
+<div class="flex flex-col space-y-6 animate__animated animate__fadeIn animate__fast hflexy">
 
   <div class="flex items-center justify-between text-gray-500 mb-6">
     <div class="flex-1 flex flex-col items-center">
@@ -61,16 +61,27 @@
         </div>
         <div>
           <label for="validity_days" class="block text-sm font-medium text-gray-700">Días de Validez</label>
-          <input type="number" id="validity_days" formControlName="validity_days"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+          <select id="validity_days" formControlName="validity_days"
+            class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+            <option [ngValue]="''" disabled>-- Cuando expira la cotización? --</option>
+            <option [ngValue]="15">15 días</option>
+            <option [ngValue]="30">30 días</option>
+          </select>
           <div
             *ngIf="quotationForm.get('validity_days')?.invalid && (quotationForm.get('validity_days')?.dirty || quotationForm.get('validity_days')?.touched)"
-            class="text-red-500 text-sm mt-1">Campo requerido.</div>
+            class="text-red-500 text-sm mt-1">Necesitas elegir cuantos dias.</div>
         </div>
         <div>
           <label for="term" class="block text-sm font-medium text-gray-700">Término</label>
-          <input type="text" id="term" formControlName="term"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+          <select id="user_id" formControlName="term"
+            class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+            <option [ngValue]="''" disabled>-- Cuanto plazo para el pago? --</option>
+            <option [ngValue]="'30'">30 días</option>
+            <option [ngValue]="'60'">60 días</option>
+          </select>
+          <div
+            *ngIf="quotationForm.get('term')?.invalid && (quotationForm.get('term')?.dirty || quotationForm.get('term')?.touched)"
+            class="text-red-500 text-sm mt-1">Necesitas elegir cuanto plazo para el pago.</div>
           <div
             *ngIf="quotationForm.get('term')?.invalid && (quotationForm.get('term')?.dirty || quotationForm.get('term')?.touched)"
             class="text-red-500 text-sm mt-1">Campo requerido.</div>
@@ -122,7 +133,7 @@
               class="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded-full transition-colors duration-200"
               title="Eliminar ítem">
               <fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>
-              borarr
+              Quitar
             </button>
           </div>
         </div>

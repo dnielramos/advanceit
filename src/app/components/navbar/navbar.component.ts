@@ -2,7 +2,7 @@ import { NgClass, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faShoppingCart, faLanguage } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faLanguage, faSignOut } from '@fortawesome/free-solid-svg-icons';
 import { MobileMenuComponent } from './mobile-menu/mobile-menu.component';
 import { TitleMegaMenuComponent } from '../../utils/title-mega-menu/title-mega-menu.component';
 import { TrmComponent } from './trm/trm.component';
@@ -14,6 +14,8 @@ import { BuscadorPrincipalComponent } from '../products/buscador-principal/busca
 import { BuscadorNavbarComponent } from './buscador-navbar/buscador-navbar.component';
 import { CategoryMenuComponent } from '../../pages/productos/categories/category.component';
 import { BrandMenuComponent } from '../../pages/productos/brands/brand-menu.component';
+import { AuthService } from '../../services/auth.service';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'app-navbar',
@@ -42,12 +44,23 @@ export class NavbarComponent {
   idiom = 'English';
   menuCategories: boolean = false;
   menuBrands: boolean = false;
+  islogged: boolean = false;
+faSignOut: IconProp = faSignOut;
 
   constructor(
     private translate: TranslateService,
     private contextService: ContextService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
+
+    this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
+      if (!isLoggedIn) {
+        this.islogged = false;
+      } else {
+        this.islogged = true;
+      }
+    });
     this.translate.addLangs(['es', 'en']);
     this.translate.setDefaultLang('es');
     this.translate.use('es');
@@ -76,6 +89,14 @@ export class NavbarComponent {
     this.contextService.nav$.subscribe((value) => {
       this.showNav = value;
     });
+  }
+
+
+  onSignOut(): void {
+    if (confirm('¿Está seguro de cerrar sesión?')) {
+      this.authService.logout();
+      this.router.navigate(['/']);
+    }
   }
 
   cambiarIdioma() {

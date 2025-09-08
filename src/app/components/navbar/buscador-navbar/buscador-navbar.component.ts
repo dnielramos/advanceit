@@ -25,6 +25,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faBars,
+  faSignOut,
 } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterLink } from '@angular/router';
 import { ProductoFinal } from '../../../models/Productos';
@@ -35,6 +36,7 @@ import { PRODUCTOS_DEFAULT } from '../../../constants/default-products';
 import { ProductsService } from '../../../services/product.service';
 import { AuthService, Role } from '../../../services/auth.service';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'app-buscador-navbar',
@@ -104,6 +106,7 @@ export class BuscadorNavbarComponent implements OnInit {
 
   // Lista de productos que se muestra en la UI y se filtra
   productos: ProductoFinal[] = [];
+faSignOut: IconProp = faSignOut;
 
   constructor(
     private brandService: BrandImageService,
@@ -114,6 +117,13 @@ export class BuscadorNavbarComponent implements OnInit {
 
   inputFocused = false;
   hoveringSuggestions = false;
+
+  onSignOut(): void {
+    if (confirm('¿Está seguro de cerrar sesión?')) {
+      this.authService.logout();
+      this.router.navigate(['/']);
+    }
+  }
 
    // Importante: Referencia al CdkVirtualScrollViewport
   @ViewChild(CdkVirtualScrollViewport, { static: false })
@@ -178,7 +188,9 @@ export class BuscadorNavbarComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.islogged = this.authService.hasRole(Role.User);
+    this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
+      this.islogged = isLoggedIn;
+    });
 
     setInterval(() => {
       this.setRandomWelcomeMessage();

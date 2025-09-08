@@ -48,10 +48,15 @@
       class="hidden md:block border border-purple-700 text-purple-700 hover:bg-purple-50 py-2 px-4 rounded-md transition-colors">
       {{'navBar.buttonContact' | translate}}
     </a>
+
     <div class="items-center md:flex">
-      <a routerLink="/in" class="flex font-bold items-center space-x-2 text-gray-700 hover:text-purple-700">
+      <a *ngIf="!islogged" routerLink="/in" class="flex font-bold items-center space-x-2 text-gray-700 hover:text-purple-700">
         <span class="hidden md:inline">Login</span>
-      </a>
+      </a>  
+      <button *ngIf="islogged" (click)="onSignOut()" class="text-slate-800 bg-purple-50 rounded-full text-sm hover:text-purple-500 hover:cursor-pointer p-2">
+        <fa-icon [icon]="faSignOut"></fa-icon>
+        Cerrar Sesión
+      </button>
     </div>
     <!-- <button class="text-gray-700 hover:text-purple-700 p-2">
     <fa-icon [icon]="faGlobe" size="lg"></fa-icon>

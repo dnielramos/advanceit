@@ -67,23 +67,23 @@
   <!-- Navigation all categories and marks and more -->
   <div class="px-2 flex gap-1 justify-between items-center">
     <div class="flex items-center gap-4">
-      <div class="flex items-center gap-1 text-slate-800 hover:text-purple-500">
+      <!-- <div class="flex items-center gap-1 text-slate-800 hover:text-purple-500">
         <fa-icon [icon]="faBars" class="text-sm hover:cursor-pointer" (click)="onMenucategories()"></fa-icon>
         <h1 (click)="onMenucategories()" class="text-sm hover:text-purple-500 hover:cursor-pointer">
           Categorias
         </h1>
-      </div>
-      <div class="flex items-center gap-1 text-slate-800 hover:text-purple-500">
-        <fa-icon [icon]="faLayerGroup" class="text-sm hover:cursor-pointer" (click)="onMenuBrands()"></fa-icon>
-        <h1 (click)="onMenuBrands()" class="text-sm hover:text-purple-500 hover:cursor-pointer">
-          Marcas
+      </div> -->
+      <div class="flex items-center gap-1  bg-purple-50 rounded-full p-2 text-slate-800 hover:text-purple-500">
+        <fa-icon [icon]="faFilter" class="text-sm hover:cursor-pointer" (click)="onMenuBrands()"></fa-icon>
+        <h1 (click)="onMenuBrands()" class="text-sm text-[12px] hover:text-purple-500 hover:cursor-pointer">
+          Ver Filtros
         </h1>
       </div>
       <button *ngIf="islogged"
-        class="text-slate-800 bg-purple-50 rounded-full text-sm hover:text-purple-500 hover:cursor-pointer p-2"
+        class="text-purple-700 text-[12px] bg-purple-50 rounded-full text-sm hover:text-purple-500 hover:cursor-pointer p-2"
         (click)="onShowOrders()">
-        <fa-icon [icon]="faShop"></fa-icon>
-        Ver Ordenes
+        <fa-icon [icon]="faDashboard"></fa-icon>
+        Dashboard
       </button>
     </div>
 

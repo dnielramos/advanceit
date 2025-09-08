@@ -26,6 +26,8 @@ import {
   faChevronRight,
   faBars,
   faSignOut,
+  faFilter,
+  faDashboard,
 } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterLink } from '@angular/router';
 import { ProductoFinal } from '../../../models/Productos';
@@ -107,6 +109,8 @@ export class BuscadorNavbarComponent implements OnInit {
   // Lista de productos que se muestra en la UI y se filtra
   productos: ProductoFinal[] = [];
 faSignOut: IconProp = faSignOut;
+faFilter: IconProp = faFilter;
+faDashboard: IconProp = faDashboard;
 
   constructor(
     private brandService: BrandImageService,

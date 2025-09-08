@@ -19,11 +19,13 @@ import { AuthService, Role } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { GridProductsStoreComponent } from "../../../components/products/products-store/grid-products-store.component";
 import { AngularToastifyModule, ToastService } from "angular-toastify";
+import { ProductAdvanceComponent } from "../../../components/products/product-advance/product-advance.component";
+import { b, d } from "../../../../../node_modules/@angular/cdk/scrolling-module.d-ud2XrbF8";
 
 @Component({
   selector: 'app-advance-product',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, GridProductsStoreComponent, AngularToastifyModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, GridProductsStoreComponent, AngularToastifyModule, ProductAdvanceComponent, ],
   templateUrl: './advance-products.component.html',
   styles: `
     .loader {

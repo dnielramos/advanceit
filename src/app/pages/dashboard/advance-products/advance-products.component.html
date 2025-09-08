@@ -85,86 +85,14 @@
 
   <div class="container mx-auto max-w-7xl">
     <div *ngIf="filteredProducts().length > 0 && searchTerm.length > 0; else noProducts"
-      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <div *ngFor="let item of filteredProducts(); trackby: trackBySku" @fadeIn
-        class="flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-shadow duration-300 hover:shadow-xl">
-        <div class="group relative h-64 overflow-hidden bg-gray-100">
-          <img [src]="getActiveImage(item)" [alt]="getProductTitle(item)"
-            class="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105" />
+      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
 
-          <div *ngIf="hasMultipleImages(item)" class="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 space-x-2">
-          </div>
+      <app-product-advance *ngFor="let p of filteredProducts(); tracky: trackBySku" @fadeIn @fadeOut
+        [producto]="p" (agregarAlCarrito)="addToCart($event)"></app-product-advance>
 
-          <div *ngIf="item.descuentos"
-            class="absolute left-3 top-3 rounded bg-purple-500 px-2 py-1 text-xs font-bold text-white">
-            OFERTA
-          </div>
-        </div>
-
-        <div class="flex flex-grow flex-col p-5">
-          <div class="mb-2">
-            <span class="text-xs font-medium text-purple-800">
-              {{ item.marca }}
-            </span>
-            <h3 class="line-clamp-2 cursor-pointer text-lg font-semibold text-gray-800 hover:text-purple-700"
-              title="{{ getProductTitle(item) }}">
-              {{ getProductTitle(item) }}
-            </h3>
-          </div>
-
-          <p class="line-clamp-2 mb-4 text-sm text-gray-600">
-            {{ getProductDescription(item) }}
-          </p>
-
-          <div class="mb-4 flex flex-wrap gap-1">
-            <span *ngFor="let tag of getProductTags(item).slice(0, 3)"
-              class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
-              #{{ tag }}
-            </span>
-          </div>
-
-          <div class="mt-auto">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-2xl font-bold text-gray-900">
-                  {{
-                  item.precio
-                  ? (item.precio | currency : "USD" : "symbol" : "1.0-0")
-                  : "Consultar"
-                  }}
-                </p>
-                <p *ngIf="(item.precio ?? 0) < +item.precioRetail" class="text-sm text-gray-500 line-through">
-                  {{ item.precioRetail | currency : "USD" : "symbol" : "1.0-0" }}
-                </p>
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <div class="mb-2 flex items-center text-sm"
-                [ngClass]="item.disponibilidad ? 'text-green-700' : 'text-red-700'">
-                <div class="mr-2 h-2 w-2 rounded-full" [ngClass]="item.disponibilidad ? 'bg-green-500' : 'bg-red-500'">
-                </div>
-                <span *ngIf="item.disponibilidad">
-                  Disponible ({{ item.cantidad }} en stock)
-                </span>
-                <span *ngIf="!item.disponibilidad"> Agotado </span>
-              </div>
-
-              <button (click)="addToCart(item)" [disabled]="!item.disponibilidad"
-                class="flex w-full items-center justify-center rounded-lg px-4 py-2 font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
-                [ngClass]="
-                  item.disponibilidad
-                    ? 'bg-purple-600 hover:bg-purple-700'
-                    : 'bg-gray-400'
-                ">
-                <fa-icon [icon]="faShoppingCart" class="mr-2"></fa-icon>
-                <span>Agregar al Carrito</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
+
+
 
     <ng-template #noProducts>
       <app-grid-products-store (añadirAlCarrito)="addToCart($event)"></app-grid-products-store>

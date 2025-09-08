@@ -6,8 +6,7 @@
   <!-- Marca (logo) con posicionamiento absoluto y máscara blanca -->
   <div class="absolute top-2 right-2 z-10">
     <div class="bg-white rounded-2xl p-2 inline-flex items-center justify-center">
-      <img [src]="producto.marca | logo" [alt]="'Marca: ' + producto.marca"
-        class="h-12 w-auto object-contain" />
+      <img [src]="producto.marca | logo" [alt]="'Marca: ' + producto.marca" class="h-12 w-auto object-contain" />
     </div>
   </div>
 
@@ -41,17 +40,32 @@
 
     <!-- Precio y botón de compra -->
     <div class="flex justify-between items-center mt-auto">
-      <span *ngIf="logged" class="text-purple-700 font-bold text-lg">
-        $ {{ producto.precio | number : '1.2-2' }}
-      </span>
-      <span *ngIf="!logged" class="text-purple-700 font-bold text-lg">
-        <!-- $ {{ producto.precio | number : '1.2-2' }} -->
-      </span>
+
+
+      <div *ngIf="logged" class="flex flex-col w-[90%] align-center justify-center items-center">
+
+        <span class="text-purple-700 font-bold text-lg">
+          $ {{ producto.precio | number : '1.2' }}
+        </span>
+
+        <div class="mb-2 flex items-center justify-start w-[90%] text-[10px]"
+        [ngClass]="producto.disponibilidad ? 'text-green-700' : 'text-red-700'">
+        <div class="mr-2 h-2 w-2 rounded-full" [ngClass]="producto.disponibilidad ? 'bg-green-500' : 'bg-red-500'">
+        </div>
+        <span *ngIf="producto.disponibilidad">
+          {{ producto.cantidad }} en stock
+        </span>
+        <span *ngIf="!producto.disponibilidad"> Agotado </span>
+      </div>
+
+      </div>
 
       <button
-        class="bg-gradient-to-r bg-purple-500 hover:bg-purple-800 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105 hover:-rotate-5"
-        (click)="addToCart(producto)">
-        Comprar
+        class="bg-gradient-to-r w-45 gap-2 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105 hover:-rotate-5"
+        (click)="addToCart(producto)"
+        [disabled]="!producto.disponibilidad"
+        [ngClass]="producto.disponibilidad ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400 cursor-not-allowed'">
+        <span class="text-sm">Añadir</span>
         <fa-icon [icon]="faShoppingCart"></fa-icon>
       </button>
     </div>

@@ -15,10 +15,11 @@ import { RouterLink } from '@angular/router';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { AuthService, Role } from '../../../services/auth.service';
 import { LogoPipe } from '../../../pipes/logo.pipe';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-product-advance',
-  imports: [CommonModule, FontAwesomeModule, SanitizeImageUrlPipe, LogoPipe],
+  imports: [CommonModule, FontAwesomeModule, SanitizeImageUrlPipe, LogoPipe, FormsModule],
   templateUrl: './product-advance.component.html',
 })
 export class ProductAdvanceComponent {
@@ -37,7 +38,9 @@ export class ProductAdvanceComponent {
   faCodeBranch = faCodeBranch;
 
   constructor(private authService: AuthService) {
-    this.logged = this.authService.hasRole(Role.User);
+    this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
+      this.logged = isLoggedIn;
+    });
   }
 
   addToCart(producto: ProductoFinal) {

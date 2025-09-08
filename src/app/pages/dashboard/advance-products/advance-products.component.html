@@ -2,22 +2,13 @@
   <div class="sticky top-0 z-20 bg-white/80 backdrop-blur-sm shadow-md">
     <div class="container mx-auto max-w-7xl px-4 py-4">
       <div class="relative mb-4">
-        <input
-          type="text"
-          [(ngModel)]="searchTerm"
-          (input)="filterProducts()"
+        <input type="text" [(ngModel)]="searchTerm" (input)="filterProducts()"
           placeholder="Busca por nombre, marca, SKU..."
-          class="w-full rounded-full border border-gray-300 px-6 py-4 pl-12 text-lg shadow-sm outline-none transition-shadow focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
-        />
-        <fa-icon
-          [icon]="faSearch"
-          class="absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-400"
-        ></fa-icon>
+          class="w-full rounded-full border border-gray-300 px-6 py-4 pl-12 text-lg shadow-sm outline-none transition-shadow focus:border-purple-500 focus:ring-2 focus:ring-purple-200" />
+        <fa-icon [icon]="faSearch" class="absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-400"></fa-icon>
       </div>
 
-      <div
-        class="flex flex-col flex-wrap items-center justify-between gap-4 md:flex-row"
-      >
+      <div class="flex flex-col flex-wrap items-center justify-between gap-4 md:flex-row">
         <div class="font-semibold text-gray-600">
           <span class="text-purple-600">{{ filteredProducts().length }}</span>
           producto(s) encontrado(s)
@@ -25,46 +16,27 @@
 
         <div class="flex flex-wrap justify-center gap-3">
           <div class="relative inline-block">
-            <button
-              (click)="toggleCategoryFilter()"
-              class="flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 shadow-sm transition-all hover:bg-gray-50"
-            >
+            <button (click)="toggleCategoryFilter()"
+              class="flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 shadow-sm transition-all hover:bg-gray-50">
               <fa-icon [icon]="faFilter" class="mr-2 text-purple-500"></fa-icon>
               <span>Categorías</span>
-              <span
-                *ngIf="selectedCategories.length > 0"
-                class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white"
-                >{{ selectedCategories.length }}</span
-              >
+              <span *ngIf="selectedCategories.length > 0"
+                class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white">{{
+                selectedCategories.length }}</span>
             </button>
-            <div
-              *ngIf="showCategoryFilter()"
-              @fadeIn
-              class="absolute right-0 z-10 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-xl"
-            >
+            <div *ngIf="showCategoryFilter()" @fadeIn
+              class="absolute right-0 z-10 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-xl">
               <div class="max-h-60 overflow-y-auto p-3">
                 <div *ngFor="let cat of uniqueCategories()">
-                  <label
-                    class="flex cursor-pointer items-center rounded p-2 hover:bg-purple-50"
-                  >
-                    <input
-                      type="checkbox"
-                      [checked]="selectedCategories.includes(cat)"
-                      (change)="toggleCategory(cat)"
-                      class="h-4 w-4 accent-purple-500"
-                    />
+                  <label class="flex cursor-pointer items-center rounded p-2 hover:bg-purple-50">
+                    <input type="checkbox" [checked]="selectedCategories.includes(cat)" (change)="toggleCategory(cat)"
+                      class="h-4 w-4 accent-purple-500" />
                     <span class="ml-3 text-gray-700">{{ cat }}</span>
                   </label>
                 </div>
               </div>
-              <div
-                *ngIf="selectedCategories.length > 0"
-                class="flex justify-end border-t border-gray-200 p-2"
-              >
-                <button
-                  (click)="clearCategoryFilters()"
-                  class="text-sm text-purple-600 hover:underline"
-                >
+              <div *ngIf="selectedCategories.length > 0" class="flex justify-end border-t border-gray-200 p-2">
+                <button (click)="clearCategoryFilters()" class="text-sm text-purple-600 hover:underline">
                   Limpiar filtros
                 </button>
               </div>
@@ -72,58 +44,36 @@
           </div>
 
           <div class="relative inline-block">
-            <button
-              (click)="toggleBrandFilter()"
-              class="flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 shadow-sm transition-all hover:bg-gray-50"
-            >
+            <button (click)="toggleBrandFilter()"
+              class="flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 shadow-sm transition-all hover:bg-gray-50">
               <fa-icon [icon]="faStore" class="mr-2 text-purple-500"></fa-icon>
               <span>Marcas</span>
-              <span
-                *ngIf="selectedBrands.length > 0"
-                class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white"
-                >{{ selectedBrands.length }}</span
-              >
+              <span *ngIf="selectedBrands.length > 0"
+                class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white">{{
+                selectedBrands.length }}</span>
             </button>
-            <div
-              *ngIf="showBrandFilter()"
-              @fadeIn
-              class="absolute right-0 z-10 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-xl"
-            >
+            <div *ngIf="showBrandFilter()" @fadeIn
+              class="absolute right-0 z-10 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-xl">
               <div class="max-h-60 overflow-y-auto p-3">
                 <div *ngFor="let brand of uniqueBrands()">
-                  <label
-                    class="flex cursor-pointer items-center rounded p-2 hover:bg-purple-50"
-                  >
-                    <input
-                      type="checkbox"
-                      [checked]="selectedBrands.includes(brand)"
-                      (change)="toggleBrand(brand)"
-                      class="h-4 w-4 accent-purple-500"
-                    />
+                  <label class="flex cursor-pointer items-center rounded p-2 hover:bg-purple-50">
+                    <input type="checkbox" [checked]="selectedBrands.includes(brand)" (change)="toggleBrand(brand)"
+                      class="h-4 w-4 accent-purple-500" />
                     <span class="ml-3 text-gray-700">{{ brand }}</span>
                   </label>
                 </div>
               </div>
-              <div
-                *ngIf="selectedBrands.length > 0"
-                class="flex justify-end border-t border-gray-200 p-2"
-              >
-                <button
-                  (click)="clearBrandFilters()"
-                  class="text-sm text-purple-600 hover:underline"
-                >
+              <div *ngIf="selectedBrands.length > 0" class="flex justify-end border-t border-gray-200 p-2">
+                <button (click)="clearBrandFilters()" class="text-sm text-purple-600 hover:underline">
                   Limpiar filtros
                 </button>
               </div>
             </div>
           </div>
 
-          <button
-            *ngIf="searchTerm || selectedCategories.length > 0 || selectedBrands.length > 0"
-            @fadeIn
+          <button *ngIf="searchTerm || selectedCategories.length > 0 || selectedBrands.length > 0" @fadeIn
             (click)="resetFilters()"
-            class="flex items-center rounded-lg bg-red-100 px-4 py-2 text-sm text-red-700 shadow-sm transition-all hover:bg-red-200"
-          >
+            class="flex items-center rounded-lg bg-red-100 px-4 py-2 text-sm text-red-700 shadow-sm transition-all hover:bg-red-200">
             Limpiar Todo
           </button>
         </div>
@@ -134,47 +84,30 @@
   <lib-toastify-toast-container></lib-toastify-toast-container>
 
   <div class="container mx-auto max-w-7xl">
-    <!-- <div
-      *ngIf="filteredProducts().length > 0; else noProducts"
-      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-    >
-      <div
-        *ngFor="let item of filteredProducts(); trackby: trackBySku"
-        @fadeIn
-        class="flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-shadow duration-300 hover:shadow-xl"
-      >
+    <div *ngIf="filteredProducts().length > 0 && searchTerm.length > 0; else noProducts"
+      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div *ngFor="let item of filteredProducts(); trackby: trackBySku" @fadeIn
+        class="flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-shadow duration-300 hover:shadow-xl">
         <div class="group relative h-64 overflow-hidden bg-gray-100">
-          <img
-            [src]="getActiveImage(item)"
-            [alt]="getProductTitle(item)"
-            class="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-          />
+          <img [src]="getActiveImage(item)" [alt]="getProductTitle(item)"
+            class="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105" />
 
-          <div
-            *ngIf="hasMultipleImages(item)"
-            class="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 space-x-2"
-          >
+          <div *ngIf="hasMultipleImages(item)" class="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 space-x-2">
           </div>
 
-          <div
-            *ngIf="item.descuentos"
-            class="absolute left-3 top-3 rounded bg-purple-500 px-2 py-1 text-xs font-bold text-white"
-          >
+          <div *ngIf="item.descuentos"
+            class="absolute left-3 top-3 rounded bg-purple-500 px-2 py-1 text-xs font-bold text-white">
             OFERTA
           </div>
         </div>
 
         <div class="flex flex-grow flex-col p-5">
           <div class="mb-2">
-            <span
-              class="text-xs font-medium text-purple-800"
-            >
+            <span class="text-xs font-medium text-purple-800">
               {{ item.marca }}
             </span>
-            <h3
-              class="line-clamp-2 cursor-pointer text-lg font-semibold text-gray-800 hover:text-purple-700"
-              title="{{ getProductTitle(item) }}"
-            >
+            <h3 class="line-clamp-2 cursor-pointer text-lg font-semibold text-gray-800 hover:text-purple-700"
+              title="{{ getProductTitle(item) }}">
               {{ getProductTitle(item) }}
             </h3>
           </div>
@@ -184,10 +117,8 @@
           </p>
 
           <div class="mb-4 flex flex-wrap gap-1">
-            <span
-              *ngFor="let tag of getProductTags(item).slice(0, 3)"
-              class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700"
-            >
+            <span *ngFor="let tag of getProductTags(item).slice(0, 3)"
+              class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
               #{{ tag }}
             </span>
           </div>
@@ -197,60 +128,49 @@
               <div>
                 <p class="text-2xl font-bold text-gray-900">
                   {{
-                    item.precio
-                      ? (item.precio | currency : "USD" : "symbol" : "1.0-0")
-                      : "Consultar"
+                  item.precio
+                  ? (item.precio | currency : "USD" : "symbol" : "1.0-0")
+                  : "Consultar"
                   }}
                 </p>
-                <p
-                  *ngIf="(item.precio ?? 0) < +item.precioRetail"
-                  class="text-sm text-gray-500 line-through"
-                >
+                <p *ngIf="(item.precio ?? 0) < +item.precioRetail" class="text-sm text-gray-500 line-through">
                   {{ item.precioRetail | currency : "USD" : "symbol" : "1.0-0" }}
                 </p>
               </div>
             </div>
 
             <div class="mt-4">
-              <div
-                class="mb-2 flex items-center text-sm"
-                [ngClass]="item.disponibilidad ? 'text-green-700' : 'text-red-700'"
-              >
-                <div
-                  class="mr-2 h-2 w-2 rounded-full"
-                  [ngClass]="item.disponibilidad ? 'bg-green-500' : 'bg-red-500'"
-                ></div>
+              <div class="mb-2 flex items-center text-sm"
+                [ngClass]="item.disponibilidad ? 'text-green-700' : 'text-red-700'">
+                <div class="mr-2 h-2 w-2 rounded-full" [ngClass]="item.disponibilidad ? 'bg-green-500' : 'bg-red-500'">
+                </div>
                 <span *ngIf="item.disponibilidad">
                   Disponible ({{ item.cantidad }} en stock)
                 </span>
                 <span *ngIf="!item.disponibilidad"> Agotado </span>
               </div>
 
-              <button
-                (click)="addToCart(item)"
-                [disabled]="!item.disponibilidad"
+              <button (click)="addToCart(item)" [disabled]="!item.disponibilidad"
                 class="flex w-full items-center justify-center rounded-lg px-4 py-2 font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
                 [ngClass]="
                   item.disponibilidad
                     ? 'bg-purple-600 hover:bg-purple-700'
                     : 'bg-gray-400'
-                "
-              >
-                <fa-icon
-                  [icon]="faShoppingCart"
-                  class="mr-2"
-                ></fa-icon>
+                ">
+                <fa-icon [icon]="faShoppingCart" class="mr-2"></fa-icon>
                 <span>Agregar al Carrito</span>
               </button>
             </div>
           </div>
         </div>
       </div>
-    </div> -->
-
-    <app-grid-products-store (añadirAlCarrito)="addToCart($event)"></app-grid-products-store>
+    </div>
 
     <ng-template #noProducts>
+      <app-grid-products-store (añadirAlCarrito)="addToCart($event)"></app-grid-products-store>
+    </ng-template>
+
+    <!-- <ng-template #noProducts>
       <div class="flex flex-col items-center py-20 text-center">
         <div *ngIf="allProducts.length === 0; else noResults" class="loader"></div>
         <p *ngIf="allProducts.length === 0" class="mt-4 text-gray-600">
@@ -276,20 +196,19 @@
           </button>
         </ng-template>
       </div>
-    </ng-template>
+    </ng-template> -->
   </div>
 
-    <!-- t+item de carrito -->
-    <div *ngIf="cartItemCount() > 0 && islogged()"
-      class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl hover:cursor-pointer right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
-      <a (click)="goToCart()" class="relative flex items-center justify-center w-full h-full">
-        <span
-          class="p-2 absolute top-2 right-2 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-          {{ cartItemCount() }}
-        </span>
-        <fa-icon [icon]="faShoppingCart" class="text-xl md:text-2xl "></fa-icon>
-      </a>
-    </div>
+  <!-- t+item de carrito -->
+  <div *ngIf="cartItemCount() > 0 && islogged()"
+    class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl hover:cursor-pointer right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
+    <a (click)="goToCart()" class="relative flex items-center justify-center w-full h-full">
+      <span
+        class="p-2 absolute top-2 right-2 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+        {{ cartItemCount() }}
+      </span>
+      <fa-icon [icon]="faShoppingCart" class="text-xl md:text-2xl "></fa-icon>
+    </a>
+  </div>
 
 </div>
-

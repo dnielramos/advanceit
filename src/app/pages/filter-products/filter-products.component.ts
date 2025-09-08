@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faChevronRight, faArrowLeft, faCopyright, faTags, faLayerGroup, faStar, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faArrowLeft, faCopyright, faTags, faLayerGroup, faStar, faFilter, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
 import { SkeletonFilterProductComponent } from './skeleton-lfilter-product/skeleton-filter-product.component';
@@ -11,6 +11,8 @@ import { CategoriesService, GroupedCategory } from '../../services/categories.se
 import { Brand, BrandsService } from '../../services/brands.service';
 import { ProductsService } from '../../services/product.service';
 import { BrandMenuComponent } from "../productos/brands/brand-menu.component";
+import { CartService } from '../../services/cart.service';
+import { AngularToastifyModule, ToastService } from 'angular-toastify';
 
 @Component({
   selector: 'app-product-filter-page',
@@ -20,7 +22,8 @@ import { BrandMenuComponent } from "../productos/brands/brand-menu.component";
     FontAwesomeModule,
     ProductAdvanceComponent,
     SkeletonFilterProductComponent,
-    BrandMenuComponent
+    BrandMenuComponent,
+    AngularToastifyModule
 ],
   templateUrl: './filter-products.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +38,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   faLayerGroup = faLayerGroup;
   faStar = faStar;
   faFilters = faFilter;
+  faShoppingCart = faShoppingCart;
 
   // --- Estado del Componente con Signals ---
   products = signal<ProductoFinal[]>([]);
@@ -52,12 +56,18 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
   private currentFilters: { [key: string]: string | null } = {};
 
+  cartItemCount = signal<number>(0);
+  isLoggedIn = signal<boolean>(false);
+
+
   constructor(
     private productService: ProductsService,
     private categoryService: CategoriesService,
+    private cartService: CartService,
     private brandService: BrandsService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +82,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
       
       this.resetAndLoadProducts();
       this.updateViewTitle();
+      this.cartService.getCartCount().subscribe(count => this.cartItemCount.set(count));
     });
   }
 
@@ -80,6 +91,17 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
 
   onMenuBrands() {
     this.showBrandsMenu.set(true);
+  }
+
+  goToCart() {
+    this.router.navigate(['/cart'])
+  }
+
+
+  onAddToCart(product: ProductoFinal): void {
+    this.cartService.addToCart(product);
+    this.toastService.success(`Producto ${product.nombre} agregado al carrito`);
+    this.cartService.getCartCount().subscribe(count => this.cartItemCount.set(count));
   }
 
     /**

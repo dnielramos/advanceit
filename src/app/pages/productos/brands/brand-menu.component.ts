@@ -99,7 +99,7 @@ export class BrandMenuComponent implements OnInit {
             cleanFilters[key] = filters[key] as string;
         }
     }
-    this.router.navigate(['/productos'], { queryParams: cleanFilters });
+    this.router.navigate(['/filter-products'], { queryParams: cleanFilters });
   }
 
   /**

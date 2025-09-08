@@ -53,9 +53,9 @@
       <a *ngIf="!islogged" routerLink="/in" class="flex font-bold items-center space-x-2 text-gray-700 hover:text-purple-700">
         <span class="hidden md:inline">Login</span>
       </a>  
-      <button *ngIf="islogged" (click)="onSignOut()" class="text-slate-800 bg-purple-50 rounded-full text-sm hover:text-purple-500 hover:cursor-pointer p-2">
+      <button *ngIf="islogged" (click)="onSignOut()" class="text-slate-800 bg-purple-50 rounded-full text-sm hover:text-purple-500 hover:cursor-pointer mx-2 p-2">
         <fa-icon [icon]="faSignOut"></fa-icon>
-        Cerrar Sesión
+        <span class="hidden md:inline">Cerrar Sesión</span>
       </button>
     </div>
     <!-- <button class="text-gray-700 hover:text-purple-700 p-2">

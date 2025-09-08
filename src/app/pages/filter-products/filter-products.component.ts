@@ -1,342 +1,194 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  OnDestroy,
-  HostListener,
-} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faShoppingCart,
-  faCheckCircle,
-  faAnglesRight,
-  faFilter,
-} from '@fortawesome/free-solid-svg-icons';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { ProductoFinal } from '../../models/Productos';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { faChevronRight, faArrowLeft, faCopyright, faTags, faLayerGroup, faStar, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { ProductAdvanceComponent } from '../../components/products/product-advance/product-advance.component';
-import { ENVIRONMENT } from '../../../enviroments/enviroment';
 import { SkeletonFilterProductComponent } from './skeleton-lfilter-product/skeleton-filter-product.component';
-import { InfoLoginComponent } from '../productos/info-login/info-login.component';
-import { AngularToastifyModule, ToastService } from 'angular-toastify';
-import { AuthService, Role } from '../../services/auth.service';
-import { CartService } from '../../services/cart.service';
-import { CreateUserComponent } from '../../components/users/create-user/create-user.component';
-
-interface PagedProductsResponse {
-  products: ProductoFinal[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
-
-interface CategoryResponse {
-  category: string;
-  subCategories: string[];
-  quantity: number;
-}
+import { ProductoFinal } from '../../models/Productos';
+import { CategoriesService, GroupedCategory } from '../../services/categories.service';
+import { Brand, BrandsService } from '../../services/brands.service';
+import { ProductsService } from '../../services/product.service';
+import { BrandMenuComponent } from "../productos/brands/brand-menu.component";
 
 @Component({
-  selector: 'app-filter-products',
+  selector: 'app-product-filter-page',
   standalone: true,
   imports: [
     CommonModule,
     FontAwesomeModule,
     ProductAdvanceComponent,
     SkeletonFilterProductComponent,
-    RouterModule,
-    InfoLoginComponent,
-    AngularToastifyModule,
-    CreateUserComponent,
-  ],
+    BrandMenuComponent
+],
   templateUrl: './filter-products.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterProductsComponent implements OnInit, OnDestroy {
-  @Input() productos: ProductoFinal[] = [];
-
-  faShoppingCart = faShoppingCart;
-  faCheckCircle = faCheckCircle;
-  faAnglesRight = faAnglesRight;
+  // --- Iconos ---
+  faChevronRight = faChevronRight;
+  faArrowLeft = faArrowLeft;
+  faCopyright = faCopyright;
+  faTags = faTags;
+  faLayerGroup = faLayerGroup;
+  faStar = faStar;
   faFilters = faFilter;
 
-  comprarProductos = false;
-  createUser: boolean = false;
-  islogged: boolean = false;
-  cartItemCount: number = 0;
+  // --- Estado del Componente con Signals ---
+  products = signal<ProductoFinal[]>([]);
+  categories = signal<GroupedCategory[]>([]);
+  brands = signal<Brand[]>([]);
+  
+  activeView = signal<'categories' | 'brands'>('categories');
+  currentCategory = signal<GroupedCategory | null>(null);
 
-  private readonly API_URL = ENVIRONMENT.apiUrlRender;
-
-  categoria: string = '';
-  subcategoria: string = '';
-  tituloVista: string = '';
-
-  categorias: CategoryResponse[] = [];
-  seleccionCategoria: string | null = null;
-  seleccionSubcategoria: string | null = null;
-  modoTodos: boolean = false; // true = usar /advance-products/all-paginated
-
-  cargando: boolean = false;
-  paginaActual: number = 1;
-  totalPaginas: number = 0;
-  hayMasProductos: boolean = true;
+  isLoading = signal<boolean>(true);
+  currentPage = signal<number>(1);
+  hasNextPage = signal<boolean>(true);
+  viewTitle = signal<string>('Todos los Productos');
 
   private routeSubscription?: Subscription;
-
-  private rawCategoryParam: string | null = null;
-  private rawSubcategoryParam: string | null = null;
+  private currentFilters: { [key: string]: string | null } = {};
 
   constructor(
-    private http: HttpClient,
+    private productService: ProductsService,
+    private categoryService: CategoriesService,
+    private brandService: BrandsService,
     private route: ActivatedRoute,
-    private router: Router,
-    private toastService: ToastService,
-    private authService: AuthService,
-    private cartService: CartService
-  ) {
-    // En el constructor de NavbarComponent
-    cartService.getCart().subscribe((items) => {
-      this.cartItemCount = items.length;
-    });
-  }
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.islogged = this.authService.hasRole(Role.User);
-    this.cargarCategorias();
+    this.loadFilterData(); // Carga categorías y marcas una vez
 
-    this.routeSubscription = this.route.paramMap.subscribe((params) => {
-      this.resetearEstado();
-
-      this.rawCategoryParam = params.get('categoria');
-      this.rawSubcategoryParam = params.get('subcategoria');
-
-      if (!this.rawCategoryParam) {
-        // Ruta "todas"
-        this.modoTodos = true;
-        this.tituloVista = 'Todos los productos';
-        this.cargarProductos();
-        return;
-      }
-
-      this.modoTodos = false;
-
-      if (this.rawSubcategoryParam) {
-        this.subcategoria = this.capitalizar(this.rawSubcategoryParam);
-        this.categoria = this.capitalizar(this.rawCategoryParam);
-        this.tituloVista = `${this.categoria} › ${this.subcategoria}`;
-        this.seleccionCategoria = this.categoria;
-        this.seleccionSubcategoria = this.subcategoria;
-      } else {
-        this.categoria = this.capitalizar(this.rawCategoryParam);
-        this.subcategoria = '';
-        this.tituloVista = this.categoria;
-        this.seleccionCategoria = this.categoria;
-        this.seleccionSubcategoria = null;
-      }
-
-      this.cargarProductos();
+    this.routeSubscription = this.route.queryParams.subscribe(params => {
+      this.currentFilters = {
+        category: params['category'] || null,
+        subcategory: params['subcategory'] || null,
+        brand: params['brand'] || null,
+      };
+      
+      this.resetAndLoadProducts();
+      this.updateViewTitle();
     });
   }
+
+
+  showBrandsMenu = signal<boolean>(false);
+
+    /**
+   * Navega a la vista de productos para una categoría o subcategoría específica.
+   * @param categoryName El nombre de la categoría o subcategoría.
+   */
+    navigateToSubcategory(categoryName: string): void {
+      if (categoryName) {
+        // Navega a la ruta, por ejemplo: /categorias/Laptops
+        this.router.navigate([`/categorias/${this.currentCategory}`, categoryName]);
+      }
+    }
+    /**
+     * Navega a la vista de productos para una categoría o subcategoría específica.
+     * @param subcategoryName El nombre de la categoría o subcategoría.
+     */
+    navigateToCategory(subcategoryName: string): void {
+      if (subcategoryName) {
+        // Navega a la ruta, por ejemplo: /categorias/Laptops
+        this.router.navigate([`/categorias`, subcategoryName]);
+      }
+    }
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
   }
 
-  addToCart(product: ProductoFinal): void {
-    if (this.cartService.addToCart(product)) {
-      this.toastService.success(`${product.nombre} añadido al carrito`);
-    } else {
-      this.toastService.error(`NO pude añadir ${product.nombre} al carrito`);
-    }
-    // alert(`${product.nombre} añadido al carrito`);
+  private loadFilterData(): void {
+    this.categoryService.categorias$.subscribe(cats => this.categories.set(cats));
+    this.brandService.brands$.subscribe(b => this.brands.set(b));
   }
 
-  onComprarProductos(product: ProductoFinal | null): void {
-    if (this.authService.hasRole(Role.User) && product) {
-      this.addToCart(product);
-    } else {
-      this.comprarProductos = !this.comprarProductos;
-      const html = document.documentElement;
-      const body = document.body;
+  private resetAndLoadProducts(): void {
+    this.products.set([]);
+    this.currentPage.set(1);
+    this.hasNextPage.set(true);
+    this.loadProducts();
+  }
 
-      if (this.comprarProductos) {
-        html.classList.add('no-scroll');
-        body.classList.add('no-scroll');
+  private loadProducts(loadMore = false): void {
+    if (!this.hasNextPage() && loadMore) return;
+    
+    this.isLoading.set(true);
+    
+    this.productService.getAllProducts().subscribe(response => {
+      if (loadMore) {
+        this.products.update(currentProducts => [...currentProducts, ...response.products]);
       } else {
-        html.classList.remove('no-scroll');
-        body.classList.remove('no-scroll');
+        this.products.set(response.products);
       }
-    }
+      this.hasNextPage.set(response.products.length > 0);
+      this.isLoading.set(false);
+    });
+  }
+  
+  loadMoreProducts(): void {
+    this.currentPage.update(page => page + 1);
+    this.loadProducts(true);
   }
 
-  handleCreate(): void {
-    console.log('El usuario quiere registrarse.');
-    this.onComprarProductos(null);
-    this.createUser = true;
+  // --- Lógica del Menú de Filtros ---
+
+  setActiveView(view: 'categories' | 'brands'): void {
+    this.activeView.set(view);
+    this.currentCategory.set(null);
   }
 
-  handleLogin(): void {
-    console.log(
-      'El usuario quiere iniciar sesión. Redirigiendo a la página de login...'
-    );
-    this.onComprarProductos(null);
-    this.router.navigate(['/in']);
-  }
-
-  onOutregister() {
-    this.createUser = !this.createUser;
-
-    const html = document.documentElement;
-    const body = document.body;
-
-    if (this.comprarProductos) {
-      html.classList.add('no-scroll');
-      body.classList.add('no-scroll');
+  selectCategory(category: GroupedCategory): void {
+    if (!category.subCategories || category.subCategories.length === 0) {
+      this.applyFilters({ category: category.category, subcategory: null, brand: null });
     } else {
-      html.classList.remove('no-scroll');
-      body.classList.remove('no-scroll');
+      this.currentCategory.set(category);
     }
   }
 
-  // @HostListener('window:scroll')
-  // onScroll(): void {
-  //   const scrollPosition =
-  //     window.pageYOffset || document.documentElement.scrollTop;
-  //   const scrollHeight = document.documentElement.scrollHeight;
-  //   const clientHeight = document.documentElement.clientHeight;
-
-  //   if (
-  //     scrollPosition + clientHeight >= scrollHeight - 300 &&
-  //     !this.cargando &&
-  //     this.hayMasProductos
-  //   ) {
-  //     this.cargarMasProductos();
-  //   }
-  // }
-
-  onProductScroll(event: Event): void {
-    // Hacemos un type casting del target para acceder a sus propiedades de scroll
-    const target = event.target as HTMLElement;
-    const scrollPosition = target.scrollTop;
-    const scrollHeight = target.scrollHeight;
-    const clientHeight = target.clientHeight;
-
-    // La lógica es la misma, pero con las propiedades del elemento
-    if (
-      scrollPosition + clientHeight >= scrollHeight - 300 &&
-      !this.cargando &&
-      this.hayMasProductos
-    ) {
-      this.cargarMasProductos();
-    }
+  goBack(): void {
+    this.currentCategory.set(null);
   }
 
-  private resetearEstado(): void {
-    this.productos = [];
-    this.paginaActual = 1;
-    this.totalPaginas = 0;
-    this.hayMasProductos = true;
-    this.cargando = false;
-  }
-
-  private cargarCategorias(): void {
-    this.http
-      .get<{ catalog: CategoryResponse[] }>(`${this.API_URL}/categories`)
-      .subscribe({
-        next: (res) => {
-          this.categorias = res.catalog;
-        },
-        error: (err) => {
-          console.error('Error cargando categorías:', err);
-        },
-      });
-  }
-
-  private cargarProductos(): void {
-    this.cargando = true;
-
-    let url: string;
-    if (this.modoTodos) {
-      url = `${this.API_URL}/advance-products/all-paginated`;
-    } else {
-      url = `${this.API_URL}/categories/${this.getEndpoint()}`;
-    }
-
-    const params = new HttpParams()
-      .set('page', this.paginaActual.toString())
-      .set('limit', 10);
-
-    this.http.get<PagedProductsResponse>(url, { params }).subscribe({
-      next: (res) => {
-        this.productos = res.products;
-        this.totalPaginas = res.totalPages;
-        this.hayMasProductos = res.hasNextPage;
-        this.cargando = false;
-      },
-      error: (err) => {
-        console.error('Error cargando productos:', err);
-        this.cargando = false;
-      },
+  // --- Navegación y aplicación de filtros ---
+  
+  applyFilters(newFilters: { [key: string]: string | null }): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: newFilters,
+      queryParamsHandling: 'merge', // Puedes cambiar a 'merge' si quieres combinar filtros
     });
   }
 
-  private cargarMasProductos(): void {
-    if (!this.hayMasProductos) return;
+  onSelectCategory(categoryName: string): void {
+    this.applyFilters({ category: categoryName, subcategory: null, brand: null });
+  }
 
-    this.paginaActual++;
-    this.cargando = true;
-
-    let url: string;
-    if (this.modoTodos) {
-      url = `${this.API_URL}/advance-products/all-paginated`;
-    } else {
-      url = `${this.API_URL}/categories/${this.getEndpoint()}`;
+  onSelectSubcategory(subcategoryName: string): void {
+    const parentCategory = this.currentCategory();
+    if (parentCategory) {
+      this.applyFilters({ category: parentCategory.category, subcategory: subcategoryName, brand: null });
     }
-
-    const params = new HttpParams()
-      .set('page', this.paginaActual.toString())
-      .set('limit', 10);
-
-    this.http.get<PagedProductsResponse>(url, { params }).subscribe({
-      next: (res) => {
-        this.productos = [...this.productos, ...res.products];
-        this.hayMasProductos = res.hasNextPage;
-        this.cargando = false;
-      },
-      error: (err) => {
-        console.error('Error cargando más productos:', err);
-        this.cargando = false;
-      },
-    });
   }
 
-  private getEndpoint(): string {
-    if (this.rawSubcategoryParam) {
-      return `by-subcategory/${encodeURIComponent(this.rawSubcategoryParam)}`;
-    }
-    return `by-category/${encodeURIComponent(this.rawCategoryParam || '')}`;
+  onSelectBrand(brandName: string): void {
+    this.applyFilters({ brand: brandName, category: null, subcategory: null });
   }
-
-  private capitalizar(texto: string): string {
-    return texto
-      .toLowerCase()
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, (l) => l.toUpperCase());
-  }
-
-  seleccionarFiltro(cat: string | null, sub?: string): void {
-    if (!cat) {
-      // "Todas"
-      this.router.navigate(['/categorias']);
-    } else if (sub) {
-      this.router.navigate(['/categorias', cat, sub]);
+  
+  private updateViewTitle(): void {
+    const { category, subcategory, brand } = this.currentFilters;
+    if (brand) {
+      this.viewTitle.set(`Marca: ${brand}`);
+    } else if (category && subcategory) {
+      this.viewTitle.set(`${category} > ${subcategory}`);
+    } else if (category) {
+      this.viewTitle.set(category);
     } else {
-      this.router.navigate(['/categorias', cat]);
+      this.viewTitle.set('Todos los Productos');
     }
   }
 }

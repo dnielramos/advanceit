@@ -14,6 +14,9 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { Subscription } from 'rxjs';
 import { ApiGetAllProductsResponse, ProductsService } from '../../../services/product.service';
 import { ProductoFinal } from '../../../models/Productos'; // Interfaz correcta ya en uso
+import { CartService } from '../../../services/cart.service';
+import { AuthService, Role } from '../../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-advance-product',
@@ -61,13 +64,16 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
   faHeart = faHeart;
   faFilter = faFilter;
 
+  cartItemCount = signal(0);
+  islogged = signal(false);
+
   // Datos
   allProducts: ProductoFinal[] = [];
   filteredProducts = signal<ProductoFinal[]>([]);
 
   private productsSubscription?: Subscription;
 
-  constructor(private productsService: ProductsService) {}
+  constructor(private productsService: ProductsService, private cartService: CartService, private authService: AuthService, private router: Router) {}
 
   // Estados UI
   searchTerm: string = '';
@@ -79,22 +85,39 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
 
   // Mensajes de bienvenida
   welcomeMessages = [
-    '¡Descubre lo último en tecnología!',
-    '¡Ofertas especiales solo por hoy!',
-    'Envío gratis en compras superiores a $100',
-    '¡Encuentra el producto perfecto para ti!',
-    '¡Bienvenido a la mejor tienda de tecnología!',
+    'Bienvenido a Advance',
+    'Distribuidores autorizados Dell',
+    'Distribuidores autorizados HP',
+    'Distribuidores autorizados Lenovo',
+    'Somos creadores del cambio',
   ];
   welcomeMessage = signal('');
 
   ngOnInit() {
     this.loadProducts();
     this.setRandomWelcomeMessage();
-    setInterval(() => this.setRandomWelcomeMessage(), 5000);
+    this.cartService.getCart().subscribe((items) => {
+      this.cartItemCount.set(items.length);
+    });
+    this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
+      this.islogged.set(isLoggedIn);
+    });
+    const interval = setInterval(() => this.setRandomWelcomeMessage(), 5000);
+    this.ngOnDestroy = () => clearInterval(interval);
   }
 
   ngOnDestroy(): void {
     this.productsSubscription?.unsubscribe();
+  }
+
+  addToCart(product: ProductoFinal) {
+    console.log(product);
+
+    this.cartService.addToCart(product);
+  }
+
+  goToCart() {
+    this.router.navigate(['/dashboard/cart'])
   }
 
   setRandomWelcomeMessage() {

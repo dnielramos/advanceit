@@ -65,6 +65,8 @@ export const dashboardRoutes: Routes = [
             '../pages/dashboard/advance-products/advance-products.component'
           ).then((m) => m.AdvanceProductsComponent),
       },
+      
+      { path: 'cart', loadComponent: () => import('../components/cart/cart.component').then(m => m.CartComponent) },
       {
         path: '',
         redirectTo: 'home',

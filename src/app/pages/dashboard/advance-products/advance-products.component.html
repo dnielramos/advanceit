@@ -225,6 +225,7 @@
               </div>
 
               <button
+                (click)="addToCart(item)"
                 [disabled]="!item.disponibilidad"
                 class="flex w-full items-center justify-center rounded-lg px-4 py-2 font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
                 [ngClass]="
@@ -273,4 +274,17 @@
       </div>
     </ng-template>
   </div>
+
+    <!-- t+item de carrito -->
+    <div *ngIf="cartItemCount() > 0 && islogged()"
+      class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl hover:cursor-pointer right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
+      <a (click)="goToCart()" class="relative flex items-center justify-center w-full h-full">
+        <span
+          class="p-2 absolute top-2 right-2 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          {{ cartItemCount() }}
+        </span>
+        <fa-icon [icon]="faShoppingCart" class="text-xl md:text-2xl "></fa-icon>
+      </a>
+    </div>
 </div>
+

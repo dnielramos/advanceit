@@ -10,6 +10,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { QuotationCreateComponent } from '../quotation-create/quotation-create.component';
 import { Validators } from '@angular/forms';
 import { PopulatedQuotation } from '../../../../models/quotation-populated';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -45,7 +46,7 @@ throw new Error('Method not implemented.');
   faCalendarAlt = faCalendarAlt;
   faBoxOpen = faBoxOpen;
 
-  constructor(private quotationService: QuotationService) {}
+  constructor(private quotationService: QuotationService, private router: Router) {}
 
   ngOnInit(): void {
     this.fetchQuotations();
@@ -65,11 +66,8 @@ throw new Error('Method not implemented.');
     });
   }
 
-  openCreateModal(): void {
-    this.currentModal = 'create';
-    this.modalTitle = 'Crear Nueva Cotización';
-    this.selectedQuotationId = null;
-    this.isModalOpen = true;
+  openCreate(): void {
+   this.router.navigate(['/dashboard/advance-products']);
   }
 
   openEditModal(id: string): void {

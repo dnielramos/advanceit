@@ -18,14 +18,17 @@ import {
   faHandshake,
   faFileLines,
 } from '@fortawesome/free-solid-svg-icons';
-import { AuthService } from '../../../services/auth.service'; // Asegúrate que la ruta sea correcta
+import { AuthService, Role } from '../../../services/auth.service'; // Asegúrate que la ruta sea correcta
 import { Subscription } from 'rxjs';
+import { User } from '../../../models/user';
+import { UsersService } from '../../../services/users.service';
 
 // Interfaz para definir la estructura de cada item del menú
 interface MenuItem {
   key: string;
   label: string;
   icon: any;
+  roles: Role[];
   routerLink?: string;
   subItems?: SubMenuItem[];
   requiresAuth?: boolean; // Propiedad para controlar la visibilidad
@@ -60,13 +63,13 @@ interface SubMenuItem {
 
       <div class="px-4 py-2 flex items-center space-x-3">
         <img
-          src="https://media.licdn.com/dms/image/v2/D4E03AQFDztdvDENj0g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1683622382036?e=1758758400&v=beta&t=nMNysUkiWLXygvz_kaCK_t3gQ4qsTTkY-Y0HbX9LBgI"
+          src="{{ userActive.picture }}"
           alt="User Avatar"
           class="w-10 h-10 rounded-full"
         />
         <div class="leading-tight pt-2" *ngIf="!isToggleSidebarDesktop">
-          <p class="font-semibold text-gray-700 text-sm">Arturo Esguerra</p>
-          <p class="text-xs text-purple-600">CEO / Advance IT</p>
+          <p class="font-semibold text-gray-700 text-sm">{{ userActive.name }}</p>
+          <p class="text-xs text-purple-600">{{ userActive.company }}</p>
         </div>
       </div>
 
@@ -75,7 +78,7 @@ interface SubMenuItem {
       <nav class="flex-1 overflow-y-auto px-2">
         <ng-container *ngFor="let item of menuItems">
           <a
-            *ngIf="!item.subItems"
+            *ngIf="!item.subItems && authService.hasRole(item.roles)"
             [routerLink]="item.routerLink"
             routerLinkActive="bg-purple-100 text-purple-700"
             class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors duration-200"
@@ -152,13 +155,27 @@ export class SidebarComponent implements OnInit, OnDestroy {
   public openDropdowns: { [key: string]: boolean } = {};
   public menuItems: MenuItem[] = []; // Se inicializa vacío y se construye dinámicamente
 
-  constructor(private authService: AuthService) {}
+  public userActive !: User;
+
+  constructor(protected authService: AuthService, userService: UsersService) {
+
+    authService.isLoggedIn$.subscribe((isLoggedIn) => {
+      if (isLoggedIn) {
+        userService.getUserById(authService.getUserId()!).subscribe((user) => {
+          this.userActive = user;
+
+          console.log(this.userActive, 'USER ACTIVE');
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
     // Nos suscribimos al estado de login del servicio de autenticación
     this.authSubscription = this.authService.isLoggedIn$.subscribe(isLoggedIn => {
-      this.buildMenu(isLoggedIn);
+      this.buildMenu(isLoggedIn); 
     });
+
   }
 
   ngOnDestroy(): void {
@@ -174,6 +191,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         key: 'dashboard',
         label: 'Dashboard',
         icon: faTachometerAlt,
+        roles: [Role.Admin, Role.User],
         routerLink: '/dashboard/home',
       },
       // {
@@ -190,6 +208,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         key: 'tienda',
         label: 'Tienda',
         icon: faIcons,
+        roles: [Role.Admin, Role.User],
         subItems: [
           { label: 'Buscar productos', routerLink: '/dashboard/advance-products' },
         ],
@@ -197,6 +216,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       {
         key: 'ordenes',
         label: 'Órdenes',
+        roles: [Role.Admin, Role.User],
         icon: faDatabase,
         routerLink: '/dashboard/orders',
         // subItems: [
@@ -206,6 +226,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       {
         key: 'cotizaciones',
         label: 'Cotizaciones',
+        roles: [Role.Admin, Role.User],
         icon: faFileLines,
         routerLink: '/dashboard/cotizaciones',
         // subItems: [
@@ -214,6 +235,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       },
       {
         key: 'usuarios',
+        roles: [Role.Admin],
         label: 'Usuarios',
         icon: faUsers,
         routerLink: '/dashboard/users'
@@ -224,6 +246,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       },
       {
         key: 'empresas',
+        roles: [Role.Admin],
         label: 'Empresas',
         icon: faHandshake,
         routerLink: '/dashboard/companies'
@@ -234,6 +257,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       },
       {
         key: 'logistica',
+        roles: [Role.Admin],
         label: 'Logística',
         icon: faTruckFast,
         routerLink: '/dashboard/logistica'

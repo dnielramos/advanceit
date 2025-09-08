@@ -25,7 +25,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Observable } from 'rxjs';
 import { CompaniesService } from '../../../../services/companies.service';
 import { UsersService } from '../../../../services/users.service';
-import { QuotationProductsComponent } from "../quotation-product.component";
 import { AuthService } from '../../../../services/auth.service';
 import { CreationMode } from '../../../../models/creation-mode';
 import { Router } from '@angular/router';
@@ -35,7 +34,7 @@ import { CartService } from '../../../../services/cart.service';
 library.add(faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight);
 
 @Component({
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, QuotationProductsComponent, AngularToastifyModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, AngularToastifyModule],
   selector: 'app-quotation-create',
   templateUrl: './quotation-create.component.html',
 })

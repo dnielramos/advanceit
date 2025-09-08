@@ -91,21 +91,25 @@
       </div>
     </div>
   </aside>
-<!-- 
-  <div *ngIf="showBrandsMenu" (click)="onMenuBrands()" 
+
+
+
+  <div *ngIf="showBrandsMenu()" (click)="showBrandsMenu.set(false)" 
     class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden">
     <app-brand-menu (click)="$event.stopPropagation()"></app-brand-menu>
-  </div> -->
+     
+  </div>
 
 
 
   <!-- Columna de Contenido (Derecha) -->
   <main class="w-full p-6 bg-gray-50">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-orange-700">{{ viewTitle() }}</h1>
+      <h1 class="text-sm md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-orange-700">{{ viewTitle() }}</h1>
       <!-- Botón de filtro para móviles -->
-      <button class="md:hidden p-2 rounded-md bg-purple-600 text-white">
+      <button (click)="onMenuBrands()" class="md:hidden flex items-center gap-2 p-2 rounded-md bg-purple-600 text-white">
         <fa-icon [icon]="faFilters"></fa-icon>
+        <p class="text-xs md:text-sm">Filtros</p>
       </button>
     </div>
 

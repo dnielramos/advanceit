@@ -26,6 +26,7 @@ import { BrandMenuComponent } from "../productos/brands/brand-menu.component";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterProductsComponent implements OnInit, OnDestroy {
+
   // --- Iconos ---
   faChevronRight = faChevronRight;
   faArrowLeft = faArrowLeft;
@@ -76,6 +77,10 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
 
 
   showBrandsMenu = signal<boolean>(false);
+
+  onMenuBrands() {
+    this.showBrandsMenu.set(true);
+  }
 
     /**
    * Navega a la vista de productos para una categoría o subcategoría específica.

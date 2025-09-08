@@ -11,10 +11,11 @@ import { QuotationCreateComponent } from '../quotation-create/quotation-create.c
 import { Validators } from '@angular/forms';
 import { PopulatedQuotation } from '../../../../models/quotation-populated';
 import { Router } from '@angular/router';
+import { AngularToastifyModule, ToastService } from 'angular-toastify';
 
 
 @Component({
-  imports: [QuotationFormComponent, QuotationDetailComponent, QuotationCreateComponent, CommonModule, FontAwesomeModule],
+  imports: [QuotationFormComponent, QuotationDetailComponent, QuotationCreateComponent, CommonModule, FontAwesomeModule, AngularToastifyModule],
   selector: 'app-quotation-list',
   templateUrl: './quotation-list.component.html',
 })
@@ -33,6 +34,7 @@ throw new Error('Method not implemented.');
   modalTitle = '';
 
   //icons
+  toastQuotation : any;
 
   faPlus = faPlus;
   faFileInvoice = faFileInvoice;
@@ -46,10 +48,22 @@ throw new Error('Method not implemented.');
   faCalendarAlt = faCalendarAlt;
   faBoxOpen = faBoxOpen;
 
-  constructor(private quotationService: QuotationService, private router: Router) {}
+  constructor(private quotationService: QuotationService, private router: Router, private toastService: ToastService) {
+
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+      this.toastQuotation = navigation.extras.state;
+    }
+  }
 
   ngOnInit(): void {
     this.fetchQuotations();
+
+    if (this.toastQuotation) {
+      this.toastService.success(`Cotización creada exitosamente ${this.toastQuotation.id}`);
+      this.toastQuotation = null;
+      
+    }
   }
 
   fetchQuotations(): void {

@@ -97,23 +97,23 @@ export class CreateOrderModalComponent {
 
     const { fecha, hora } = this.getCurrentDateTime();
     // ACTUALIZADO: El tipo de la nueva orden coincide con Omit<Order, 'id'>
-    const newOrderData: Omit<Order, 'id'> = {
-      numeroOrden: this.generateOrderNumber(),
-      fecha,
-      hora,
-      estadoPago: 'pendiente',
-      precioTotal: this.calculateTotal(),
-      // El método para obtener los SKUs sigue siendo válido
-      productos: this.newOrderProducts.map((product) => product.SKU),
-      cliente: this.newOrderClient.trim(),
-      shippingNo: `SH-${Math.floor(Math.random() * 1000)
-        .toString()
-        .padStart(3, '0')}`,
-      notas: this.newOrderNote.trim(),
-    };
+    // const newOrderData: Omit<Order, 'id'> = {
+    //   numeroOrden: this.generateOrderNumber(),
+    //   fecha,
+    //   hora,
+    //   estadoPago: 'pendiente',
+    //   precioTotal: this.calculateTotal(),
+    //   // El método para obtener los SKUs sigue siendo válido
+    //   // productos: this.newOrderProducts.map((product) => product.SKU),
+    //   cliente: this.newOrderClient.trim(),
+    //   shippingNo: `SH-${Math.floor(Math.random() * 1000)
+    //     .toString()
+    //     .padStart(3, '0')}`,
+    //   notas: this.newOrderNote.trim(),
+    // };
 
-    console.log('Nueva Orden:', newOrderData);
-    this.createOrder.emit(newOrderData);
+    // console.log('Nueva Orden:', newOrderData);
+    // this.createOrder.emit(newOrderData);
     this.close.emit(); // Cierra el modal después de emitir
   }
 

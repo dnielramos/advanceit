@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-cart',
@@ -18,7 +19,7 @@ export class CartComponent implements OnInit {
   discount: number = 0;
   private apiUrlOrders = 'https://advance-genai.onrender.com/orders';
 
-  constructor(private cartService: CartService, private http: HttpClient, private router: Router) {}
+  constructor(private cartService: CartService, private http: HttpClient, private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.cartService.getCart().subscribe((items) => {
@@ -69,7 +70,7 @@ export class CartComponent implements OnInit {
   }
 
   createOrder(): void {
-    const productosSKU = this.cartItems.map((item) => item.product.SKU);
+    const productos = this.cartItems.map((item) => item);
     const numeroOrden = 'ORD-' + Date.now(); // Puedes ajustar esta lógica
     const now = new Date();
     const fecha = now.toISOString().split('T')[0]; // yyyy-mm-dd
@@ -82,23 +83,26 @@ export class CartComponent implements OnInit {
       hora,
       estadoPago: 'pendiente', // Asumimos pago inmediato por ahora
       precioTotal,
-      productos: productosSKU,
-      cliente: 'cliente-anónimo', // Cambiar si tienes login
+      productos: productos,
+      cliente: this.authService.getUserId() || 'cliente-anonimo',
       shippingNo: 'ENVIO-' + Date.now(), // Puedes mejorar esto
       notas: '', // O permitir que el usuario escriba algo
     };
 
-    this.http.post(this.apiUrlOrders, nuevaOrden).subscribe({
-      next: (response) => {
-        alert('Orden creada con éxito');
-        this.cartService.clearCart();
-          this.router.navigate(['productos/orden-exitosa']); // Ruta al componente
-      },
-      error: (error) => {
-        console.error('Error creando la orden', error);
-        alert('Hubo un error al crear la orden');
-      },
-    });
+    this.router.navigate(['dashboard/cotizaciones/crear-cotizacion'], { state: { order: nuevaOrden } });
+    console.log(nuevaOrden);
+
+    // this.http.post(this.apiUrlOrders, nuevaOrden).subscribe({
+    //   next: (response) => {
+    //     alert('Orden creada con éxito');
+    //     this.cartService.clearCart();
+    //       this.router.navigate(['productos/orden-exitosa']); // Ruta al componente
+    //   },
+    //   error: (error) => {
+    //     console.error('Error creando la orden', error);
+    //     alert('Hubo un error al crear la orden');
+    //   },
+    // });
   }
 
   // Continuar comprando

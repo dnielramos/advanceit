@@ -1,4 +1,4 @@
-<div class="flex flex-col space-y-6 animate__animated animate__fadeIn animate__fast hflexy">
+<div class="flex flex-col hflexy z-1000 mt-6 p-6 space-y-6 animate__animated animate__fadeIn animate__fast">
 
   <div class="flex items-center justify-between text-gray-500 mb-6">
     <div class="flex-1 flex flex-col items-center">
@@ -29,6 +29,8 @@
   </div>
 
   <form [formGroup]="quotationForm" (ngSubmit)="onSubmit()">
+
+    <lib-toastify-toast-container></lib-toastify-toast-container>
 
     <div *ngIf="currentStep === 1" class="animate__animated animate__fadeInRight">
       <h3 class="text-xl font-semibold text-gray-800 mb-4">Información Principal</h3>
@@ -140,7 +142,7 @@
       </div>
       <button type="button" (click)="openProductModal()"
         class="flex items-center justify-center w-full py-2 border-2 border-dashed border-gray-300 rounded-md text-gray-500 hover:text-purple-600 hover:border-purple-400 transition-colors duration-200 mt-4">
-        <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Añadir Ítem
+        <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Añadir Ítems
       </button>
     </div>
 
@@ -182,19 +184,22 @@
             </thead>
             <tbody>
               <tr *ngFor="let detail of details.controls" class="bg-white border-b">
-                <td class="px-4 py-2">{{ detail.value.product_id }}</td>
+                <td class="px-4 py-2 text-ellipsis overflow-hidden whitespace-nowrap">{{ detail.value.product_name }}</td>
                 <td class="px-4 py-2">{{ detail.value.quantity }}</td>
                 <td class="px-4 py-2">${{ detail.value.unit_price | number:'1.2-2' }}</td>
               </tr>
+              <tr>
+                <td colspan="2" class="px-4 py-2 font-bold">Total:</td>
+                <td class="px-4 py-2 font-bold text-purple-600 text-lg m-4 text-center text-lg">${{ totalQuotation | number:'1.2-2' }}</td>
+              </tr>
             </tbody>
           </table>
-          <p class="text-purple-600 font-bold text-lg m-4">Total: ${{ totalQuotation | number:'1.2-2' }}</p>
         </div>
       </div>
     </div>
   </form>
 
-  <div class="flex justify-between pt-6 border-t mt-6">
+  <div class="flex justify-between py-6 border-t">
     <button *ngIf="currentStep > 1" (click)="prevStep()" type="button"
       class="flex items-center px-4 py-2 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200">
       <fa-icon [icon]="['fas', 'arrow-left']" class="mr-2"></fa-icon> Anterior
@@ -218,6 +223,3 @@
     </button>
   </div>
 </div>
-<app-quotation-products [isVisible]="isProductModalVisible" (productSelected)="onProductSelected($event)"
-  (closeModal)="onModalClose()">
-</app-quotation-products>

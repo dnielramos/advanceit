@@ -57,6 +57,13 @@ export const dashboardRoutes: Routes = [
             (m) => m.QuotationComponent
           ),
       },
+      {
+        path: 'cotizaciones/crear-cotizacion',
+        loadComponent: () =>
+          import('../pages/dashboard/quotations/quotation-create/quotation-create.component').then(
+            (m) => m.QuotationCreateComponent
+          ),
+      },
 
       {
         path: 'advance-products',

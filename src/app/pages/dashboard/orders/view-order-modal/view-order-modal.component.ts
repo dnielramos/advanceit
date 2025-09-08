@@ -39,8 +39,8 @@ export class ViewOrderModalComponent implements OnInit {
   loadProductDetails(): void {
     this.isLoading = true;
 
-    this.order.productos.forEach((sku) => {
-      this.ordersService.searchProductBySku(sku).subscribe({
+    this.order.productos.forEach((product) => {
+      this.ordersService.searchProductBySku(product.product.SKU).subscribe({
         next: (product) => {
           console.log('Producto encontrado desde view order:', product);
           this.orderProducts.push(product);
@@ -52,7 +52,7 @@ export class ViewOrderModalComponent implements OnInit {
           this.isLoading = false;
           console.log(
             'Productos en la orden encontrados: ',
-            this.order.productos
+            this.orderProducts
           );
         },
       });

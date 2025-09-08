@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ProductoFinal } from '../models/Productos';
+import { CartItem } from './cart.service';
 
 // // Interfaces para tipado fuerte
 // export interface Product {
@@ -21,7 +22,7 @@ export interface Order {
   hora: string;
   estadoPago: 'pagado' | 'no_pagado' | 'pendiente' | 'cancelado';
   precioTotal: number;
-  productos: string[]; // Array de SKUs
+  productos: CartItem[]; // Array de cart Items
   cliente: string;
   shippingNo: string;
   notas?: string;

@@ -28,11 +28,14 @@ import { UsersService } from '../../../../services/users.service';
 import { QuotationProductsComponent } from "../quotation-product.component";
 import { AuthService } from '../../../../services/auth.service';
 import { CreationMode } from '../../../../models/creation-mode';
+import { Router } from '@angular/router';
+import { AngularToastifyModule, ToastService } from 'angular-toastify';
+import { CartService } from '../../../../services/cart.service';
 
 library.add(faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight);
 
 @Component({
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, QuotationProductsComponent],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, QuotationProductsComponent, AngularToastifyModule],
   selector: 'app-quotation-create',
   templateUrl: './quotation-create.component.html',
 })
@@ -41,6 +44,9 @@ export class QuotationCreateComponent implements OnInit {
 
   users$: Observable<any[]> | undefined; // Observable para la lista de usuarios
   companies$: Observable<any[]> | undefined; // Observable para la lista de empresas (asumiendo un servicio similar)
+
+  order: any;
+  navigation: any;
 
   quotationForm: FormGroup;
   isLoading = false;
@@ -60,11 +66,24 @@ export class QuotationCreateComponent implements OnInit {
     private quotationService: QuotationService,
     private companiesService: CompaniesService,
     private userService: UsersService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService,
+    private cartService: CartService, 
+    private router: Router
   ) {
 
-    this.userId = this.authService.getUserId();
+    const cNavigation = this.router.getCurrentNavigation();
+    if (cNavigation?.extras.state) {
+      this.navigation = cNavigation.extras.state;
+      this.order = this.navigation.order;
+      console.log(this.order, 'ORDEN RECIBIDA DESDE EL CARRITO');
+    } else {
+      console.log('No se recibio orden');
+    }
 
+
+
+    this.userId = this.authService.getUserId();
 
     this.quotationForm = this.fb.group({
       company_id: ['', Validators.required],
@@ -79,58 +98,41 @@ export class QuotationCreateComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.users$ = this.userService.getUsers();
     this.companies$ = this.companiesService.findAll();
+
+     // Si recibiste una orden, puedes usarla aquí para poblar el formulario
+     if (this.order) {
+      console.log(this.order.productos, 'PRODUCTOS RECIBIDOS DESDE EL CARRITO'); 
+      this.populateFormWithOrderData();
+    }
   }
+
+    // Método opcional para poblar el formulario con los datos de la orden
+    populateFormWithOrderData(): void {
+      const detailsFormArray = this.details;
+      this.order.productos.forEach((product: any) => {
+        detailsFormArray.push(this.fb.group({
+          product_id: [product.product.id, Validators.required],
+          product_name: [product.product.nombre],
+          quantity: [product.quantity, [Validators.required, Validators.min(1)]],
+          unit_price: [product.product.precio, [Validators.required, Validators.min(0)]],
+          discount: [0],
+          taxes: [0],
+        }));
+      });
+      this.calculateTotal(); // Recalcula el total inicial
+    }
 
   // Métodos para abrir y cerrar el modal
   openProductModal(): void {
-    this.isProductModalVisible = true;
+    // this.isProductModalVisible = true;
+    this.router.navigate(['dashboard/advance-products']);
   }
 
   onModalClose(): void {
     this.isProductModalVisible = false;
-  }
-
-  // Método para manejar el producto seleccionado
-  onProductSelected(product: any): void {
-    // Busca si el producto ya existe en los controles del FormArray
-    const existingDetailIndex = this.details.controls.findIndex(
-      (control) => control.get('product_id')?.value === product.id
-    );
-  
-    if (existingDetailIndex !== -1) {
-      // ---- ESTA ES LA PARTE CORREGIDA ----
-  
-      // 1. Obtiene el FormGroup específico en ese índice.
-      const detailGroup = this.details.at(existingDetailIndex) as FormGroup;
-  
-      // 2. Obtiene la cantidad actual de ese FormGroup.
-      const currentQuantity = detailGroup.get('quantity')?.value;
-  
-      // 3. Usa patchValue para actualizar la cantidad. Esto actualiza el modelo y la vista.
-      detailGroup.patchValue({
-        quantity: currentQuantity + 1,
-      });
-  
-      alert(`Se actualizó la cantidad para el producto ${product.nombre}`);
-  
-    } else {
-      // Si el producto no existe, se agrega uno nuevo (esta parte ya estaba bien).
-      const detailGroup = this.fb.group({
-        product_id: [product.id, Validators.required],
-        product_name: [product.nombre], // Opcional, para mostrar en la UI
-        quantity: [1, [Validators.required, Validators.min(1)]],
-        unit_price: [product.precio, [Validators.required, Validators.min(0)]],
-        discount: [0],
-        taxes: [0],
-      });
-      this.details.push(detailGroup);
-      alert(`${product.nombre} agregado exitosamente`);
-    }
-    
-    // Opcional: Llama a un método para recalcular totales cada vez que se modifica.
-    this.calculateTotal(); 
   }
   
   // Método auxiliar para calcular el total (opcional pero recomendado)
@@ -277,12 +279,22 @@ export class QuotationCreateComponent implements OnInit {
     this.quotationService.create(payload).subscribe({
       next: (response) => {
         console.log('Cotización creada exitosamente:', response);
+        this.toastService.success(`Cotización creada exitosamente ${response.id}`);
         this.isLoading = false;
         this.onQuotationCreated.emit();
+        this.cartService.clearCart();
+        setTimeout(() => {
+          this.router.navigate(['dashboard/cotizaciones'], {state: {order: response.id}});
+        }, 3000);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error al crear la cotización:', error);
+        this.toastService.error(`Error al crear la cotización ${error}`);
+        this.isLoading = false;
+        setTimeout(() => {
+          this.router.navigate(['dashboard/advance-products']);
+        }, 3000);
       },
     });
   }

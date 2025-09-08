@@ -99,9 +99,9 @@ export class EditOrderModalComponent implements OnInit {
   // --- Acción Final ---
   submitSaveChanges(): void {
     // Actualizar el array de SKUs en la orden a guardar
-    this.editableOrder.productos = this.orderProducts.map((p) => p.SKU);
+    // this.editableOrder.productos = this.orderProducts.map((p) => p.SKU);
 
-    // Emitir la orden completamente actualizada
-    this.save.emit(this.editableOrder);
+    // // Emitir la orden completamente actualizada
+    // this.save.emit(this.editableOrder);
   }
 }

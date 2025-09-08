@@ -18,11 +18,12 @@ import { CartService } from '../../../services/cart.service';
 import { AuthService, Role } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { GridProductsStoreComponent } from "../../../components/products/products-store/grid-products-store.component";
+import { AngularToastifyModule, ToastService } from "angular-toastify";
 
 @Component({
   selector: 'app-advance-product',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, GridProductsStoreComponent],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, GridProductsStoreComponent, AngularToastifyModule],
   templateUrl: './advance-products.component.html',
   styles: `
     .loader {
@@ -74,7 +75,7 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
 
   private productsSubscription?: Subscription;
 
-  constructor(private productsService: ProductsService, private cartService: CartService, private authService: AuthService, private router: Router) {}
+  constructor(private productsService: ProductsService, private cartService: CartService, private authService: AuthService, private router: Router, private toastService: ToastService) {}
 
   // Estados UI
   searchTerm: string = '';
@@ -113,7 +114,7 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
 
   addToCart(product: ProductoFinal) {
     console.log(product);
-
+    this.toastService.success(`Producto ${product.nombre} agregado al carrito`);
     this.cartService.addToCart(product);
   }
 

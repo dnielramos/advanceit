@@ -96,32 +96,47 @@
   <lib-toastify-toast-container></lib-toastify-toast-container>
 
 
-  <div *ngIf="showBrandsMenu()" (click)="showBrandsMenu.set(false)" 
+  <div *ngIf="showBrandsMenu()" (click)="showBrandsMenu.set(false)"
     class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden">
     <app-brand-menu (click)="$event.stopPropagation()"></app-brand-menu>
-     
+
   </div>
 
-    <!-- t+item de carrito -->
-    <div *ngIf="cartItemCount() > 0"
-      class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl hover:cursor-pointer right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
-      <a (click)="goToCart()" class="relative flex items-center justify-center w-full h-full">
-        <span
-          class="p-2 absolute top-2 right-2 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-          {{ cartItemCount() }}
-        </span>
-        <fa-icon [icon]="faShoppingCart" class="text-xl md:text-2xl "></fa-icon>
-      </a>
-    </div>
+  <!-- t+item de carrito -->
+  <div *ngIf="cartItemCount() > 0 && isLoggedIn()"
+    class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl hover:cursor-pointer right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
+    <a (click)="goToCart()" class="relative flex items-center justify-center w-full h-full">
+      <span
+        class="p-2 absolute top-2 right-2 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+        {{ cartItemCount() }}
+      </span>
+      <fa-icon [icon]="faShoppingCart" class="text-xl md:text-2xl "></fa-icon>
+    </a>
+  </div>
 
+
+  <div *ngIf="comprarProductos()" class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden">
+    <app-info-login *ngIf="comprarProductos()" (close)="closeComprarProductos()" (loginAction)="handleLogin()"
+      (createAction)="handleCreate()">
+    </app-info-login>
+  </div>
+
+
+  <div *ngIf="createUser()" class="bg-black/60 backdrop-blur-sm fixed top-0 z-50 w-full h-full overflow-hidden"
+    (click)="onOutregister()">
+    <app-create-user></app-create-user>
+  </div>
 
 
   <!-- Columna de Contenido (Derecha) -->
   <main class="w-full p-6 bg-gray-50">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-sm md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-orange-700">{{ viewTitle() }}</h1>
+      <h1
+        class="text-sm md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-orange-700">
+        {{ viewTitle() }}</h1>
       <!-- Botón de filtro para móviles -->
-      <button (click)="onMenuBrands()" class="md:hidden flex items-center gap-2 p-2 rounded-md bg-purple-600 text-white">
+      <button (click)="onMenuBrands()"
+        class="md:hidden flex items-center gap-2 p-2 rounded-md bg-purple-600 text-white">
         <fa-icon [icon]="faFilters"></fa-icon>
         <p class="text-xs md:text-sm">Filtros</p>
       </button>
@@ -132,7 +147,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       @for (producto of products(); track producto.SKU) {
       <!-- Aquí usas tu componente de tarjeta de producto -->
-      <app-product-advance (agregarAlCarrito)="onAddToCart($event)" [producto]="producto"></app-product-advance>
+      <app-product-advance (agregarAlCarrito)="onComprarProductos($event)" [producto]="producto"></app-product-advance>
       }
     </div>
     }

@@ -13,18 +13,22 @@ import { ProductsService } from '../../services/product.service';
 import { BrandMenuComponent } from "../productos/brands/brand-menu.component";
 import { CartService } from '../../services/cart.service';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
+import { AuthService } from '../../services/auth.service';
+import { CreateUserComponent } from "../../components/users/create-user/create-user.component";
+import { InfoLoginComponent } from "../productos/info-login/info-login.component";
 
 @Component({
   selector: 'app-product-filter-page',
-  standalone: true,
   imports: [
     CommonModule,
     FontAwesomeModule,
     ProductAdvanceComponent,
     SkeletonFilterProductComponent,
     BrandMenuComponent,
-    AngularToastifyModule
-],
+    AngularToastifyModule,
+    InfoLoginComponent,
+    CreateUserComponent,
+  ],
   templateUrl: './filter-products.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -44,7 +48,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   products = signal<ProductoFinal[]>([]);
   categories = signal<GroupedCategory[]>([]);
   brands = signal<Brand[]>([]);
-  
+
   activeView = signal<'categories' | 'brands'>('categories');
   currentCategory = signal<GroupedCategory | null>(null);
 
@@ -59,6 +63,9 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   cartItemCount = signal<number>(0);
   isLoggedIn = signal<boolean>(false);
 
+  comprarProductos = signal<boolean>(false);
+  createUser = signal<boolean>(false);
+
 
   constructor(
     private productService: ProductsService,
@@ -67,8 +74,9 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
     private brandService: BrandsService,
     private route: ActivatedRoute,
     private router: Router,
-    private toastService: ToastService
-  ) {}
+    private toastService: ToastService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.loadFilterData(); // Carga categorías y marcas una vez
@@ -79,11 +87,53 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
         subcategory: params['subcategory'] || null,
         brand: params['brand'] || null,
       };
-      
+
       this.resetAndLoadProducts();
       this.updateViewTitle();
       this.cartService.getCartCount().subscribe(count => this.cartItemCount.set(count));
+      this.authService.isLoggedIn$.subscribe(isLoggedIn => this.isLoggedIn.set(isLoggedIn));
     });
+  }
+
+  handleLogin() {
+    this.comprarProductos.set(false);
+    this.createUser.set(false);
+  }
+
+  handleCreate() {
+    this.comprarProductos.set(false);
+    this.createUser.set(true);
+  }
+
+
+  onComprarProductos(product: ProductoFinal | null): void {
+    if (this.isLoggedIn() && product) {
+      this.onAddToCart(product);
+    } else {
+      this.comprarProductos.set(true);
+      const html = document.documentElement;
+      const body = document.body;
+
+      if (this.comprarProductos()) {
+        html.classList.add('no-scroll');
+        body.classList.add('no-scroll');
+      } else {
+        html.classList.remove('no-scroll');
+        body.classList.remove('no-scroll');
+      }
+    }
+  }
+
+  closeComprarProductos() {
+    this.comprarProductos.set(false);
+    const html = document.documentElement;
+    const body = document.body;
+    html.classList.remove('no-scroll');
+    body.classList.remove('no-scroll');
+  }
+
+  onOutregister() {
+    this.createUser.set(false);
   }
 
 
@@ -94,7 +144,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   }
 
   goToCart() {
-    this.router.navigate(['/cart'])
+    this.router.navigate(['/productos/cart'])
   }
 
 
@@ -104,26 +154,26 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
     this.cartService.getCartCount().subscribe(count => this.cartItemCount.set(count));
   }
 
-    /**
+  /**
+ * Navega a la vista de productos para una categoría o subcategoría específica.
+ * @param categoryName El nombre de la categoría o subcategoría.
+ */
+  navigateToSubcategory(categoryName: string): void {
+    if (categoryName) {
+      // Navega a la ruta, por ejemplo: /categorias/Laptops
+      this.router.navigate([`/categorias/${this.currentCategory}`, categoryName]);
+    }
+  }
+  /**
    * Navega a la vista de productos para una categoría o subcategoría específica.
-   * @param categoryName El nombre de la categoría o subcategoría.
+   * @param subcategoryName El nombre de la categoría o subcategoría.
    */
-    navigateToSubcategory(categoryName: string): void {
-      if (categoryName) {
-        // Navega a la ruta, por ejemplo: /categorias/Laptops
-        this.router.navigate([`/categorias/${this.currentCategory}`, categoryName]);
-      }
+  navigateToCategory(subcategoryName: string): void {
+    if (subcategoryName) {
+      // Navega a la ruta, por ejemplo: /categorias/Laptops
+      this.router.navigate([`/categorias`, subcategoryName]);
     }
-    /**
-     * Navega a la vista de productos para una categoría o subcategoría específica.
-     * @param subcategoryName El nombre de la categoría o subcategoría.
-     */
-    navigateToCategory(subcategoryName: string): void {
-      if (subcategoryName) {
-        // Navega a la ruta, por ejemplo: /categorias/Laptops
-        this.router.navigate([`/categorias`, subcategoryName]);
-      }
-    }
+  }
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
@@ -143,9 +193,9 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
 
   private loadProducts(loadMore = false): void {
     if (!this.hasNextPage() && loadMore) return;
-    
+
     this.isLoading.set(true);
-    
+
     this.productService.getAllProducts().subscribe(response => {
       if (loadMore) {
         this.products.update(currentProducts => [...currentProducts, ...response.products]);
@@ -156,7 +206,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
       this.isLoading.set(false);
     });
   }
-  
+
   loadMoreProducts(): void {
     this.currentPage.update(page => page + 1);
     this.loadProducts(true);
@@ -182,7 +232,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   }
 
   // --- Navegación y aplicación de filtros ---
-  
+
   applyFilters(newFilters: { [key: string]: string | null }): void {
     this.router.navigate([], {
       relativeTo: this.route,
@@ -205,7 +255,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   onSelectBrand(brandName: string): void {
     this.applyFilters({ brand: brandName, category: null, subcategory: null });
   }
-  
+
   private updateViewTitle(): void {
     const { category, subcategory, brand } = this.currentFilters;
     if (brand) {

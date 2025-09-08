@@ -91,8 +91,8 @@ export class GridProductsStoreComponent
     }
   }
 
-  addToCart(product: any) {
-    const cantidad = parseInt(product.cantidad) || 1;
+  addToCart(product: ProductoFinal) {
+    const cantidad = parseInt(product.cantidad.toString()) || 1;
     this.añadirAlCarrito.emit(product);
   }
 }

@@ -17,11 +17,12 @@ import { ProductoFinal } from '../../../models/Productos'; // Interfaz correcta 
 import { CartService } from '../../../services/cart.service';
 import { AuthService, Role } from '../../../services/auth.service';
 import { Router } from '@angular/router';
+import { GridProductsStoreComponent } from "../../../components/products/products-store/grid-products-store.component";
 
 @Component({
   selector: 'app-advance-product',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, GridProductsStoreComponent],
   templateUrl: './advance-products.component.html',
   styles: `
     .loader {

@@ -131,8 +131,8 @@
     </div>
   </div>
 
-  <div class="container mx-auto max-w-7xl p-4 py-8 sm:p-8">
-    <div
+  <div class="container mx-auto max-w-7xl">
+    <!-- <div
       *ngIf="filteredProducts().length > 0; else noProducts"
       class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
     >
@@ -244,7 +244,9 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
+
+    <app-grid-products-store (añadirAlCarrito)="addToCart($event)"></app-grid-products-store>
 
     <ng-template #noProducts>
       <div class="flex flex-col items-center py-20 text-center">
@@ -286,5 +288,6 @@
         <fa-icon [icon]="faShoppingCart" class="text-xl md:text-2xl "></fa-icon>
       </a>
     </div>
+
 </div>
 

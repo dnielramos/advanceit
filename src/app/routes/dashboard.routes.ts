@@ -51,6 +51,13 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
+        path: 'payments',
+        loadComponent: () =>
+          import('../components/dashboard/payments-manager/payments-manager.component').then(
+            (m) => m.PaymentsManagerComponent
+          ),
+      },
+      {
         path: 'shippings',
         loadComponent: () =>
           import('../components/dashboard/shippings-manager/shippings-manager.component').then(

@@ -256,6 +256,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
         // ],
       },
       {
+        key: 'pagos',
+        roles: [Role.Admin],
+        label: 'Pagos',
+        icon: faHandshake,
+        routerLink: '/dashboard/payments'
+        // requiresAuth: true, // Este item necesita que el usuario esté logueado
+        // subItems: [
+        //   { label: 'Ver Usuarios', routerLink: '/dashboard/users' },
+        // ],
+      },
+      {
         key: 'shippings',
         roles: [Role.Admin],
         label: 'Envios',

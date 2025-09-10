@@ -1,0 +1,161 @@
+<div class="bg-gray-50 min-h-screen font-sans text-gray-800 p-4 sm:p-6 lg:p-8">
+
+    <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+      <h1 class="text-3xl font-bold text-gray-800">Gestión de Pagos</h1>
+      <button (click)="openCreateModal()" class="flex items-center gap-2 bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-75 transition-all duration-300">
+        <fa-icon [icon]="faPlus"></fa-icon>
+        Registrar Pago
+      </button>
+    </header>
+  
+    <main class="flex flex-col lg:flex-row lg:gap-8">
+  
+      <div class="w-full lg:w-1/3 xl:w-1/4 animate__animated animate__fadeInLeft">
+        @if (isLoading) {
+        <div class="flex justify-center items-center h-64"><fa-icon [icon]="faCircleNotch" size="3x" class="text-violet-500 animate-spin"></fa-icon></div>
+        } @else if (error) {
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center gap-3"><fa-icon [icon]="faExclamationTriangle"></fa-icon><p class="font-bold">{{ error }}</p></div>
+        } @else {
+          <div class="space-y-3">
+            @for (payment of payments; track payment.id) {
+            <div (click)="selectPayment(payment)" [ngClass]="{'bg-violet-50 border-violet-500 shadow-lg': selectedPayment?.id === payment.id, 'bg-white border-gray-200 hover:border-violet-400 hover:shadow-md': selectedPayment?.id !== payment.id}" class="p-4 border rounded-lg cursor-pointer transition-all duration-300">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm text-gray-500">Orden: {{ payment.order_id }}</p>
+                  <p class="font-bold text-lg text-gray-800">{{ payment.monto | currency:'USD':'symbol':'1.2-2' }}</p>
+                </div>
+                <span [ngClass]="statusInfo[payment.estado].color" class="flex items-center gap-2 text-xs font-semibold bg-gray-100 px-2 py-1 rounded-full">
+                    <fa-icon [icon]="statusInfo[payment.estado].icon"></fa-icon>
+                    {{ statusInfo[payment.estado].label }}
+                  </span>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Vence: {{ payment.fechaLimitePago | date }}</p>
+            </div>
+            }
+          </div>
+        }
+      </div>
+  
+      <div class="w-full lg:w-2/3 xl:w-3/4 mt-8 lg:mt-0 animate__animated animate__fadeInUp">
+        @if (selectedPayment) {
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-4 border-b border-gray-200 mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-violet-700">Detalles del Pago</h2>
+              <p class="text-sm text-gray-500">Orden: {{ selectedPayment.order_id }}</p>
+            </div>
+            <div class="mt-4 sm:mt-0 text-right">
+              <p class="text-sm text-gray-600">Monto a Pagar</p>
+              <p class="font-semibold text-2xl">{{ selectedPayment.monto | currency:'USD':'symbol':'1.2-2' }}</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="flex items-center gap-3"><fa-icon [icon]="statusInfo[selectedPayment.estado].icon" size="lg" [ngClass]="statusInfo[selectedPayment.estado].color"></fa-icon><div><span class="text-sm text-gray-500">Estado</span><p class="font-semibold">{{ statusInfo[selectedPayment.estado].label }}</p></div></div>
+            <div class="flex items-center gap-3"><fa-icon [icon]="methodInfo[selectedPayment.metodo].icon" size="lg" class="text-gray-500"></fa-icon><div><span class="text-sm text-gray-500">Método</span><p class="font-semibold">{{ methodInfo[selectedPayment.metodo].label }}</p></div></div>
+            <div class="flex items-center gap-3"><fa-icon [icon]="faClock" size="lg" class="text-gray-500"></fa-icon><div><span class="text-sm text-gray-500">Fecha Límite</span><p class="font-semibold">{{ selectedPayment.fechaLimitePago | date:'longDate' }}</p></div></div>
+            @if(selectedPayment.fechaPago) {
+              <div class="flex items-center gap-3"><fa-icon [icon]="faCheck" size="lg" class="text-green-500"></fa-icon><div><span class="text-sm text-gray-500">Fecha de Pago</span><p class="font-semibold">{{ selectedPayment.fechaPago | date:'longDate' }}</p></div></div>
+            }
+          </div>
+  
+          <div class="mt-8 pt-6 border-t border-gray-200 flex flex-wrap gap-4">
+            <button (click)="openActionModal('status')" class="btn-action bg-blue-100 text-blue-700 hover:bg-blue-200">Cambiar Estado</button>
+            <button (click)="openActionModal('date')" class="btn-action bg-yellow-100 text-yellow-700 hover:bg-yellow-200">Fijar Fecha de Pago</button>
+            <button (click)="openActionModal('voucher')" class="btn-action bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2"><fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante</button>
+          </div>
+  
+        </div>
+        } @else {
+        <div class="hidden lg:flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
+          <div class="text-center text-gray-500">
+            <fa-icon [icon]="faFileInvoiceDollar" size="4x" class="mb-4"></fa-icon>
+            <p class="text-xl font-semibold">Selecciona un pago</p>
+            <p>Elige un pago de la lista para ver sus detalles y acciones.</p>
+          </div>
+        </div>
+        }
+      </div>
+    </main>
+  </div>
+  
+  @if (isCreateModalOpen) {
+  <div class="fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4" (click)="closeCreateModal()">
+    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg animate__animated animate__zoomIn" (click)="$event.stopPropagation()">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Registrar Nuevo Pago</h2>
+      <form #createForm="ngForm" (ngSubmit)="handleCreateSubmit()">
+        <div class="space-y-4">
+          <input type="text" name="order_id" [(ngModel)]="newPayment.order_id" placeholder="ID de la Orden" required class="form-input">
+          <input type="number" name="monto" [(ngModel)]="newPayment.monto" placeholder="Monto" required class="form-input">
+          <div>
+            <label class="form-label">Fecha Límite</label>
+            <input type="date" name="fechaLimitePago" [(ngModel)]="newPayment.fechaLimitePago" required class="form-input mt-1">
+          </div>
+          <div>
+            <label class="form-label">Método de Pago</label>
+            <select name="metodo" [(ngModel)]="newPayment.metodo" class="form-input mt-1">
+              <option value="transferencia">Transferencia</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="credito">Crédito</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex justify-end gap-4 mt-8">
+          <button type="button" (click)="closeCreateModal()" class="btn-secondary">Cancelar</button>
+          <button type="submit" [disabled]="!createForm.valid" class="btn-primary">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+  
+  @if (isActionModalOpen && selectedPayment) {
+  <div class="fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4" (click)="closeActionModal()">
+    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg animate__animated animate__zoomIn" (click)="$event.stopPropagation()">
+      
+      @if (actionType === 'status') { <h2 class="text-2xl font-bold mb-6">Actualizar Estado</h2> }
+      @if (actionType === 'date') { <h2 class="text-2xl font-bold mb-6">Actualizar Fecha de Pago</h2> }
+      @if (actionType === 'voucher') { <h2 class="text-2xl font-bold mb-6">Subir Comprobante</h2> }
+  
+      @if (actionType === 'status') {
+        <form #statusForm="ngForm" (ngSubmit)="handleStatusUpdate()">
+          <select name="status" [(ngModel)]="updateStatus" class="form-input">
+            <option value="pendiente">Pendiente</option>
+            <option value="pagado">Pagado</option>
+            <option value="no_pagado">No Pagado</option>
+            <option value="atrasado">Atrasado</option>
+          </select>
+          <div class="flex justify-end gap-4 mt-8"><button type="button" (click)="closeActionModal()" class="btn-secondary">Cancelar</button><button type="submit" class="btn-primary">Actualizar</button></div>
+        </form>
+      }
+      @if (actionType === 'date') {
+        <form #dateForm="ngForm" (ngSubmit)="handleDateUpdate()">
+            <input type="date" name="date" [(ngModel)]="updateDate" class="form-input">
+            <div class="flex justify-end gap-4 mt-8"><button type="button" (click)="closeActionModal()" class="btn-secondary">Cancelar</button><button type="submit" class="btn-primary">Actualizar</button></div>
+        </form>
+      }
+      @if (actionType === 'voucher') {
+        <div>
+          <label for="voucherFile" class="flex flex-col items-center justify-center w-full h-40 border-2 border-violet-300 border-dashed rounded-lg cursor-pointer bg-violet-50 hover:bg-violet-100">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-violet-600">
+              <fa-icon [icon]="faFileArrowUp" size="3x"></fa-icon>
+              @if (selectedFile) {
+                <p class="mt-2 text-sm text-gray-700"><span class="font-semibold">{{ selectedFile.name }}</span></p>
+              } @else {
+                <p class="mt-2 text-sm"><span class="font-semibold">Click para buscar</span> o arrastra el archivo</p>
+              }
+            </div>
+            <input id="voucherFile" type="file" class="hidden" (change)="onFileSelected($event)">
+          </label>
+          <div class="flex justify-end gap-4 mt-8">
+              <button type="button" (click)="closeActionModal()" class="btn-secondary">Cancelar</button>
+              <button type="button" (click)="handleVoucherUpload()" [disabled]="!selectedFile || isUploading" class="btn-primary flex items-center gap-2">
+                  @if (isUploading) { <fa-icon [icon]="faCircleNotch" class="animate-spin"></fa-icon> Subiendo... }
+                  @else { Subir }
+              </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  }

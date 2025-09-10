@@ -111,25 +111,12 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
       this.onAddToCart(product);
     } else {
       this.comprarProductos.set(true);
-      const html = document.documentElement;
-      const body = document.body;
-
-      if (this.comprarProductos()) {
-        html.classList.add('no-scroll');
-        body.classList.add('no-scroll');
-      } else {
-        html.classList.remove('no-scroll');
-        body.classList.remove('no-scroll');
-      }
     }
   }
 
   closeComprarProductos() {
     this.comprarProductos.set(false);
-    const html = document.documentElement;
-    const body = document.body;
-    html.classList.remove('no-scroll');
-    body.classList.remove('no-scroll');
+
   }
 
   onOutregister() {

@@ -51,6 +51,13 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
+        path: 'shippings',
+        loadComponent: () =>
+          import('../components/dashboard/shippings-manager/shippings-manager.component').then(
+            (m) => m.ShippingsManagerComponent
+          ),
+      },
+      {
         path: 'cotizaciones',
         loadComponent: () =>
           import('../pages/dashboard/quotations/quotation.component').then(

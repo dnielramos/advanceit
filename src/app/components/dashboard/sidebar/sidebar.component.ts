@@ -256,11 +256,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
         // ],
       },
       {
-        key: 'logistica',
+        key: 'shippings',
         roles: [Role.Admin],
-        label: 'Logística',
+        label: 'Envios',
         icon: faTruckFast,
-        routerLink: '/dashboard/logistica'
+        routerLink: '/dashboard/shippings'
         // requiresAuth: true, // Este item necesita que el usuario esté logueado
         // subItems: [
         //   { label: 'Ver Usuarios', routerLink: '/dashboard/users' },

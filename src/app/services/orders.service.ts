@@ -24,7 +24,8 @@ export interface Order {
   precioTotal: number;
   productos: CartItem[]; // Array de cart Items
   cliente: string;
-  shippingNo: string;
+  quotationId : string; // ID de la cotización asociada, si aplica
+  shippingNo?: string;
   notas?: string;
 }
 

@@ -5,16 +5,6 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { ProductAdvanceComponent } from "../product-advance/product-advance.component"; // Importa los iconos específicos
 import { ProductoFinal } from '../../../models/Productos';
 
-// Asumiendo que tienes una interfaz para Product y el componente app-product-advance
-// Si no tienes una interfaz, puedes definirla aquí o ajustarla a tu tipo de dato.
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  // Agrega otras propiedades de tu producto aquí
-}
-
 @Component({
   selector: 'app-slide-product-store',
   standalone: true, // Indica que es un componente standalone

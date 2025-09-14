@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrdersService, Order } from '../../../services/orders.service';
-
-// Importa los nuevos componentes individuales
-import { PageHeaderComponent } from './page-header/page-header.component';
+import { QuotationService } from '../../../services/quotation.service';
 import {
   OrderFilterComponent,
   FilterData,
   ResumenData,
 } from './order-filter/order-filter.component';
 import { OrderCardComponent } from './order-card/order-card.component';
-import { CreateOrderModalComponent } from './create-order-modal/create-order-modal.component';
-import { EditOrderModalComponent } from './edit-order-modal/edit-order-modal.component';
 import { ViewOrderModalComponent } from './view-order-modal/view-order-modal.component';
+import { ProductoFinal } from '../../../models/Productos';
+import { ProductsService } from '../../../services/product.service';
+import { Quotation, QuotationDetail } from '../../../models/quotation.types';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-orders',
@@ -20,11 +20,8 @@ import { ViewOrderModalComponent } from './view-order-modal/view-order-modal.com
   // Asegúrate de importar los nuevos componentes aquí
   imports: [
     CommonModule,
-    PageHeaderComponent,
     OrderFilterComponent,
     OrderCardComponent,
-    CreateOrderModalComponent,
-    EditOrderModalComponent,
     ViewOrderModalComponent,
   ],
   templateUrl: './orders.component.html',
@@ -44,8 +41,8 @@ export class OrdersComponent implements OnInit {
     );
     this.applyFilters(); // Re-aplica filtros para actualizar la vista
     this.updateResumen(); // Actualiza el contador
-
   }
+
   allOrders: Order[] = [];
   filteredOrders: Order[] = [];
 
@@ -65,12 +62,19 @@ export class OrdersComponent implements OnInit {
   orderToEdit: Order | null = null; // ¡NUEVO!
   orderToView: Order | null = null;
 
-
-    // --- Propiedades para manejar el estado de la UI ---
+  // --- Propiedades para manejar el estado de la UI ---
   isUpdating = false;
   updateError: string | null = null;
 
-  constructor(private ordersService: OrdersService) {}
+  isProcessing = false; // Nueva propiedad para indicar el estado de procesamiento
+  quotationToValidate: (Quotation & { details: QuotationDetail[] }) | null =
+    null;
+  productsToValidate: { producto: ProductoFinal; cantidad_solicitada: number }[] = []; // Productos obtenidos para validar
+
+  constructor(
+    private ordersService: OrdersService,
+    private quotationService: QuotationService
+  ) {}
 
   ngOnInit(): void {
     this.loadOrders();
@@ -128,7 +132,7 @@ export class OrdersComponent implements OnInit {
     this.orderToEdit = order;
   }
 
- /**
+  /**
    * Se activa cuando el usuario guarda los cambios en el modal de edición.
    * Llama al servicio para actualizar la orden en la base de datos y,
    * si tiene éxito, actualiza la orden en la lista local y cierra el modal.
@@ -137,7 +141,9 @@ export class OrdersComponent implements OnInit {
   handleSaveChanges(updatedOrder: Order): void {
     // 1. Validar que tenemos una orden para actualizar
     if (!updatedOrder || !updatedOrder.id) {
-      console.error('Error: No se proporcionó una orden válida para actualizar.');
+      console.error(
+        'Error: No se proporcionó una orden válida para actualizar.'
+      );
       return;
     }
 
@@ -153,7 +159,7 @@ export class OrdersComponent implements OnInit {
       // 4. 'next' se ejecuta si la llamada a la API fue exitosa.
       next: (savedOrder) => {
         // Actualiza la lista local con los datos frescos del servidor.
-        const index = this.allOrders.findIndex(o => o.id === savedOrder.id);
+        const index = this.allOrders.findIndex((o) => o.id === savedOrder.id);
         if (index !== -1) {
           this.allOrders[index] = savedOrder;
         }
@@ -169,7 +175,7 @@ export class OrdersComponent implements OnInit {
         console.error('Error al actualizar la orden:', err);
         this.updateError = 'No se pudo guardar la orden. Inténtalo de nuevo.';
         this.isUpdating = false;
-      }
+      },
     });
   }
 
@@ -184,7 +190,6 @@ export class OrdersComponent implements OnInit {
   }
 
   handleCreateOrder(newOrderData: Omit<Order, 'id'>): void {
-
     console.log('Nueva Orden RECIBIDA:', newOrderData);
     this.ordersService.createOrder(newOrderData).subscribe({
       next: () => {
@@ -195,11 +200,49 @@ export class OrdersComponent implements OnInit {
     });
   }
 
-  handleMarkAsPaid(order: Order): void {
+  processOrder(order: Order): void {
     const confirmation = confirm(
       `¿Marcar la Orden #${order.numeroOrden} como "Pagada"?`
     );
     if (!confirmation) return;
+
+    this.isProcessing = true; // Mostrar el modal de procesamiento
+
+    console.log('Procesando orden:', order);
+
+    this.quotationService.findOne(order.quotationId).subscribe({
+      next: (quotation) => {
+        this.quotationToValidate = quotation;
+        console.log('Cotización asociada:', this.quotationToValidate);
+
+        // Ahora, para cada detalle en la cotización, obtener el producto por SKU y conservar la cantidad del producto que dice en detalle
+        if (this.quotationToValidate) {
+          const productObservables = this.quotationToValidate.details.map(
+            (detail) =>
+              this.ordersService.searchProductBySku(detail.product_id)
+          );
+
+          // Suscribirse a todas las búsquedas de productos
+          forkJoin(productObservables).subscribe({
+            next: (products) => {
+              this.productsToValidate = products.map((producto, index) => ({
+                producto,
+                cantidad_solicitada: this.quotationToValidate?.details[index].quantity || 0,
+              }));
+
+              console.log('Productos obtenidos para validar:', this.productsToValidate);
+            },
+            error: (err) => {
+              console.error('Error al obtener productos:', err);
+            },
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al obtener la cotización:', err);
+        this.isProcessing = false;
+      },
+    });
 
     // Lógica para actualizar (aquí simulada en el front)
     const orderToUpdate = this.allOrders.find(

@@ -144,4 +144,13 @@ export class ProductsService {
   get getFavoritesProducts() {
     return this._productosFavorites;
   }
+
+  getProductBySku(sku: string): Observable<ProductoFinal | null> {
+    return this.http.get<ProductoFinal>(`${this.apiUrlRender}/advance-products/by-sku/${sku}`).pipe(
+      catchError((error) => {
+        console.error(`Error no pude obtener el producto con SKU ${sku}: debido a ::: `, error);
+        return of(null);
+      })
+    );
+  }
 }

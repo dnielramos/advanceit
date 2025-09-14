@@ -21,7 +21,7 @@ import { AngularToastifyModule, ToastService } from 'angular-toastify';
   imports: [CommonModule, FormsModule, FaIconComponent, AngularToastifyModule],
   template: `
     <div
-      class="hero-sectionS mt-10 flex bg-linear-to-b from-white to-purple-200 items-center justify-center"
+      class="hero-sectionS fixed mt-0 z-50 flex bg-linear-to-b from-white to-purple-200 items-center justify-center"
     >
       <lib-toastify-toast-container
         [iconLibrary]="'font-awesome'"
@@ -47,7 +47,7 @@ import { AngularToastifyModule, ToastService } from 'angular-toastify';
               />
             </div>
             <h2 class="text-2xl font-bold text-center text-orange-500 mb-6">
-              Inicio de sesion
+              Inicio de sesión
             </h2>
             <form #loginForm="ngForm" (ngSubmit)="onLogin(loginForm)">
               <!-- Campos del formulario (sin cambios) -->

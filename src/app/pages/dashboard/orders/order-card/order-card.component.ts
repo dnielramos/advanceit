@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPen, faEye, faCheckSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faEye, faCheckSquare, faTrash, faCodeCompare } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '../../../../services/orders.service';
 import { AuthService } from '../../../../services/auth.service';
 
@@ -38,6 +38,7 @@ export class OrderCardComponent implements OnDestroy{
   faEye = faEye;
   faCheckSquare = faCheckSquare;
   faTrash = faTrash;
+  faCodeCompare = faCodeCompare;
 
   get estadoPagoClass() {
     return {

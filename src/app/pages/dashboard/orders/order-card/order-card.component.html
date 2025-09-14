@@ -2,7 +2,7 @@
   class="bg-white rounded-lg shadow-sm p-4 transition hover:shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-4 my-4">
 
   <div class="flex-1">
-    <p class="font-semibold text-slate-800">Orden #{{ order.numeroOrden }}</p>
+    <p class="font-semibold text-purple-600">Orden {{ order.numeroOrden }}</p>
     <p class="text-sm text-slate-500">{{ order.cliente }}</p>
     <p class="text-xs text-slate-400 mt-1 font-medium">{{ order.productos.length }} Items</p>
   </div>
@@ -16,12 +16,12 @@
 
   <div
     class="flex items-center gap-1 border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-4 mt-3 md:mt-0">
-    <!-- <button *ngIf="order.estadoPago !== 'pagado'" (click)="markAsPaid.emit(order)"
+    <button *ngIf="order.estadoPago !== 'pagado'" (click)="markAsPaid.emit(order)"
       class="flex items-center gap-1.5 text-sm font-semibold text-green-600 px-3 py-1.5 rounded-md hover:bg-green-50 transition-colors"
       aria-label="Marcar como pagada">
-      <fa-icon [icon]="faCheckSquare"></fa-icon> Cerrar
-    </button> -->
-    <button *ngIf="order.estadoPago !== 'pagado'"
+      <fa-icon [icon]="faCodeCompare"></fa-icon> Procesar orden
+    </button>
+    <button *ngIf="order.estadoPago === 'pagado'"
       class="flex items-center gap-1.5 text-sm font-semibold text-green-600 px-3 py-1.5 rounded-md hover:bg-green-50 transition-colors"
       aria-label="Marcar como pagada">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -36,16 +36,17 @@
       class="p-2 text-slate-500 hover:text-purple-600 rounded-full hover:bg-slate-100 transition-colors"
       aria-label="Ver">
       <fa-icon [icon]="faEye" class="w-4 h-4"></fa-icon>
+      Mostrar detalles
     </button>
-    <button (click)="edit.emit(order)" *ngIf="!isLoggedIn"
+    <!-- <button (click)="edit.emit(order)"
       class="p-2 text-slate-500 hover:text-purple-600 rounded-full hover:bg-slate-100 transition-colors"
       aria-label="Editar">
       <fa-icon [icon]="faPen" class="w-4 h-4"></fa-icon>
     </button>
-    <button (click)="delete.emit(order)" *ngIf="!isLoggedIn"
+    <button (click)="delete.emit(order)"
       class="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
       aria-label="Eliminar">
       <fa-icon [icon]="faTrash" class="w-4 h-4"></fa-icon>
-    </button>
+    </button> -->
   </div>
 </div>

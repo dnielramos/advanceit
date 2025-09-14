@@ -1,10 +1,12 @@
 <div class="p-4 sm:p-6 md:p-8 bg-slate-50 hflexy scroll-purple flex flex-col">
 
-  <app-page-header
+  <!-- <app-page-header
     title="Gestión de Órdenes"
     buttonText="Crear Nueva Orden"
     (buttonClick)="isCreateModalVisible = true"
-  ></app-page-header>
+  ></app-page-header> -->
+
+  <h1 class="text-2xl text-transparent flex gap-2 bg-clip-text bg-gradient-to-r from-purple-600 to-orange-800 font-bold mb-4"><span class="hidden: md:block">Gestión de</span> Órdenes</h1>
 
   <app-order-filter
     [filters]="filters"

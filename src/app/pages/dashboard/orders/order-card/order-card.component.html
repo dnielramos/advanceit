@@ -8,8 +8,11 @@
   </div>
 
   <div class="flex items-center gap-4 md:gap-6">
-    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" [ngClass]="estadoPagoClass">
+    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" *ngIf="order.estadoPago !== 'pagado'" [ngClass]="estadoPagoClass">
       {{ order.estadoPago.replace('_', ' ') }}
+    </span>
+    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" *ngIf="order.estadoPago == 'pagado'" [ngClass]="estadoPagoClass">
+      {{ 'Procesado' }}
     </span>
     <p class="text-lg font-bold text-slate-800 w-28 text-right">${{ order.precioTotal | number:'1.2-2' }}</p>
   </div>

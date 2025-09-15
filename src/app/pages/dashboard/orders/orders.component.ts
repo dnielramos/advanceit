@@ -14,6 +14,7 @@ import { ProductsService } from '../../../services/product.service';
 import { Quotation, QuotationDetail } from '../../../models/quotation.types';
 import { forkJoin } from 'rxjs';
 import { CreateOrderModalComponent } from './create-order-modal/create-order-modal.component';
+import { CreateShippingDto, ShippingsService } from '../../../services/shippings.service';
 
 @Component({
   selector: 'app-orders',
@@ -24,7 +25,7 @@ import { CreateOrderModalComponent } from './create-order-modal/create-order-mod
     OrderFilterComponent,
     OrderCardComponent,
     ViewOrderModalComponent,
-    CreateOrderModalComponent
+    CreateOrderModalComponent,
   ],
   templateUrl: './orders.component.html',
 })
@@ -69,13 +70,17 @@ export class OrdersComponent implements OnInit {
   updateError: string | null = null;
 
   isProcessing = false; // Nueva propiedad para indicar el estado de procesamiento
-  orderToProcess : Order | null = null; // Orden que se está procesando
+  orderToProcess: Order | null = null; // Orden que se está procesando
   quotationToValidate: (Quotation & { details: QuotationDetail[] }) | null =
     null;
-  productsToValidate: { producto: ProductoFinal | null; cantidad_solicitada: number }[] = []; // Productos obtenidos para validar
+  productsToValidate: {
+    producto: ProductoFinal | null;
+    cantidad_solicitada: number;
+  }[] = []; // Productos obtenidos para validar
 
   constructor(
     private ordersService: OrdersService,
+    private shippingService: ShippingsService,
     private quotationService: QuotationService,
     private productsService: ProductsService
   ) {}
@@ -214,6 +219,42 @@ export class OrdersComponent implements OnInit {
     this.orderToProcess = order; // Establecer la orden que se está procesando
 
     console.log('Procesando orden:', order);
+  }
 
+  handleProcessOrder(shippingData: CreateShippingDto): void {
+    if (!this.orderToProcess) {
+      console.error('No hay una orden seleccionada para procesar.');
+      return;
+    }
+
+    // Aquí puedes manejar el proceso de envío utilizando shippingData
+    console.log('Datos de envío recibidos:', shippingData);
+
+    // Crear el envío en el backend
+    this.shippingService.createShipping(shippingData).subscribe({
+      next: (newShipping) => {
+        alert('Envío creado exitosamente.');
+        console.log('Envío creado exitosamente:', newShipping);
+      },
+      error: (err) => {
+        console.error('Error creando el envío:', err);
+        alert('Hubo un error al crear el envío. Por favor, inténtalo de nuevo.');
+      },
+    });
+
+
+    this.ordersService
+      .updateOrderStatus(this.orderToProcess.id, 'pagado')
+      .subscribe({
+        next: () => {
+          console.log('Estado de la orden actualizado a "pagado".');
+          this.loadOrders(); // Recargar la lista de órdenes
+        },
+        error: (err) => {
+          console.error('Error al actualizar el estado de la orden:', err);
+        },
+      });
+    this.isProcessing = false; // Cerrar el modal de procesamiento
+    this.orderToProcess = null; // Limpiar la orden procesada
   }
 }

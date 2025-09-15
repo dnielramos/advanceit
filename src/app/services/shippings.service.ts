@@ -5,13 +5,23 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import { 
-  Shipping, 
-  CreateShippingPayload, 
-  UpdateStatusPayload, 
-  UpdateDeliveryDatePayload 
+import {
+  Shipping,
+  CreateShippingPayload,
+  UpdateStatusPayload,
+  UpdateDeliveryDatePayload
 } from '../models/shipping.model';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
+
+
+export interface CreateShippingDto {
+  order_id: string;
+  transportadora: string;
+  guia: string;
+  fechaEstimada: string; // YYYY-MM-DD
+  notas?: string;
+  direccion_entrega?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +29,7 @@ import { ENVIRONMENT } from '../../enviroments/enviroment';
 export class ShippingsService {
   // Asegúrate de que esta URL base coincida con la de tu backend.
   // Es recomendable usar variables de entorno para esto.
-  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/shippings`; 
+  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/shippings`;
 
   constructor(private http: HttpClient) { }
 

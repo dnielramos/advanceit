@@ -29,6 +29,7 @@ import { UsersService } from '../../../../services/users.service';
 import { CompaniesService, Company } from '../../../../services/companies.service';
 import { PopulatedQuotation, Quotation } from '../../../../models/quotation.types';
 import { User } from '../../../../models/user';
+import { CreateShippingDto } from '../../../../services/shippings.service';
 
 // Interface para el evento de salida
 export interface ProcessOrderPayload {
@@ -48,7 +49,7 @@ export interface ProcessOrderPayload {
 export class CreateOrderModalComponent implements OnInit {
   @Input() order: Order | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() processOrder = new EventEmitter<ProcessOrderPayload>();
+  @Output() processOrder = new EventEmitter<CreateShippingDto>();
 
   // --- Iconos ---
   faTimes = faTimes;
@@ -188,14 +189,22 @@ export class CreateOrderModalComponent implements OnInit {
 
     const payload: ProcessOrderPayload = {
         orderId: this.order.id,
-        shippingAddress: this.shippingAddress.trim(),
-        estimatedDeliveryDays: this.estimatedDeliveryDays,
         carrier: this.carrier.trim(),
-        trackingNumber: this.trackingNumber.trim()
+        trackingNumber: this.trackingNumber.trim(),
+        estimatedDeliveryDays: this.estimatedDeliveryDays,
+        shippingAddress: this.shippingAddress.trim(),
     };
 
-    console.log('Procesando Orden:', payload);
-    this.processOrder.emit(payload);
+    const shippingData: CreateShippingDto = {
+      order_id: this.order.id,
+      transportadora: this.carrier.trim(),
+      guia: this.trackingNumber.trim(),
+      fechaEstimada: this.estimatedDeliveryDays ? new Date(Date.now() + this.estimatedDeliveryDays * 86400000).toISOString().split('T')[0] : '',
+      direccion_entrega: `Envío para la orden ${this.order.id}`
+    };
+
+    console.log('Procesando Orden:', shippingData);
+    this.processOrder.emit(shippingData);
 
     // Simula una llamada a API y luego cierra
     setTimeout(() => {

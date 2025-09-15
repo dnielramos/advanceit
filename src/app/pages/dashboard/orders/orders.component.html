@@ -5,6 +5,7 @@
     <app-create-order-modal
       [order]="orderToProcess"
       (close)="isProcessing = false"
+      (processOrder)="handleProcessOrder($event); isProcessing = false"
     ></app-create-order-modal>
   </div>
 

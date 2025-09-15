@@ -13,6 +13,7 @@ import { ProductoFinal } from '../../../models/Productos';
 import { ProductsService } from '../../../services/product.service';
 import { Quotation, QuotationDetail } from '../../../models/quotation.types';
 import { forkJoin } from 'rxjs';
+import { CreateOrderModalComponent } from './create-order-modal/create-order-modal.component';
 
 @Component({
   selector: 'app-orders',
@@ -23,6 +24,7 @@ import { forkJoin } from 'rxjs';
     OrderFilterComponent,
     OrderCardComponent,
     ViewOrderModalComponent,
+    CreateOrderModalComponent
   ],
   templateUrl: './orders.component.html',
 })
@@ -67,6 +69,7 @@ export class OrdersComponent implements OnInit {
   updateError: string | null = null;
 
   isProcessing = false; // Nueva propiedad para indicar el estado de procesamiento
+  orderToProcess : Order | null = null; // Orden que se está procesando
   quotationToValidate: (Quotation & { details: QuotationDetail[] }) | null =
     null;
   productsToValidate: { producto: ProductoFinal | null; cantidad_solicitada: number }[] = []; // Productos obtenidos para validar
@@ -208,6 +211,7 @@ export class OrdersComponent implements OnInit {
     if (!confirmation) return;
 
     this.isProcessing = true; // Mostrar el modal de procesamiento
+    this.orderToProcess = order; // Establecer la orden que se está procesando
 
     console.log('Procesando orden:', order);
 

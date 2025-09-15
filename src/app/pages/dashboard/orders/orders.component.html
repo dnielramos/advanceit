@@ -2,8 +2,11 @@
 
   <!-- Modal de procesamiento de orden -->
    <div *ngIf="isProcessing" class="fixed inset-0 bg-black/40 flex items-center justify-center z-1000">
-
-   </div>
+    <app-create-order-modal
+      [order]="orderToProcess"
+      (close)="isProcessing = false"
+    ></app-create-order-modal>
+  </div>
 
   <h1 class="text-2xl text-transparent flex gap-2 bg-clip-text bg-gradient-to-r from-purple-600 to-orange-800 font-bold mb-4">
     <span class="hidden: md:block">Gestión de</span> Órdenes

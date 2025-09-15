@@ -29,7 +29,7 @@ export interface Order {
   notas?: string;
 }
 
-interface OrderProducts extends ProductoFinal {
+export interface OrderProducts extends ProductoFinal {
   cantidad_solicitada: number; // Cantidad solicitada en la orden
 }
 

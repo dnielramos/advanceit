@@ -2,25 +2,42 @@
 ================================================================
 /src/app/components/orders/create-order-modal/create-order-modal.component.ts
 ================================================================
-Lógica del componente actualizada para funcionar con el nuevo OrdersService.
+Lógica del componente refactorizada para una mejor carga de datos, validación centralizada y una UI/UX mejorada.
 */
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-// Se importan las interfaces actualizadas del servicio
 import {
-  OrdersService,
-  Order,
-} from '../../../../services/orders.service';
-import { ProductoFinal } from '../../../../models/Productos';
+  faTimes,
+  faCheckCircle,
+  faExclamationTriangle,
+  faSpinner,
+  faCreditCard,
+  faBoxOpen,
+  faUser,
+} from '@fortawesome/free-solid-svg-icons';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+// --- Interfaces (se asume que están en los archivos correspondientes) ---
+
+// --- Servicios ---
+import { Order, OrderProducts, OrdersService } from '../../../../services/orders.service';
 import { QuotationService } from '../../../../services/quotation.service';
-import { ProductsService } from '../../../../services/product.service';
+import { UsersService } from '../../../../services/users.service';
+import { CompaniesService, Company } from '../../../../services/companies.service';
 import { PopulatedQuotation, Quotation } from '../../../../models/quotation.types';
 import { User } from '../../../../models/user';
-import { Company } from '../../../../services/companies.service';
-import { forkJoin } from 'rxjs';
+
+// Interface para el evento de salida
+export interface ProcessOrderPayload {
+  orderId: string;
+  shippingAddress: string;
+  estimatedDeliveryDays: number | null;
+  carrier: string;
+  trackingNumber: string;
+}
 
 @Component({
   selector: 'app-create-order-modal',
@@ -29,170 +46,161 @@ import { forkJoin } from 'rxjs';
   templateUrl: './create-order-modal.component.html',
 })
 export class CreateOrderModalComponent implements OnInit {
-
-  @Input() order !: Order;
-  isProcessing = false; // Estado para mostrar el modal de procesamiento
+  @Input() order: Order | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() createOrder = new EventEmitter<Omit<Order, 'id'>>();
+  @Output() processOrder = new EventEmitter<ProcessOrderPayload>();
 
   // --- Iconos ---
   faTimes = faTimes;
+  faCheckCircle = faCheckCircle;
+  faExclamationTriangle = faExclamationTriangle;
+  faSpinner = faSpinner;
+  faCreditCard = faCreditCard;
+  faBoxOpen = faBoxOpen;
+  faUser = faUser;
 
-  // --- Estado interno del formulario ---
-  newOrderClient = '';
-  newOrderNote = '';
-  newOrderProducts: ProductoFinal[] = [];
-  newProductInput = '';
-  productSearchResult: ProductoFinal | null = null;
-  productSearchError = '';
-  isSearching = false; // Añadido para feedback al usuario
-
-  cotizacion : PopulatedQuotation | null = null;
-  compania : Company | null = null;
-  usuario : User | null = null;
-  quotationToValidate: PopulatedQuotation | null = null;
-  productsToValidate: { producto: ProductoFinal | null; cantidad_solicitada: number }[] = [];
-
-  // --- Nuevos campos para el detalle del envío ---
-  newOrderShippingAddress = '';
-  newOrderEstimatedDeliveryTime: number | null = null;
-  newOrderCarrier = '';
-  newOrderTrackingNumber = '';
-
-  // --- Campos para Validación ---
-  isOrderValid = false;
-  validationErrors: string[] = [];
+  // --- Estado de Carga y UI ---
+  isLoading = true;
   isSubmitting = false;
+  loadingMessage = 'Cargando detalles de la orden...';
 
-  constructor(private ordersService: OrdersService, private quotationService: QuotationService, private productsService: ProductsService) {}
+  // --- Datos para Validación ---
+  quotation: PopulatedQuotation | null = null;
+  company: Company | null = null;
+  user: User | null = null;
+  products: OrderProducts[] = [];
 
-  // --- Lógica para Procesar la Orden ---
+  // --- Estado de Validación ---
+  isOrderValid = false;
+  creditCheck = { valid: false, available: 0, remaining: 0 };
+  stockCheckValid = false;
+  formCheckValid = false;
+  validationErrors: string[] = [];
+
+  // --- Campos del Formulario de Envío ---
+  shippingAddress = '';
+  estimatedDeliveryDays: number | null = null;
+  carrier = '';
+  trackingNumber = '';
+
+  constructor(
+    private ordersService: OrdersService,
+    private quotationService: QuotationService,
+    private usersService: UsersService,
+    private companyService: CompaniesService
+  ) {}
+
   ngOnInit(): void {
-    this.getQuotation();
+    if (this.order) {
+      this.loadOrderData();
+    } else {
+      this.isLoading = false;
+      this.validationErrors.push('No se proporcionó una orden para procesar.');
+    }
   }
 
-  getQuotation(): void {
+  loadOrderData(): void {
     if (!this.order) return;
 
-    this.quotationService.findOne(this.order.quotationId).subscribe({
-      next: (quotation) => {
-        this.quotationToValidate = quotation;
-        console.log('Cotización asociada:', this.quotationToValidate);
+    // 1. Cargar productos de la orden
+    this.ordersService.getOrderProducts(this.order.id).subscribe({
+      next: (orderProducts) => {
+        this.products = orderProducts;
 
-        // Ahora, para cada detalle en la cotización, obtener el producto por id y conservar la cantidad del producto que dice en detalle
-        if (this.quotationToValidate) {
-          const productObservables = this.quotationToValidate.details.map(
-            (detail) =>
-              this.productsService.getProductById(detail.product_id)
-          );
+        // 2. Cargar la cotización asociada
+        this.quotationService.findOne(this.order!.quotationId).subscribe({
+          next: (quotation) => {
+            this.quotation = quotation;
 
-          // Suscribirse a todas las búsquedas de productos
-          forkJoin(productObservables).subscribe({
-            next: (products) => {
-              this.productsToValidate = products.map((producto, index) => ({
-                producto,
-                cantidad_solicitada: this.quotationToValidate?.details[index].quantity || 0,
-              }));
+            // 3. Cargar usuario y compañía en paralelo
+            this.loadingMessage = 'Verificando cliente y crédito...';
+            forkJoin({
+              user: this.usersService.getUserById(quotation.user_id).pipe(catchError(() => of(null))),
+              company: this.companyService.findById(quotation.company_id).pipe(catchError(() => of(null)))
+            }).subscribe(({ user, company }) => {
+                if (user) this.user = user;
+                if (company) this.company = company;
 
-              console.log('Productos obtenidos para validar:', this.productsToValidate);
-            },
-            error: (err) => {
-              console.error('Error al obtener productos:', err);
-            },
-          });
-        }
+                // 4. Una vez cargado todo, validar la orden
+                this.validateOrder();
+                this.isLoading = false;
+            });
+          },
+          error: () => this.handleLoadError('No se pudo cargar la cotización asociada.'),
+        });
       },
-      error: (err) => {
-        console.error('Error al obtener la cotización:', err);
-        this.isProcessing = false;
-      },
+      error: () => this.handleLoadError('No se pudieron cargar los productos de la orden.'),
     });
   }
 
-
-      processOrder(order: Order): void {
-      const confirmation = confirm(
-        `¿Marcar la Orden #${order.numeroOrden} como "Pagada"?`
-      );
-      if (!confirmation) return;
-
-      this.isProcessing = true; // Mostrar el modal de procesamiento
-
-      console.log('Procesando orden:', order);
-
-      this.quotationService.findOne(order.quotationId).subscribe({
-        next: (quotation) => {
-          this.quotationToValidate = quotation;
-          console.log('Cotización asociada:', this.quotationToValidate);
-
-          // Ahora, para cada detalle en la cotización, obtener el producto por id y conservar la cantidad del producto que dice en detalle
-          if (this.quotationToValidate) {
-            const productObservables = this.quotationToValidate.details.map(
-              (detail) =>
-                this.productsService.getProductById(detail.product_id)
-            );
-
-            // Suscribirse a todas las búsquedas de productos
-            forkJoin(productObservables).subscribe({
-              next: (products) => {
-                this.productsToValidate = products.map((producto, index) => ({
-                  producto,
-                  cantidad_solicitada: this.quotationToValidate?.details[index].quantity || 0,
-                }));
-
-                console.log('Productos obtenidos para validar:', this.productsToValidate);
-              },
-              error: (err) => {
-                console.error('Error al obtener productos:', err);
-              },
-            });
-          }
-        },
-        error: (err) => {
-          console.error('Error al obtener la cotización:', err);
-          this.isProcessing = false;
-        },
-      });
-    }
-
-
-  calculateTotal(): number {
-    return this.newOrderProducts.reduce((acc, p) => acc + (p["price"] || 0), 0);
+  private handleLoadError(message: string): void {
+      this.validationErrors.push(message);
+      this.isLoading = false;
   }
 
-  // --- Lógica para Crear y Emitir la Orden ---
+  validateOrder(): void {
+    this.validationErrors = [];
+
+    // --- Validación 1: Crédito de la Compañía ---
+    if (this.company && this.order) {
+      this.creditCheck.available = this.company.saldo_credito - this.company.saldo_gastado;
+      this.creditCheck.valid = this.creditCheck.available >= this.order.precioTotal;
+      this.creditCheck.remaining = this.creditCheck.available - this.order.precioTotal;
+      if (!this.creditCheck.valid) {
+        this.validationErrors.push('Crédito insuficiente para cubrir el total de la orden.');
+      }
+    } else {
+      this.creditCheck.valid = false;
+      this.validationErrors.push('No se pudo verificar la información de crédito de la compañía.');
+    }
+
+    // --- Validación 2: Stock de Productos ---
+    this.stockCheckValid = this.products.every(
+      (p) => p.cantidad_solicitada <= (p.cantidad ?? 0)
+    );
+    if (!this.stockCheckValid) {
+      this.validationErrors.push('Uno o más productos no tienen stock suficiente.');
+    }
+
+    // --- Validación 3: Formulario de Envío ---
+    this.formCheckValid = this.shippingAddress.trim() !== '' && this.carrier.trim() !== '' && this.trackingNumber.trim() !== '';
+    if (!this.formCheckValid) {
+        this.validationErrors.push('La dirección, transportadora y número de guía son obligatorios.');
+    }
+
+    // --- Estado Final de Validación ---
+    this.isOrderValid = this.creditCheck.valid && this.stockCheckValid && this.formCheckValid;
+  }
+
+  // Se llama cada vez que el formulario cambia para re-validar
+  onFormChange(): void {
+    this.validateOrder();
+  }
+
   submitOrder(): void {
-    if (!this.newOrderClient.trim() || this.newOrderProducts.length === 0) {
-      alert('El nombre del cliente y al menos un producto son obligatorios.');
+    this.validateOrder(); // Re-validar por si acaso
+    if (!this.isOrderValid || !this.order) {
+      alert('Por favor, corrige los errores antes de continuar.');
       return;
     }
 
-    const { fecha, hora } = this.getCurrentDateTime();
-    // ACTUALIZADO: El tipo de la nueva orden coincide con Omit<Order, 'id'>
-    // const newOrderData: Omit<Order, 'id'> = {
-    //   numeroOrden: this.generateOrderNumber(),
-    //   fecha,
-    //   hora,
-    //   estadoPago: 'pendiente',
-    //   precioTotal: this.calculateTotal(),
-    //   // El método para obtener los SKUs sigue siendo válido
-    //   // productos: this.newOrderProducts.map((product) => product.SKU),
-    //   cliente: this.newOrderClient.trim(),
-    //   shippingNo: `SH-${Math.floor(Math.random() * 1000)
-    //     .toString()
-    //     .padStart(3, '0')}`,
-    //   notas: this.newOrderNote.trim(),
-    // };
+    this.isSubmitting = true;
 
-    // console.log('Nueva Orden:', newOrderData);
-    // this.createOrder.emit(newOrderData);
-    this.close.emit(); // Cierra el modal después de emitir
-  }
-  // --- Métodos Auxiliares ---
-  private getCurrentDateTime(): { fecha: string; hora: string } {
-    const now = new Date();
-    const fecha = now.toISOString().split('T')[0]; // Formato YYYY-MM-DD
-    const hora = now.toTimeString().split(' ')[0]; // Formato HH:MM:SS
-    return { fecha, hora };
+    const payload: ProcessOrderPayload = {
+        orderId: this.order.id,
+        shippingAddress: this.shippingAddress.trim(),
+        estimatedDeliveryDays: this.estimatedDeliveryDays,
+        carrier: this.carrier.trim(),
+        trackingNumber: this.trackingNumber.trim()
+    };
+
+    console.log('Procesando Orden:', payload);
+    this.processOrder.emit(payload);
+
+    // Simula una llamada a API y luego cierra
+    setTimeout(() => {
+        this.isSubmitting = false;
+        this.close.emit();
+    }, 1500);
   }
 }

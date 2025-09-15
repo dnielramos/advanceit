@@ -1,20 +1,8 @@
-<div class="p-4 sm:p-6 md:p-8 bg-slate-50 hflexy scroll-purple flex flex-col">
+<div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple flex flex-col">
 
   <!-- Modal de procesamiento de orden -->
    <div *ngIf="isProcessing" class="fixed inset-0 bg-black/40 flex items-center justify-center z-1000">
-    <p (click)="isProcessing = false">cerrar</p>
-     <h2 class="text-lg font-semibold">Procesando Orden...</h2>
-     <p>Por favor, espera mientras se procesa tu solicitud.</p>
 
-     <div *ngFor="let detail of productsToValidate">
-       <p>Validando producto: {{ detail.producto.nombre }}</p>
-       <p>SKU: {{ detail.producto.SKU }}</p>
-       <p>Stock Disponible: {{ detail.producto.cantidad }}</p>
-       <p>Cantidad: {{ detail.cantidad_solicitada }}</p>
-        <p *ngIf="detail.producto.cantidad < detail.cantidad_solicitada" class="text-red-600 font-bold">
-          ¡Stock Insuficiente!
-        </p>
-     </div>
    </div>
 
   <h1 class="text-2xl text-transparent flex gap-2 bg-clip-text bg-gradient-to-r from-purple-600 to-orange-800 font-bold mb-4">

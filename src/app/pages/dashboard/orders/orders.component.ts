@@ -69,11 +69,12 @@ export class OrdersComponent implements OnInit {
   isProcessing = false; // Nueva propiedad para indicar el estado de procesamiento
   quotationToValidate: (Quotation & { details: QuotationDetail[] }) | null =
     null;
-  productsToValidate: { producto: ProductoFinal; cantidad_solicitada: number }[] = []; // Productos obtenidos para validar
+  productsToValidate: { producto: ProductoFinal | null; cantidad_solicitada: number }[] = []; // Productos obtenidos para validar
 
   constructor(
     private ordersService: OrdersService,
-    private quotationService: QuotationService
+    private quotationService: QuotationService,
+    private productsService: ProductsService
   ) {}
 
   ngOnInit(): void {
@@ -202,7 +203,7 @@ export class OrdersComponent implements OnInit {
 
   processOrder(order: Order): void {
     const confirmation = confirm(
-      `¿Marcar la Orden #${order.numeroOrden} como "Pagada"?`
+      `Para cerrar la orden #${order.numeroOrden} es necesario tener los datos de la guía de envío. \n¿Deseas continuar?`
     );
     if (!confirmation) return;
 
@@ -210,50 +211,5 @@ export class OrdersComponent implements OnInit {
 
     console.log('Procesando orden:', order);
 
-    this.quotationService.findOne(order.quotationId).subscribe({
-      next: (quotation) => {
-        this.quotationToValidate = quotation;
-        console.log('Cotización asociada:', this.quotationToValidate);
-
-        // Ahora, para cada detalle en la cotización, obtener el producto por SKU y conservar la cantidad del producto que dice en detalle
-        if (this.quotationToValidate) {
-          const productObservables = this.quotationToValidate.details.map(
-            (detail) =>
-              this.ordersService.searchProductBySku(detail.product_id)
-          );
-
-          // Suscribirse a todas las búsquedas de productos
-          forkJoin(productObservables).subscribe({
-            next: (products) => {
-              this.productsToValidate = products.map((producto, index) => ({
-                producto,
-                cantidad_solicitada: this.quotationToValidate?.details[index].quantity || 0,
-              }));
-
-              console.log('Productos obtenidos para validar:', this.productsToValidate);
-            },
-            error: (err) => {
-              console.error('Error al obtener productos:', err);
-            },
-          });
-        }
-      },
-      error: (err) => {
-        console.error('Error al obtener la cotización:', err);
-        this.isProcessing = false;
-      },
-    });
-
-    // Lógica para actualizar (aquí simulada en el front)
-    const orderToUpdate = this.allOrders.find(
-      (o) => o.numeroOrden === order.numeroOrden
-    );
-    if (orderToUpdate) {
-      orderToUpdate.estadoPago = 'pagado';
-      this.applyFilters(); // Re-aplica filtros para actualizar la vista
-      this.updateResumen(); // Actualiza el contador
-      // En un caso real, llamarías aquí al servicio:
-      // this.ordersService.updateOrder(order.id, { estadoPago: 'pagado' }).subscribe(...);
-    }
   }
 }

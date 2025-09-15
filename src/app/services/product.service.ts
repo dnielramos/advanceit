@@ -153,4 +153,14 @@ export class ProductsService {
       })
     );
   }
+
+
+  getProductById(id: string): Observable<ProductoFinal | null> {
+    return this.http.get<ProductoFinal>(`${this.apiUrlRender}/advance-products?id=${id}`).pipe(
+      catchError((error) => {
+        console.error(`Error no pude obtener el producto con ID ${id}: debido a ::: `, error);
+        return of(null);
+      })
+    );
+  }
 }

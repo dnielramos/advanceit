@@ -37,6 +37,13 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
+        path: 'orders/procesar-orden',
+        loadComponent: () =>
+          import('../pages/dashboard/orders/create-order-modal/create-order-modal.component').then(
+            (m) => m.CreateOrderModalComponent
+          ),
+      },
+      {
         path: 'users',
         loadComponent: () =>
           import('../pages/dashboard/users/user-list.component').then(
@@ -86,7 +93,7 @@ export const dashboardRoutes: Routes = [
             '../pages/dashboard/advance-products/advance-products.component'
           ).then((m) => m.AdvanceProductsComponent),
       },
-      
+
       { path: 'cart', loadComponent: () => import('../components/cart/cart.component').then(m => m.CartComponent) },
       {
         path: '',

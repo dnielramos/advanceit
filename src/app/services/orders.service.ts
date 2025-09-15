@@ -29,8 +29,8 @@ export interface Order {
   notas?: string;
 }
 
-interface ApiNexsysResponse {
-  return: ProductoFinal[];
+interface OrderProducts extends ProductoFinal {
+  cantidad_solicitada: number; // Cantidad solicitada en la orden
 }
 
 @Injectable({
@@ -91,26 +91,13 @@ export class OrdersService {
 
   // --- Métodos para Productos relacionados a una Orden ---
 
-  getOrderProducts(orderId: string): Observable<ApiNexsysResponse> {
+  getOrderProducts(orderId: string): Observable<OrderProducts[]> {
     return this.http
-      .get<ApiNexsysResponse>(`${this.apiUrl}/${orderId}/products`)
+      .get<OrderProducts[]>(`${this.apiUrl}/${orderId}/products`)
       .pipe(catchError(this.handleError));
   }
 
-  searchProductBySku(sku: string): Observable<ProductoFinal> {
-    return this.http.get<any>(`${this.productSearchUrl}?sku=${sku}`).pipe(
-      map((response) => {
 
-        console.log('Respuesta de búsqueda de producto por SKU:', response);
-        // Validar estructura de respuesta
-        if (response) {
-          return response as ProductoFinal;
-        }
-        throw new Error('Producto no encontrado');
-      }),
-      catchError(this.handleError)
-    );
-  }
 
   // --- Manejo de Errores ---
   private handleError(error: any) {

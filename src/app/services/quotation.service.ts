@@ -8,9 +8,9 @@ import {
   QuotationDetail,
   UpdateQuotationDto,
   QuotationStatus,
+  PopulatedQuotation,
 } from '../models/quotation.types'; // Asegúrate de que este path sea correcto
 import { ENVIRONMENT } from '../../enviroments/enviroment';
-import { PopulatedQuotation } from '../models/quotation-populated';
 
 
 
@@ -90,9 +90,9 @@ export class QuotationService {
    * @param id El ID de la cotización.
    * @returns Un Observable de la cotización.
    */
-  findOne(id: string): Observable<Quotation & { details: QuotationDetail[] }> {
+  findOne(id: string): Observable<PopulatedQuotation> {
     return this.http
-      .get<Quotation & { details: QuotationDetail[] }>(`${this.apiUrl}/${id}`)
+      .get<PopulatedQuotation>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 

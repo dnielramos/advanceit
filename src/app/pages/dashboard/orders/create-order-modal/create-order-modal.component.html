@@ -2,7 +2,7 @@
   <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl relative flex flex-col" style="max-height: 90vh;">
 
     <div class="flex items-center justify-between p-4 border-b border-slate-200">
-      <h2 class="text-xl font-bold text-slate-800">Crear Nueva Orden</h2>
+      <h2 class="text-xl font-bold text-slate-800">Procesando Orden {{ order.numeroOrden }}</h2>
       <button (click)="close.emit()" class="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
         <fa-icon [icon]="faTimes" class="w-5 h-5"></fa-icon>
       </button>
@@ -10,53 +10,86 @@
 
     <div class="p-6 space-y-5 overflow-y-auto">
 
+
       <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Cliente <span class="text-red-500">*</span></label>
-        <input [(ngModel)]="newOrderClient" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500" placeholder="Nombre del cliente" />
+        <h2>Verifica los datos del usuario</h2>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">Cliente <span
+            class="text-red-500">*</span></label>
+        cliente seleccionado: <strong class="text-slate-800">{{ usuario?.name }}</strong>
+        empresa acreditora: <strong class="text-slate-800">{{ compania?.razon_social }}</strong>
+        valor de crédito solicitado: <strong class="text-slate-800">{{ order.precioTotal |
+          currency:'USD':'symbol':'1.2-2' }}</strong>
+        dias de plazo para pagar: <strong class="text-slate-800">{{ cotizacion?.validity_days }}</strong>
+      </div>
+
+
+      <div>
+        <p>Verifica el Stock de los siguientes productos</p>
+        <div *ngFor="let item of productsToValidate">
+          <p>SKU: {{ item?.producto?.SKU }}</p>
+          <p>Stock Disponible: {{ item.producto?.cantidad }}</p>
+          <p>Cantidad solicitada: {{ item.cantidad_solicitada }}</p>
+          precio: {{item?.producto?.precio}}
+          nombre: {{ item?.producto?.nombre }}
+
+          <p *ngIf="item.cantidad_solicitada >= (item?.producto?.cantidad || 0)" class="text-red-600 font-bold">
+            ¡Stock Insuficiente! Valida la cantidad solicitada.
+          </p>
+          <p *ngIf="item.cantidad_solicitada < (item?.producto?.cantidad || 0)" class="text-green-600 font-bold">
+            Stock Suficiente
+          </p>
+        </div>
       </div>
 
       <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Buscar Producto por SKU</label>
-        <div class="flex gap-2">
-          <input [(ngModel)]="newProductInput" (keyup.enter)="searchProduct()" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500" placeholder="Ingresa SKU y presiona Enter..." />
-          <button (click)="searchProduct()" class="bg-purple-600 text-white px-4 rounded-md hover:bg-purple-700 font-semibold">Buscar</button>
-        </div>
-        <div *ngIf="productSearchResult" class="mt-3 bg-slate-50 p-3 rounded-md">
-          <div class="flex justify-between items-center">
-            <div>
-              <strong class="text-slate-800">{{ productSearchResult["name"] }}</strong>
-              <p class="text-sm text-slate-600">${{ productSearchResult["price"] }} {{ productSearchResult['currency'] || 'NE' }}</p>
-            </div>
-            <button (click)="addProductToOrder(productSearchResult)" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 font-semibold">Añadir</button>
+
+        <form action="">
+          <h2>Agrega el detalle del envio de la orden</h2>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Dirección de Envío <span
+              class="text-red-500">*</span></label>
+            <input type="text" [(ngModel)]="newOrderShippingAddress" placeholder="Dirección de Envío"
+          class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+        Tiempo de entrega estimado (días):
+        <input type="number" [(ngModel)]="newOrderEstimatedDeliveryTime" placeholder="Tiempo de entrega en días"
+          class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+        numero de guia:
+        <input type="text" [(ngModel)]="newOrderTrackingNumber" placeholder="Número de Guía"
+          class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+        transportadora:
+        <input type="text" [(ngModel)]="newOrderCarrier" placeholder="Transportadora"
+          class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+        </form>
+
+      </div>
+
+      <div>
+        <p class="text-sm text-slate-500">* Asegúrate de que toda la información sea correcta antes de crear la orden.
+          Una vez creada, no podrás modificarla.</p>
+
+        <div *ngIf="isSubmitting" class="w-full bg-slate-100 p-4 rounded-lg text-center">
+          <p class="text-slate-600">Creando la orden, por favor espera...</p>
+          <div class="mt-4">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-8 w-8 mx-auto"></div>
           </div>
         </div>
-        <div *ngIf="productSearchError" class="text-red-600 mt-2 text-sm">{{ productSearchError }}</div>
+
+        <div
+          class="flex flex-col sm:flex-row items-center justify-between p-4 bg-slate-50 border-t border-slate-200 mt-auto">
+          <div class="text-xl font-bold text-slate-800 mb-4 sm:mb-0">
+            Total: <span class="text-purple-600">${{ calculateTotal() | number:'1.2-2' }}</span>
+          </div>
+          <button (click)="submitOrder()" [disabled]="!newOrderClient.trim() || newOrderProducts.length === 0"
+            class="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-bold px-8 py-3 rounded-lg shadow-md transition-all disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none">
+            Confirmar y Crear Orden
+          </button>
+        </div>
       </div>
 
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Productos en la Orden ({{newOrderProducts.length}}) <span class="text-red-500">*</span></label>
-        <ul class="border border-slate-200 rounded-md p-2 space-y-1 min-h-[80px] max-h-40 overflow-y-auto bg-slate-50">
-          <li *ngIf="newOrderProducts.length === 0" class="text-center text-sm text-slate-500 py-4">Aún no hay productos</li>
-          <li *ngFor="let p of newOrderProducts; let i = index" class="flex justify-between items-center text-sm p-1 rounded hover:bg-slate-200">
-            <span>{{ p["name"] }} - <strong>${{ p["price"] }}</strong>{{p["currency"] || 'NE'}}</span>
-            <button (click)="removeProductFromOrder(i)" class="text-red-500 hover:text-red-700 font-bold text-xs">QUITAR</button>
-          </li>
-        </ul>
-      </div>
 
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Nota Adicional (Opcional)</label>
-        <textarea [(ngModel)]="newOrderNote" rows="3" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 resize-y"></textarea>
-      </div>
+
+
     </div>
 
-    <div class="flex flex-col sm:flex-row items-center justify-between p-4 bg-slate-50 border-t border-slate-200 mt-auto">
-      <div class="text-xl font-bold text-slate-800 mb-4 sm:mb-0">
-        Total: <span class="text-purple-600">${{ calculateTotal() | number:'1.2-2' }}</span>
-      </div>
-      <button (click)="submitOrder()" [disabled]="!newOrderClient.trim() || newOrderProducts.length === 0" class="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-bold px-8 py-3 rounded-lg shadow-md transition-all disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none">
-        Confirmar y Crear Orden
-      </button>
-    </div>
+
   </div>
 </div>

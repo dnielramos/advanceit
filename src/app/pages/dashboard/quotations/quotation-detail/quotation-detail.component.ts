@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { QuotationService } from '../../../../services/quotation.service';
-import { Quotation, QuotationStatus } from '../../../../models/quotation.types';
+import { PopulatedQuotation, Quotation, QuotationStatus } from '../../../../models/quotation.types';
 import { faSpinner, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ library.add(faSpinner, faExclamationCircle);
 })
 export class QuotationDetailComponent implements OnInit {
   @Input() quotationId: string | null = null;
-  quotation: (Quotation & { details: any[] }) | null = null;
+  quotation: PopulatedQuotation| null = null;
   isLoading = true;
   error: string | null = null;
 

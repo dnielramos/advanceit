@@ -1,17 +1,20 @@
 <lib-toastify-toast-container *ngIf="toastQuotation"></lib-toastify-toast-container>
 <div class="p-8 bg-slate-50 hflexy">
+
   <div class="flex justify-between mb-4 items-center">
 
-
-    <h1 class="text-2xl text-transparent flex gap-2 bg-clip-text bg-gradient-to-r from-purple-600 to-orange-800 font-bold ">
+    <h1
+      class="text-2xl text-transparent flex gap-2 bg-clip-text bg-gradient-to-r from-purple-600 to-orange-800 font-bold ">
       <span class="hidden md:flex">Administrador de </span>
       <span class="flex"> Cotizaciones</span>
     </h1>
     <div class="flex space-x-4">
-      <button (click)="openCreate()" class="hidden lg:flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-300 animate__animated animate__fadeInRight">
+      <button (click)="openCreate()"
+        class="hidden lg:flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-300 animate__animated animate__fadeInRight">
         + Nueva Cotización
       </button>
-      <button (click)="openCreate()" class="flex lg:hidden items-center px-4 py-2 bg-purple-600 text-white rounded-full text-lg font-bold shadow-purple-100 shadow-md hover:bg-purple-700 transition-colors duration-300 animate__animated animate__fadeInRight">
+      <button (click)="openCreate()"
+        class="flex lg:hidden items-center px-4 py-2 bg-purple-600 text-white rounded-full text-lg font-bold shadow-purple-100 shadow-md hover:bg-purple-700 transition-colors duration-300 animate__animated animate__fadeInRight">
         +
       </button>
 
@@ -24,16 +27,18 @@
     <p class="text-sm text-gray-500">Resultados: {{ quotations.length }}</p>
   </div> -->
 
-  <div *ngIf="quotations.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
-    <div *ngFor="let q of quotations" class="bg-white p-6 rounded-xl shadow-lg shadow-purple-50 transition-all duration-300 transform border-t-4 border-purple-500">
+  <div *ngIf="quotations.length > 0"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
+    <div *ngFor="let q of quotations"
+      class="bg-white p-6 rounded-xl shadow-lg shadow-purple-50 transition-all duration-300 transform border-t-4 border-purple-500">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-sm font-semibold text-gray-900">{{ q.company_id?.razon_social }}</h2>
+        <h2 class="text-sm font-semibold text-gray-900">{{ q.company.razon_social }}</h2>
         <span [class]="getStatusColor(q.status)" class="text-sm font-medium px-3 py-1 rounded-full capitalize">
           {{ getStatusText(q.status) }}
         </span>
       </div>
       <div class="text-gray-600 text-sm mb-4">
-        <p class="truncate">Responsable: {{ q.created_by?.name }}</p>
+        <p class="truncate">Responsable: {{ q.user.name }}</p>
         <!-- <p class="truncate">Usuario: {{ q.user_id?.name }}</p> -->
         <p>Total: ${{ q.total }}</p>
         <p>Validez: {{ q.validity_days }} días</p>
@@ -41,29 +46,59 @@
       </div>
 
       <div class="flex justify-end space-x-2 mt-4">
-        <button (click)="openDetailsModal(q.id)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Ver detalles">
+        <button (click)="openDetailsModal(q.id)"
+          class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
+          title="Ver detalles">
           <fa-icon [icon]="faEye"></fa-icon>
         </button>
-        <button (click)="openEditModal(q.id)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Editar">
+        <button (click)="openEditModal(q.id)"
+          class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
+          title="Editar">
           <fa-icon [icon]="faEdit"></fa-icon>
         </button>
-        <button (click)="openStatusModal(q.id)" class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200" title="Cambiar estado">
+        <button (click)="openStatusModal(q.id)"
+          class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
+          title="Cambiar estado">
           <fa-icon [icon]="faCheckCircle"></fa-icon>
         </button>
-        <button (click)="confirmDeletion(q.id)" class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-colors duration-200" title="Eliminar">
+        <button (click)="confirmDeletion(q.id)"
+          class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-colors duration-200"
+          title="Eliminar">
           <fa-icon [icon]="faTrashAlt"></fa-icon>
         </button>
       </div>
     </div>
   </div>
 
-  <div *ngIf="quotations.length === 0" class="text-center py-20 text-gray-500 animate__animated animate__fadeIn">
-    <p class="text-xl">No hay cotizaciones para mostrar.</p>
+  <div *ngIf="quotations.length === 0"
+    class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn">
+    <!-- Ícono -->
+    <fa-icon [icon]="faBoxOpen" class="text-purple-500 mb-4 text-5xl drop-shadow-sm"></fa-icon>
+
+    <!-- Título -->
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">
+      No hay cotizaciones
+    </h2>
+
+    <!-- Descripción -->
+    <p class="text-gray-500 text-sm text-center max-w-md">
+      Aún no has agregado productos o cotizaciones.
+      Empieza creando una nueva para verla aquí.
+    </p>
+
+    <!-- Botón de acción -->
+    <button
+      (click)="openCreate()"
+      class="mt-6 px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow transition-all duration-300">
+      Crear cotización
+    </button>
   </div>
 </div>
 
-<div *ngIf="isModalOpen" class="fixed inset-0 bg-gray-900/50 flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn">
-  <div class="bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate__animated animate__zoomIn">
+<div *ngIf="isModalOpen"
+  class="fixed inset-0 bg-gray-900/50 flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn">
+  <div
+    class="bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate__animated animate__zoomIn">
     <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
       <h2 class="text-2xl font-bold text-gray-800">{{ modalTitle }}</h2>
       <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">

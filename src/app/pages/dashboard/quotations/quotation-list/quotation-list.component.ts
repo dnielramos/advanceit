@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { QuotationService } from '../../../../services/quotation.service';
-import { Quotation, QuotationStatus } from '../../../../models/quotation.types';
+import { PopulatedQuotation, Quotation, QuotationStatus } from '../../../../models/quotation.types';
 import { faPlus, faFileInvoice, faEye, faEdit, faCheckCircle, faTrashAlt, faTimes, faUser, faDollarSign, faCalendarAlt, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { QuotationFormComponent } from '../quotation-form/quotation-form.component';
@@ -9,7 +9,6 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { QuotationCreateComponent } from '../quotation-create/quotation-create.component';
 import { Validators } from '@angular/forms';
-import { PopulatedQuotation } from '../../../../models/quotation-populated';
 import { Router } from '@angular/router';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 
@@ -62,7 +61,7 @@ throw new Error('Method not implemented.');
     if (this.toastQuotation) {
       this.toastService.success(`Cotización creada exitosamente ${this.toastQuotation.id}`);
       this.toastQuotation = null;
-      
+
     }
   }
 

@@ -1,6 +1,21 @@
 // src/app/services/quotation/quotation.types.ts
 
+import { User } from './user';
+
 // Define los enumeradores y las interfaces que coincidan con tu backend
+
+interface QuotationUser {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface QuotationCompany{
+  id: string;
+  razon_social: string;
+  nit: string;
+}
+
 export enum QuotationStatus {
   DRAFT = 'draft',
   SENT = 'sent',
@@ -35,6 +50,21 @@ export interface Quotation {
   total: number;
 }
 
+interface PQuotation {
+  id: string;
+  company_id: string;
+  user_id: string;
+  creation_date: Date;
+  expiration_date: Date;
+  validity_days: number;
+  term: string;
+  creation_mode: string;
+  created_by: QuotationUser;
+  edited_by?: QuotationUser;
+  status: QuotationStatus;
+  total: number;
+}
+
 export interface CreateQuotationDto {
   company_id: string;
   user_id: string;
@@ -65,4 +95,22 @@ export interface CreateQuotationDetailDto {
 export interface CreateFullQuotationDto {
   quotation: CreateQuotationDto;
   details: CreateQuotationDetailDto[];
+}
+
+export interface PopulatedQuotation {
+  id: string;
+  user: QuotationUser;
+  user_id: string;
+  company_id: string;
+  company: QuotationCompany;
+  creation_date: Date;
+  expiration_date: Date;
+  validity_days: number;
+  term: string;
+  creation_mode: string;
+  created_by: QuotationUser;
+  edited_by?: QuotationUser;
+  status: QuotationStatus;
+  total: number;
+  details: QuotationDetail[];
 }

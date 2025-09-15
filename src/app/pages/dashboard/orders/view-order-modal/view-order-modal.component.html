@@ -2,7 +2,7 @@
   <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl flex flex-col" style="max-height: 90vh;">
 
     <div class="flex items-center justify-between p-4 border-b border-slate-200">
-      <h2 class="text-xl font-bold text-slate-800">Detalles de la Orden #{{ order.numeroOrden }}</h2>
+      <h2 class="text-xl font-bold text-slate-800">Detalles de la Orden {{ order.numeroOrden }}</h2>
       <button (click)="close.emit()" class="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
         <fa-icon [icon]="faTimes" class="w-5 h-5"></fa-icon>
       </button>
@@ -37,7 +37,7 @@
       </div>
 
       <div>
-        <h3 class="text-lg font-bold text-slate-800 mb-2 border-t pt-4">Productos ({{ orderProducts.length }})</h3>
+        <h3 class="text-lg font-bold text-slate-800 mb-2 border-t pt-4">Productos ({{ totalOrderQuantity }})</h3>
         <div *ngIf="isLoading" class="text-center text-slate-500 py-4">Cargando productos...</div>
         <ul *ngIf="!isLoading" class="space-y-2">
           <li *ngIf="orderProducts.length === 0" class="text-center text-slate-500 py-2">No hay productos en esta orden.
@@ -47,8 +47,12 @@
             <div>
               <p class="font-semibold text-slate-800">{{ product.nombre }}</p>
               <p class="text-xs text-slate-500">SKU: {{ product.SKU }}</p>
+              <p class="text-xs text-slate-500">Cantidad: {{ product.cantidad_solicitada }}</p>
             </div>
-            <p class="font-bold text-slate-700">${{ product.precio| number:'1.2' }}</p>
+            <div>
+              <p class="font-bold text-slate-700">${{ product.precio| number:'1.2' }}</p>
+              <p class="text-xs text-slate-700">Subtotal: ${{ product.precio || 0  * product.cantidad_solicitada | number:'1.2' }}</p>
+            </div>
           </li>
         </ul>
       </div>

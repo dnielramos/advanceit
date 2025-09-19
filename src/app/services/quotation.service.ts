@@ -21,7 +21,7 @@ import { ENVIRONMENT } from '../../enviroments/enviroment';
   providedIn: 'root',
 })
 export class QuotationService {
-  private apiUrl = `${ENVIRONMENT.apiUrlRender}/quotations`;
+  private apiUrl = `${ENVIRONMENT.apiUrl}/quotations`;
 
   constructor(private http: HttpClient) {}
 

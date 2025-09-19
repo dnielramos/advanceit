@@ -14,7 +14,13 @@ import { ProductsService } from '../../../services/product.service';
 import { Quotation, QuotationDetail } from '../../../models/quotation.types';
 import { forkJoin } from 'rxjs';
 import { CreateOrderModalComponent } from './create-order-modal/create-order-modal.component';
-import { CreateShippingDto, ShippingsService } from '../../../services/shippings.service';
+import {
+  CreateShippingDto,
+  ShippingsService,
+} from '../../../services/shippings.service';
+import { PaymentsService } from '../../../services/payments.service';
+import { PaymentMethod, PaymentStatus } from '../../../models/payment.model';
+import { AuthService, Role } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-orders',
@@ -78,15 +84,26 @@ export class OrdersComponent implements OnInit {
     cantidad_solicitada: number;
   }[] = []; // Productos obtenidos para validar
 
+
+  role: Role | null = null;
+  Role = Role; // Hacer que la enumeración Role esté disponible en la plantilla
+
   constructor(
     private ordersService: OrdersService,
     private shippingService: ShippingsService,
+    private paymentsService: PaymentsService,
+    private authService: AuthService,
     private quotationService: QuotationService,
     private productsService: ProductsService
   ) {}
 
   ngOnInit(): void {
     this.loadOrders();
+
+
+    this.authService.currentUserRole$.subscribe((role) => {
+      this.role = role;
+    });
   }
 
   loadOrders(): void {
@@ -238,10 +255,26 @@ export class OrdersComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error creando el envío:', err);
-        alert('Hubo un error al crear el envío. Por favor, inténtalo de nuevo.');
+        alert(
+          'Hubo un error al crear el envío. Por favor, inténtalo de nuevo.'
+        );
       },
     });
 
+    const userId = this.authService.getUserId();
+
+    if (!userId) {
+      console.error('No se pudo obtener el ID del usuario.');
+      return;
+    }
+
+    const payloadPayment = {
+      order_id: this.orderToProcess.id,
+      monto: this.orderToProcess.precioTotal,
+      fechaLimitePago: this.orderToProcess.fecha, // formato YYYY-MM-DD
+      metodo: 'transferencia' as PaymentMethod,
+      createdBy: userId,
+    };
 
     this.ordersService
       .updateOrderStatus(this.orderToProcess.id, 'pagado')
@@ -254,6 +287,18 @@ export class OrdersComponent implements OnInit {
           console.error('Error al actualizar el estado de la orden:', err);
         },
       });
+
+    this.paymentsService.createPayment(payloadPayment).subscribe({
+      next: (newPayment) => {
+        alert('Pago creado exitosamente.');
+        console.log('Pago creado exitosamente:', newPayment);
+      },
+      error: (err) => {
+        console.error('Error creando el pago:', err);
+        alert('Hubo un error al crear el pago. Por favor, inténtalo de nuevo.');
+      },
+    });
+
     this.isProcessing = false; // Cerrar el modal de procesamiento
     this.orderToProcess = null; // Limpiar la orden procesada
   }

@@ -3,7 +3,7 @@ import { CommonModule, NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPen, faEye, faCheckSquare, faTrash, faCodeCompare } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '../../../../services/orders.service';
-import { AuthService } from '../../../../services/auth.service';
+import { AuthService, Role } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-order-card',
@@ -18,11 +18,18 @@ export class OrderCardComponent implements OnDestroy{
   @Output() edit = new EventEmitter<Order>();
   @Output() delete = new EventEmitter<Order>();
   isLoggedIn: boolean = false;
+  role: Role | null = null;
+  Role = Role; // Hacer que la enumeración Role esté disponible en la plantilla
   private isLoggedInSubscription: any;
+  private roleSubscription: any;
 
   constructor(private authService: AuthService) {
     this.isLoggedInSubscription = this.authService.isLoggedIn$.subscribe(isLoggedIn => {
       this.isLoggedIn = isLoggedIn;
+    });
+
+    this.roleSubscription = this.authService.currentUserRole$.subscribe(role => {
+      this.role = role;
     });
   }
 
@@ -30,6 +37,9 @@ export class OrderCardComponent implements OnDestroy{
     // Limpiar suscripciones si es necesario
     if (this.isLoggedInSubscription) {
       this.isLoggedInSubscription.unsubscribe();
+    }
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
     }
   }
 

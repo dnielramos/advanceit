@@ -94,6 +94,9 @@ export class AuthService {
     }
   }
 
+  getCurrentUserRole(): Role | null {
+    return this.currentUserRole.getValue();
+  }
 
   getToken(): string | null {
     return localStorage.getItem('adtkn');

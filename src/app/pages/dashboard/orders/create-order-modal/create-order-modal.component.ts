@@ -144,7 +144,7 @@ export class CreateOrderModalComponent implements OnInit {
 
     // --- Validación 1: Crédito de la Compañía ---
     if (this.company && this.order) {
-      this.creditCheck.available = this.company.saldo_credito - this.company.saldo_gastado;
+      this.creditCheck.available = parseInt(this.company.saldo_credito) - parseInt(this.company.saldo_gastado);
       this.creditCheck.valid = this.creditCheck.available >= this.order.precioTotal;
       this.creditCheck.remaining = this.creditCheck.available - this.order.precioTotal;
       if (!this.creditCheck.valid) {

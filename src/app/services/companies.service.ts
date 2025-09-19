@@ -12,11 +12,11 @@ export interface Company {
   pais: string;
   ciudad: string;
   condiciones_pago: string;
-  descuento_base: number;
-  descuento_especial: number;
-  saldo_credito: number;
-  saldo_gastado: number;
-  valor_logistica: number;
+  descuento_base: string;
+  descuento_especial: string;
+  saldo_credito: string;
+  saldo_gastado: string;
+  valor_logistica: string;
   estado: string;
   fecha_creacion: string;
   fecha_actualizacion: string;

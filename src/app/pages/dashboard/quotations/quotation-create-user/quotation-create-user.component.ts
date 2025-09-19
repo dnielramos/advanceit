@@ -22,33 +22,35 @@ import {
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { Observable } from 'rxjs';
-import { CompaniesService } from '../../../../services/companies.service';
+import { Observable, distinctUntilChanged } from 'rxjs';
+import { CompaniesService, Company } from '../../../../services/companies.service';
 import { UsersService } from '../../../../services/users.service';
-import { AuthService } from '../../../../services/auth.service';
+import { AuthService, Role } from '../../../../services/auth.service';
 import { CreationMode } from '../../../../models/creation-mode';
 import { Router } from '@angular/router';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 import { CartService } from '../../../../services/cart.service';
+import { User } from '../../../../models/user';
 
 library.add(faPlus, faTrashAlt, faSave, faSpinner, faArrowLeft, faArrowRight);
 
 @Component({
   imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, AngularToastifyModule],
-  selector: 'app-quotation-create',
-  templateUrl: './quotation-create.component.html',
+selector: 'app-quotation-create-user',
+  templateUrl: './quotation-create-user.component.html',
 })
-export class QuotationCreateComponent implements OnInit {
+export class QuotationCreateUserComponent implements OnInit {
   @Output() onQuotationCreated = new EventEmitter<void>();
 
   users$: Observable<any[]> | undefined; // Observable para la lista de usuarios
   companies$: Observable<any[]> | undefined; // Observable para la lista de empresas (asumiendo un servicio similar)
 
+  user$ : Observable<User> | undefined; // Observable para el usuario actual
+  company$ : Observable<any> | undefined; // Observable para la empresa actual
+
   order: any;
   navigation: any;
-  companyActive: any;
 
-  isLogging = false;
   userRole: string | null = null;
 
   quotationForm: FormGroup;
@@ -60,8 +62,8 @@ export class QuotationCreateComponent implements OnInit {
   hoy: string = new Date().toISOString().split('T')[0];
   expiration_date: string = new Date().toISOString().split('T')[0];
 
-  user: any = '';
-  company: any = '';
+  user !: User;
+  company !: Company;
   totalQuotation: number = 0;
 
   constructor(
@@ -102,11 +104,50 @@ export class QuotationCreateComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.users$ = this.userService.getUsers();
-    this.companies$ = this.companiesService.findAll();
     this.authService.currentUserRole$.subscribe((role) => {
       this.userRole = role;
     });
+
+         // Cargar usuarios y empresas
+    if (this.userRole === Role.Admin) {
+      this.users$ = this.userService.getUsers();
+      this.companies$ = this.companiesService.findAll();
+    }else if (this.userRole === Role.User) {
+      this.userId = this.authService.getUserId();
+      if(this.userId){
+        this.user$ = this.userService.getUserById(this.userId);
+
+        this.user$.subscribe((user: User) => {
+
+          const userCompanyId = user.company || '11'; // Asigna un ID de empresa predeterminado si no existe
+          console.log(user, 'USUARIO ENCONTRADO CON SU EMPRESA');
+
+          if(!userCompanyId){
+            this.toastService.error('El usuario no tiene una empresa con credito asignado. El pago se realizará a Contado.');
+          } else{
+            this.toastService.info('El pago se realizará a Credito según los terminos y condiciones de la empresa.');
+          }
+
+          this.companiesService.findById(userCompanyId).subscribe((company: Company) => {
+            this.company = company;
+            console.log(this.company, 'EMPRESA DEL USUARIO');
+            this.quotationForm.get('user_id')?.setValue(user.id);
+            this.quotationForm.get('company_id')?.setValue(this.company.razon_social);
+            this.quotationForm.get('term')?.setValue(this.company.condiciones_pago);
+            this.quotationForm.get('user_id')?.disable();
+            this.quotationForm.get('company_id')?.disable();
+            this.quotationForm.get('term')?.disable();
+          });
+
+
+
+          console.log(this.company, 'EMPRESA ALMACENDA EN VARIABLE');
+
+        });
+
+      }
+    }
+
 
      // Si recibiste una orden, puedes usarla aquí para poblar el formulario
      if (this.order) {
@@ -118,12 +159,14 @@ export class QuotationCreateComponent implements OnInit {
     // Método opcional para poblar el formulario con los datos de la orden
     populateFormWithOrderData(): void {
       const detailsFormArray = this.details;
-      this.order.productos.forEach((product: any) => {
+      this.order.productos.forEach((item: any) => {
         detailsFormArray.push(this.fb.group({
-          product_id: [product.product.id, Validators.required],
-          product_name: [product.product.nombre],
-          quantity: [product.quantity, [Validators.required, Validators.min(1)]],
-          unit_price: [product.product.precio, [Validators.required, Validators.min(0)]],
+          product_id: [{value: item.product.id, disabled: true}, Validators.required],
+          product_name: [item.product.nombre],
+          product_description: [item.product.descripcion],
+          product_image: [item.product.imagen],
+          quantity: [item.quantity, [Validators.required, Validators.min(1)]],
+          unit_price: [item.product.precio, [Validators.required, Validators.min(0)]],
           discount: [0],
           taxes: [0],
         }));

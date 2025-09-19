@@ -81,8 +81,8 @@ export const dashboardRoutes: Routes = [
       {
         path: 'cotizaciones/crear-cotizacion',
         loadComponent: () =>
-          import('../pages/dashboard/quotations/quotation-create/quotation-create.component').then(
-            (m) => m.QuotationCreateComponent
+          import('../pages/dashboard/quotations/quotation-create-user/quotation-create-user.component').then(
+            (m) => m.QuotationCreateUserComponent
           ),
       },
 

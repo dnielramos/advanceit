@@ -188,6 +188,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
               this.quotationForm.get('user_id')?.disable();
               this.quotationForm.get('company_id')?.disable();
               this.quotationForm.get('term')?.disable();
+              this.quotationForm.get('validity_days')?.disable();
 
               // **FIX:** Llamada explícita al recálculo una vez que todos los datos están listos
               this.recalculateTotals();

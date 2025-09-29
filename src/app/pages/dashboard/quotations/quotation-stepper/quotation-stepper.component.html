@@ -1,0 +1,21 @@
+<div class="flex items-center text-slate-500 mb-10 p-4 bg-white rounded-xl shadow-sm">
+  <div class="flex-1 flex flex-col items-center relative">
+    <div class="w-10 h-10 flex items-center justify-center rounded-full font-bold transition-colors duration-300 z-10"
+      [ngClass]="currentStep >= 1 ? 'bg-purple-600 text-white shadow-lg' : 'bg-slate-200 text-slate-400'">1</div>
+    <span class="text-sm mt-2 font-semibold" [ngClass]="{'text-purple-600': currentStep >= 1}">Cliente</span>
+  </div>
+  <div class="flex-1 border-t-2 transition-colors duration-300"
+    [ngClass]="currentStep >= 2 ? 'border-purple-500' : 'border-slate-300'"></div>
+  <div class="flex-1 flex flex-col items-center">
+    <div class="w-10 h-10 flex items-center justify-center rounded-full font-bold transition-colors duration-300 z-10"
+      [ngClass]="currentStep >= 2 ? 'bg-purple-600 text-white shadow-lg' : 'bg-slate-200 text-slate-400'">2</div>
+    <span class="text-sm mt-2 font-semibold" [ngClass]="{'text-purple-600': currentStep >= 2}">Productos</span>
+  </div>
+  <div class="flex-1 border-t-2 transition-colors duration-300"
+    [ngClass]="currentStep >= 3 ? 'border-purple-500' : 'border-slate-300'"></div>
+  <div class="flex-1 flex flex-col items-center">
+    <div class="w-10 h-10 flex items-center justify-center rounded-full font-bold transition-colors duration-300 z-10"
+      [ngClass]="currentStep >= 3 ? 'bg-purple-600 text-white shadow-lg' : 'bg-slate-200 text-slate-400'">3</div>
+    <span class="text-sm mt-2 font-semibold" [ngClass]="{'text-purple-600': currentStep >= 3}">Resumen</span>
+  </div>
+</div>

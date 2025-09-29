@@ -1,0 +1,105 @@
+<h2 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+  <fa-icon [icon]="['fas', 'file-invoice-dollar']"></fa-icon>Resumen de la Cotización
+</h2>
+<div class="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+  <div class="p-6 md:p-10">
+    <div class="flex flex-col sm:flex-row justify-between items-start pb-6 border-b border-slate-200">
+      <div class="flex items-center gap-4 mb-4 sm:mb-0">
+        <img src="assets/images/logo.png" alt="Logo Advance" class="h-14">
+        <div>
+          <h3 class="text-2xl font-extrabold text-slate-900">Advance Technology Projects</h3>
+          <p class="text-sm text-slate-500">NIT - 900562155 | www.advanceit.co</p>
+        </div>
+      </div>
+      <div class="text-left sm:text-right">
+        <h3 class="text-3xl font-bold text-slate-800">COTIZACIÓN</h3>
+        <p class="text-sm text-slate-500 mt-1">Fecha: {{ currentDate | date:'d MMMM, y' }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+      <div>
+        <h4 class="font-semibold text-slate-500 uppercase tracking-wider text-xs mb-2">Cliente</h4>
+        <p class="font-bold text-slate-900 text-xl">{{ selectedCompany?.razon_social }}</p>
+        <p class="text-slate-600 mt-1">Atención: {{ selectedUser?.name }}</p>
+        <p class="text-slate-600">{{ selectedUser?.email }}</p>
+      </div>
+      <div class="md:text-right">
+        <h4 class="font-semibold text-slate-500 uppercase tracking-wider text-xs mb-2">Condiciones</h4>
+        <p class="text-slate-700"><strong>Validez:</strong> {{ quotationForm.value.validity_days }} días</p>
+        <p class="text-slate-700"><strong>Pago:</strong> {{ esOrdenDeContado ? 'De Contado' :
+          selectedCompany?.condiciones_pago + ' días de crédito' }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="mt-4 overflow-x-auto">
+    <table class="min-w-full">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Producto</th>
+          <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">Cant.</th>
+          <th class="px-6 py-4 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Precio Unit.</th>
+          <th class="px-6 py-4 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200">
+        <tr *ngFor="let detail of details.controls">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <p class="font-semibold text-slate-900">{{ detail.value.product_name }}</p>
+            <p class="text-xs text-slate-500 max-w-xs truncate">{{ detail.value.product_description }}</p>
+          </td>
+          <td class="px-6 py-4 text-center text-slate-700">{{ detail.value.quantity }}</td>
+          <td class="px-6 py-4 text-right text-slate-700">{{ detail.value.unit_price | currency:'COP':'symbol':'1.0-0'
+            }}</td>
+          <td class="px-6 py-4 text-right font-semibold text-slate-800">{{ (detail.value.quantity *
+            detail.value.unit_price) | currency:'COP':'symbol':'1.0-0' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="bg-slate-50 p-6 md:p-10">
+    <div class="flex flex-col md:flex-row justify-between gap-8">
+      <div class="w-full md:w-1/2">
+        <h4 class="font-semibold text-slate-800 mb-3">Estado del Crédito</h4>
+        <div *ngIf="esOrdenDeContado" class="p-4 bg-blue-100 text-purple-800 rounded-lg border border-blue-200">
+          <p class="font-bold">Pago de Contado</p>
+          <p class="text-sm mt-1">Esta orden no requiere validación de crédito.</p>
+        </div>
+        <div *ngIf="!esOrdenDeContado && creditoCubreOrden"
+          class="p-4 bg-green-100 text-green-800 rounded-lg border border-green-200">
+          <fa-icon [icon]="['fas', 'check-circle']" class="text-2xl"></fa-icon>
+          <p class="text-sm mt-1">El crédito disponible de <strong>{{ creditoDisponible |
+              currency:'COP':'symbol':'1.0-0' }}</strong> es suficiente.</p>
+        </div>
+        <div *ngIf="!esOrdenDeContado && !creditoCubreOrden"
+          class="p-4 bg-red-100 text-red-800 rounded-lg border border-red-200">
+          <p class="font-bold">Crédito Insuficiente</p>
+          <p class="text-sm mt-1">El total excede el crédito de <strong>{{ creditoDisponible |
+              currency:'COP':'symbol':'1.0-0' }}</strong>.</p>
+        </div>
+      </div>
+      <div class="w-full md:w-1/2 max-w-sm ml-auto space-y-2 text-slate-700">
+        <div class="flex justify-between"><span>Subtotal Productos:</span> <span>{{ subtotal |
+            currency:'COP':'symbol':'1.0-0' }}</span></div>
+        <div class="flex justify-between text-red-600"><span>Descuentos ({{ totalDescuentos }}%):</span> <span>- {{
+            valorBaseDescuentos | currency:'COP':'symbol':'1.0-0' }}</span></div>
+        <div class="flex justify-between"><span>Valor Logística:</span> <span>+ {{ valorLogistica |
+            currency:'COP':'symbol':'1.0-0' }}</span></div>
+        <div class="border-t my-2 border-slate-200"></div>
+        <div class="flex justify-between font-semibold"><span>Base Gravable (IVA):</span> <span>{{ baseParaIVA |
+            currency:'COP':'symbol':'1.0-0' }}</span></div>
+        <div class="flex justify-between"><span>IVA (19%):</span> <span>+ {{ valorIVA | currency:'COP':'symbol':'1.0-0'
+            }}</span></div>
+        <div class="border-t-2 my-2 border-slate-300"></div>
+        <div class="flex justify-between items-center text-slate-900">
+          <span class="font-bold text-xl">GRAN TOTAL:</span>
+          <span class="font-bold text-purple-600 text-3xl">{{ granTotal | currency:'COP':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="border-t border-slate-200 bg-white px-6 md:px-10 py-5">
+    <p class="text-xs text-center text-slate-500">
+      Gracias por su interés. Si tiene alguna pregunta, no dude en contactarnos.
+    </p>
+  </div>
+</div>

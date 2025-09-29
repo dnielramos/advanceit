@@ -1,0 +1,48 @@
+<div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+  <div>
+    <h2 class="text-3xl font-bold text-slate-800">Productos de la Cotización</h2>
+    <p class="text-slate-500 mt-1">Añade o ajusta los productos para el cliente.</p>
+  </div>
+  <button type="button" (click)="onAdd()"
+    class="flex-shrink-0 w-full md:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+    <fa-icon [icon]="['fas', 'plus']"></fa-icon>Añadir más productos
+  </button>
+</div>
+<div formArrayName="details" class="space-y-4">
+  <p *ngIf="details.length === 0"
+    class="text-center text-slate-500 py-12 bg-white rounded-2xl shadow-lg border border-slate-200">
+    Aún no has añadido productos. <br> ¡Haz clic en "Añadir más productos" para empezar!
+  </p>
+  <div *ngFor="let detail of details.controls; let i = index" [formGroupName]="i"
+    class="flex flex-col md:flex-row items-center p-4 bg-white rounded-2xl shadow-lg border border-slate-200 gap-5 transition-shadow hover:shadow-xl">
+    <img [src]="detail.value.product_image || 'https://via.placeholder.com/150'" alt="Imagen del producto"
+      class="w-28 h-28 object-cover rounded-xl flex-shrink-0">
+    <div class="flex-grow text-center md:text-left">
+      <h4 class="font-bold text-slate-800 text-lg">{{ detail.value.product_name }}</h4>
+      <p class="text-sm text-slate-600 mt-1">{{ detail.value.product_description }}</p>
+    </div>
+    <div class="flex items-center gap-4 flex-wrap justify-center">
+      <div>
+        <label class="block text-xs font-medium text-slate-600 text-center mb-1">Cantidad</label>
+        <input type="number" formControlName="quantity"
+          class="w-24 text-center p-2 border-slate-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 text-center mb-1">Precio Unit.</label>
+        <input type="number" formControlName="unit_price"
+          class="w-36 text-right p-2 border-slate-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+      </div>
+      <div class="text-center">
+        <p class="text-xs font-medium text-slate-600">Subtotal</p>
+        <p class="font-bold text-purple-600 text-lg mt-1">
+          {{ (detail.value.quantity * detail.value.unit_price) | currency:'COP':'symbol':'1.0-0' }}
+        </p>
+      </div>
+    </div>
+    <button (click)="onRemove(i)" type="button"
+      class="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+      title="Eliminar producto">
+      <fa-icon [icon]="['fas', 'trash-alt']" size="lg"></fa-icon>
+    </button>
+  </div>
+</div>

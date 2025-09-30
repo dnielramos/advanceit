@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 export enum Role {
   User = 'user',
@@ -25,9 +26,6 @@ interface JwtPayload {
 export class AuthService {
   private currentUserRole = new BehaviorSubject<Role | null>(null);
   public currentUserRole$ = this.currentUserRole.asObservable();
-
-  // <-- MODIFICADO: `isLoggedIn$` ahora se deriva de `currentUserRole$`
-  // Esto asegura que el estado de login es SIEMPRE consistente con el rol.
   public isLoggedIn$: Observable<boolean>;
 
   public activeUser$: Observable<string> = of('');
@@ -37,8 +35,10 @@ export class AuthService {
   private router = inject(Router);
 
   // URL del endpoint para validar el token
-  private baseURL = 'https://advance-genai.onrender.com';
+  private baseURL = ENVIRONMENT.apiUrl;
   private readonly validationUrl = `${this.baseURL}/auth/profile`;
+   // --- NUEVO: Endpoint de Refresh ---
+  private readonly refreshUrl = `${this.baseURL}/auth/refresh`;
 
   constructor() {
     // <-- AÑADIDO: Se crea el observable derivado en el constructor.
@@ -50,7 +50,7 @@ export class AuthService {
   }
 
   private loadTokenOnStart(): void {
-    const token = this.getToken();
+    const token = this.getAccessToken();
     if (token) {
       // Al validar, se actualizará `currentUserRole`, y `isLoggedIn$` reaccionará automáticamente.
       this.validateToken().subscribe();
@@ -60,8 +60,17 @@ export class AuthService {
     }
   }
 
+   // --- MÉTODOS DE TOKENS ACTUALIZADOS ---
+  getAccessToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refresh_token');
+  }
+
   validateToken(): Observable<boolean> {
-    const token = this.getToken();
+    const token = this.getAccessToken();
     if (!token) {
       this.currentUserRole.next(null); // Asegura que el estado de rol sea nulo
       return of(false);
@@ -75,15 +84,15 @@ export class AuthService {
       }),
       catchError((error) => {
         console.error('La validación del token falló', error);
-        this.logout(); // Logout limpiará el rol, y `isLoggedIn$` emitirá `false`.
-        this.router.navigate(['/in']);
+        // this.logout(); // Logout limpiará el rol, y `isLoggedIn$` emitirá `false`.
+        // this.router.navigate(['/in']);
         return of(false);
       })
     );
   }
 
   getUserId(): string | null {
-    const token = this.getToken();
+    const token = this.getAccessToken();
     if (!token) return null;
 
     try {
@@ -98,20 +107,45 @@ export class AuthService {
     return this.currentUserRole.getValue();
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('adtkn');
+  // getToken(): string | null {
+  //   return localStorage.getItem('adtkn');
+  // }
+
+  // --- MODIFICADO: handleLogin ahora guarda ambos tokens ---
+  handleLogin(tokens: { access_token: string, refresh_token: string }): void {
+    localStorage.setItem('access_token', tokens.access_token);
+    localStorage.setItem('refresh_token', tokens.refresh_token);
+    this.decodeAndStoreToken(tokens.access_token);
   }
 
-  handleLogin(token: string): void {
-    localStorage.setItem('adtkn', token);
-    // Al decodificar y establecer el rol, `isLoggedIn$` emitirá `true` automáticamente.
-    this.decodeAndStoreToken(token);
-  }
-
+  // --- MODIFICADO: logout borra ambos tokens ---
   logout(): void {
-    localStorage.removeItem('adtkn');
-    // Al poner el rol en `null`, `isLoggedIn$` emitirá `false` automáticamente.
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     this.currentUserRole.next(null);
+    this.router.navigate(['/in']); // Redirige al login
+  }
+
+   // --- NUEVO: Lógica para refrescar el token ---
+  refreshToken(): Observable<{ access_token: string }> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${refreshToken}`
+    });
+
+    return this.http.post<{ access_token: string }>(this.refreshUrl, {}, { headers }).pipe(
+      tap(tokens => {
+        // Guarda el nuevo access token cuando la llamada es exitosa
+        localStorage.setItem('access_token', tokens.access_token);
+        this.decodeAndStoreToken(tokens.access_token);
+        console.log('Token refrescado exitosamente!');
+      })
+    );
   }
 
 

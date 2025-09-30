@@ -7,6 +7,7 @@ import { provideAnimations } from '@angular/platform-browser/animations'; // Imp
 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './security/jwt.interceptor';
+import { authInterceptor } from './security/auth.interceptor';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http, './i18n/', '.json?v=${Date.now()}');
@@ -21,7 +22,7 @@ export const appConfig: ApplicationConfig = {
       })
     ),
     provideAnimations(),
-    provideHttpClient(withInterceptors([jwtInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideTranslateService({
       loader: {
         provide: TranslateLoader,

@@ -14,6 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'; // <-- 1. Importa el ícono de check
 import { AuthService, Role } from '../../services/auth.service';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
+import { ENVIRONMENT } from '../../../enviroments/enviroment';
 
 @Component({
   selector: 'app-login',
@@ -221,7 +222,7 @@ export class LoginComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
-  private baseURL = 'https://advance-genai.onrender.com';
+  private baseURL = ENVIRONMENT.apiUrl;
 
   private readonly apiUrl = `${this.baseURL}/auth/login`;
 
@@ -242,12 +243,12 @@ export class LoginComponent {
     this.isLoading = true;
 
     this.http
-      .post<{ access_token: string }>(this.apiUrl, this.credentials)
+      .post<{ access_token: string, refresh_token: string }>(this.apiUrl, this.credentials)
       .subscribe({
         next: (response) => {
           // --- 4. Lógica de éxito actualizada ---
           console.log('Login exitoso, token recibido.');
-          this.authService.handleLogin(response.access_token);
+          this.authService.handleLogin(response);
 
           form.resetForm();
           this.loginSuccess = true;
@@ -259,7 +260,7 @@ export class LoginComponent {
           } else if (this.authService.hasRole(Role.User)) {
             setTimeout(() => {
               this.toastService.success('Bienvenido a la sección de productos');
-              this.router.navigate(['/productos']);
+              this.router.navigate(['/dashboard/advance-products']);
             }, 2000);
           }
         },

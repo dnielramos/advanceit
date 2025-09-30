@@ -183,6 +183,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
                   parseInt(this.selectedCompany?.condiciones_pago) > 0
                     ? `${this.selectedCompany.condiciones_pago}`
                     : 'Contado',
+                validity_days: 15,
               });
 
               this.quotationForm.get('user_id')?.disable();
@@ -216,15 +217,15 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
   }
 
   private normalizeCompany(raw: Company): Company {
-  return {
-    ...raw,
-    descuento_base: String(raw.descuento_base ?? '0'),
-    descuento_especial: String(raw.descuento_especial ?? '0'),
-    valor_logistica: String(raw.valor_logistica ?? '0'),
-    saldo_credito: String(raw.saldo_credito ?? '0'),
-    saldo_gastado: String(raw.saldo_gastado ?? '0'),
-  };
-}
+    return {
+      ...raw,
+      descuento_base: String(raw.descuento_base ?? '0'),
+      descuento_especial: String(raw.descuento_especial ?? '0'),
+      valor_logistica: String(raw.valor_logistica ?? '0'),
+      saldo_credito: String(raw.saldo_credito ?? '0'),
+      saldo_gastado: String(raw.saldo_gastado ?? '0'),
+    };
+  }
 
   private recalculateTotals(): void {
     if (!this.selectedCompany) return;
@@ -364,11 +365,11 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
     this.quotationService.create(payload).subscribe({
       next: (response) => {
         this.isLoading = false;
+        this.cartService.clearCart();
+        this.router.navigate(['/dashboard/cotizaciones']);
         this.toastService.success(
           `Cotización #${response.id} creada con éxito.`
         );
-        this.cartService.clearCart();
-        this.router.navigate(['/dashboard/cotizaciones']);
       },
       error: (error) => {
         this.isLoading = false;

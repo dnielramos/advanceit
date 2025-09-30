@@ -35,7 +35,7 @@ export class AuthService {
   private router = inject(Router);
 
   // URL del endpoint para validar el token
-  private baseURL = ENVIRONMENT.apiUrl;
+  private baseURL = ENVIRONMENT.apiUrlRender;
   private readonly validationUrl = `${this.baseURL}/auth/profile`;
    // --- NUEVO: Endpoint de Refresh ---
   private readonly refreshUrl = `${this.baseURL}/auth/refresh`;

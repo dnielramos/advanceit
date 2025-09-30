@@ -147,7 +147,7 @@
               </div>
               <div class="md:text-right">
                 <h4 class="font-semibold text-slate-500 uppercase tracking-wider text-xs mb-2">Condiciones</h4>
-                <p class="text-slate-700"><strong>Validez:</strong> {{ quotationForm.value.validity_days }} días</p>
+                <p class="text-slate-700"><strong>Validez:</strong> {{ quotationForm.getRawValue().validity_days }} días</p>
                 <p class="text-slate-700"><strong>Pago:</strong> {{ esOrdenDeContado ? 'De Contado' : selectedCompany?.condiciones_pago + ' días de crédito' }}</p>
               </div>
             </div>

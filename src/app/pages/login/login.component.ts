@@ -222,7 +222,7 @@ export class LoginComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
-  private baseURL = ENVIRONMENT.apiUrl;
+  private baseURL = ENVIRONMENT.apiUrlRender;
 
   private readonly apiUrl = `${this.baseURL}/auth/login`;
 

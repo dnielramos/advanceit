@@ -20,12 +20,12 @@ export interface HistoryEvent {
 export interface Shipping {
     id: string; // UUID
     order_id: string;
-    transportadora: string;
-    guia: string;
+    transportadora?: string;
+    guia?: string;
     estado: ShippingStatus;
     historial?: HistoryEvent[];
     notas?: string;
-    fechaEstimada: string; // YYYY-MM-DD
+    fechaEstimada?: string; // YYYY-MM-DD
     fechaEntregaReal?: string; // YYYY-MM-DD
 }
 

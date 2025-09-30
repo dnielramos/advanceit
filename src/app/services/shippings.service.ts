@@ -16,11 +16,11 @@ import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 export interface CreateShippingDto {
   order_id: string;
-  transportadora: string;
-  guia: string;
-  fechaEstimada: string; // YYYY-MM-DD
+  transportadora?: string;
+  guia?: string;
+  fechaEstimada?: string; // YYYY-MM-DD
   notas?: string;
-  direccion_entrega?: string;
+  direccion_entrega: string;
 }
 
 @Injectable({
@@ -29,7 +29,7 @@ export interface CreateShippingDto {
 export class ShippingsService {
   // Asegúrate de que esta URL base coincida con la de tu backend.
   // Es recomendable usar variables de entorno para esto.
-  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/shippings`;
+  private readonly apiUrl = `${ENVIRONMENT.apiUrl}/shippings`;
 
   constructor(private http: HttpClient) { }
 

@@ -108,7 +108,9 @@ export class CreateOrderModalComponent implements OnInit {
   ngOnInit(): void {
     if (this.order) {
       this.loadOrderData();
-      this.loadCompanyData();
+      // this.loadCompanyData();
+
+      console.log(this.company)
     } else {
       this.isLoading = false;
       this.validationErrors.push('No se proporcionó una orden para procesar.');
@@ -208,20 +210,25 @@ export class CreateOrderModalComponent implements OnInit {
       );
     }
 
+    //pobkar los datos de envio con los datos de la compañia
+    this.shippingAddress = this.company?.ciudad || 'Advance Technology Projects' + this.company?.pais || '';
+    this.carrier = 'BODEGA_ADVANCE'
+
     // --- Validación 3: Formulario de Envío ---
     this.formCheckValid =
       this.shippingAddress.trim() !== '' &&
-      this.carrier.trim() !== '' &&
-      this.trackingNumber.trim() !== '';
+      this.carrier.trim() !== '';
+
     if (!this.formCheckValid) {
       this.validationErrors.push(
-        'La dirección, transportadora y número de guía son obligatorios.'
+        'No encontré una direccion de envio para esta orden. Agrégala en la seccion Empresas.'
       );
     }
 
     // --- Estado Final de Validación ---
     this.isOrderValid =
       this.creditCheck.valid && this.stockCheckValid && this.formCheckValid;
+
   }
 
   // Se llama cada vez que el formulario cambia para re-validar
@@ -238,24 +245,16 @@ export class CreateOrderModalComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    const payload: ProcessOrderPayload = {
-      orderId: this.order.id,
-      carrier: this.carrier.trim(),
-      trackingNumber: this.trackingNumber.trim(),
-      estimatedDeliveryDays: this.estimatedDeliveryDays,
-      shippingAddress: this.shippingAddress.trim(),
-    };
-
     const shippingData: CreateShippingDto = {
       order_id: this.order.id,
       transportadora: this.carrier.trim(),
-      guia: this.trackingNumber.trim(),
+      guia: 'ADVANCE',
       fechaEstimada: this.estimatedDeliveryDays
         ? new Date(Date.now() + this.estimatedDeliveryDays * 86400000)
             .toISOString()
             .split('T')[0]
         : '',
-      direccion_entrega: `Envío para la orden ${this.order.id}`,
+      direccion_entrega: this.shippingAddress,
     };
 
     console.log('Procesando Orden:', shippingData);

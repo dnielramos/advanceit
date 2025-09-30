@@ -238,6 +238,12 @@ export class OrdersComponent implements OnInit {
     console.log('Procesando orden:', order);
   }
 
+  addDays(date: Date, days: number): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
   handleProcessOrder(shippingData: CreateShippingDto): void {
     if (!this.orderToProcess) {
       console.error('No hay una orden seleccionada para procesar.');
@@ -271,7 +277,7 @@ export class OrdersComponent implements OnInit {
     const payloadPayment = {
       order_id: this.orderToProcess.id,
       monto: this.orderToProcess.precioTotal,
-      fechaLimitePago: this.orderToProcess.fecha, // formato YYYY-MM-DD
+      fechaLimitePago: this.addDays(new Date(), 30).toString(), // hoy mas 30 dias 1 mes
       metodo: 'transferencia' as PaymentMethod,
       createdBy: userId,
     };

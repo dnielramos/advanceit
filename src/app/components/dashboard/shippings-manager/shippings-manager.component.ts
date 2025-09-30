@@ -1,32 +1,16 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-// Importaciones de FontAwesome
+import { FormsModule, NgForm } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   IconDefinition,
-  faBox,
-  faCheckCircle,
-  faCircleNotch,
-  faEye,
-  faPlus,
-  faShippingFast,
-  faTimesCircle,
-  faTruck,
-  faWarehouse,
-  faExclamationTriangle
+  faCheckCircle, faCircleNotch, faEdit, faExclamationTriangle, faEye,
+  faImage, faPlus, faSpinner, faTimesCircle, faTruck, faWarehouse,
 } from '@fortawesome/free-solid-svg-icons';
-
-// Tus modelos y servicios
-import { ShippingsService } from '../../../services/shippings.service';
-import { Shipping, ShippingStatus, CreateShippingPayload } from '../../../models/shipping.model';
 import { finalize } from 'rxjs';
 
-// Objeto para mapear estados a íconos y colores (mejora la legibilidad del template)
-type StatusInfo = {
-  [key in ShippingStatus]: { icon: IconDefinition; color: string; label: string };
-};
+import { ShippingsService } from '../../../services/shippings.service';
+import { Shipping, ShippingStatus, CreateShippingPayload, UpdateStatusPayload } from '../../../models/shipping.model';
 
 @Component({
   selector: 'app-shippings-manager',
@@ -35,27 +19,32 @@ type StatusInfo = {
   templateUrl: './shippings-manager.component.html',
 })
 export class ShippingsManagerComponent implements OnInit {
-  // Inyección de dependencias moderna
   private shippingsService = inject(ShippingsService);
 
-  // Estado del componente
+  // --- Estado del Componente ---
   public shippings: Shipping[] = [];
   public selectedShipping: Shipping | null = null;
   public isLoading = true;
   public error: string | null = null;
 
-  // Estado del modal de creación
-  public isModalOpen = false;
-  public newShipping: CreateShippingPayload = this.getInitialNewShippingPayload();
+  // --- Estado del Modal de Actualización ---
+  public isUpdateStatusModalOpen = false;
+  public isSubmitting = false;
+  public updateStatusPayload: any = this.getInitialUpdateStatusPayload();
+  public readonly availableStatuses: Exclude<ShippingStatus, 'preparando'>[] = ['en_transito', 'entregado', 'fallido'];
+  public guiaImagePreview: string | null = null;
+  public fileError: string | null = null;
 
-  // --- Íconos de FontAwesome ---
+  // --- Íconos ---
   faPlus = faPlus;
   faCircleNotch = faCircleNotch;
   faEye = faEye;
   faExclamationTriangle = faExclamationTriangle;
+  faEdit = faEdit;
+  faImage = faImage;
+  faSpinner = faSpinner;
 
-  // Mapeo de estados para la UI
-  public readonly statusInfo: StatusInfo = {
+  public readonly statusInfo: { [key in ShippingStatus]: { icon: IconDefinition; color: string; label: string }; } = {
     preparando: { icon: faWarehouse, color: 'text-yellow-500', label: 'Preparando' },
     en_transito: { icon: faTruck, color: 'text-blue-500', label: 'En Tránsito' },
     entregado: { icon: faCheckCircle, color: 'text-green-500', label: 'Entregado' },
@@ -73,16 +62,12 @@ export class ShippingsManagerComponent implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (data) => {
-          this.shippings = data;
-          // Si había un envío seleccionado, lo actualizamos con la nueva data
+          this.shippings = data.sort((a, b) => new Date(b.fechaEstimada || 0).getTime() - new Date(a.fechaEstimada || 0).getTime());
           if (this.selectedShipping) {
             this.selectedShipping = this.shippings.find(s => s.id === this.selectedShipping?.id) || null;
           }
         },
-        error: (err) => {
-          this.error = 'No se pudieron cargar los envíos. Intenta de nuevo más tarde.';
-          console.error(err);
-        },
+        error: (err) => { this.error = 'No se pudieron cargar los envíos.'; console.error(err); },
       });
   }
 
@@ -90,51 +75,94 @@ export class ShippingsManagerComponent implements OnInit {
     this.selectedShipping = shipping;
   }
 
-  clearSelection(): void {
-      this.selectedShipping = null;
+  openUpdateStatusModal(): void {
+    if (!this.selectedShipping) return;
+    this.updateStatusPayload = this.getInitialUpdateStatusPayload();
+    this.guiaImagePreview = null;
+    this.fileError = null;
+    this.isUpdateStatusModalOpen = true;
   }
 
-  openCreateModal(): void {
-    this.newShipping = this.getInitialNewShippingPayload();
-    this.isModalOpen = true;
+  closeUpdateStatusModal(): void {
+    this.isUpdateStatusModalOpen = false;
   }
 
-  closeModal(): void {
-    this.isModalOpen = false;
-  }
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      this.guiaImagePreview = null;
+      this.updateStatusPayload.comprobanteGuiaBase64 = null;
+      this.fileError = null;
+      return;
+    }
 
-  handleCreateSubmit(): void {
-    // Aquí iría una validación más robusta (p.ej. con Zod o FormControls)
-    if (!this.newShipping.order_id || !this.newShipping.guia || !this.newShipping.transportadora) {
-        alert('Por favor completa todos los campos requeridos.');
+    const file = input.files[0];
+    if (file.size > 5 * 1024 * 1024) { // Límite de 5MB
+        this.fileError = "El archivo es muy grande (máx 5MB).";
+        input.value = '';
         return;
     }
 
-    this.shippingsService.createShipping(this.newShipping).subscribe({
-      next: () => {
-        this.closeModal();
-        this.loadShippings(); // Recargamos la lista para ver el nuevo envío
-      },
-      error: (err) => {
-        alert('Error al crear el envío.');
-        console.error(err);
-      }
-    });
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.guiaImagePreview = reader.result as string;
+      this.updateStatusPayload.comprobanteGuiaBase64 = reader.result as string;
+      this.fileError = null;
+    };
+    reader.onerror = () => { this.fileError = "No se pudo leer el archivo."; }
+    reader.readAsDataURL(file);
   }
-  
-  // Función para obtener un nuevo objeto para el formulario de creación
-  private getInitialNewShippingPayload(): CreateShippingPayload {
+
+  handleUpdateStatusSubmit(form: NgForm): void {
+    if (form.invalid) {
+      Object.values(form.controls).forEach(control => control.markAsTouched());
+      return;
+    }
+    if (this.updateStatusPayload.estado === 'en_transito' && !this.updateStatusPayload.comprobanteGuiaBase64) {
+        this.fileError = "La foto del comprobante es obligatoria.";
+        return;
+    }
+    if (!this.selectedShipping) return;
+    this.isSubmitting = true;
+
+    const finalPayload: UpdateStatusPayload = {
+      estado: this.updateStatusPayload.estado,
+      description: this.updateStatusPayload.description,
+    };
+
+    // if (finalPayload.estado === 'en_transito') {
+    //   finalPayload.comprobanteGuiaBase64 = this.updateStatusPayload.comprobanteGuiaBase64;
+    //   finalPayload.guia = this.updateStatusPayload.guia;
+    //   finalPayload.transportadora = this.updateStatusPayload.transportadora;
+    //   finalPayload.fechaEstimada = this.updateStatusPayload.fechaEstimada;
+    //   finalPayload.direccionEntrega = this.updateStatusPayload.direccionEntrega;
+    // }
+
+    this.shippingsService.updateShippingStatus(this.selectedShipping.id, finalPayload)
+      .pipe(finalize(() => this.isSubmitting = false))
+      .subscribe({
+        next: () => {
+          this.closeUpdateStatusModal();
+          this.loadShippings();
+        },
+        error: (err) => { alert('Error al actualizar el estado del envío.'); console.error(err); }
+      });
+  }
+
+  private getInitialUpdateStatusPayload(): any {
+    const today = new Date().toISOString().split('T')[0];
+    // this.selectedShipping?.fechaEstimada.split('T')[0] ||
     return {
-      order_id: '',
-      transportadora: '',
-      guia: '',
-      fechaEstimada: new Date().toISOString().split('T')[0], // Fecha de hoy por defecto
-      notas: '',
+      estado: null,
+      description: '',
+      comprobanteGuiaBase64: null,
+      guia: this.selectedShipping?.guia || '',
+      transportadora: this.selectedShipping?.transportadora || '',
+      fechaEstimada: today,
+      direccionEntrega: '',
     };
   }
 
-  // Helper para obtener la info de estado en el template
-  getStatusInfo(status: ShippingStatus) {
-    return this.statusInfo[status];
-  }
+  getStatusInfo(status: ShippingStatus) { return this.statusInfo[status]; }
 }
+

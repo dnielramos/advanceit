@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Role } from './auth.service';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
+import { User } from '../models/user';
 
 // DTOs (Data Transfer Objects) para tipar las peticiones
 export interface CreateUserDto {
@@ -59,8 +60,8 @@ export class UsersService {
    * @param id El ID del usuario.
    * @returns Un Observable con el usuario encontrado.
    */
-  getUserById(id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}`);
+  getUserById(id: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
 
   /**

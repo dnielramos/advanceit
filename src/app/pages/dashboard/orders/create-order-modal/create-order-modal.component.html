@@ -3,7 +3,10 @@
 
     <header class="flex items-center justify-between p-4 border-b border-slate-200">
       <h2 class="text-xl font-bold text-slate-800">
-        Procesar Orden: <span class="text-purple-600">{{ order?.numeroOrden }}</span>
+        <p>
+          Procesar Orden:
+        </p>
+        <span class="text-purple-600">{{ order?.numeroOrden }}</span>
       </h2>
       <button (click)="close.emit()" title="Cerrar" class="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
         <fa-icon [icon]="faTimes" class="w-5 h-5"></fa-icon>
@@ -28,9 +31,9 @@
         </div>
 
         <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
-          <h3 class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4 flex items-center">
+          <h3 class="text-md md:text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4 flex items-center">
             <fa-icon [icon]="faCreditCard" class="mr-3 text-purple-500"></fa-icon>
-            Validación de Cliente y Crédito
+            Validación de Cliente
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div class="space-y-2">
@@ -53,18 +56,18 @@
               <p class="font-semibold text-slate-900">{{ order?.precioTotal | currency:'USD':'symbol':'1.0-0' }}</p>
             </div>
           </div>
-          <div *ngIf="creditCheck.valid" class="mt-4 p-3 bg-green-50 text-green-800 rounded-md border border-green-200 flex items-center font-semibold">
+          <div *ngIf="creditCheck.valid" class="mt-4 p-3 bg-green-50 text-green-800 rounded-md border border-green-200 flex text-sm items-center font-semibold">
             <fa-icon [icon]="faCheckCircle" class="mr-2"></fa-icon>
             Crédito Aprobado. Saldo restante: {{ creditCheck.remaining | currency:'USD':'symbol':'1.0-0' }}
           </div>
-          <div *ngIf="!creditCheck.valid" class="mt-4 p-3 bg-red-50 text-red-800 rounded-md border border-red-200 flex items-center font-semibold">
+          <div *ngIf="!creditCheck.valid" class="mt-4 p-3 bg-red-50 text-red-800 rounded-md border border-red-200 flex text-sm items-center font-semibold">
             <fa-icon [icon]="faExclamationTriangle" class="mr-2"></fa-icon>
             Crédito Insuficiente. Se requiere un pago por adelantado.
           </div>
         </div>
 
         <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
-          <h3 class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4 flex items-center">
+          <h3 class=" text-md md:text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4 flex items-center">
             <fa-icon [icon]="faBoxOpen" class="mr-3 text-purple-500"></fa-icon>
             Verificación de Inventario
           </h3>

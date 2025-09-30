@@ -23,13 +23,24 @@ import { catchError } from 'rxjs/operators';
 // --- Interfaces (se asume que están en los archivos correspondientes) ---
 
 // --- Servicios ---
-import { Order, OrderProducts, OrdersService } from '../../../../services/orders.service';
+import {
+  Order,
+  OrderProducts,
+  OrdersService,
+} from '../../../../services/orders.service';
 import { QuotationService } from '../../../../services/quotation.service';
 import { UsersService } from '../../../../services/users.service';
-import { CompaniesService, Company } from '../../../../services/companies.service';
-import { PopulatedQuotation, Quotation } from '../../../../models/quotation.types';
+import {
+  CompaniesService,
+  Company,
+} from '../../../../services/companies.service';
+import {
+  PopulatedQuotation,
+  Quotation,
+} from '../../../../models/quotation.types';
 import { User } from '../../../../models/user';
 import { CreateShippingDto } from '../../../../services/shippings.service';
+import { AuthService } from '../../../../services/auth.service';
 
 // Interface para el evento de salida
 export interface ProcessOrderPayload {
@@ -84,9 +95,12 @@ export class CreateOrderModalComponent implements OnInit {
   carrier = '';
   trackingNumber = '';
 
+  userActive: any;
+
   constructor(
     private ordersService: OrdersService,
     private quotationService: QuotationService,
+    private authService: AuthService,
     private usersService: UsersService,
     private companyService: CompaniesService
   ) {}
@@ -94,10 +108,23 @@ export class CreateOrderModalComponent implements OnInit {
   ngOnInit(): void {
     if (this.order) {
       this.loadOrderData();
+      this.loadCompanyData();
     } else {
       this.isLoading = false;
       this.validationErrors.push('No se proporcionó una orden para procesar.');
     }
+  }
+
+  loadCompanyData(): void {
+    this.authService.activeUser$.subscribe((id) => {
+      this.userActive = id;
+
+      this.usersService.getUserById(id).subscribe((user: User) => {
+        if (user && user.company) {
+          this.companyService.findById(user.company);
+        }
+      });
+    });
   }
 
   loadOrderData(): void {
@@ -116,27 +143,35 @@ export class CreateOrderModalComponent implements OnInit {
             // 3. Cargar usuario y compañía en paralelo
             this.loadingMessage = 'Verificando cliente y crédito...';
             forkJoin({
-              user: this.usersService.getUserById(quotation.user_id).pipe(catchError(() => of(null))),
-              company: this.companyService.findById(quotation.company_id).pipe(catchError(() => of(null)))
+              user: this.usersService
+                .getUserById(quotation.user_id)
+                .pipe(catchError(() => of(null))),
+              company: this.companyService
+                .findById(quotation.company_id)
+                .pipe(catchError(() => of(null))),
             }).subscribe(({ user, company }) => {
-                if (user) this.user = user;
-                if (company) this.company = company;
+              if (user) this.user = user;
+              if (company) this.company = company;
 
-                // 4. Una vez cargado todo, validar la orden
-                this.validateOrder();
-                this.isLoading = false;
+              // 4. Una vez cargado todo, validar la orden
+              this.validateOrder();
+              this.isLoading = false;
             });
           },
-          error: () => this.handleLoadError('No se pudo cargar la cotización asociada.'),
+          error: () =>
+            this.handleLoadError('No se pudo cargar la cotización asociada.'),
         });
       },
-      error: () => this.handleLoadError('No se pudieron cargar los productos de la orden.'),
+      error: () =>
+        this.handleLoadError(
+          'No se pudieron cargar los productos de la orden.'
+        ),
     });
   }
 
   private handleLoadError(message: string): void {
-      this.validationErrors.push(message);
-      this.isLoading = false;
+    this.validationErrors.push(message);
+    this.isLoading = false;
   }
 
   validateOrder(): void {
@@ -144,15 +179,23 @@ export class CreateOrderModalComponent implements OnInit {
 
     // --- Validación 1: Crédito de la Compañía ---
     if (this.company && this.order) {
-      this.creditCheck.available = parseInt(this.company.saldo_credito) - parseInt(this.company.saldo_gastado);
-      this.creditCheck.valid = this.creditCheck.available >= this.order.precioTotal;
-      this.creditCheck.remaining = this.creditCheck.available - this.order.precioTotal;
+      this.creditCheck.available =
+        parseInt(this.company.saldo_credito) -
+        parseInt(this.company.saldo_gastado);
+      this.creditCheck.valid =
+        this.creditCheck.available >= this.order.precioTotal;
+      this.creditCheck.remaining =
+        this.creditCheck.available - this.order.precioTotal;
       if (!this.creditCheck.valid) {
-        this.validationErrors.push('Crédito insuficiente para cubrir el total de la orden.');
+        this.validationErrors.push(
+          'Crédito insuficiente para cubrir el total de la orden.'
+        );
       }
     } else {
       this.creditCheck.valid = false;
-      this.validationErrors.push('No se pudo verificar la información de crédito de la compañía.');
+      this.validationErrors.push(
+        'No se pudo verificar la información de crédito de la compañía.'
+      );
     }
 
     // --- Validación 2: Stock de Productos ---
@@ -160,17 +203,25 @@ export class CreateOrderModalComponent implements OnInit {
       (p) => p.cantidad_solicitada <= (p.cantidad ?? 0)
     );
     if (!this.stockCheckValid) {
-      this.validationErrors.push('Uno o más productos no tienen stock suficiente.');
+      this.validationErrors.push(
+        'Uno o más productos no tienen stock suficiente.'
+      );
     }
 
     // --- Validación 3: Formulario de Envío ---
-    this.formCheckValid = this.shippingAddress.trim() !== '' && this.carrier.trim() !== '' && this.trackingNumber.trim() !== '';
+    this.formCheckValid =
+      this.shippingAddress.trim() !== '' &&
+      this.carrier.trim() !== '' &&
+      this.trackingNumber.trim() !== '';
     if (!this.formCheckValid) {
-        this.validationErrors.push('La dirección, transportadora y número de guía son obligatorios.');
+      this.validationErrors.push(
+        'La dirección, transportadora y número de guía son obligatorios.'
+      );
     }
 
     // --- Estado Final de Validación ---
-    this.isOrderValid = this.creditCheck.valid && this.stockCheckValid && this.formCheckValid;
+    this.isOrderValid =
+      this.creditCheck.valid && this.stockCheckValid && this.formCheckValid;
   }
 
   // Se llama cada vez que el formulario cambia para re-validar
@@ -188,19 +239,23 @@ export class CreateOrderModalComponent implements OnInit {
     this.isSubmitting = true;
 
     const payload: ProcessOrderPayload = {
-        orderId: this.order.id,
-        carrier: this.carrier.trim(),
-        trackingNumber: this.trackingNumber.trim(),
-        estimatedDeliveryDays: this.estimatedDeliveryDays,
-        shippingAddress: this.shippingAddress.trim(),
+      orderId: this.order.id,
+      carrier: this.carrier.trim(),
+      trackingNumber: this.trackingNumber.trim(),
+      estimatedDeliveryDays: this.estimatedDeliveryDays,
+      shippingAddress: this.shippingAddress.trim(),
     };
 
     const shippingData: CreateShippingDto = {
       order_id: this.order.id,
       transportadora: this.carrier.trim(),
       guia: this.trackingNumber.trim(),
-      fechaEstimada: this.estimatedDeliveryDays ? new Date(Date.now() + this.estimatedDeliveryDays * 86400000).toISOString().split('T')[0] : '',
-      direccion_entrega: `Envío para la orden ${this.order.id}`
+      fechaEstimada: this.estimatedDeliveryDays
+        ? new Date(Date.now() + this.estimatedDeliveryDays * 86400000)
+            .toISOString()
+            .split('T')[0]
+        : '',
+      direccion_entrega: `Envío para la orden ${this.order.id}`,
     };
 
     console.log('Procesando Orden:', shippingData);
@@ -208,8 +263,8 @@ export class CreateOrderModalComponent implements OnInit {
 
     // Simula una llamada a API y luego cierra
     setTimeout(() => {
-        this.isSubmitting = false;
-        this.close.emit();
+      this.isSubmitting = false;
+      this.close.emit();
     }, 1500);
   }
 }

@@ -91,6 +91,8 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
   creditoCubreOrden: boolean = true;
   esOrdenDeContado: boolean = true;
 
+  companyId = "11";
+
   constructor(
     private fb: FormBuilder,
     private quotationService: QuotationService,
@@ -168,10 +170,13 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe((user) => {
           this.selectedUser = user;
-          const companyId = user.company?.id || 11;
+
+          if(user && user.company){
+            this.companyId = user.company
+          }
 
           this.companiesService
-            .findById(companyId)
+            .findById(this.companyId)
             .pipe(take(1))
             .subscribe((company) => {
               this.selectedCompany = company; // Guardamos la empresa

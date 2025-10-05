@@ -11,11 +11,12 @@ import { finalize } from 'rxjs';
 
 import { ShippingsService } from '../../../services/shippings.service';
 import { Shipping, ShippingStatus, CreateShippingPayload, UpdateStatusPayload } from '../../../models/shipping.model';
+import { UpdateStatusModalComponent } from "./update-status-modal/update-status-modal.component";
 
 @Component({
   selector: 'app-shippings-manager',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, UpdateStatusModalComponent],
   templateUrl: './shippings-manager.component.html',
 })
 export class ShippingsManagerComponent implements OnInit {
@@ -43,6 +44,7 @@ export class ShippingsManagerComponent implements OnInit {
   faEdit = faEdit;
   faImage = faImage;
   faSpinner = faSpinner;
+  faTruck = faTruck;
 
   public readonly statusInfo: { [key in ShippingStatus]: { icon: IconDefinition; color: string; label: string }; } = {
     preparando: { icon: faWarehouse, color: 'text-yellow-500', label: 'Preparando' },

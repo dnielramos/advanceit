@@ -1,7 +1,7 @@
 <div class="bg-gray-50 min-h-screen font-sans text-gray-800 p-4 sm:p-6 lg:p-8">
 
-  <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-    <h1 class="text-3xl font-bold text-gray-800">Gestión de Envíos</h1>
+  <header class="flex items-center mb-6 pb-4 border-b border-gray-200">
+    <h1 class="text-2xl font-bold text-transparent bg-linear-50 from-purple-700 to-orange-700 bg-clip-text">Gestión de Envíos</h1>
     <!-- Puedes descomentar este botón si lo necesitas para la creación -->
     <!-- <button (click)="openCreateModal()" class="flex items-center gap-2 bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-violet-700">
       <fa-icon [icon]="faPlus"></fa-icon>
@@ -14,100 +14,107 @@
     <!-- Columna Izquierda: Lista de Envíos -->
     <div class="w-full lg:w-1/3 xl:w-1/4 animate__animated animate__fadeInLeft">
       @if (isLoading) {
-        <div class="flex items-center justify-center h-64">
-          <fa-icon [icon]="faCircleNotch" size="3x" class="text-violet-500 animate-spin"></fa-icon>
-        </div>
+      <div class="flex items-center justify-center h-64">
+        <fa-icon [icon]="faCircleNotch" size="3x" class="text-violet-500 animate-spin"></fa-icon>
+      </div>
       }
       @if (error && !isLoading) {
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
-          <div class="flex items-center gap-3">
-            <fa-icon [icon]="faExclamationTriangle"></fa-icon>
-            <p class="font-bold">{{ error }}</p>
-          </div>
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
+        <div class="flex items-center gap-3">
+          <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+          <p class="font-bold">{{ error }}</p>
         </div>
+      </div>
       }
       @if (!isLoading && !error) {
-        <div class="space-y-3">
-          @for (shipping of shippings; track shipping.id) {
-            <div (click)="selectShipping(shipping)"
-                 [ngClass]="{'bg-violet-50 border-violet-500 shadow-lg': selectedShipping?.id === shipping.id, 'bg-white border-gray-200 hover:border-violet-400 hover:shadow-md': selectedShipping?.id !== shipping.id}"
-                 class="p-4 border rounded-lg cursor-pointer transition-all duration-300">
+      <div class="space-y-3">
+        @for (shipping of shippings; track shipping.id) {
+        <div (click)="selectShipping(shipping)"
+          [ngClass]="{'bg-violet-50 border-violet-500 shadow-lg': selectedShipping?.id === shipping.id, 'bg-white border-gray-200 hover:border-violet-400 hover:shadow-md': selectedShipping?.id !== shipping.id}"
+          class="p-4 border rounded-lg cursor-pointer transition-all duration-300">
 
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-sm text-gray-500">Orden: {{ shipping.order_id }}</p>
-                  <p class="font-bold text-gray-800">{{ shipping.transportadora }}</p>
-                </div>
-                <span [ngClass]="getStatusInfo(shipping.estado).color" class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap">
-                  <fa-icon [icon]="getStatusInfo(shipping.estado).icon"></fa-icon>
-                  {{ getStatusInfo(shipping.estado).label }}
-                </span>
-              </div>
-              <p class="text-xs text-gray-400 mt-2">Guía: {{ shipping.guia }}</p>
+          <div class="flex justify-between items-start">
+            <div>
+              <!-- <p class="text-sm text-gray-500">Orden: {{ shipping.order_id }}</p> -->
+              <p class="text-sm text-gray-500">Orden: {{ shipping.order_id }}</p>
+              <p class="font-bold text-gray-800">{{ shipping.transportadora }}</p>
             </div>
-          }
+            <span [ngClass]="getStatusInfo(shipping.estado).color"
+              class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap">
+              <fa-icon [icon]="getStatusInfo(shipping.estado).icon"></fa-icon>
+              {{ getStatusInfo(shipping.estado).label }}
+            </span>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">Guía: {{ shipping.guia }}</p>
         </div>
+        }
+      </div>
       }
     </div>
 
     <!-- Columna Derecha: Detalles del Envío -->
     <div class="w-full lg:w-2/3 xl:w-3/4 mt-8 lg:mt-0 animate__animated animate__fadeInUp">
       @if (selectedShipping) {
-        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+      <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
 
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-4 border-b border-gray-200 mb-6">
-            <div>
-              <h2 class="text-2xl font-bold text-violet-700">Detalles del Envío</h2>
-              <p class="text-sm text-gray-500">Guía: {{ selectedShipping.guia }}</p>
-            </div>
-            <div class="mt-4 sm:mt-0 text-right">
-              <p class="text-sm text-gray-600">Fecha Estimada</p>
-              <p class="font-semibold text-lg">{{ selectedShipping.fechaEstimada | date:'longDate' }}</p>
-            </div>
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-4 border-b border-gray-200 mb-6">
+          <div>
+            <h2 class="text-2xl font-bold text-violet-700">Detalles del Envío</h2>
+            <p class="text-sm text-gray-500">Guía: {{ selectedShipping.guia }}</p>
           </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-            <div><span class="font-semibold">ID Orden:</span> {{ selectedShipping.order_id }}</div>
-            <div><span class="font-semibold">Transportadora:</span> {{ selectedShipping.transportadora }}</div>
-            <div [ngClass]="getStatusInfo(selectedShipping.estado).color" class="flex items-center gap-2">
-              <fa-icon [icon]="getStatusInfo(selectedShipping.estado).icon" size="lg"></fa-icon>
-              <span class="font-semibold text-lg">{{ getStatusInfo(selectedShipping.estado).label }}</span>
-            </div>
-            @if (selectedShipping.fechaEntregaReal) {
-              <div><span class="font-semibold">Entregado el:</span> {{ selectedShipping.fechaEntregaReal | date:'longDate' }}</div>
-            }
+          <div class="mt-4 sm:mt-0 text-right">
+            <p class="text-sm text-gray-600">Fecha Estimada</p>
+            <p class="font-semibold text-lg">{{ selectedShipping.fechaEstimada | date:'longDate' }}</p>
           </div>
-
-          <h3 class="text-xl font-bold text-gray-800 mb-4">Historial</h3>
-          <div class="relative border-l-2 border-violet-200 pl-6 space-y-8">
-            @for (event of selectedShipping.historial; track event.timestamp) {
-              <div class="relative">
-                <div class="absolute -left-[34px] top-1 h-4 w-4 rounded-full" [ngClass]="getStatusInfo(event.status).color.replace('text-', 'bg-')"></div>
-                <p class="text-sm text-gray-500">{{ event.timestamp | date:'medium' }}</p>
-                <p class="font-semibold" [ngClass]="getStatusInfo(event.status).color">{{ getStatusInfo(event.status).label }}</p>
-                <p class="text-gray-700">{{ event.description }}</p>
-              </div>
-            }
-          </div>
-
-          <!-- *** BOTÓN PARA ABRIR EL MODAL DE ACTUALIZACIÓN *** -->
-          <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
-            <button (click)="openUpdateStatusModal()" class="flex items-center gap-2 bg-violet-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-75 transition-all duration-300">
-              <fa-icon [icon]="faEdit"></fa-icon>
-              Actualizar Estado
-            </button>
-          </div>
-
         </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+          <div><span class="font-semibold">ID Orden:</span> {{ selectedShipping.order_id }}</div>
+          <div><span class="font-semibold">Transportadora:</span> {{ selectedShipping.transportadora }}</div>
+          <div [ngClass]="getStatusInfo(selectedShipping.estado).color" class="flex items-center gap-2">
+            <fa-icon [icon]="getStatusInfo(selectedShipping.estado).icon" size="lg"></fa-icon>
+            <span class="font-semibold text-lg">{{ getStatusInfo(selectedShipping.estado).label }}</span>
+          </div>
+          @if (selectedShipping.fechaEntregaReal) {
+          <div><span class="font-semibold">Entregado el:</span> {{ selectedShipping.fechaEntregaReal | date:'longDate'
+            }}</div>
+          }
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Historial</h3>
+        <div class="relative border-l-2 border-violet-200 pl-6 space-y-8">
+          @for (event of selectedShipping.historial; track event.timestamp) {
+          <div class="relative">
+            <div class="absolute -left-[34px] top-1 h-4 w-4 rounded-full"
+              [ngClass]="getStatusInfo(event.status).color.replace('text-', 'bg-')"></div>
+            <p class="text-sm text-gray-500">{{ event.timestamp | date:'medium' }}</p>
+            <p class="font-semibold" [ngClass]="getStatusInfo(event.status).color">{{ getStatusInfo(event.status).label
+              }}</p>
+            <p class="text-gray-700">{{ event.description }}</p>
+          </div>
+          }
+        </div>
+
+        <!-- *** BOTÓN PARA ABRIR EL MODAL DE ACTUALIZACIÓN *** -->
+        <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+          <button (click)="openUpdateStatusModal()"
+            class="flex items-center gap-2 bg-violet-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-75 transition-all duration-300">
+            <fa-icon [icon]="faEdit"></fa-icon>
+            Actualizar Estado
+          </button>
+        </div>
+
+      </div>
       } @else {
-        <!-- *** CÓDIGO DEL PLACEHOLDER RESTAURADO *** -->
-        <div class="hidden lg:flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
-          <div class="text-center text-gray-500">
-            <fa-icon [icon]="faEye" size="4x" class="mb-4"></fa-icon>
-            <p class="text-xl font-semibold">Selecciona un envío</p>
-            <p>Elige un envío de la lista para ver sus detalles aquí.</p>
-          </div>
+      <!-- *** CÓDIGO DEL PLACEHOLDER RESTAURADO *** -->
+      <div
+        class="hidden lg:flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
+        <div class="text-center text-gray-500">
+          <fa-icon [icon]="faEye" size="4x" class="mb-4"></fa-icon>
+          <p class="text-xl font-semibold">Selecciona un envío</p>
+          <p>Elige un envío de la lista para ver sus detalles aquí.</p>
         </div>
+      </div>
       }
     </div>
   </main>
@@ -116,102 +123,11 @@
 
 <!-- *** MODAL PARA ACTUALIZAR ESTADO (VERSIÓN CORREGIDA Y COMPLETA) *** -->
 @if (isUpdateStatusModalOpen) {
-  <div class="fixed inset-0 bg-black bg-opacity-60 z-40 flex items-center justify-center p-4 animate__animated animate__fadeIn" (click)="closeUpdateStatusModal()">
-    <div class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-2xl m-4 animate__animated animate__zoomIn" (click)="$event.stopPropagation()">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Actualizar Estado del Envío</h2>
-        <button (click)="closeUpdateStatusModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-      </div>
+<!-- En tu componente principal -->
+<app-update-status-modal [isOpen]="isUpdateStatusModalOpen" [isSubmitting]="isSubmitting"
+  [availableStatuses]="availableStatuses" [updateStatusPayload]="updateStatusPayload"
+  [guiaImagePreview]="guiaImagePreview" [fileError]="fileError" (close)="closeUpdateStatusModal()"
+  (submit)="handleUpdateStatusSubmit($event)" (fileSelected)="onFileSelected($event)">
+</app-update-status-modal>
 
-      <form #updateStatusForm="ngForm" (ngSubmit)="handleUpdateStatusSubmit(updateStatusForm)" novalidate>
-        <div class="space-y-5">
-
-          <!-- Selector de Estado -->
-          <div>
-            <label for="estado" class="block text-sm font-medium text-gray-700 mb-1">Nuevo Estado</label>
-            <select id="estado" name="estado" [(ngModel)]="updateStatusPayload.estado" #estado="ngModel" required
-              class="w-full px-4 py-2.5 border rounded-lg focus:ring-violet-500 focus:border-violet-500"
-              [ngClass]="{'border-red-500': estado.invalid && estado.touched, 'border-gray-300': !estado.invalid || estado.untouched}">
-              <option [ngValue]="null" disabled>Selecciona un estado...</option>
-              @for (status of availableStatuses; track status) {
-                <option [value]="status">{{ getStatusInfo(status).label }}</option>
-              }
-            </select>
-            @if(estado.invalid && estado.touched) { <p class="text-red-500 text-xs mt-1">El estado es obligatorio.</p> }
-          </div>
-
-          <!-- Campos Condicionales para "En Tránsito" -->
-          @if (updateStatusPayload.estado === 'en_transito') {
-            <div class="border border-gray-200 rounded-lg p-4 space-y-4 bg-gray-50 animate__animated animate__fadeIn">
-              <h3 class="font-semibold text-gray-700">Información de Tránsito</h3>
-
-              <!-- Carga de Imagen -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Comprobante de Envío (Guía)</label>
-                <div class="mt-1 flex items-center gap-4">
-                  @if (guiaImagePreview) {
-                    <img [src]="guiaImagePreview" alt="Vista previa" class="h-20 w-20 object-cover rounded-md border border-gray-300">
-                  } @else {
-                    <div class="h-20 w-20 bg-gray-100 rounded-md flex items-center justify-center text-gray-400 border" [ngClass]="{'border-red-500': !!fileError, 'border-gray-200': !fileError}">
-                      <fa-icon [icon]="faImage" size="2x"></fa-icon>
-                    </div>
-                  }
-                  <input type="file" accept="image/png, image/jpeg, image/webp" (change)="onFileSelected($event)" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 cursor-pointer"/>
-                </div>
-                @if (fileError) { <p class="text-red-500 text-xs mt-1">{{ fileError }}</p> }
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                   <label for="guia" class="block text-sm font-medium text-gray-700 mb-1">Número de Guía</label>
-                   <input type="text" name="guia" [(ngModel)]="updateStatusPayload.guia" #guia="ngModel" required class="w-full px-3 py-2 border rounded-lg" [ngClass]="{'border-red-500': guia.invalid && guia.touched, 'border-gray-300': !guia.invalid || guia.untouched}">
-                   @if(guia.invalid && guia.touched) { <p class="text-red-500 text-xs mt-1">El número de guía es obligatorio.</p> }
-                </div>
-                <div>
-                   <label for="transportadora" class="block text-sm font-medium text-gray-700 mb-1">Transportadora</label>
-                   <input type="text" name="transportadora" [(ngModel)]="updateStatusPayload.transportadora" #transportadora="ngModel" required class="w-full px-3 py-2 border rounded-lg" [ngClass]="{'border-red-500': transportadora.invalid && transportadora.touched, 'border-gray-300': !transportadora.invalid || transportadora.untouched}">
-                   @if(transportadora.invalid && transportadora.touched) { <p class="text-red-500 text-xs mt-1">La transportadora es obligatoria.</p> }
-                </div>
-              </div>
-
-              <div>
-                 <label for="direccionEntrega" class="block text-sm font-medium text-gray-700 mb-1">Dirección de Entrega</label>
-                 <input type="text" name="direccionEntrega" [(ngModel)]="updateStatusPayload.direccionEntrega" #direccionEntrega="ngModel" required class="w-full px-3 py-2 border rounded-lg" [ngClass]="{'border-red-500': direccionEntrega.invalid && direccionEntrega.touched, 'border-gray-300': !direccionEntrega.invalid || direccionEntrega.untouched}">
-                 @if(direccionEntrega.invalid && direccionEntrega.touched) { <p class="text-red-500 text-xs mt-1">La dirección es obligatoria.</p> }
-              </div>
-
-              <div>
-                <label for="fechaEstimada" class="block text-sm font-medium text-gray-700 mb-1">Fecha Estimada de Entrega</label>
-                <input type="date" name="fechaEstimada" [(ngModel)]="updateStatusPayload.fechaEstimada" #fechaEstimada="ngModel" required class="w-full px-3 py-2 border rounded-lg" [ngClass]="{'border-red-500': fechaEstimada.invalid && fechaEstimada.touched, 'border-gray-300': !fechaEstimada.invalid || fechaEstimada.untouched}">
-                @if(fechaEstimada.invalid && fechaEstimada.touched) { <p class="text-red-500 text-xs mt-1">La fecha estimada es obligatoria.</p> }
-              </div>
-
-            </div>
-          }
-
-          <!-- Descripción General -->
-          <div>
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción / Motivo</label>
-            <textarea name="description" [(ngModel)]="updateStatusPayload.description" placeholder="Añade un comentario..." rows="3" required #description="ngModel"
-              class="w-full px-4 py-2 border rounded-lg"
-              [ngClass]="{'border-red-500': description.invalid && description.touched, 'border-gray-300': !description.invalid || description.untouched}"></textarea>
-            @if(description.invalid && description.touched) { <p class="text-red-500 text-xs mt-1">La descripción es obligatoria.</p> }
-          </div>
-
-        </div>
-
-        <div class="flex justify-end gap-4 mt-8">
-          <button type="button" (click)="closeUpdateStatusModal()" [disabled]="isSubmitting" class="py-2 px-5 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 transition-colors">Cancelar</button>
-
-          <button type="submit" [disabled]="!updateStatusForm.valid || isSubmitting" class="py-2 px-5 bg-violet-600 text-white font-semibold rounded-lg hover:bg-violet-700 disabled:bg-violet-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center w-36">
-            @if (isSubmitting) {
-              <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
-            } @else {
-              <span>Actualizar Estado</span>
-            }
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 }

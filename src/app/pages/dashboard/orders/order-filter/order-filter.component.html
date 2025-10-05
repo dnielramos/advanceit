@@ -1,19 +1,18 @@
-<div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm shadow-purple-50 mb-6">
+<div class="bg-white p-4 sm:p-6 rounded-xl shadow-xs shadow-purple-100 mb-6 border border-purple-50">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-center">
-
     <!-- Filtros -->
     <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 text-sm">
       <input
         [(ngModel)]="filters.numeroOrden"
         (input)="onFilterChange()"
         placeholder="Numero de orden ORD-"
-        class="block w-full sm:w-auto flex-grow rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm py-2 px-3"
+        class="block w-full sm:w-auto flex-grow rounded-lg border-1 border-gray-100 bg-gray-50 shadow-sm focus:border-orange-100 focus:ring-2 focus:ring-orange-200 focus:bg-white text-sm py-2.5 px-4 transition-all placeholder:text-gray-400 outline-none appearance-none"
       />
 
       <select
         [(ngModel)]="filters.estado"
         (change)="onFilterChange()"
-        class="block w-full sm:w-auto flex-grow rounded-md border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm py-2 px-3"
+        class="block text-gray-400 w-full sm:w-auto flex-grow rounded-lg border-2 border-gray-100 bg-gray-50 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:bg-white focus:text-slate-700 text-sm py-2.5 px-4 transition-all outline-none appearance-none"
       >
         <option value="">Todos los estados</option>
         <option value="pagado">Pagado</option>
@@ -24,7 +23,7 @@
 
       <button
         (click)="clearFilters.emit()"
-        class="text-sm text-slate-600 hover:text-purple-600 font-semibold transition-colors py-2"
+        class="text-sm text-gray-600 hover:text-purple-600 hover:bg-purple-50 font-semibold transition-all py-2 px-4 rounded-lg outline-none focus:ring-2 focus:ring-purple-200"
       >
         Limpiar filtros
       </button>
@@ -32,21 +31,21 @@
 
     <!-- Resumen -->
     <div class="grid-cols-2 sm:grid-cols-4 hidden xl:grid gap-3 text-center mt-4 md:mt-0">
-      <div class="bg-slate-100 p-2 sm:p-3 rounded-lg">
-        <span class="text-[10px] sm:text-xs font-medium text-slate-500">TOTAL</span>
-        <p class="text-base sm:text-xl font-bold text-slate-800">{{ resumen.total }}</p>
+      <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-3 rounded-lg border border-gray-200">
+        <span class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wide">TOTAL</span>
+        <p class="text-base sm:text-xl font-bold text-gray-800 mt-1">{{ resumen.total }}</p>
       </div>
-      <div class="bg-green-100 p-2 sm:p-3 rounded-lg">
-        <span class="text-[10px] sm:text-xs font-medium text-green-600">PAGADO</span>
-        <p class="text-base sm:text-xl font-bold text-green-800">{{ resumen.pagado }}</p>
+      <div class="bg-gradient-to-br from-green-50 to-green-100 p-2 sm:p-3 rounded-lg border border-green-200">
+        <span class="text-[10px] sm:text-xs font-semibold text-green-600 uppercase tracking-wide">PAGADO</span>
+        <p class="text-base sm:text-xl font-bold text-green-700 mt-1">{{ resumen.pagado }}</p>
       </div>
-      <div class="bg-yellow-100 p-2 sm:p-3 rounded-lg">
-        <span class="text-[10px] sm:text-xs font-medium text-yellow-600">PENDIENTE</span>
-        <p class="text-base sm:text-xl font-bold text-yellow-800">{{ resumen.pendiente }}</p>
+      <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-2 sm:p-3 rounded-lg border border-purple-200">
+        <span class="text-[10px] sm:text-xs font-semibold text-purple-600 uppercase tracking-wide">PENDIENTE</span>
+        <p class="text-base sm:text-xl font-bold text-purple-700 mt-1">{{ resumen.pendiente }}</p>
       </div>
-      <div class="bg-red-100 p-2 sm:p-3 rounded-lg">
-        <span class="text-[10px] sm:text-xs font-medium text-red-600">CANCELADO</span>
-        <p class="text-base sm:text-xl font-bold text-red-800">{{ resumen.cancelado }}</p>
+      <div class="bg-gradient-to-br from-gray-100 to-gray-200 p-2 sm:p-3 rounded-lg border border-gray-300">
+        <span class="text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wide">CANCELADO</span>
+        <p class="text-base sm:text-xl font-bold text-gray-700 mt-1">{{ resumen.cancelado }}</p>
       </div>
     </div>
   </div>

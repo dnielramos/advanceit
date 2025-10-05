@@ -1,46 +1,43 @@
 <div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple flex flex-col">
 
   <!-- Modal de procesamiento de orden -->
-   <div *ngIf="isProcessing" class="fixed inset-0 bg-black/40 flex items-center justify-center z-1000">
-    <app-create-order-modal
-      [order]="orderToProcess"
-      (close)="isProcessing = false"
-      (processOrder)="handleProcessOrder($event); isProcessing = false"
-    ></app-create-order-modal>
+  <div *ngIf="isProcessing" class="fixed inset-0 bg-black/40 flex items-center justify-center z-1000">
+    <app-create-order-modal [order]="orderToProcess" (close)="isProcessing = false"
+      (processOrder)="handleProcessOrder($event); isProcessing = false"></app-create-order-modal>
   </div>
-
-  <h1 class="text-2xl text-transparent flex gap-2 bg-clip-text bg-linear-10 from-purple-600 to-orange-700 font-bold mb-4">
+<!--
+  <h1
+    class="text-2xl text-transparent flex gap-2 bg-clip-text bg-linear-10 from-purple-600 to-orange-700 font-bold mb-4">
     <span class="hidden: md:block">Gestión de</span> Órdenes
-  </h1>
+  </h1> -->
 
-  <app-order-filter
-    [filters]="filters"
-    [resumen]="resumen"
-    (filtersChange)="handleFilterChange($event)"
-    (clearFilters)="handleClearFilters()"
-  ></app-order-filter>
+
+<app-header-crud
+  titulo="Órdenes"
+  descripcion="Administra las órdenes de compra"
+  textoBotonActualizar="Refrescar"
+  [filterByStatus]="true"
+  [filterStatusValues]="['pagado', 'no_pagado', 'pendiente', 'cancelado']"
+  placeholderInput="Número de orden (ej. ORD-123)"
+  (actualizar)="loadOrders()"
+  (filterChange)="handleFilterChange($event)"
+  (clearFilters)="handleClearFilters()">
+</app-header-crud>
+
+  <!-- <app-order-filter [filters]="filters" [resumen]="resumen" (filtersChange)="handleFilterChange($event)"
+    (clearFilters)="handleClearFilters()"></app-order-filter> -->
 
   <div class="flex-1 overflow-y-auto space-y-4 pr-2">
-    <app-order-card
-      *ngFor="let order of filteredOrders"
-      [order]="order"
-      (markAsPaid)="processOrder($event)"
-      (edit)="handleEditOrder(order)"
-      (view)="handleViewOrder(order)"
-      (delete)="handleDeleteOrder(order)"
-      (viewInvoice)="handleViewInvoice(order)"
-    ></app-order-card>
+    <app-order-card *ngFor="let order of filteredOrders" [order]="order" (markAsPaid)="processOrder($event)"
+      (edit)="handleEditOrder(order)" (view)="handleViewOrder(order)" (delete)="handleDeleteOrder(order)"
+      (viewInvoice)="handleViewInvoice(order)"></app-order-card>
   </div>
 
-  <app-view-order-modal
-    *ngIf="orderToView"
-    [order]="orderToView"
-    (close)="orderToView = null"
-  ></app-view-order-modal>
+  <app-view-order-modal *ngIf="orderToView" [order]="orderToView" (close)="orderToView = null"></app-view-order-modal>
 
   <div>
     <div>
-      <p>Esta es una factura</p>
+      <p>-</p>
     </div>
   </div>
 </div>

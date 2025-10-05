@@ -3,22 +3,20 @@
     <!-- Filtros -->
     <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 text-sm">
       <input
-        [(ngModel)]="filters.numeroOrden"
+        [(ngModel)]="filters.texto"
         (input)="onFilterChange()"
         placeholder="Numero de orden ORD-"
         class="block w-full sm:w-auto flex-grow rounded-lg border-1 border-gray-100 bg-gray-50 shadow-sm focus:border-orange-100 focus:ring-2 focus:ring-orange-200 focus:bg-white text-sm py-2.5 px-4 transition-all placeholder:text-gray-400 outline-none appearance-none"
       />
 
       <select
+        *ngIf="filterBystatus"
         [(ngModel)]="filters.estado"
         (change)="onFilterChange()"
         class="block text-gray-400 w-full sm:w-auto flex-grow rounded-lg border-2 border-gray-100 bg-gray-50 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:bg-white focus:text-slate-700 text-sm py-2.5 px-4 transition-all outline-none appearance-none"
       >
         <option value="">Todos los estados</option>
-        <option value="pagado">Pagado</option>
-        <option value="no_pagado">No pagado</option>
-        <option value="pendiente">Pendiente</option>
-        <option value="cancelado">Cancelado</option>
+        <option *ngFor="let item of filterStatusVlues" value="{{item}}">0{{item}}</option>
       </select>
 
       <button

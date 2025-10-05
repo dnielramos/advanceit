@@ -21,6 +21,7 @@ import {
 import { PaymentsService } from '../../../services/payments.service';
 import { PaymentMethod, PaymentStatus } from '../../../models/payment.model';
 import { AuthService, Role } from '../../../services/auth.service';
+import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 
 @Component({
   selector: 'app-orders',
@@ -28,11 +29,11 @@ import { AuthService, Role } from '../../../services/auth.service';
   // Asegúrate de importar los nuevos componentes aquí
   imports: [
     CommonModule,
-    OrderFilterComponent,
     OrderCardComponent,
     ViewOrderModalComponent,
     CreateOrderModalComponent,
-  ],
+    HeaderCrudComponent
+],
   templateUrl: './orders.component.html',
 })
 export class OrdersComponent implements OnInit {
@@ -56,7 +57,7 @@ export class OrdersComponent implements OnInit {
   filteredOrders: Order[] = [];
 
   filters = {
-    numeroOrden: '',
+    texto : '',
     estado: '',
   };
 
@@ -124,8 +125,8 @@ export class OrdersComponent implements OnInit {
       const estadoMatch = this.filters.estado
         ? order.estadoPago === this.filters.estado
         : true;
-      const numeroMatch = this.filters.numeroOrden
-        ? order.numeroOrden.includes(this.filters.numeroOrden)
+      const numeroMatch = this.filters.texto
+        ? order.numeroOrden.toLowerCase().includes(this.filters.texto.toLowerCase())
         : true;
       return estadoMatch && numeroMatch;
     });
@@ -213,7 +214,7 @@ export class OrdersComponent implements OnInit {
   }
 
   handleClearFilters(): void {
-    this.filters = { numeroOrden: '', estado: '' };
+    this.filters = { texto: '', estado: '' };
     this.applyFilters();
   }
 

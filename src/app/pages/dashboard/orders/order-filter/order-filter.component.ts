@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 export interface FilterData {
-  numeroOrden?: string;
+  texto?: string;
   estado?: string;
 }
 
@@ -23,6 +23,8 @@ export interface ResumenData {
 export class OrderFilterComponent {
   @Input() filters: FilterData = {};
   @Input() resumen: ResumenData = { total: 0, pagado: 0, pendiente: 0, cancelado: 0 };
+  @Input() filterBystatus : boolean = false
+  @Input() filterStatusVlues : string[] = ["pagado","no_pagado","pendiente","cancelado"];
 
   @Output() filtersChange = new EventEmitter<FilterData>();
   @Output() clearFilters = new EventEmitter<void>();

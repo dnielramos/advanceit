@@ -2,66 +2,88 @@
   <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl flex flex-col" style="max-height: 90vh;">
 
     <div class="flex items-center justify-between p-4 border-b border-slate-200">
-      <h2 class="text-xl font-bold text-slate-800">Detalles de la Orden {{ order.numeroOrden }}</h2>
+      <h2 class="text-xl font-bold flex flex-col gap-">
+        <span class="text-slate-800">Detalles de la Orden </span>
+        <span class="text-purple-700">{{ order.numeroOrden }}</span>
+      </h2>
       <button (click)="close.emit()" class="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
         <fa-icon [icon]="faTimes" class="w-5 h-5"></fa-icon>
       </button>
     </div>
 
-    <div class="p-6 space-y-6 overflow-y-auto">
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-5 text-sm">
+<div class="p-4 md:p-6 space-y-6 overflow-y-auto">
+  <!-- Información principal -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-5 text-sm">
+    <div>
+      <p class="text-slate-500 font-semibold">Cliente</p>
+      <p *ngIf="user" class="text-slate-800">{{ user.name }}</p>
+      <ng-container *ngIf="!user">
+        <p class="bg-slate-200 w-30 animate-pulse rounded-2xl h-3"></p>
+        <p class="bg-slate-200 w-20 animate-pulse rounded-2xl mt-1 h-3"></p>
+      </ng-container>
+    </div>
+
+    <div>
+      <p class="text-slate-500 font-semibold">Fecha</p>
+      <p class="text-slate-800">{{ order.fecha | date }}</p>
+    </div>
+
+    <div>
+      <p class="text-slate-500 font-semibold">Estado de Pago</p>
+      <p>
+        <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" [ngClass]="estadoPagoClass">
+          {{ order.estadoPago.replace('_', ' ') }}
+        </span>
+      </p>
+    </div>
+
+    <div class="col-span-1 sm:col-span-2">
+      <p class="text-slate-500 font-semibold">Total de la Orden</p>
+      <p class="text-2xl font-bold text-purple-600">${{ order.precioTotal | number:'1.2-2' }}</p>
+    </div>
+  </div>
+
+  <!-- Productos -->
+  <div>
+    <h3 class="text-lg font-bold text-slate-800 mb-2 border-t pt-4">
+      Productos ({{ totalOrderQuantity }})
+    </h3>
+
+    <div *ngIf="isLoading" class="text-center text-slate-500 py-4">
+      Cargando productos...
+    </div>
+
+    <ul *ngIf="!isLoading" class="space-y-2">
+      <li *ngIf="orderProducts.length === 0" class="text-center text-slate-500 py-2">
+        No hay productos en esta orden.
+      </li>
+
+      <li *ngFor="let product of orderProducts"
+          class="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-slate-50 p-3 rounded-md gap-2">
         <div>
-          <p class="text-slate-500 font-semibold">Cliente</p>
-          <p class="text-slate-800">{{ order.cliente }}</p>
+          <p class="font-semibold text-slate-800 break-words">{{ product.nombre }}</p>
+          <p class="text-xs text-slate-500">SKU: {{ product.SKU }}</p>
+          <p class="text-xs text-slate-500">Cantidad: {{ product.cantidad_solicitada }}</p>
         </div>
-        <div>
-          <p class="text-slate-500 font-semibold">Fecha</p>
-          <p class="text-slate-800">{{ order.fecha }}</p>
-        </div>
-        <div>
-          <p class="text-slate-500 font-semibold">Hora</p>
-          <p class="text-slate-800">{{ order.hora }}</p>
-        </div>
-        <div>
-          <p class="text-slate-500 font-semibold">Estado de Pago</p>
-          <p>
-            <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" [ngClass]="estadoPagoClass">
-              {{ order.estadoPago.replace('_', ' ') }}
-            </span>
+        <div class="text-right sm:text-left">
+          <p class="font-bold text-slate-700">${{ product.precio | number:'1.0' }}</p>
+          <p *ngIf="product.precio" class="text-xs text-slate-700">
+            Subtotal: ${{ product.precio * product.cantidad_solicitada | number:'1.2' }}
           </p>
         </div>
-        <div class="col-span-2">
-          <p class="text-slate-500 font-semibold">Total de la Orden</p>
-          <p class="text-2xl font-bold text-purple-600">${{ order.precioTotal | number:'1.2-2' }}</p>
-        </div>
-      </div>
+      </li>
+    </ul>
+  </div>
 
-      <div>
-        <h3 class="text-lg font-bold text-slate-800 mb-2 border-t pt-4">Productos ({{ totalOrderQuantity }})</h3>
-        <div *ngIf="isLoading" class="text-center text-slate-500 py-4">Cargando productos...</div>
-        <ul *ngIf="!isLoading" class="space-y-2">
-          <li *ngIf="orderProducts.length === 0" class="text-center text-slate-500 py-2">No hay productos en esta orden.
-          </li>
-          <li *ngFor="let product of orderProducts"
-            class="flex justify-between items-center bg-slate-50 p-3 rounded-md">
-            <div>
-              <p class="font-semibold text-slate-800">{{ product.nombre }}</p>
-              <p class="text-xs text-slate-500">SKU: {{ product.SKU }}</p>
-              <p class="text-xs text-slate-500">Cantidad: {{ product.cantidad_solicitada }}</p>
-            </div>
-            <div>
-              <p class="font-bold text-slate-700">${{ product.precio| number:'1.2' }}</p>
-              <p class="text-xs text-slate-700">Subtotal: ${{ product.precio || 0  * product.cantidad_solicitada | number:'1.2' }}</p>
-            </div>
-          </li>
-        </ul>
-      </div>
+  <!-- Notas -->
+  <div *ngIf="order.notas">
+    <h3 class="text-lg font-bold text-slate-800 mb-2 border-t pt-4">Notas Adicionales</h3>
+    <p class="text-slate-700 bg-slate-50 p-3 rounded-md whitespace-pre-wrap">
+      {{ order.notas }}
+    </p>
+  </div>
+</div>
 
-      <div *ngIf="order.notas">
-        <h3 class="text-lg font-bold text-slate-800 mb-2 border-t pt-4">Notas Adicionales</h3>
-        <p class="text-slate-700 bg-slate-50 p-3 rounded-md whitespace-pre-wrap">{{ order.notas }}</p>
-      </div>
-    </div>
 
     <div class="flex justify-end p-4 bg-slate-50 border-t border-slate-200">
       <button (click)="close.emit()"

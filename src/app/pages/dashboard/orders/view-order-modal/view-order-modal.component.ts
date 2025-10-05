@@ -5,6 +5,8 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { OrdersService, Order } from '../../../../services/orders.service';
 import { ProductoFinal } from '../../../../models/Productos';
 import { ProductsService } from '../../../../services/product.service';
+import { UsersService } from '../../../../services/users.service';
+import { User } from '../../../../models/user';
 
 @Component({
   selector: 'app-view-order-modal',
@@ -16,6 +18,9 @@ export class ViewOrderModalComponent implements OnInit {
   @Input() order!: Order;
   @Output() close = new EventEmitter<void>();
 
+  //usuario activo
+  user !: User;
+
   // --- Iconos ---
   faTimes = faTimes;
 
@@ -26,6 +31,7 @@ export class ViewOrderModalComponent implements OnInit {
 
   constructor(
     private ordersService: OrdersService,
+    private userService: UsersService,
     private productsService: ProductsService
   ) {}
 
@@ -33,6 +39,7 @@ export class ViewOrderModalComponent implements OnInit {
     // Cuando el componente se inicia, carga los detalles de los productos
     if (this.order && this.order.productos.length > 0) {
       this.loadProductDetails();
+
     } else {
       this.isLoading = false;
     }
@@ -62,6 +69,10 @@ export class ViewOrderModalComponent implements OnInit {
         console.log('Productos en la orden encontrados: ', this.orderProducts);
       },
     });
+
+    this.userService.getUserById(this.order.cliente).subscribe((user$)=>{
+      this.user = user$;
+    })
 
   }
 

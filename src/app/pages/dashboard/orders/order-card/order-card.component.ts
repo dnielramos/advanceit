@@ -1,17 +1,21 @@
-import { Component, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPen, faEye, faCheckSquare, faTrash, faCodeCompare } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '../../../../services/orders.service';
 import { AuthService, Role } from '../../../../services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { CompaniesService, Company } from '../../../../services/companies.service';
+import { UsersService } from '../../../../services/users.service';
+import { User } from '../../../../models/user';
 
 @Component({
   selector: 'app-order-card',
   standalone: true,
   imports: [CommonModule, FontAwesomeModule, NgClass],
-  templateUrl: './order-card.component.html',
+templateUrl: './order-card.component.html',
 })
-export class OrderCardComponent implements OnDestroy{
+export class OrderCardComponent implements OnInit, OnDestroy{
   @Input() order!: Order;
   @Output() markAsPaid = new EventEmitter<Order>();
   @Output() view = new EventEmitter<Order>();
@@ -23,7 +27,9 @@ export class OrderCardComponent implements OnDestroy{
   private isLoggedInSubscription: any;
   private roleSubscription: any;
 
-  constructor(private authService: AuthService) {
+  user !: User;
+
+  constructor(private authService: AuthService, private userService: UsersService) {
     this.isLoggedInSubscription = this.authService.isLoggedIn$.subscribe(isLoggedIn => {
       this.isLoggedIn = isLoggedIn;
     });
@@ -31,6 +37,15 @@ export class OrderCardComponent implements OnDestroy{
     this.roleSubscription = this.authService.currentUserRole$.subscribe(role => {
       this.role = role;
     });
+  }
+
+
+  ngOnInit(): void {
+     if(this.order){
+       this.userService.getUserById(this.order.cliente).subscribe((user$)=>{
+        this.user = user$;
+       });
+     }
   }
 
   ngOnDestroy(): void {

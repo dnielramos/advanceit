@@ -71,9 +71,11 @@ export class OrdersComponent implements OnInit {
   orderToEdit: Order | null = null; // ¡NUEVO!
   orderToView: Order | null = null;
 
+
   // --- Propiedades para manejar el estado de la UI ---
   isUpdating = false;
   updateError: string | null = null;
+  viewInvoice = false;
 
   isProcessing = false; // Nueva propiedad para indicar el estado de procesamiento
   orderToProcess: Order | null = null; // Orden que se está procesando
@@ -227,10 +229,6 @@ export class OrdersComponent implements OnInit {
   }
 
   processOrder(order: Order): void {
-    const confirmation = confirm(
-      `Para cerrar la orden #${order.numeroOrden} es necesario tener los datos de la guía de envío. \n¿Deseas continuar?`
-    );
-    if (!confirmation) return;
 
     this.isProcessing = true; // Mostrar el modal de procesamiento
     this.orderToProcess = order; // Establecer la orden que se está procesando
@@ -307,5 +305,10 @@ export class OrdersComponent implements OnInit {
 
     this.isProcessing = false; // Cerrar el modal de procesamiento
     this.orderToProcess = null; // Limpiar la orden procesada
+  }
+
+  handleViewInvoice(order: Order): void{
+    this.viewInvoice = true
+
   }
 }

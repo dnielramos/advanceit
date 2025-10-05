@@ -9,7 +9,7 @@
     ></app-create-order-modal>
   </div>
 
-  <h1 class="text-2xl text-transparent flex gap-2 bg-clip-text bg-gradient-to-r from-purple-600 to-orange-800 font-bold mb-4">
+  <h1 class="text-2xl text-transparent flex gap-2 bg-clip-text bg-linear-10 from-purple-600 to-orange-700 font-bold mb-4">
     <span class="hidden: md:block">Gestión de</span> Órdenes
   </h1>
 
@@ -28,6 +28,7 @@
       (edit)="handleEditOrder(order)"
       (view)="handleViewOrder(order)"
       (delete)="handleDeleteOrder(order)"
+      (viewInvoice)="handleViewInvoice(order)"
     ></app-order-card>
   </div>
 
@@ -36,4 +37,10 @@
     [order]="orderToView"
     (close)="orderToView = null"
   ></app-view-order-modal>
+
+  <div>
+    <div>
+      <p>Esta es una factura</p>
+    </div>
+  </div>
 </div>

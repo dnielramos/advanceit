@@ -1,4 +1,4 @@
-<div class="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm">
+<div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm">
   <div class="bg-slate-50 w-full max-w-4xl rounded-xl shadow-2xl flex flex-col max-h-[95vh]">
 
     <header class="flex items-center justify-between p-4 border-b border-slate-200">
@@ -118,17 +118,18 @@
                 <input id="shippingAddress" type="text" [(ngModel)]="shippingAddress" (ngModelChange)="onFormChange()" name="shippingAddress" placeholder="Ej: Calle 123 #45-67, Bogotá" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
               </div>
               <div>
-                <label for="carrier" class="block text-sm font-semibold text-slate-700 mb-1">Transportadora <span class="text-red-500">*</span></label>
-                <input id="carrier" type="text" [(ngModel)]="carrier" (ngModelChange)="onFormChange()" name="carrier" placeholder="Ej: Servientrega" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                <label for="carrier" disabled="true" class="block text-sm font-semibold text-slate-700 mb-1">Transportadora <span class="text-red-500">*</span></label>
+                <input id="carrier" disabled="true" type="text" [(ngModel)]="carrier" (ngModelChange)="onFormChange()" name="carrier" placeholder="Ej: Servientrega" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                <p class="text-slate-500 text-[10px] mt-2 p-2">El mayorista enviará los productos a la bodega donde gestionaran su historial.</p>
               </div>
-              <div>
+              <!-- <div>
                 <label for="trackingNumber" class="block text-sm font-semibold text-slate-700 mb-1">Número de Guía <span class="text-red-500">*</span></label>
                 <input id="trackingNumber" type="text" [(ngModel)]="trackingNumber" (ngModelChange)="onFormChange()" name="trackingNumber" placeholder="Ej: 0123456789" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
               </div>
               <div class="md:col-span-2">
                 <label for="deliveryTime" class="block text-sm font-semibold text-slate-700 mb-1">Tiempo de entrega estimado (días)</label>
                 <input id="deliveryTime" type="number" [(ngModel)]="estimatedDeliveryDays" (ngModelChange)="onFormChange()" name="deliveryTime" placeholder="Ej: 3" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
-              </div>
+              </div> -->
             </form>
           </div>
       </ng-container>

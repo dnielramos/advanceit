@@ -95,7 +95,7 @@
                   <td class="px-4 py-3 font-medium text-slate-900">{{ item.nombre }}</td>
                   <td class="px-4 py-3 font-mono">{{ item.SKU }}</td>
                   <td class="px-4 py-3 text-center font-bold">{{ item.cantidad_solicitada }}</td>
-                  <td class="px-4 py-3 text-center">{{ item.cantidad ?? 0 }}</td>
+                  <td class="px-4 py-3 text-center">{{ item.cantidad }}</td>
                   <td class="px-4 py-3 text-center">
                     <ng-container *ngIf="item.cantidad_solicitada <= (item.cantidad ?? 0); else noStock">
                       <span
@@ -130,7 +130,7 @@
 
               <div class="flex justify-end gap-2 text-xs text-slate-600 mb-2">
                 <span>Disponible:</span>
-                <span class="font-bold">{{ item.cantidad ?? 0 }}</span>
+                <span class="font-bold">{{ item.cantidad }}</span>
               </div>
 
               <div class="flex justify-end">

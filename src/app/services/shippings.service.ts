@@ -9,10 +9,9 @@ import {
   Shipping,
   CreateShippingPayload,
   UpdateStatusPayload,
-  UpdateDeliveryDatePayload
+  UpdateDeliveryDatePayload,
 } from '../models/shipping.model';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
-
 
 export interface CreateShippingDto {
   order_id: string;
@@ -24,14 +23,14 @@ export interface CreateShippingDto {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ShippingsService {
   // Asegúrate de que esta URL base coincida con la de tu backend.
   // Es recomendable usar variables de entorno para esto.
-  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/shippings`;
+  private readonly apiUrl = `${ENVIRONMENT.apiUrl}/shippings`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Crea un nuevo registro de envío.
@@ -40,7 +39,7 @@ export class ShippingsService {
    */
   createShipping(shippingData: CreateShippingPayload): Observable<Shipping> {
     return this.http.post<Shipping>(this.apiUrl, shippingData).pipe(
-      tap(newShipping => console.log('Envío creado:', newShipping)),
+      tap((newShipping) => console.log('Envío creado:', newShipping)),
       catchError(this.handleError)
     );
   }
@@ -51,7 +50,9 @@ export class ShippingsService {
    */
   getAllShippings(): Observable<Shipping[]> {
     return this.http.get<Shipping[]>(this.apiUrl).pipe(
-      tap(shippings => console.log(`Se obtuvieron ${shippings.length} envíos`)),
+      tap((shippings) =>
+        console.log(`Se obtuvieron ${shippings.length} envíos`)
+      ),
       catchError(this.handleError)
     );
   }
@@ -64,7 +65,7 @@ export class ShippingsService {
   getShippingById(id: string): Observable<Shipping> {
     const url = `${this.apiUrl}/${id}`;
     return this.http.get<Shipping>(url).pipe(
-      tap(shipping => console.log(`Envío obtenido:`, shipping)),
+      tap((shipping) => console.log(`Envío obtenido:`, shipping)),
       catchError(this.handleError)
     );
   }
@@ -75,12 +76,36 @@ export class ShippingsService {
    * @param payload - Objeto con el nuevo estado y la descripción.
    * @returns Un Observable con el envío actualizado.
    */
-  updateShippingStatus(id: string, payload: UpdateStatusPayload): Observable<Shipping> {
+  updateShippingStatus(
+    id: string,
+    payload: UpdateStatusPayload
+  ): Observable<Shipping> {
     const url = `${this.apiUrl}/${id}/status`;
     return this.http.patch<Shipping>(url, payload).pipe(
-      tap(updatedShipping => console.log('Estado del envío actualizado:', updatedShipping)),
+      tap((updatedShipping) =>
+        console.log('Estado del envío actualizado:', updatedShipping)
+      ),
       catchError(this.handleError)
     );
+  }
+
+  /**
+   * Actualiza el envío (incluyendo estado, comprobante, etc.)
+   * El backend se encarga de:
+   * - Establecer fecha de entrega si estado === 'entregado'
+   * - Guardar el documento si comprobanteGuiaBase64 está presente
+   */
+  updateShipping(
+    id: string,
+    payload: UpdateStatusPayload
+  ): Observable<Shipping> {
+    // Opcional: si quieres asegurar que la fecha de entrega se envíe explícitamente
+    // (aunque tu backend la genera), podrías hacer:
+    // if (payload.estado === 'entregado') {
+    //   payload.fechaEntregaReal = new Date().toISOString();
+    // }
+
+    return this.http.patch<Shipping>(`${this.apiUrl}/${id}`, payload);
   }
 
   /**
@@ -89,10 +114,15 @@ export class ShippingsService {
    * @param payload - Objeto con la nueva fecha de entrega.
    * @returns Un Observable con el envío actualizado.
    */
-  updateRealDeliveryDate(id: string, payload: UpdateDeliveryDatePayload): Observable<Shipping> {
+  updateRealDeliveryDate(
+    id: string,
+    payload: UpdateDeliveryDatePayload
+  ): Observable<Shipping> {
     const url = `${this.apiUrl}/${id}/delivery-date`;
     return this.http.patch<Shipping>(url, payload).pipe(
-      tap(updatedShipping => console.log('Fecha de entrega actualizada:', updatedShipping)),
+      tap((updatedShipping) =>
+        console.log('Fecha de entrega actualizada:', updatedShipping)
+      ),
       catchError(this.handleError)
     );
   }
@@ -108,7 +138,9 @@ export class ShippingsService {
     } else {
       // El backend retornó un código de error.
       // El cuerpo de la respuesta puede contener pistas sobre lo que salió mal.
-      errorMessage = `Error del servidor (código ${error.status}): ${error.error.message || error.statusText}`;
+      errorMessage = `Error del servidor (código ${error.status}): ${
+        error.error.message || error.statusText
+      }`;
     }
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));

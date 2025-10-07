@@ -76,18 +76,18 @@ export class ShippingsService {
    * @param payload - Objeto con el nuevo estado y la descripción.
    * @returns Un Observable con el envío actualizado.
    */
-  updateShippingStatus(
-    id: string,
-    payload: UpdateStatusPayload
-  ): Observable<Shipping> {
-    const url = `${this.apiUrl}/${id}/status`;
-    return this.http.patch<Shipping>(url, payload).pipe(
-      tap((updatedShipping) =>
-        console.log('Estado del envío actualizado:', updatedShipping)
-      ),
-      catchError(this.handleError)
-    );
-  }
+  // updateShippingStatus(
+  //   id: string,
+  //   payload: UpdateStatusPayload
+  // ): Observable<Shipping> {
+  //   const url = `${this.apiUrl}/${id}/status`;
+  //   return this.http.patch<Shipping>(url, payload).pipe(
+  //     tap((updatedShipping) =>
+  //       console.log('Estado del envío actualizado:', updatedShipping)
+  //     ),
+  //     catchError(this.handleError)
+  //   );
+  // }
 
   /**
    * Actualiza el envío (incluyendo estado, comprobante, etc.)

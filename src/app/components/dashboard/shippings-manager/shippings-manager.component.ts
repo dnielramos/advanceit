@@ -234,100 +234,69 @@ export class ShippingsManagerComponent implements OnInit {
   }
 
   handleUpdateStatusSubmit(form: NgForm): void {
-    // 1. Validaciones iniciales (esto no cambia)
+
+    if(this.isSubmitting) return;
+    // 1. Validaciones iniciales (estas se mantienen igual)
     if (form.invalid) {
       Object.values(form.controls).forEach((control) =>
         control.markAsTouched()
       );
       return;
     }
+    if (!this.selectedShipping) {
+      console.error('No hay un envío seleccionado.');
+      return;
+    }
     if (
       this.updateStatusPayload.estado === 'en_transito' &&
       !this.updateStatusPayload.comprobanteGuiaBase64
     ) {
-      this.fileError = 'La foto del comprobante es obligatoria.';
+      this.fileError =
+        'La foto del comprobante es obligatoria para el estado "En Tránsito".';
       return;
     }
-    if (!this.selectedShipping) return;
+
     this.isSubmitting = true;
 
-    // 2. Definimos una variable para el payload que se enviará
-    let finalPayload: UpdateStatusPayload;
+    // 2. Construir un ÚNICO payload dinámicamente
+    // Todos los casos necesitan el estado y la descripción.
+    const finalPayload: any = {
+      estado: this.updateStatusPayload.estado,
+      description: this.updateStatusPayload.description,
+    };
 
-    // 3. Lógica condicional para construir el payload
+    // Si el estado es 'en_transito', agregamos los campos adicionales.
+    // El backend sabrá qué hacer con ellos.
     if (this.updateStatusPayload.estado === 'en_transito') {
-      // Si es 'en_transito', incluimos TODOS los campos
-      finalPayload = {
-        estado: this.updateStatusPayload.estado,
-        description: this.updateStatusPayload.description,
-        guia: this.updateStatusPayload.guia,
-        transportadora: this.updateStatusPayload.transportadora,
-        fechaEstimada: this.updateStatusPayload.fechaEstimada,
-        direccionEntrega: this.updateStatusPayload.direccionEntrega,
-        comprobanteGuiaBase64: this.updateStatusPayload.comprobanteGuiaBase64,
-      };
-
-      this.shippingsService
-        .updateShipping(this.selectedShipping.id, finalPayload)
-        .subscribe((sh: Shipping) => {
-          if (sh.order_id) {
-            alert('Documento guardado.');
-            this.closeUpdateStatusModal();
-            this.isSubmitting = false;
-            this.loadShippings();
-            if (this.isMobile) {
-              this.closeDetailsModal();
-            }
-          }
-        });
-    } else {
-      // Para cualquier otro estado ('entregado', 'fallido'), solo incluimos lo básico
-      finalPayload = {
-        estado: this.updateStatusPayload.estado,
-        description: this.updateStatusPayload.description,
-      };
-
-      this.shippingsService
-        .updateShippingStatus(
-          this.selectedShipping.id,
-          finalPayload as UpdateStatusPayload
-        )
-        .pipe(finalize(() => (this.isSubmitting = false)))
-        .subscribe({
-          next: () => {
-            this.closeUpdateStatusModal();
-            this.loadShippings();
-            if (this.isMobile) {
-              this.closeDetailsModal();
-            }
-          },
-          error: (err) => {
-            alert('Error al actualizar el estado del envío.');
-            console.error(err);
-          },
-        });
+      finalPayload.guia = this.updateStatusPayload.guia;
+      finalPayload.transportadora = this.updateStatusPayload.transportadora;
+      finalPayload.fechaEstimada = this.updateStatusPayload.fechaEstimada;
+      finalPayload.direccionEntrega = this.updateStatusPayload.direccionEntrega;
+      finalPayload.comprobanteGuiaBase64 =
+        this.updateStatusPayload.comprobanteGuiaBase64;
     }
 
-    console.log(finalPayload);
-
-    // 4. Llamamos al servicio con el payload que acabamos de construir
-    // this.shippingsService
-    //   .updateShippingStatus(this.selectedShipping.id, finalPayload as UpdateStatusPayload)
-    //   .pipe(finalize(() => (this.isSubmitting = false)))
-    //   .subscribe({
-    //     next: () => {
-    //       this.closeUpdateStatusModal();
-    //       this.loadShippings();
-    //       // Cierra también el modal de detalles si está abierto en móvil
-    //       if (this.isMobile) {
-    //         this.closeDetailsModal();
-    //       }
-    //     },
-    //     error: (err) => {
-    //       alert('Error al actualizar el estado del envío.');
-    //       console.error(err);
-    //     },
-    //   });
+    // 3. Llamar al servicio UNA SOLA VEZ con el payload construido
+    this.shippingsService
+      .updateShipping(this.selectedShipping.id, finalPayload)
+      .pipe(finalize(() => (this.isSubmitting = false)))
+      .subscribe({
+        next: () => {
+          alert('¡El envío se ha actualizado correctamente!');
+          this.closeUpdateStatusModal();
+          this.loadShippings();
+          if (this.isMobile) {
+            this.closeDetailsModal();
+          }
+        },
+        error: (err) => {
+          // Mejoramos el mensaje de error para que muestre el error del backend
+          const errorMessage =
+            err?.error?.message || 'Ocurrió un error inesperado.';
+          alert(`Error al actualizar el envío: ${errorMessage}`);
+          console.error(err);
+        },
+      });
   }
 
   private getInitialUpdateStatusPayload(): any {

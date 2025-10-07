@@ -248,12 +248,7 @@ export class CreateOrderModalComponent implements OnInit {
     const shippingData: CreateShippingDto = {
       order_id: this.order.id,
       transportadora: this.carrier.trim(),
-      guia: 'ADVANCE',
-      fechaEstimada: this.estimatedDeliveryDays
-        ? new Date(Date.now() + this.estimatedDeliveryDays * 86400000)
-            .toISOString()
-            .split('T')[0]
-        : '',
+      fechaEstimada: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
       direccion_entrega: this.shippingAddress,
     };
 

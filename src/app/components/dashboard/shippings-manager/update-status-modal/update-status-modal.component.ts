@@ -9,10 +9,9 @@ import { faImage, faSpinner } from '@fortawesome/free-solid-svg-icons';
   selector: 'app-update-status-modal',
   standalone: true,
   templateUrl: './update-status-modal.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule]
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
 })
 export class UpdateStatusModalComponent {
-
   @Input() isOpen = false;
   @Input() isSubmitting = false;
   @Input() availableStatuses: string[] = [];
@@ -33,6 +32,10 @@ export class UpdateStatusModalComponent {
   }
 
   handleSubmit(form: NgForm) {
+    if (this.isSubmitting) {
+      console.warn('Submit bloqueado: ya se está enviando');
+      return;
+    }
     this.submit.emit(form);
   }
 
@@ -43,10 +46,10 @@ export class UpdateStatusModalComponent {
   getStatusInfo(status: string) {
     // Ejemplo genérico, puedes reemplazar con tu lógica actual
     const labels: Record<string, any> = {
-      'pendiente': { label: 'Pendiente' },
-      'en_transito': { label: 'En Tránsito' },
-      'entregado': { label: 'Entregado' },
-      'cancelado': { label: 'Cancelado' }
+      pendiente: { label: 'Pendiente' },
+      en_transito: { label: 'En Tránsito' },
+      entregado: { label: 'Entregado' },
+      cancelado: { label: 'Cancelado' },
     };
     return labels[status] || { label: status };
   }

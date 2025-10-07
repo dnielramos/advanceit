@@ -263,6 +263,7 @@ export class OrdersComponent implements OnInit {
         alert(
           'Hubo un error al crear el envío. Por favor, inténtalo de nuevo.'
         );
+        return;
       },
     });
 

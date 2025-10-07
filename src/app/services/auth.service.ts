@@ -84,7 +84,7 @@ export class AuthService {
       }),
       catchError((error) => {
         console.error('La validación del token falló', error);
-        // this.logout(); // Logout limpiará el rol, y `isLoggedIn$` emitirá `false`.
+        this.logout(); // Logout limpiará el rol, y `isLoggedIn$` emitirá `false`.
         // this.router.navigate(['/in']);
         return of(false);
       })

@@ -104,7 +104,7 @@
         <p class="font-semibold text-lg">
           {{ shipping.fechaEstimada | date: 'longDate' }}
         </p>
-        <p class="text-sm text-gray-600">Fecha entrega real</p>
+        <p *ngIf="shipping?.estado =='entregado'" class="text-sm text-gray-600">Fecha entrega real</p>
         <p *ngIf="shipping?.estado =='entregado'" class="font-semibold text-lg">
           {{ shipping.fechaEntregaReal | date: 'longDate' }}
         </p>

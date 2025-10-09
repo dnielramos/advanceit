@@ -106,16 +106,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
         roles: [Role.Admin, Role.User],
         routerLink: '/dashboard/home',
       },
-      // {
-      //   key: 'proveedores',
-      //   label: 'Proveedores',
-      //   icon: faCube,
-      //   requiresAuth: true, // Este item necesita que el usuario esté logueado
-      //   subItems: [
-      //     { label: 'Ingram', routerLink: '/dashboard/add-ingram-products' },
-      //     { label: 'Nexsys', routerLink: '/dashboard/add-nexsys-products' },
-      //   ],
-      // },
+      {
+        key: 'proveedores',
+        label: 'Proveedores',
+        roles: [Role.Admin],
+        icon: faCube,
+        subItems: [
+          { label: 'Ingram', routerLink: '/dashboard/add-ingram-products' },
+          { label: 'Nexsys', routerLink: '/dashboard/add-nexsys-products' },
+        ],
+      },
       {
         key: 'tienda',
         label: 'Tienda',

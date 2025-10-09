@@ -137,7 +137,7 @@ export class AddProductsComponent implements OnInit, OnDestroy {
   selectedProduct = signal<ProductoIngram | null>(null);
 
   constructor(
-    private productService: IngramService, // Usa IngramService
+    private ingramService: IngramService, // Usa IngramService
     private fb: FormBuilder
   ) {
     this.initializeForms();
@@ -202,7 +202,7 @@ export class AddProductsComponent implements OnInit, OnDestroy {
   loadAllProducts(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.productService
+    this.ingramService
       .getProducts(ingramPartNumbersDell)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -226,9 +226,9 @@ export class AddProductsComponent implements OnInit, OnDestroy {
     let searchObservable: Observable<ProductoIngram | ProductoIngram[] | null>;
 
     if (searchMode === 'sku') {
-      searchObservable = this.productService.getProducts([term]);
+      searchObservable = this.ingramService.getProducts([term]);
     } else { // searchMode === 'all'
-      searchObservable = this.productService.getProducts([term]); // This assumes an API endpoint for general search
+      searchObservable = this.ingramService.getProducts([term]); // This assumes an API endpoint for general search
                                                                   // If not, you'd filter `allProducts` client-side
     }
 

@@ -12,7 +12,7 @@ export class IngramService {
 
   private readonly apiUrlRender = ENVIRONMENT.apiUrlRender;
   private API_DETAILS_URL = `${this.apiUrlRender}/scraper/multiple`;
-  private API_PRODUCTS_URL = `${this.apiUrlRender}/ingram/products`;
+  private API_PRODUCTS_URL = `${this.apiUrlRender}/ingram/all-products`;
 
   constructor(private http: HttpClient) {}
 
@@ -53,7 +53,7 @@ export class IngramService {
       );
     }
 
-    getProducts(skus: string[]): Observable<ProductoIngram[]> {
-    return this.http.post<ProductoIngram[]>(this.API_PRODUCTS_URL, {ingramPartNumbers: skus});
+    getProducts(skus ?: string[]): Observable<ProductoIngram[]> {
+    return this.http.get<ProductoIngram[]>(this.API_PRODUCTS_URL);
   }
 }

@@ -12,7 +12,7 @@ export interface CartItem {
 })
 export class CartService {
   private cartSubject = new BehaviorSubject<CartItem[]>([]);
-  private cartItems: CartItem[] = [];
+  public cartItems: CartItem[] = [];
   private cartCount = new BehaviorSubject<number>(0);
 
   constructor() {
@@ -41,13 +41,13 @@ export class CartService {
   addToCart(product: ProductoFinal, quantity: number = 1): boolean {
     const existingItem = this.cartItems.find(item => item.product.id === product.id);
 
-    
+
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
       this.cartItems.push({ product, quantity });
     }
-    
+
     try {
       this.updateCart();
       //actualizar el contador

@@ -1,0 +1,138 @@
+<div class="p-4 mt-30 md:mt-16 md:p-8">
+
+
+  <lib-toastify-toast-container></lib-toastify-toast-container>
+
+  <button (click)="goBack()" class="flex ml-6 md:ml-2 items-center text-sm font-medium text-slate-600 hover:text-purple-600 transition-colors">
+    <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon>
+    Volver
+  </button>
+</div>
+
+<div class="p-4 md:p-8 pt-0">
+
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center text-center py-20">
+    <fa-icon [icon]="faSpinner" size="3x" class="text-purple-500 animate-spin"></fa-icon>
+    <p class="mt-4 text-lg font-semibold text-slate-600">Cargando producto...</p>
+  </div>
+
+  <ng-container *ngIf="product$ | async as product; else notFound">
+    <div *ngIf="product && !isLoading" class="bg-slate-50 rounded-2xl shadow-xl p-6 md:p-8 animate__animated animate__fadeIn">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <div class="flex items-center justify-center bg-white p-4 rounded-lg shadow-inner">
+          <img [src]="product.imagen | sanitizeImageUrl" [alt]="product.nombre" class="max-h-96 w-auto object-contain mix-blend-multiply">
+        </div>
+
+        <div class="flex flex-col space-y-4">
+          <div>
+            <span class="text-sm font-medium text-orange-600">{{ product.marca }} / {{ product.subcategoria }}</span>
+            <h1 class="text-3xl font-bold text-slate-800 mt-1">{{ product.nombre }}</h1>
+            <p class="text-xs text-slate-400 mt-1">SKU: {{ product.SKU }}</p>
+          </div>
+
+          <div class="flex items-center">
+            <span [ngClass]="{
+              'bg-green-100 text-green-800': product.disponibilidad,
+              'bg-red-100 text-red-800': !product.disponibilidad
+            }" class="text-xs font-semibold px-2.5 py-0.5 rounded-full">
+              {{ product.disponibilidad ? 'Disponible' : 'Agotado' }}
+            </span>
+          </div>
+
+          <ul class="space-y-2 text-slate-600">
+            <li *ngFor="let feature of parsedFeatures" class="flex items-start">
+              <fa-icon [icon]="faCheckCircle" class="bg-linear from-purple-700 to bg-orange-600 bg-clip-text text-purple-500 mt-1 mr-3 flex-shrink-0"></fa-icon>
+              <span>{{ feature }}</span>
+            </li>
+          </ul>
+
+          <div class="pt-4">
+            <p class="text-4xl font-extrabold text-slate-900">{{ product.precio | currency:'USD':'symbol':'1.2-2' }}</p>
+          </div>
+
+          <div class="flex items-center space-x-4 pt-4">
+            <div class="flex items-center border border-slate-300 rounded-lg">
+              <button (click)="decrementQuantity()" class="p-3 text-slate-500 hover:bg-slate-100 rounded-l-lg transition-colors disabled:opacity-50" [disabled]="quantity === 1">
+                <fa-icon [icon]="faMinus"></fa-icon>
+              </button>
+              <span class="px-4 text-lg font-semibold text-slate-700">{{ quantity }}</span>
+              <button (click)="incrementQuantity()" class="p-3 text-slate-500 hover:bg-slate-100 rounded-r-lg transition-colors">
+                <fa-icon [icon]="faPlus"></fa-icon>
+              </button>
+            </div>
+            <button type="button" *ngIf="product" (click)="handleComprar(product)" class="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+              Añadir al carrito
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12">
+        <div class="border-b border-slate-200">
+          <nav class="flex -mb-px space-x-6" aria-label="Tabs">
+            <button (click)="setActiveTab('description')" [ngClass]="{
+              'border-purple-500 text-purple-600': activeTab === 'description',
+              'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300': activeTab !== 'description'
+            }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base transition-colors">
+              <fa-icon [icon]="faInfoCircle" class="mr-2"></fa-icon>Descripción
+            </button>
+            <button (click)="setActiveTab('specs')" [ngClass]="{
+              'border-purple-500 text-purple-600': activeTab === 'specs',
+              'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300': activeTab !== 'specs'
+            }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base transition-colors">
+              <fa-icon [icon]="faMicrochip" class="mr-2"></fa-icon>Especificaciones Técnicas
+            </button>
+          </nav>
+        </div>
+
+        <div class="py-6">
+          <div *ngIf="activeTab === 'description'" class="prose text-lg max-w-none text-slate-600">
+            <p>{{ product.descripcion }}</p>
+          </div>
+          <div *ngIf="activeTab === 'specs' && parsedSpecs">
+            <div class="space-y-6">
+              <div *ngFor="let category of specCategories">
+                <h3 class="text-lg font-semibold text-slate-800 md:text-2xl mb-3 border-b pb-2">{{ category }}</h3>
+                <dl class="grid grid-cols-1 text-md sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+                  <ng-container *ngFor="let spec of parsedSpecs[category] | keyvalue">
+                    <dt class="font-medium text-slate-500">{{ spec.key }}</dt>
+                    <dd class="text-slate-800">{{ spec.value }}</dd>
+                  </ng-container>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="mt-8 border-t border-slate-200 pt-6">
+          <h3 class="text-base font-semibold text-slate-700 mb-3 flex items-center">
+            <fa-icon [icon]="faTag" class="mr-2 text-slate-400"></fa-icon>
+            Etiquetas
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            <span *ngFor="let tag of product.etiquetas" class="bg-slate-200 text-slate-700 text-xs font-medium px-3 py-1 rounded-full">
+              {{ tag }}
+            </span>
+          </div>
+      </div> -->
+
+    </div>
+  </ng-container>
+
+  <ng-template #notFound>
+    <div *ngIf="errorOccurred && !isLoading" class="flex flex-col items-center justify-center text-center py-20">
+      <fa-icon [icon]="faExclamationTriangle" size="3x" class="text-amber-500"></fa-icon>
+      <p class="mt-4 text-xl font-semibold text-slate-700">Producto no encontrado</p>
+      <p class="text-slate-500 mt-2">Lo sentimos, no pudimos encontrar el producto que buscas.</p>
+    </div>
+  </ng-template>
+
+</div>
+
+
+
+
+<app-cart *ngIf="cartService.cartItems.length > 0"></app-cart>

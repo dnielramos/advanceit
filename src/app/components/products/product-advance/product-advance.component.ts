@@ -11,7 +11,7 @@ import {
   faCodeBranch,
 } from '@fortawesome/free-solid-svg-icons';
 import { ProductoFinal } from '../../../models/Productos';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SanitizeImageUrlPipe } from '../../../pipes/sanitize-image-url.pipe';
 import { AuthService, Role } from '../../../services/auth.service';
 import { LogoPipe } from '../../../pipes/logo.pipe';
@@ -23,6 +23,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './product-advance.component.html',
 })
 export class ProductAdvanceComponent {
+
   @Input() productosFiltrados: ProductoFinal[] = [];
   @Input() producto!: ProductoFinal;
   @Output() agregarAlCarrito = new EventEmitter<ProductoFinal>();
@@ -37,10 +38,15 @@ export class ProductAdvanceComponent {
   faCopririgth = faCopyright;
   faCodeBranch = faCodeBranch;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router) {
     this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
       this.logged = isLoggedIn;
     });
+  }
+
+  navigateToProductDetail(producto: ProductoFinal) {
+    const productDetailUrl = `/productos/${producto.id}`;
+    this.router.navigateByUrl(productDetailUrl);
   }
 
   addToCart(producto: ProductoFinal) {
@@ -68,4 +74,23 @@ export class ProductAdvanceComponent {
     // Caso 2: Los datos vienen correctamente como un array (o son nulos/indefinidos)
     return Array.isArray(etiquetas) ? etiquetas : [];
   }
+
+
+  get safeCaracteristicas(): string[] {
+    const caracteristicas = this.producto["caracteristicas"];
+    // Caso 1: Los datos vienen como un string que parece un array (el error actual)
+    if (typeof caracteristicas === 'string') {
+      try {
+        const parsed = JSON.parse(caracteristicas);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        // Si no se puede parsear, devolvemos un array vacío para no romper la app
+        return [];
+      }
+    }
+
+    // Caso 2: Los datos vienen correctamente como un array (o son nulos/indefinidos)
+    return Array.isArray(caracteristicas) ? caracteristicas : [];
+  }
+
 }

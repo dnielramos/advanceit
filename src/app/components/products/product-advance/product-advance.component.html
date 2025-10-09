@@ -2,12 +2,12 @@
   (click)="navigateToProductDetail(producto)"
   class="bg-white rounded-xl shadow overflow-hidden transform transition-transform hover:scale-101 flex flex-col min-w-70 min-h-100 relative">
   <!-- Imagen del producto -->
-  <img [src]="producto.imagen | sanitizeImageUrl" [alt]="producto.nombre" class="w-full h-48 object-contain p-4" />
+  <img [src]="producto.imagen | sanitizeImageUrl" [alt]="producto.nombre" class="w-[80%] h-48 object-contain p-4" />
 
   <!-- Marca (logo) con posicionamiento absoluto y máscara blanca -->
   <div class="absolute top-2 right-2 z-10">
     <div class="bg-white rounded-2xl p-2 inline-flex items-center justify-center">
-      <img [src]="producto.marca | logo" [alt]="'Marca: ' + producto.marca" class="h-12 w-auto object-contain" />
+      <img [src]="producto.marca | logo" [alt]="'Marca: ' + producto.marca" class="h-10 w-auto object-contain" />
     </div>
   </div>
 
@@ -33,18 +33,18 @@
     <!-- Etiquetas -->
     <div class="flex flex-wrap gap-2 mb-4">
       <span *ngFor="let tag of safeEtiquetas"
-        class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full">
+        class="bg-purple-100 text-purple-700 text-[10px] font-semibold px-2 py-1 rounded-full">
         <fa-icon [icon]="faTag"></fa-icon>
         {{ tag }}
       </span>
     </div>
 
   <!-- caracteristicas -->
-  <div class="gap-2 mb-4">
+  <div class="gap-2 mb-4 grid items-start">
     @for (caracteristica of safeCaracteristicas; track $index; let i = $index) {
-      <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full">
-        <fa-icon [icon]="faTag"></fa-icon>
-        {{ caracteristica }}
+      <span class="text-purple-700 flex gap-1 text-[12px] font-semibold px-2 py-0  rounded-full">
+        <fa-icon [icon]="faCircleCheck"></fa-icon>
+        <span class="text-slate-700">{{ caracteristica }}</span>
       </span>
     }
   </div>

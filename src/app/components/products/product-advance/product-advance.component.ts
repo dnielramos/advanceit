@@ -6,6 +6,7 @@ import {
   faCopyright,
   faShoppingCart,
   faEye,
+  faCheck,
   faLayerGroup,
   faTag,
   faCodeBranch,
@@ -35,8 +36,9 @@ export class ProductAdvanceComponent {
   faSearch = faSearch;
   faLayerGroup = faLayerGroup;
   faTag = faTag;
-  faCopririgth = faCopyright;
+  faCopyright = faCopyright;
   faCodeBranch = faCodeBranch;
+  faCircleCheck = faCheck;
 
   constructor(private authService: AuthService, private router: Router) {
     this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
@@ -53,27 +55,40 @@ export class ProductAdvanceComponent {
     this.agregarAlCarrito.emit(producto);
   }
 
-  /**
-   * ESTE ES EL GETTER DE LA SOLUCIÓN
-   * Se asegura de que las etiquetas siempre sean un array iterable.
-   */
-  get safeEtiquetas(): string[] {
-    const etiquetas = this.producto.etiquetas;
+/**
+ * ESTE ES EL GETTER DE LA SOLUCIÓN
+ * Se asegura de que las etiquetas siempre sean un array iterable,
+ * y devuelve como máximo 5 etiquetas seleccionadas aleatoriamente si hay más.
+ */
+get safeEtiquetas(): string[] {
+  const etiquetas = this.producto.etiquetas;
 
-    // Caso 1: Los datos vienen como un string que parece un array (el error actual)
-    if (typeof etiquetas === 'string') {
-      try {
-        const parsed = JSON.parse(etiquetas);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (e) {
-        // Si no se puede parsear, devolvemos un array vacío para no romper la app
-        return [];
-      }
+  let etiquetasArray: string[] = [];
+
+  // Caso 1: Los datos vienen como un string que parece un array
+  if (typeof etiquetas === 'string') {
+    try {
+      const parsed = JSON.parse(etiquetas);
+      etiquetasArray = Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      // Si no se puede parsear, dejamos el array vacío
+      etiquetasArray = [];
     }
-
-    // Caso 2: Los datos vienen correctamente como un array (o son nulos/indefinidos)
-    return Array.isArray(etiquetas) ? etiquetas : [];
   }
+  // Caso 2: Ya es un array o es null/undefined
+  else if (Array.isArray(etiquetas)) {
+    etiquetasArray = etiquetas;
+  }
+
+  // Si hay 5 o menos, devolver tal cual
+  if (etiquetasArray.length <= 5) {
+    return etiquetasArray;
+  }
+
+  // Si hay más de 5, seleccionar 5 aleatorias sin repetir
+  const shuffled = [...etiquetasArray].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, 4);
+}
 
 
   get safeCaracteristicas(): string[] {

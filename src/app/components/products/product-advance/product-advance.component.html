@@ -1,5 +1,4 @@
-<div
-  (click)="navigateToProductDetail(producto)"
+<div (click)="navigateToProductDetail(producto)"
   class="bg-white rounded-xl shadow overflow-hidden transform transition-transform hover:scale-101 flex flex-col min-w-70 min-h-100 relative">
   <!-- Imagen del producto -->
   <img [src]="producto.imagen | sanitizeImageUrl" [alt]="producto.nombre" class="w-[80%] h-48 object-contain p-4" />
@@ -39,27 +38,39 @@
       </span>
     </div>
 
-  <!-- caracteristicas -->
-  <div class="gap-2 mb-4 grid items-start">
-    @for (caracteristica of safeCaracteristicas; track $index; let i = $index) {
-      <span class="text-purple-700 flex gap-1 text-[12px] font-semibold px-2 py-0  rounded-full">
-        <fa-icon [icon]="faCircleCheck"></fa-icon>
-        <span class="text-slate-700">{{ caracteristica }}</span>
+    <div class="relative h-[154px]">
+
+      <div class="h-full overflow-y-auto hide-scrollbar">
+        <div class="gap-2 mb-4 grid items-start pb-12">
+          @for (caracteristica of safeCaracteristicas; track $index; let i = $index) {
+          <span class="text-purple-700 flex gap-1 text-[10px] font-semibold px-2 py-0 rounded-full">
+            <fa-icon [icon]="faCircleCheck"></fa-icon>
+            <span class="text-slate-700">{{ caracteristica }}</span>
+          </span>
+          }
+        </div>
+      </div>
+
+      <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none">
+      </div>
+
+    </div>
+
+    <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none">
+    </div>
+
+
+  <!-- Precio y botón de compra -->
+  <div class="flex justify-between items-center mt-auto">
+
+
+    <div *ngIf="logged" class="flex flex-col w-[90%] align-center justify-center items-center">
+
+      <span class="text-purple-700 font-bold text-lg">
+        $ {{ producto.precio | number : '1.2' }}
       </span>
-    }
-  </div>
 
-    <!-- Precio y botón de compra -->
-    <div class="flex justify-between items-center mt-auto">
-
-
-      <div *ngIf="logged" class="flex flex-col w-[90%] align-center justify-center items-center">
-
-        <span class="text-purple-700 font-bold text-lg">
-          $ {{ producto.precio | number : '1.2' }}
-        </span>
-
-        <div class="mb-2 flex items-center justify-start w-[90%] text-[10px]"
+      <div class="mb-2 flex items-center justify-start w-[90%] text-[10px]"
         [ngClass]="producto.disponibilidad ? 'text-green-700' : 'text-red-700'">
         <div class="mr-2 h-2 w-2 rounded-full" [ngClass]="producto.disponibilidad ? 'bg-green-500' : 'bg-red-500'">
         </div>
@@ -69,16 +80,15 @@
         <span *ngIf="!producto.disponibilidad"> Agotado </span>
       </div>
 
-      </div>
-
-      <button
-        class="bg-gradient-to-r w-45 gap-2 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105 hover:-rotate-5"
-        (click)="addToCart(producto)"
-        [disabled]="!producto.disponibilidad"
-        [ngClass]="producto.disponibilidad ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400 cursor-not-allowed'">
-        <span class="text-sm">Añadir</span>
-        <fa-icon [icon]="faShoppingCart"></fa-icon>
-      </button>
     </div>
+
+    <button
+      class="bg-gradient-to-r w-45 gap-2 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105 hover:-rotate-5"
+      (click)="addToCart(producto)" [disabled]="!producto.disponibilidad"
+      [ngClass]="producto.disponibilidad ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400 cursor-not-allowed'">
+      <span class="text-sm">Añadir</span>
+      <fa-icon [icon]="faShoppingCart"></fa-icon>
+    </button>
   </div>
+</div>
 </div>

@@ -90,8 +90,8 @@ export const dashboardRoutes: Routes = [
         path: 'advance-products',
         loadComponent: () =>
           import(
-            '../pages/dashboard/advance-products/advance-products.component'
-          ).then((m) => m.AdvanceProductsComponent),
+            '../pages/filter-products/filter-products.component'
+          ).then((m) => m.FilterProductsComponent),
       },
 
       { path: 'cart', loadComponent: () => import('../components/cart/cart.component').then(m => m.CartComponent) },

@@ -1,10 +1,16 @@
 <div class="flex">
-  <!-- Columna del Filtro (Izquierda) - Oculta en pantallas pequeñas -->
   <aside class="w-80 h-screen sticky top-0 hidden md:flex flex-col bg-white shadow-xl font-sans">
 
-    <!-- Contenido del filtro -->
     <div class="flex flex-col flex-grow overflow-hidden mt-5">
-      <!-- Toggle Categorías/Marcas -->
+
+      <div class="p-4">
+        <input type="text"
+               [ngModel]="searchTerm()"
+               (ngModelChange)="onSearchChange($event)"
+               placeholder="Buscar productos..."
+               class="w-full p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" />
+      </div>
+
       <div class="flex p-2 border-b">
         <button (click)="setActiveView('categories')"
           [ngClass]="{ 'bg-purple-600 text-white shadow-md': activeView() === 'categories', 'bg-gray-100 text-gray-600 hover:bg-gray-200': activeView() !== 'categories' }"
@@ -18,9 +24,7 @@
         </button>
       </div>
 
-      <!-- Vistas Deslizables -->
       <div class="relative flex-grow overflow-hidden">
-        <!-- Vista de Categorías -->
         @if (activeView() === 'categories') {
         <div class="absolute w-full h-full transition-transform duration-300 ease-in-out"
           [ngClass]="{'translate-x-0': !currentCategory(), '-translate-x-full': currentCategory()}">
@@ -39,7 +43,6 @@
             </ul>
           </div>
         </div>
-        <!-- Vista de Subcategorías -->
         <div class="absolute w-full h-full transition-transform duration-300 ease-in-out"
           [ngClass]="{'translate-x-0': currentCategory(), 'translate-x-full': !currentCategory()}">
           @if (currentCategory(); as selectedCat) {
@@ -66,20 +69,24 @@
           }
         </div>
         }
-        <!-- Vista de Marcas -->
+
         @if (activeView() === 'brands') {
         <div class="absolute w-full h-full p-4 overflow-y-auto">
           <h2 class="text-xl font-bold text-purple-700 mb-4">Marcas</h2>
           <ul class="space-y-3">
             @for (brand of brands(); track brand.name) {
-            <li (click)="onSelectBrand(brand.name)"
-              class="flex items-center justify-between p-3 bg-gray-50 hover:bg-purple-100 rounded-lg cursor-pointer transition-colors">
-              <span class="flex items-center font-medium text-gray-800 gap-3">
+            <li class="flex items-center justify-between p-3 bg-gray-50 hover:bg-purple-100 rounded-lg transition-colors">
+              <label class="flex items-center font-medium text-gray-800 gap-3 w-full cursor-pointer">
+                <input type="checkbox"
+                       [checked]="selectedBrands().has(brand.name)"
+                       (change)="toggleBrand(brand.name)"
+                       class="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer">
+
                 <img class="h-8 object-contain w-10"
-                  src="https://advanceit.co/assets/logos/{{ brand.name | lowercase }}.png"
-                  alt="logo {{ brand.name | titlecase }}">
-                {{ brand.name | titlecase }}
-              </span>
+                     src="https://advanceit.co/assets/logos/{{ brand.name | lowercase }}.png"
+                     alt="logo {{ brand.name | titlecase }}">
+                <span>{{ brand.name | titlecase }}</span>
+              </label>
               <span class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-700">
                 {{ brand.quantity }}
               </span>
@@ -92,17 +99,13 @@
     </div>
   </aside>
 
-
   <lib-toastify-toast-container></lib-toastify-toast-container>
-
 
   <div *ngIf="showBrandsMenu()" (click)="showBrandsMenu.set(false)"
     class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden">
     <app-brand-menu (click)="$event.stopPropagation()"></app-brand-menu>
-
   </div>
 
-  <!-- t+item de carrito -->
   <div *ngIf="cartItemCount() > 0 && isLoggedIn()"
     class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl hover:cursor-pointer right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
     <a (click)="goToCart()" class="relative flex items-center justify-center w-full h-full">
@@ -114,27 +117,22 @@
     </a>
   </div>
 
-
   <div *ngIf="comprarProductos()" class="bg-black/50 fixed top-0 z-50 w-full h-full flex overflow-hidden">
     <app-info-login *ngIf="comprarProductos()" (close)="closeComprarProductos()" (loginAction)="handleLogin()"
       (createAction)="handleCreate()">
     </app-info-login>
   </div>
 
-
   <div *ngIf="createUser()" class="bg-black/60 backdrop-blur-sm fixed top-0 z-50 w-full h-full overflow-hidden"
     (click)="onOutregister()">
     <app-create-user></app-create-user>
   </div>
 
-
-  <!-- Columna de Contenido (Derecha) -->
   <main class="w-full p-6 bg-gray-50">
     <div class="flex justify-between items-center mb-6">
       <h1
         class="text-sm md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-orange-700">
         {{ viewTitle() }}</h1>
-      <!-- Botón de filtro para móviles -->
       <button (click)="onMenuBrands()"
         class="md:hidden flex items-center gap-2 p-2 rounded-md bg-purple-600 text-white">
         <fa-icon [icon]="faFilters"></fa-icon>
@@ -142,17 +140,14 @@
       </button>
     </div>
 
-    <!-- Contenedor de Productos -->
     @if (products().length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 max-w-5xl gap-6">
       @for (producto of products(); track producto.SKU) {
-      <!-- Aquí usas tu componente de tarjeta de producto -->
       <app-product-advance (agregarAlCarrito)="onComprarProductos($event)" [producto]="producto"></app-product-advance>
       }
     </div>
     }
 
-    <!-- Estado de Carga (Skeleton) -->
     @if (isLoading()) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       @for (item of [1,2,3,4]; track item) {
@@ -161,14 +156,12 @@
     </div>
     }
 
-    <!-- No se encontraron productos -->
     @if (!isLoading() && products().length === 0) {
     <div class="text-center py-20">
       <p class="text-xl text-gray-500">No se encontraron productos con estos filtros.</p>
     </div>
     }
 
-    <!-- Botón para Cargar Más -->
     @if (hasNextPage() && !isLoading()) {
     <div class="text-center mt-8">
       <button (click)="loadMoreProducts()"

@@ -17,6 +17,17 @@ export interface PaginationDto {
   limit?: number;
 }
 
+
+// Interfaz para tipar los filtros
+export interface ProductFilterOptions {
+  category?: string | null;
+  subcategory?: string | null;
+  brands?: string[]; // Acepta un arreglo de marcas
+  search?: string | null;
+  page?: number;
+  limit?: number;
+}
+
 export interface PaginatedProductsResponse {
   products: ProductoFinal[];
   total: number;
@@ -31,6 +42,8 @@ export interface PaginatedProductsResponse {
 export class ProductsService {
   private readonly apiUrlRender = ENVIRONMENT.apiUrlRender;
   private API_ALL_URL = `${this.apiUrlRender}/advance-products/all`;
+
+  private API_FILTER_URL = `${this.apiUrlRender}/filter/filters`;
   // New URL for paginated products
   private API_PAGINATED_URL = `${this.apiUrlRender}/advance-products/all-paginated`;
 
@@ -162,5 +175,40 @@ export class ProductsService {
         return of(null);
       })
     );
+  }
+
+
+  /**
+   * Obtiene productos filtrados desde el backend.
+   * @param options - Un objeto con todos los filtros a aplicar.
+   * @returns Un Observable con la respuesta paginada del API.
+   */
+  getFilteredProducts(options: ProductFilterOptions): Observable<PaginatedProductsResponse> {
+    let params = new HttpParams();
+
+    // Construye los parámetros solo si tienen un valor
+    if (options.category) {
+      params = params.set('category', options.category);
+    }
+    if (options.subcategory) {
+      params = params.set('subcategory', options.subcategory);
+    }
+    if (options.search) {
+      params = params.set('search', options.search);
+    }
+    if (options.page) {
+      params = params.set('page', options.page.toString());
+    }
+    if (options.limit) {
+      params = params.set('limit', options.limit.toString());
+    }
+
+    // ✨ Lógica clave: Convierte el array de marcas en un string separado por comas
+    if (options.brands && options.brands.length > 0) {
+      params = params.set('brands', options.brands.join(','));
+    }
+
+    // Realiza la petición GET con los parámetros construidos
+    return this.http.get<PaginatedProductsResponse>(this.API_FILTER_URL, { params });
   }
 }

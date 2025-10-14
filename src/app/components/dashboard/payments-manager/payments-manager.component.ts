@@ -21,6 +21,7 @@ type ActionType = 'status' | 'date' | 'voucher';
   standalone: true,
   imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './payments-manager.component.html',
+  styleUrls: ['./payments-manager.component.css']
 })
 export class PaymentsManagerComponent implements OnInit {
   private paymentsService = inject(PaymentsService);
@@ -43,6 +44,12 @@ export class PaymentsManagerComponent implements OnInit {
   public selectedFile: File | null = null;
   public isUploading = false;
 
+  // Estado para el comprobante en Base64
+  public voucherBase64: string | null = null;
+  public showBase64Modal = false;
+
+  // Estado para vista mobile
+  public showDetailsMobile = false;
 
   // --- Iconos de FontAwesome ---
   faPlus = faPlus;
@@ -88,6 +95,11 @@ export class PaymentsManagerComponent implements OnInit {
 
   selectPayment(payment: Payment): void {
     this.selectedPayment = payment;
+    this.showDetailsMobile = true;
+  }
+
+  closeDetailsMobile(): void {
+    this.showDetailsMobile = false;
   }
 
   // --- Lógica del Modal de Creación ---
@@ -118,15 +130,26 @@ export class PaymentsManagerComponent implements OnInit {
     this.updateStatus = this.selectedPayment.estado;
     this.updateDate = this.selectedPayment.fechaPago || new Date().toISOString().split('T')[0];
     this.selectedFile = null;
+    this.voucherBase64 = null;
     this.isActionModalOpen = true;
   }
 
   closeActionModal(): void {
     this.isActionModalOpen = false;
+    this.selectedFile = null;
+    this.voucherBase64 = null;
   }
 
   handleStatusUpdate(): void {
     if (!this.selectedPayment) return;
+
+    // Si está cambiando a "pagado", solicitar comprobante
+    if (this.updateStatus === 'pagado' && this.selectedPayment.estado !== 'pagado') {
+      this.closeActionModal();
+      this.openActionModal('voucher');
+      return;
+    }
+
     this.paymentsService.updatePaymentStatus(this.selectedPayment.id, { estado: this.updateStatus })
       .subscribe(() => {
         this.loadPayments();
@@ -147,34 +170,67 @@ export class PaymentsManagerComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.selectedFile = input.files[0];
+      // Convertir a Base64 inmediatamente
+      this.convertFileToBase64(input.files[0]);
     }
   }
 
+  convertFileToBase64(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.voucherBase64 = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
   handleVoucherUpload(): void {
-    if (!this.selectedPayment || !this.selectedFile) return;
+    if (!this.selectedPayment || !this.selectedFile || !this.voucherBase64) return;
+
     this.isUploading = true;
     this.paymentsService.uploadVoucher(this.selectedPayment.id, this.selectedFile)
       .pipe(finalize(() => this.isUploading = false))
       .subscribe({
         next: () => {
-          // Marcar como pagado y actualizar fecha si no lo están ya
+          // Mostrar el Base64 antes de actualizar
+          this.showBase64Result();
+
+          // Actualizar estado a pagado y fecha si no lo están
           if (this.selectedPayment?.estado !== 'pagado') {
             this.paymentsService.updatePaymentStatus(this.selectedPayment!.id, { estado: 'pagado' })
               .subscribe(() => {
                 const today = new Date().toISOString().split('T')[0];
                 this.paymentsService.updatePaymentDate(this.selectedPayment!.id, { fechaPago: today })
                   .subscribe(() => {
-                      this.loadPayments();
-                      this.closeActionModal();
+                    this.loadPayments();
+                    this.closeActionModal();
                   });
               });
           } else {
-             this.loadPayments();
-             this.closeActionModal();
+            this.loadPayments();
+            this.closeActionModal();
           }
         },
-        error: (err) => alert('Error al subir el comprobante.'),
+        error: (err) => {
+          alert('Error al subir el comprobante.');
+          this.isUploading = false;
+        },
       });
+  }
+
+  showBase64Result(): void {
+    this.showBase64Modal = true;
+  }
+
+  closeBase64Modal(): void {
+    this.showBase64Modal = false;
+  }
+
+  copyBase64ToClipboard(): void {
+    if (this.voucherBase64) {
+      navigator.clipboard.writeText(this.voucherBase64).then(() => {
+        alert('Base64 copiado al portapapeles!');
+      });
+    }
   }
 
   // --- Métodos de Ayuda ---

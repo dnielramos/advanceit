@@ -1,161 +1,430 @@
 <div class="bg-gray-50 min-h-screen font-sans text-gray-800 p-4 sm:p-6 lg:p-8">
 
-    <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-      <h1 class="text-3xl font-bold text-gray-800">Gestión de Pagos</h1>
-      <button (click)="openCreateModal()" class="flex items-center gap-2 bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-75 transition-all duration-300">
-        <fa-icon [icon]="faPlus"></fa-icon>
-        Registrar Pago
-      </button>
-    </header>
-  
-    <main class="flex flex-col lg:flex-row lg:gap-8">
-  
-      <div class="w-full lg:w-1/3 xl:w-1/4 animate__animated animate__fadeInLeft">
-        @if (isLoading) {
-        <div class="flex justify-center items-center h-64"><fa-icon [icon]="faCircleNotch" size="3x" class="text-violet-500 animate-spin"></fa-icon></div>
-        } @else if (error) {
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center gap-3"><fa-icon [icon]="faExclamationTriangle"></fa-icon><p class="font-bold">{{ error }}</p></div>
-        } @else {
-          <div class="space-y-3">
-            @for (payment of payments; track payment.id) {
-            <div (click)="selectPayment(payment)" [ngClass]="{'bg-violet-50 border-violet-500 shadow-lg': selectedPayment?.id === payment.id, 'bg-white border-gray-200 hover:border-violet-400 hover:shadow-md': selectedPayment?.id !== payment.id}" class="p-4 border rounded-lg cursor-pointer transition-all duration-300">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-sm text-gray-500">Orden: {{ payment.order_id }}</p>
-                  <p class="font-bold text-lg text-gray-800">{{ payment.monto | currency:'USD':'symbol':'1.2-2' }}</p>
-                </div>
-                <span [ngClass]="statusInfo[payment.estado].color" class="flex items-center gap-2 text-xs font-semibold bg-gray-100 px-2 py-1 rounded-full">
-                    <fa-icon [icon]="statusInfo[payment.estado].icon"></fa-icon>
-                    {{ statusInfo[payment.estado].label }}
-                  </span>
-              </div>
-              <p class="text-xs text-gray-400 mt-2">Vence: {{ payment.fechaLimitePago | date }}</p>
-            </div>
-            }
-          </div>
-        }
+  <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+    <h1 class="text-3xl font-bold text-gray-800">Gestión de Pagos</h1>
+    <button (click)="openCreateModal()"
+      class="flex items-center gap-2 bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition-all duration-300">
+      <fa-icon [icon]="faPlus"></fa-icon>
+      Registrar Pago
+    </button>
+  </header>
+
+  <main class="flex flex-col lg:flex-row lg:gap-8 lg:h-[calc(100vh-180px)]">
+
+    <!-- Lista de Pagos - Desktop: Scroll Interno, Mobile: Vista Normal -->
+    <div class="w-full scroll-purple lg:w-1/3 xl:w-1/4 animate__animated animate__fadeInLeft lg:overflow-y-auto lg:h-full">
+      @if (isLoading) {
+      <div class="flex justify-center items-center h-64">
+        <fa-icon [icon]="faCircleNotch" size="3x" class="text-purple-500 animate-spin"></fa-icon>
       </div>
-  
-      <div class="w-full lg:w-2/3 xl:w-3/4 mt-8 lg:mt-0 animate__animated animate__fadeInUp">
-        @if (selectedPayment) {
-        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-4 border-b border-gray-200 mb-6">
+      } @else if (error) {
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center gap-3">
+        <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+        <p class="font-bold">{{ error }}</p>
+      </div>
+      } @else {
+      <div class="space-y-3 pb-4">
+        @for (payment of payments; track payment.id) {
+        <div (click)="selectPayment(payment)"
+          [ngClass]="{'bg-purple-50 border-purple-500 shadow-lg': selectedPayment?.id === payment.id, 'bg-white border-gray-200 hover:border-purple-400 hover:shadow-md': selectedPayment?.id !== payment.id}"
+          class="p-4 border rounded-lg cursor-pointer transition-all duration-300">
+          <div class="flex justify-between items-start">
             <div>
-              <h2 class="text-2xl font-bold text-violet-700">Detalles del Pago</h2>
-              <p class="text-sm text-gray-500">Orden: {{ selectedPayment.order_id }}</p>
+              <p class="text-sm text-gray-500">Orden: {{ payment.order_id }}</p>
+              <p class="font-bold text-lg text-gray-800">{{ payment.monto | currency:'USD':'symbol':'1.2-2' }}</p>
             </div>
-            <div class="mt-4 sm:mt-0 text-right">
-              <p class="text-sm text-gray-600">Monto a Pagar</p>
-              <p class="font-semibold text-2xl">{{ selectedPayment.monto | currency:'USD':'symbol':'1.2-2' }}</p>
-            </div>
+            <span [ngClass]="statusInfo[payment.estado].color"
+              class="flex items-center gap-2 text-xs font-semibold bg-gray-100 px-2 py-1 rounded-full">
+              <fa-icon [icon]="statusInfo[payment.estado].icon"></fa-icon>
+              {{ statusInfo[payment.estado].label }}
+            </span>
           </div>
-          
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div class="flex items-center gap-3"><fa-icon [icon]="statusInfo[selectedPayment.estado].icon" size="lg" [ngClass]="statusInfo[selectedPayment.estado].color"></fa-icon><div><span class="text-sm text-gray-500">Estado</span><p class="font-semibold">{{ statusInfo[selectedPayment.estado].label }}</p></div></div>
-            <div class="flex items-center gap-3"><fa-icon [icon]="methodInfo[selectedPayment.metodo].icon" size="lg" class="text-gray-500"></fa-icon><div><span class="text-sm text-gray-500">Método</span><p class="font-semibold">{{ methodInfo[selectedPayment.metodo].label }}</p></div></div>
-            <div class="flex items-center gap-3"><fa-icon [icon]="faClock" size="lg" class="text-gray-500"></fa-icon><div><span class="text-sm text-gray-500">Fecha Límite</span><p class="font-semibold">{{ selectedPayment.fechaLimitePago | date:'longDate' }}</p></div></div>
-            @if(selectedPayment.fechaPago) {
-              <div class="flex items-center gap-3"><fa-icon [icon]="faCheck" size="lg" class="text-green-500"></fa-icon><div><span class="text-sm text-gray-500">Fecha de Pago</span><p class="font-semibold">{{ selectedPayment.fechaPago | date:'longDate' }}</p></div></div>
-            }
-          </div>
-  
-          <div class="mt-8 pt-6 border-t border-gray-200 flex flex-wrap gap-4">
-            <button (click)="openActionModal('status')" class="btn-action bg-blue-100 text-blue-700 hover:bg-blue-200">Cambiar Estado</button>
-            <button (click)="openActionModal('date')" class="btn-action bg-yellow-100 text-yellow-700 hover:bg-yellow-200">Fijar Fecha de Pago</button>
-            <button (click)="openActionModal('voucher')" class="btn-action bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2"><fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante</button>
-          </div>
-  
+          <p class="text-xs text-gray-400 mt-2">Vence: {{ payment.fechaLimitePago | date }}</p>
         </div>
-        } @else {
-        <div class="hidden lg:flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
-          <div class="text-center text-gray-500">
-            <fa-icon [icon]="faFileInvoiceDollar" size="4x" class="mb-4"></fa-icon>
-            <p class="text-xl font-semibold">Selecciona un pago</p>
-            <p>Elige un pago de la lista para ver sus detalles y acciones.</p>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Detalles del Pago - Desktop: Scroll Interno, Mobile: Modal -->
+    <div class="w-full lg:w-2/3 xl:w-3/4 mt-8 lg:mt-0 animate__animated animate__fadeInUp lg:overflow-y-auto lg:h-full">
+      @if (selectedPayment) {
+      <!-- Vista Desktop -->
+      <div class="hidden lg:block bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-4 border-b border-gray-200 mb-6">
+          <div>
+            <h2 class="text-2xl font-bold text-purple-700">Detalles del Pago</h2>
+            <p class="text-sm text-gray-500">Orden: {{ selectedPayment.order_id }}</p>
+          </div>
+          <div class="mt-4 sm:mt-0 text-right">
+            <p class="text-sm text-gray-600">Monto a Pagar</p>
+            <p class="font-semibold text-2xl">{{ selectedPayment.monto | currency:'USD':'symbol':'1.2-2' }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div class="flex items-center gap-3">
+            <fa-icon [icon]="statusInfo[selectedPayment.estado].icon" size="lg"
+              [ngClass]="statusInfo[selectedPayment.estado].color"></fa-icon>
+            <div>
+              <span class="text-sm text-gray-500">Estado</span>
+              <p class="font-semibold">{{ statusInfo[selectedPayment.estado].label }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <fa-icon [icon]="methodInfo[selectedPayment.metodo].icon" size="lg" class="text-gray-500"></fa-icon>
+            <div>
+              <span class="text-sm text-gray-500">Método</span>
+              <p class="font-semibold">{{ methodInfo[selectedPayment.metodo].label }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <fa-icon [icon]="faClock" size="lg" class="text-gray-500"></fa-icon>
+            <div>
+              <span class="text-sm text-gray-500">Fecha Límite</span>
+              <p class="font-semibold">{{ selectedPayment.fechaLimitePago | date:'longDate' }}</p>
+            </div>
+          </div>
+          @if(selectedPayment.fechaPago) {
+          <div class="flex items-center gap-3">
+            <fa-icon [icon]="faCheck" size="lg" class="text-green-500"></fa-icon>
+            <div>
+              <span class="text-sm text-gray-500">Fecha de Pago</span>
+              <p class="font-semibold">{{ selectedPayment.fechaPago | date:'longDate' }}</p>
+            </div>
+          </div>
+          }
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-200 flex flex-wrap gap-4">
+          <button (click)="openActionModal('status')"
+            class="btn-action bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-lg font-semibold transition-colors">
+            Cambiar Estado
+          </button>
+          <button (click)="openActionModal('date')"
+            class="btn-action bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-semibold transition-colors">
+            Fijar Fecha de Pago
+          </button>
+          <button (click)="openActionModal('voucher')"
+            class="btn-action bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
+            <fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante
+          </button>
+        </div>
+      </div>
+      } @else {
+      <!-- Placeholder cuando no hay selección -->
+      <div
+        class="hidden lg:flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
+        <div class="text-center text-gray-500">
+          <fa-icon [icon]="faFileInvoiceDollar" size="4x" class="mb-4"></fa-icon>
+          <p class="text-xl font-semibold">Selecciona un pago</p>
+          <p>Elige un pago de la lista para ver sus detalles y acciones.</p>
+        </div>
+      </div>
+      }
+    </div>
+  </main>
+</div>
+
+<!-- Modal de Detalles para Mobile -->
+@if (showDetailsMobile && selectedPayment) {
+<div class="lg:hidden fixed inset-0 bg-black/60 z-50 flex items-end" (click)="closeDetailsMobile()">
+  <div class="bg-white rounded-t-3xl w-full max-h-[85vh] overflow-y-auto animate__animated animate__slideInUp"
+    (click)="$event.stopPropagation()">
+    <!-- Header del Modal -->
+    <div class="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center rounded-t-3xl">
+      <h2 class="text-xl font-bold text-purple-700">Detalles del Pago</h2>
+      <button (click)="closeDetailsMobile()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+    </div>
+
+    <!-- Contenido del Modal -->
+    <div class="p-6">
+      <div class="mb-6">
+        <p class="text-sm text-gray-500">Orden: {{ selectedPayment.order_id }}</p>
+        <p class="font-semibold text-3xl text-violet-700 mt-2">{{ selectedPayment.monto |
+          currency:'USD':'symbol':'1.2-2' }}</p>
+      </div>
+
+      <div class="space-y-4 mb-8">
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <fa-icon [icon]="statusInfo[selectedPayment.estado].icon" size="lg"
+            [ngClass]="statusInfo[selectedPayment.estado].color"></fa-icon>
+          <div>
+            <span class="text-sm text-gray-500">Estado</span>
+            <p class="font-semibold">{{ statusInfo[selectedPayment.estado].label }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <fa-icon [icon]="methodInfo[selectedPayment.metodo].icon" size="lg" class="text-gray-500"></fa-icon>
+          <div>
+            <span class="text-sm text-gray-500">Método</span>
+            <p class="font-semibold">{{ methodInfo[selectedPayment.metodo].label }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <fa-icon [icon]="faClock" size="lg" class="text-gray-500"></fa-icon>
+          <div>
+            <span class="text-sm text-gray-500">Fecha Límite</span>
+            <p class="font-semibold">{{ selectedPayment.fechaLimitePago | date:'longDate' }}</p>
+          </div>
+        </div>
+
+        @if(selectedPayment.fechaPago) {
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <fa-icon [icon]="faCheck" size="lg" class="text-green-500"></fa-icon>
+          <div>
+            <span class="text-sm text-gray-500">Fecha de Pago</span>
+            <p class="font-semibold">{{ selectedPayment.fechaPago | date:'longDate' }}</p>
           </div>
         </div>
         }
       </div>
-    </main>
-  </div>
-  
-  @if (isCreateModalOpen) {
-  <div class="fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4" (click)="closeCreateModal()">
-    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg animate__animated animate__zoomIn" (click)="$event.stopPropagation()">
-      <h2 class="text-2xl font-bold mb-6 text-gray-800">Registrar Nuevo Pago</h2>
-      <form #createForm="ngForm" (ngSubmit)="handleCreateSubmit()">
-        <div class="space-y-4">
-          <input type="text" name="order_id" [(ngModel)]="newPayment.order_id" placeholder="ID de la Orden" required class="form-input">
-          <input type="number" name="monto" [(ngModel)]="newPayment.monto" placeholder="Monto" required class="form-input">
-          <div>
-            <label class="form-label">Fecha Límite</label>
-            <input type="date" name="fechaLimitePago" [(ngModel)]="newPayment.fechaLimitePago" required class="form-input mt-1">
-          </div>
-          <div>
-            <label class="form-label">Método de Pago</label>
-            <select name="metodo" [(ngModel)]="newPayment.metodo" class="form-input mt-1">
-              <option value="transferencia">Transferencia</option>
-              <option value="tarjeta">Tarjeta</option>
-              <option value="credito">Crédito</option>
-            </select>
-          </div>
-        </div>
-        <div class="flex justify-end gap-4 mt-8">
-          <button type="button" (click)="closeCreateModal()" class="btn-secondary">Cancelar</button>
-          <button type="submit" [disabled]="!createForm.valid" class="btn-primary">Registrar</button>
-        </div>
-      </form>
+
+      <!-- Acciones -->
+      <div class="space-y-3">
+        <button (click)="openActionModal('status')"
+          class="w-full bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-3 rounded-lg font-semibold transition-colors">
+          Cambiar Estado
+        </button>
+        <button (click)="openActionModal('date')"
+          class="w-full bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-3 rounded-lg font-semibold transition-colors">
+          Fijar Fecha de Pago
+        </button>
+        <button (click)="openActionModal('voucher')"
+          class="w-full bg-green-100 text-green-700 hover:bg-green-200 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-colors">
+          <fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante
+        </button>
+      </div>
     </div>
   </div>
-  }
-  
-  @if (isActionModalOpen && selectedPayment) {
-  <div class="fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4" (click)="closeActionModal()">
-    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg animate__animated animate__zoomIn" (click)="$event.stopPropagation()">
-      
-      @if (actionType === 'status') { <h2 class="text-2xl font-bold mb-6">Actualizar Estado</h2> }
-      @if (actionType === 'date') { <h2 class="text-2xl font-bold mb-6">Actualizar Fecha de Pago</h2> }
-      @if (actionType === 'voucher') { <h2 class="text-2xl font-bold mb-6">Subir Comprobante</h2> }
-  
-      @if (actionType === 'status') {
-        <form #statusForm="ngForm" (ngSubmit)="handleStatusUpdate()">
-          <select name="status" [(ngModel)]="updateStatus" class="form-input">
-            <option value="pendiente">Pendiente</option>
-            <option value="pagado">Pagado</option>
-            <option value="no_pagado">No Pagado</option>
-            <option value="atrasado">Atrasado</option>
-          </select>
-          <div class="flex justify-end gap-4 mt-8"><button type="button" (click)="closeActionModal()" class="btn-secondary">Cancelar</button><button type="submit" class="btn-primary">Actualizar</button></div>
-        </form>
-      }
-      @if (actionType === 'date') {
-        <form #dateForm="ngForm" (ngSubmit)="handleDateUpdate()">
-            <input type="date" name="date" [(ngModel)]="updateDate" class="form-input">
-            <div class="flex justify-end gap-4 mt-8"><button type="button" (click)="closeActionModal()" class="btn-secondary">Cancelar</button><button type="submit" class="btn-primary">Actualizar</button></div>
-        </form>
-      }
-      @if (actionType === 'voucher') {
+</div>
+}
+
+<!-- Modal de Creación de Pago -->
+@if (isCreateModalOpen) {
+<div class="fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4" (click)="closeCreateModal()">
+  <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg animate__animated animate__zoomIn"
+    (click)="$event.stopPropagation()">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Registrar Nuevo Pago</h2>
+    <form #createForm="ngForm" (ngSubmit)="handleCreateSubmit()">
+      <div class="space-y-4">
+        <input type="text" name="order_id" [(ngModel)]="newPayment.order_id" placeholder="ID de la Orden" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
+        <input type="number" name="monto" [(ngModel)]="newPayment.monto" placeholder="Monto" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
         <div>
-          <label for="voucherFile" class="flex flex-col items-center justify-center w-full h-40 border-2 border-violet-300 border-dashed rounded-lg cursor-pointer bg-violet-50 hover:bg-violet-100">
-            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-violet-600">
-              <fa-icon [icon]="faFileArrowUp" size="3x"></fa-icon>
-              @if (selectedFile) {
-                <p class="mt-2 text-sm text-gray-700"><span class="font-semibold">{{ selectedFile.name }}</span></p>
-              } @else {
-                <p class="mt-2 text-sm"><span class="font-semibold">Click para buscar</span> o arrastra el archivo</p>
-              }
-            </div>
-            <input id="voucherFile" type="file" class="hidden" (change)="onFileSelected($event)">
-          </label>
-          <div class="flex justify-end gap-4 mt-8">
-              <button type="button" (click)="closeActionModal()" class="btn-secondary">Cancelar</button>
-              <button type="button" (click)="handleVoucherUpload()" [disabled]="!selectedFile || isUploading" class="btn-primary flex items-center gap-2">
-                  @if (isUploading) { <fa-icon [icon]="faCircleNotch" class="animate-spin"></fa-icon> Subiendo... }
-                  @else { Subir }
-              </button>
-          </div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha Límite</label>
+          <input type="date" name="fechaLimitePago" [(ngModel)]="newPayment.fechaLimitePago" required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
         </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Método de Pago</label>
+          <select name="metodo" [(ngModel)]="newPayment.metodo"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
+            <option value="transferencia">Transferencia</option>
+            <option value="tarjeta">Tarjeta</option>
+            <option value="credito">Crédito</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-end gap-4 mt-8">
+        <button type="button" (click)="closeCreateModal()"
+          class="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="!createForm.valid"
+          class="px-6 py-2 bg-violet-600 text-white font-semibold rounded-lg hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          Registrar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
+<!-- Modal de Acciones (Actualizar Estado/Fecha/Comprobante) -->
+@if (isActionModalOpen && selectedPayment) {
+<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" (click)="closeActionModal()">
+  <div
+    class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto animate__animated animate__zoomIn"
+    (click)="$event.stopPropagation()">
+
+    @if (actionType === 'status') {
+    <h2 class="text-2xl font-bold mb-6">Actualizar Estado</h2>
+    <form #statusForm="ngForm" (ngSubmit)="handleStatusUpdate()">
+      <select name="status" [(ngModel)]="updateStatus"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 mb-2">
+        <option value="pendiente">Pendiente</option>
+        <option value="pagado">Pagado</option>
+        <option value="no_pagado">No Pagado</option>
+        <option value="atrasado">Atrasado</option>
+      </select>
+      @if (updateStatus === 'pagado' && selectedPayment.estado !== 'pagado') {
+      <p class="text-sm text-amber-600 mb-4">⚠️ Al cambiar a "Pagado" se solicitará el comprobante</p>
       }
+      <div class="flex justify-end gap-4 mt-8">
+        <button type="button" (click)="closeActionModal()"
+          class="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors">
+          Cancelar
+        </button>
+        <button type="submit"
+          class="px-6 py-2 bg-violet-600 text-white font-semibold rounded-lg hover:bg-violet-700 transition-colors">
+          Actualizar
+        </button>
+      </div>
+    </form>
+    }
+
+    @if (actionType === 'date') {
+    <h2 class="text-2xl font-bold mb-6">Actualizar Fecha de Pago</h2>
+    <form #dateForm="ngForm" (ngSubmit)="handleDateUpdate()">
+      <input type="date" name="date" [(ngModel)]="updateDate"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
+      <div class="flex justify-end gap-4 mt-8">
+        <button type="button" (click)="closeActionModal()"
+          class="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors">
+          Cancelar
+        </button>
+        <button type="submit"
+          class="px-6 py-2 bg-violet-600 text-white font-semibold rounded-lg hover:bg-violet-700 transition-colors">
+          Actualizar
+        </button>
+      </div>
+    </form>
+    }
+
+    @if (actionType === 'voucher') {
+    <h2 class="text-2xl font-bold mb-6">Subir Comprobante</h2>
+    <div>
+      <label for="voucherFile"
+        class="flex flex-col items-center justify-center w-full h-40 border-2 border-violet-300 border-dashed rounded-lg cursor-pointer bg-violet-50 hover:bg-violet-100 transition-colors">
+        <div class="flex flex-col items-center justify-center pt-5 pb-6 text-violet-600">
+          <fa-icon [icon]="faFileArrowUp" size="3x"></fa-icon>
+          @if (selectedFile) {
+          <p class="mt-2 text-sm text-gray-700"><span class="font-semibold">{{ selectedFile.name }}</span></p>
+          <p class="text-xs text-gray-500 mt-1">{{ (selectedFile.size / 1024).toFixed(2) }} KB</p>
+          } @else {
+          <p class="mt-2 text-sm"><span class="font-semibold">Click para buscar</span> o arrastra el archivo</p>
+          <p class="text-xs text-gray-400 mt-1">PDF, JPG, PNG (máx. 5MB)</p>
+          }
+        </div>
+        <input id="voucherFile" type="file" class="hidden" accept="image/*,application/pdf"
+          (change)="onFileSelected($event)">
+      </label>
+
+      @if (voucherBase64) {
+      <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+        <p class="text-sm text-green-700 font-semibold flex items-center gap-2">
+          <fa-icon [icon]="faCheck"></fa-icon>
+          Archivo convertido a Base64
+        </p>
+      </div>
+      }
+
+      <div class="flex justify-end gap-4 mt-8">
+        <button type="button" (click)="closeActionModal()"
+          class="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors">
+          Cancelar
+        </button>
+        <button type="button" (click)="handleVoucherUpload()" [disabled]="!selectedFile || isUploading"
+          class="px-6 py-2 bg-violet-600 text-white font-semibold rounded-lg hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+          @if (isUploading) {
+          <fa-icon [icon]="faCircleNotch" class="animate-spin"></fa-icon> Subiendo...
+          } @else {
+          Subir y Marcar como Pagado
+          }
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+}
+
+<!-- Modal de Base64 Result -->
+@if (showBase64Modal && voucherBase64) {
+<div class="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4" (click)="closeBase64Modal()">
+  <div
+    class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate__animated animate__zoomIn"
+    (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-violet-600 to-purple-600 p-6 text-white">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">Comprobante en Base64</h2>
+          <p class="text-violet-100 text-sm mt-1">Listo para guardar en tu base de datos MySQL</p>
+        </div>
+        <button (click)="closeBase64Modal()" class="text-white hover:text-gray-200 text-3xl leading-none">×</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+      <!-- Preview de la imagen si es imagen -->
+      @if (selectedFile && selectedFile.type.startsWith('image/')) {
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Vista Previa</h3>
+        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 flex justify-center">
+          <img [src]="voucherBase64" alt="Preview" class="max-h-64 rounded-lg shadow-md">
+        </div>
+      </div>
+      }
+
+      <!-- Base64 String -->
+      <div class="mb-4">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-lg font-semibold text-gray-800">String Base64</h3>
+          <button (click)="copyBase64ToClipboard()"
+            class="flex items-center gap-2 px-4 py-2 bg-violet-100 text-violet-700 hover:bg-violet-200 rounded-lg font-semibold transition-colors">
+            <fa-icon [icon]="faCheck"></fa-icon>
+            Copiar al Portapapeles
+          </button>
+        </div>
+        <div class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto font-mono text-sm">
+          <pre class="whitespace-pre-wrap break-all">{{ voucherBase64 }}</pre>
+        </div>
+      </div>
+
+      <!-- Info adicional -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <p class="text-sm text-blue-600 font-semibold">Tipo de Archivo</p>
+          <p class="text-lg font-bold text-blue-900">{{ selectedFile?.type || 'N/A' }}</p>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+          <p class="text-sm text-green-600 font-semibold">Tamaño</p>
+          <p class="text-lg font-bold text-green-900">{{ (selectedFile?.size ? selectedFile!.size / 1024 : 0).toFixed(2)
+            }} KB</p>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+          <p class="text-sm text-purple-600 font-semibold">Caracteres Base64</p>
+          <p class="text-lg font-bold text-purple-900">{{ voucherBase64.length.toLocaleString() }}</p>
+        </div>
+      </div>
+
+      <!-- Ejemplo de código SQL -->
+      <div class="mt-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Ejemplo de Query MySQL</h3>
+        <div class="bg-gray-900 text-yellow-300 p-4 rounded-lg overflow-x-auto font-mono text-sm">
+          <pre>UPDATE pagos
+SET comprobante = '{{ voucherBase64.substring(0, 50) }}...',
+    estado = 'pagado',
+    fecha_pago = CURDATE()
+WHERE id = {{ selectedPayment?.id }};</pre>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">💡 El campo 'comprobante' debe ser de tipo LONGTEXT en MySQL</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
+      <button (click)="closeBase64Modal()"
+        class="px-6 py-2 bg-violet-600 text-white font-semibold rounded-lg hover:bg-violet-700 transition-colors">
+        Cerrar
+      </button>
     </div>
   </div>
-  }
+</div>
+}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faSearch,
@@ -23,11 +23,22 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FontAwesomeModule, SanitizeImageUrlPipe, LogoPipe, FormsModule],
   templateUrl: './product-advance.component.html',
 })
-export class ProductAdvanceComponent {
+export class ProductAdvanceComponent implements OnChanges {
 
   @Input() productosFiltrados: ProductoFinal[] = [];
   @Input() producto!: ProductoFinal;
   @Output() agregarAlCarrito = new EventEmitter<ProductoFinal>();
+
+   // 1. Crea una propiedad para almacenar las etiquetas que se mostrarán
+  etiquetasMostradas: string[] = [];
+
+// 2. Implementa el método ngOnChanges
+  ngOnChanges(changes: SimpleChanges) {
+    // Revisa si el input 'producto' ha cambiado
+    if (changes['producto'] && changes['producto'].currentValue) {
+      this.procesarEtiquetas();
+    }
+  }
 
   logged: boolean = true;
 
@@ -46,6 +57,32 @@ export class ProductAdvanceComponent {
     });
   }
 
+
+  // 3. Mueve la lógica de procesamiento a una función separada
+  private procesarEtiquetas() {
+    const etiquetas = this.producto.etiquetas;
+    let etiquetasArray: string[] = [];
+
+    if (typeof etiquetas === 'string') {
+      try {
+        const parsed = JSON.parse(etiquetas);
+        etiquetasArray = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        etiquetasArray = [];
+      }
+    } else if (Array.isArray(etiquetas)) {
+      etiquetasArray = etiquetas;
+    }
+
+    if (etiquetasArray.length <= 4) { // Nota: tu código original cortaba a 4, no a 5
+      this.etiquetasMostradas = etiquetasArray;
+    } else {
+      // La lógica aleatoria se ejecuta UNA SOLA VEZ y se guarda
+      const shuffled = [...etiquetasArray].sort(() => 0.5 - Math.random());
+      this.etiquetasMostradas = shuffled.slice(0, 4);
+    }
+  }
+
   navigateToProductDetail(producto: ProductoFinal) {
     const productDetailUrl = `/productos/${producto.id}`;
     this.router.navigateByUrl(productDetailUrl);
@@ -54,42 +91,6 @@ export class ProductAdvanceComponent {
   addToCart(producto: ProductoFinal) {
     this.agregarAlCarrito.emit(producto);
   }
-
-/**
- * ESTE ES EL GETTER DE LA SOLUCIÓN
- * Se asegura de que las etiquetas siempre sean un array iterable,
- * y devuelve como máximo 5 etiquetas seleccionadas aleatoriamente si hay más.
- */
-get safeEtiquetas(): string[] {
-  const etiquetas = this.producto.etiquetas;
-
-  let etiquetasArray: string[] = [];
-
-  // Caso 1: Los datos vienen como un string que parece un array
-  if (typeof etiquetas === 'string') {
-    try {
-      const parsed = JSON.parse(etiquetas);
-      etiquetasArray = Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      // Si no se puede parsear, dejamos el array vacío
-      etiquetasArray = [];
-    }
-  }
-  // Caso 2: Ya es un array o es null/undefined
-  else if (Array.isArray(etiquetas)) {
-    etiquetasArray = etiquetas;
-  }
-
-  // Si hay 5 o menos, devolver tal cual
-  if (etiquetasArray.length <= 5) {
-    return etiquetasArray;
-  }
-
-  // Si hay más de 5, seleccionar 5 aleatorias sin repetir
-  const shuffled = [...etiquetasArray].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, 4);
-}
-
 
   get safeCaracteristicas(): string[] {
     const caracteristicas = this.producto["caracteristicas"];

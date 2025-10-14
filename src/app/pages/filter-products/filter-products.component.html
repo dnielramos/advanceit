@@ -141,7 +141,7 @@
     </div>
 
     @if (products().length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 max-w-5xl gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 items-center justify-center xl:grid-cols-3 max-w-5xl gap-6">
       @for (producto of products(); track producto.SKU) {
       <app-product-advance (agregarAlCarrito)="onComprarProductos($event)" [producto]="producto"></app-product-advance>
       }

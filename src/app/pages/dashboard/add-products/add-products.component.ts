@@ -131,7 +131,7 @@ export class AddProductsComponent implements OnInit, OnDestroy {
   searchModes = [
     { value: 'all', label: 'Todos los productos', icon: faBox },
     // { value: 'mark', label: 'Por marca', icon: faTags }, // Removed as per requirement
-    { value: 'sku', label: 'Por SKU', icon: faBarcode },
+    // { value: 'sku', label: 'Por SKU', icon: faBarcode },
   ];
 
   selectedProduct = signal<ProductoIngram | null>(null);

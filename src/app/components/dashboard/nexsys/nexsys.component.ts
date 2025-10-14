@@ -127,8 +127,8 @@ export class NexsysComponent implements OnInit, OnDestroy {
   // Search modes
   searchModes = [
     { value: 'all', label: 'Todos los productos', icon: faBox },
-    { value: 'mark', label: 'Por marca', icon: faTags },
-    { value: 'sku', label: 'Por SKU', icon: faBarcode },
+    // { value: 'mark', label: 'Por marca', icon: faTags },
+    // { value: 'sku', label: 'Por SKU', icon: faBarcode },
   ];
 
   selectedProduct = signal<NexsysProduct | null>(null);

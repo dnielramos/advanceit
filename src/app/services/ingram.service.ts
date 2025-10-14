@@ -14,6 +14,8 @@ export class IngramService {
   private API_DETAILS_URL = `${this.apiUrlRender}/scraper/multiple`;
   private API_PRODUCTS_URL = `${this.apiUrlRender}/ingram/all-products`;
 
+  private ADVANCE_PRODUCTS_INGRAM = `${this.apiUrlRender}/advance-products/ingram`;
+
   constructor(private http: HttpClient) {}
 
   /**
@@ -53,7 +55,7 @@ export class IngramService {
       );
     }
 
-    getProducts(skus ?: string[]): Observable<ProductoIngram[]> {
-    return this.http.get<ProductoIngram[]>(this.API_PRODUCTS_URL);
+    getProducts(): Observable<ProductoIngram[]> {
+    return this.http.post<ProductoIngram[]>(this.ADVANCE_PRODUCTS_INGRAM, {});
   }
 }

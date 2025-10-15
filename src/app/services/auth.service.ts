@@ -73,6 +73,7 @@ export class AuthService {
     const token = this.getAccessToken();
     if (!token) {
       this.currentUserRole.next(null); // Asegura que el estado de rol sea nulo
+      this.isLoggedIn$ = of(false); // Actualiza el estado de login
       return of(false);
     }
 

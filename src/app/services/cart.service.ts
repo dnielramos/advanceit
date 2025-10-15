@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ProductoFinal } from '../models/Productos';
+import { Router } from '@angular/router';
 
 export interface CartItem {
   product: ProductoFinal;
@@ -15,7 +16,7 @@ export class CartService {
   public cartItems: CartItem[] = [];
   private cartCount = new BehaviorSubject<number>(0);
 
-  constructor() {
+  constructor(private router: Router) {
     // Cargar carrito desde localStorage si existe
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
@@ -94,6 +95,23 @@ export class CartService {
   // Calcular total
   getTotal(): number {
     return this.cartItems.reduce((sum, item) => sum + ((item.product.precio ?? 0) * item.quantity), 0);
+  }
+
+  // Obtener cantidad de productos en el carrito
+  getCartItemCount(): Observable<number> {
+    return this.cartCount.asObservable();
+  }
+
+  //navegar al carrito
+  goToCart(): void {
+
+    //si el usuario esta en el dashboard
+    if (this.router.url.includes('/dashboard')) {
+      this.router.navigate(['/dashboard/cart']);
+    } else {
+      //si el usuario esta en otra ruta
+      this.router.navigate(['productos/cart']);
+    }
   }
 
   // Persistir en localStorage

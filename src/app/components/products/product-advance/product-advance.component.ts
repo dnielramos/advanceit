@@ -84,11 +84,16 @@ export class ProductAdvanceComponent implements OnChanges {
   }
 
   navigateToProductDetail(producto: ProductoFinal) {
+    console.log('Navegar a detalle de producto:', producto);
     const productDetailUrl = `/productos/${producto.id}`;
     this.router.navigateByUrl(productDetailUrl);
   }
 
-  addToCart(producto: ProductoFinal) {
+  addToCart(event: Event, producto: ProductoFinal) {
+
+    //evitar propagacion de evento
+    event.stopPropagation();
+    console.log('Añadir al carrito:', producto);
     this.agregarAlCarrito.emit(producto);
   }
 

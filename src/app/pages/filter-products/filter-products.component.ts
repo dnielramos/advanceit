@@ -250,7 +250,7 @@ export class FilterProductsComponent implements OnInit, OnDestroy {
   }
 
   goToCart(): void {
-    this.router.navigate(['/productos/cart']);
+    this.router.navigate(['/dashboard/cart']);
   }
 
   onMenuBrands(): void {

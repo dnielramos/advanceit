@@ -1,0 +1,106 @@
+<div class="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8 text-slate-800 font-sans">
+  <header class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-900">Análisis General</h1>
+    <p class="text-slate-500 mt-1">
+      Hola, <span class="font-semibold text-purple-600">{{ userGreeting }}</span>.
+    </p>
+  </header>
+
+  <main class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <section class="bg-white rounded-xl p-6 shadow-md border border-slate-200 lg:col-span-3">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+        <h2 class="text-xl font-semibold text-slate-900 flex items-center mb-3 sm:mb-0">
+          <fa-icon [icon]="icons.faChartLine" class="mr-3 text-purple-600"></fa-icon>
+          Ingresos a lo Largo del Tiempo
+        </h2>
+        <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
+          <button (click)="selectPeriod('day')" [class.bg-purple-600]="selectedPeriod === 'day'" [class.text-white]="selectedPeriod === 'day'" class="px-3 py-1 rounded-md text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200">Día</button>
+          <button (click)="selectPeriod('week')" [class.bg-purple-600]="selectedPeriod === 'week'" [class.text-white]="selectedPeriod === 'week'" class="px-3 py-1 rounded-md text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200">Semana</button>
+          <button (click)="selectPeriod('month')" [class.bg-purple-600]="selectedPeriod === 'month'" [class.text-white]="selectedPeriod === 'month'" class="px-3 py-1 rounded-md text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200">Mes</button>
+        </div>
+      </div>
+      <div *ngIf="revenueOverTime$ | async as data" class="h-80 w-full">
+        <ngx-charts-line-chart
+          [results]="data"
+          [scheme]="colorScheme"
+          [xAxis]="true"
+          [yAxis]="true"
+          [legend]="false"
+          [showXAxisLabel]="true"
+          [showYAxisLabel]="true"
+          xAxisLabel="Período"
+          yAxisLabel="Ingresos"
+          [autoScale]="true"
+          [yAxisTickFormatting]="yAxisTickFormatting">
+        </ngx-charts-line-chart>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-xl p-6 shadow-md border border-slate-200 lg:col-span-2">
+      <h2 class="text-xl font-semibold text-slate-900 flex items-center mb-4">
+        <fa-icon [icon]="icons.faChartPie" class="mr-3 text-purple-600"></fa-icon>
+        Distribución de Pagos
+      </h2>
+      <div *ngIf="paymentStatus$ | async as data" class="h-80 w-full">
+        <ngx-charts-advanced-pie-chart
+          [results]="data"
+          [scheme]="colorScheme"
+          [gradient]="true">
+        </ngx-charts-advanced-pie-chart>
+      </div>
+    </section>
+
+        <section class="bg-white rounded-xl p-6 shadow-md border border-slate-200 lg:col-span-5">
+      <h2 class="text-xl font-semibold text-slate-900 flex items-center mb-4">
+        <fa-icon [icon]="icons.faTruckFast" class="mr-3 text-purple-600"></fa-icon>
+        Estado de los Envíos
+      </h2>
+      <div *ngIf="shippingStatus$ | async as data" class="h-80 w-full">
+        <ngx-charts-pie-grid
+          [results]="data"
+          [scheme]="colorScheme">
+        </ngx-charts-pie-grid>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-xl p-6 shadow-md border border-slate-200 lg:col-span-3">
+      <h2 class="text-xl font-semibold text-slate-900 flex items-center mb-4">
+        <fa-icon [icon]="icons.faBoxesStacked" class="mr-3 text-purple-600"></fa-icon>
+        Top 5 Productos por Ingresos
+      </h2>
+      <div *ngIf="topProducts$ | async as data" class="h-96 w-full">
+        <ngx-charts-bar-horizontal
+          [results]="data"
+          [scheme]="colorScheme"
+          [xAxis]="true"
+          [yAxis]="true"
+          [showXAxisLabel]="true"
+          xAxisLabel="Ingresos Totales"
+          [showYAxisLabel]="false"
+          [xAxisTickFormatting]="yAxisTickFormatting">
+        </ngx-charts-bar-horizontal>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-xl p-6 shadow-md border border-slate-200 lg:col-span-2">
+      <h2 class="text-xl font-semibold text-slate-900 flex items-center mb-4">
+        <fa-icon [icon]="icons.faFilterCircleDollar" class="mr-3 text-purple-600"></fa-icon>
+        Embudo de Cotizaciones
+      </h2>
+      <div *ngIf="quotationFunnel$ | async as data" class="h-96 w-full">
+        <ngx-charts-bar-vertical
+          [results]="data"
+          [scheme]="colorScheme"
+          [xAxis]="true"
+          [yAxis]="true"
+          [legend]="false"
+          [showXAxisLabel]="true"
+          [showYAxisLabel]="true"
+          xAxisLabel="Etapa"
+          yAxisLabel="Cantidad">
+        </ngx-charts-bar-vertical>
+      </div>
+    </section>
+
+  </main>
+</div>

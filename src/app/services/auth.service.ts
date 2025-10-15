@@ -5,6 +5,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
+import { UsersService } from './users.service';
 
 export enum Role {
   User = 'user',
@@ -40,7 +41,7 @@ export class AuthService {
    // --- NUEVO: Endpoint de Refresh ---
   private readonly refreshUrl = `${this.baseURL}/auth/refresh`;
 
-  constructor() {
+  constructor( private userService: UsersService) {
     // <-- AÑADIDO: Se crea el observable derivado en el constructor.
     this.isLoggedIn$ = this.currentUserRole$.pipe(
       map((role) => role !== null) // Si hay rol, está logueado (true), si es null, no lo está (false).
@@ -98,6 +99,15 @@ export class AuthService {
 
     try {
       const decoded: any = jwtDecode(token);
+      const userId = decoded.sub || decoded.userId || null;
+
+      if (userId) {
+        // Actualiza el observable activeUser$ con el email del usuario
+        this.activeUser$ = this.userService.getUserById(userId).pipe(
+          map(user => user.name)
+        );
+      }
+
       return decoded.sub || decoded.userId || null;
     } catch (e) {
       return null;

@@ -17,6 +17,7 @@ import {
   faTruckFast,
   faHandshake,
   faFileLines,
+  faWandSparkles
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService, Role } from '../../../services/auth.service'; // Asegúrate que la ruta sea correcta
 import { Subscription } from 'rxjs';
@@ -57,6 +58,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   faHandshake = faHandshake;
   faTruckFast = faTruckFast;
   faFileLines = faFileLines;
+  faWandSparkles = faWandSparkles;
 
   private authSubscription!: Subscription;
 
@@ -99,6 +101,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private buildMenu(isLoggedIn: boolean): void {
     const allMenuItems: MenuItem[] = [
+      {
+        key: 'lunai',
+        label: 'Luna AI',
+        icon: faWandSparkles,
+        roles: [Role.Admin, Role.User],
+        routerLink: '/dashboard/lunai',
+      },
       {
         key: 'dashboard',
         label: 'Dashboard',

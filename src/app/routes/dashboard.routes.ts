@@ -13,6 +13,11 @@ export const dashboardRoutes: Routes = [
       {
         path: 'home',
         loadComponent: () =>
+          import('../pages/resume/resume.component').then((m) => m.ResumeComponent),
+      },
+      {
+        path: 'lunai',
+        loadComponent: () =>
           import('../pages/luki/luki.component').then((m) => m.LukiComponent),
       },
       {

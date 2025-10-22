@@ -77,6 +77,13 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
+        path: 'rmas',
+        loadComponent: () =>
+          import('../components/dashboard/rmas-manager/rmas-manager.component').then(
+            (m) => m.RmaManagerComponent
+          ),
+      },
+      {
         path: 'cotizaciones',
         loadComponent: () =>
           import('../pages/dashboard/quotations/quotation.component').then(

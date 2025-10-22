@@ -3,24 +3,24 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, tap, map } from 'rxjs/operators';
 
-import { 
-  Payment, 
-  CreatePaymentPayload, 
-  UpdateStatusPayload, 
-  UpdateDatePayload 
+import {
+  Payment,
+  CreatePaymentPayload,
+  UpdateStatusPayload,
+  UpdateDatePayload,
 } from '../models/payment.model';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PaymentsService {
   private readonly http = inject(HttpClient);
-  
+
   // Es recomendable usar variables de entorno para esta URL.
-  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/payments`;
+  private readonly apiUrl = `${ENVIRONMENT.apiUrl}/payments`;
 
   /**
    * Crea un nuevo registro de pago.
@@ -29,7 +29,7 @@ export class PaymentsService {
    */
   createPayment(paymentData: CreatePaymentPayload): Observable<Payment> {
     return this.http.post<Payment>(this.apiUrl, paymentData).pipe(
-      tap(newPayment => console.log('Pago creado:', newPayment)),
+      tap((newPayment) => console.log('Pago creado:', newPayment)),
       catchError(this.handleError)
     );
   }
@@ -40,7 +40,7 @@ export class PaymentsService {
    */
   getAllPayments(): Observable<Payment[]> {
     return this.http.get<Payment[]>(this.apiUrl).pipe(
-      tap(payments => console.log(`Se obtuvieron ${payments.length} pagos`)),
+      tap((payments) => console.log(`Se obtuvieron ${payments.length} pagos`)),
       catchError(this.handleError)
     );
   }
@@ -53,7 +53,7 @@ export class PaymentsService {
   getPaymentById(id: string): Observable<Payment> {
     const url = `${this.apiUrl}/${id}`;
     return this.http.get<Payment>(url).pipe(
-      tap(payment => console.log('Pago obtenido por ID:', payment)),
+      tap((payment) => console.log('Pago obtenido por ID:', payment)),
       catchError(this.handleError)
     );
   }
@@ -66,7 +66,7 @@ export class PaymentsService {
   getPaymentByOrderId(orderId: string): Observable<Payment> {
     const url = `${this.apiUrl}/order/${orderId}`;
     return this.http.get<Payment>(url).pipe(
-      tap(payment => console.log('Pago obtenido por OrderID:', payment)),
+      tap((payment) => console.log('Pago obtenido por OrderID:', payment)),
       catchError(this.handleError)
     );
   }
@@ -77,10 +77,15 @@ export class PaymentsService {
    * @param payload - Objeto con el nuevo estado.
    * @returns Un Observable con el pago actualizado.
    */
-  updatePaymentStatus(id: string, payload: UpdateStatusPayload): Observable<Payment> {
+  updatePaymentStatus(
+    id: string,
+    payload: UpdateStatusPayload
+  ): Observable<Payment> {
     const url = `${this.apiUrl}/${id}/status`;
     return this.http.patch<Payment>(url, payload).pipe(
-      tap(updatedPayment => console.log('Estado del pago actualizado:', updatedPayment)),
+      tap((updatedPayment) =>
+        console.log('Estado del pago actualizado:', updatedPayment)
+      ),
       catchError(this.handleError)
     );
   }
@@ -91,10 +96,15 @@ export class PaymentsService {
    * @param payload - Objeto con la nueva fecha de pago.
    * @returns Un Observable con el pago actualizado.
    */
-  updatePaymentDate(id: string, payload: UpdateDatePayload): Observable<Payment> {
+  updatePaymentDate(
+    id: string,
+    payload: UpdateDatePayload
+  ): Observable<Payment> {
     const url = `${this.apiUrl}/${id}/date`;
     return this.http.patch<Payment>(url, payload).pipe(
-      tap(updatedPayment => console.log('Fecha de pago actualizada:', updatedPayment)),
+      tap((updatedPayment) =>
+        console.log('Fecha de pago actualizada:', updatedPayment)
+      ),
       catchError(this.handleError)
     );
   }
@@ -107,7 +117,7 @@ export class PaymentsService {
    */
   uploadVoucher(id: string, voucherFile: File): Observable<Payment> {
     const url = `${this.apiUrl}/${id}/voucher`;
-    
+
     // Para subir archivos, se debe usar FormData.
     const formData = new FormData();
     // 'comprobante' debe coincidir con el nombre del campo en el FileInterceptor del backend.
@@ -117,6 +127,11 @@ export class PaymentsService {
       tap(() => console.log(`Comprobante subido para el pago ID: ${id}`)),
       catchError(this.handleError)
     );
+  }
+
+  getReceipt(paymentId: string): Observable<string | null> {
+    return this.http.get<{ comprobante: string | null }>(`${this.apiUrl}/${paymentId}/voucher`)
+      .pipe(map(res => res.comprobante));
   }
 
   /**
@@ -129,7 +144,9 @@ export class PaymentsService {
       errorMessage = `Error: ${error.error.message}`;
     } else {
       // El backend retornó un código de error.
-      errorMessage = `Error del servidor (código ${error.status}): ${error.error.message || error.statusText}`;
+      errorMessage = `Error del servidor (código ${error.status}): ${
+        error.error.message || error.statusText
+      }`;
     }
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));

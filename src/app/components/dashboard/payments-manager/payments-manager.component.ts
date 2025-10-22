@@ -10,6 +10,7 @@ import { IconDefinition, faCashRegister, faCheck, faCircleNotch, faClock, faCred
 // Tus modelos y servicios
 import { PaymentsService } from '../../../services/payments.service';
 import { Payment, PaymentStatus, PaymentMethod, CreatePaymentPayload } from '../../../models/payment.model';
+import { PaymentVoucherComponent } from "./payment-voucher/payment-voucher.component";
 
 // Tipos para los helpers de la UI
 type StatusInfo = { [key in PaymentStatus]: { icon: IconDefinition; color: string; label: string } };
@@ -19,11 +20,12 @@ type ActionType = 'status' | 'date' | 'voucher';
 @Component({
   selector: 'app-payments-manager',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, PaymentVoucherComponent],
   templateUrl: './payments-manager.component.html',
   styleUrls: ['./payments-manager.component.css']
 })
 export class PaymentsManagerComponent implements OnInit {
+
   private paymentsService = inject(PaymentsService);
 
   // Estado del componente
@@ -47,6 +49,8 @@ export class PaymentsManagerComponent implements OnInit {
   // Estado para el comprobante en Base64
   public voucherBase64: string | null = null;
   public showBase64Modal = false;
+
+  public voucherModal = false;
 
   // Estado para vista mobile
   public showDetailsMobile = false;
@@ -219,6 +223,15 @@ export class PaymentsManagerComponent implements OnInit {
 
   showBase64Result(): void {
     this.showBase64Modal = true;
+  }
+
+
+  showVoucherModal(): void {
+    this.voucherModal = true;
+  }
+
+  closeVoucherModal(): void {
+    this.voucherModal = false;
   }
 
   closeBase64Modal(): void {

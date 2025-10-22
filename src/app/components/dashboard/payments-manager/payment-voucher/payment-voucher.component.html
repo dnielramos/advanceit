@@ -1,0 +1,54 @@
+<!-- ✅ Estado: Comprobante disponible -->
+<div
+  *ngIf="comprobanteUrl && !isLoading && !hasError"
+  class="w-100 text-center space-y-6 overflow-y-auto
+         max-h-[85vh] px-2 bg-white scroll-purple scrollbar-track-gray-800 rounded-lg"
+>
+  <h2 class="text-2xl font-semibold mt-4 text-purple-700 tracking-wide drop-shadow-md">
+    Comprobante de Pago
+  </h2>
+
+  <!-- PDF -->
+  <object
+    *ngIf="isPdf; else imageView"
+    [data]="comprobanteUrl"
+    type="application/pdf"
+    class="w-full h-[80vh] sm:h-[600px] rounded-xl border border-purple-600/50 shadow-inner bg-gray-50"
+  >
+    <p class="text-purple-300 text-sm p-4">
+      Tu navegador no puede mostrar el PDF.
+      <a [href]="comprobanteUrl" target="_blank" class="underline text-purple-400">
+        Haz clic aquí para abrirlo directamente
+      </a>.
+    </p>
+  </object>
+
+  <!-- Imagen -->
+  <ng-template #imageView>
+    <div class="flex justify-center">
+      <img
+        [src]="comprobanteUrl"
+        alt="Comprobante de pago"
+        class="rounded-xl border border-purple-600/50 shadow-md
+               object-contain max-h-[75vh] sm:max-h-[600px]"
+      />
+    </div>
+  </ng-template>
+
+  <!-- Botón de descarga -->
+  <a
+    [href]="comprobanteUrl"
+    download="comprobante"
+    class="inline-flex items-center justify-center gap-2
+           bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-600 hover:to-purple-400
+           transition-all duration-300 text-white px-6 py-2.5 rounded-lg
+           shadow-lg hover:shadow-purple-600/40 font-medium sticky bottom-2"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+    </svg>
+    Descargar comprobante
+  </a>
+</div>

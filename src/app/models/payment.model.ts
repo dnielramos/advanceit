@@ -23,6 +23,7 @@ export interface Payment {
   estado: PaymentStatus;
   createdBy?: string;
   fechaPago?: string; // formato YYYY-MM-DD
+  comprobante?: string; // Base64 del comprobante
 }
 
 // --- DTOs (Data Transfer Objects) para las peticiones ---

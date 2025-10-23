@@ -116,39 +116,37 @@
     </div>
   </section>
 
-  <!-- Detalle de inventario -->
-  <div *ngIf="selectedCompany()" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-[95%] max-h-[85vh] overflow-auto p-8">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold text-purple-700 flex items-center">
-          <i class="fa-solid fa-building mr-2"></i>
-          {{ selectedCompany()?.company }}
-        </h3>
-        <button (click)="closeInventory()" class="text-red-600 font-semibold hover:underline flex items-center gap-1">
-          <i class="fa-solid fa-xmark"></i> Cerrar
-        </button>
-      </div>
-      <div class="overflow-x-auto rounded-lg border border-gray-200">
-        <table class="min-w-full text-sm">
-          <thead class="bg-purple-100 text-purple-800">
-            <tr>
-              <th *ngFor="let col of selectedCompany()?.columns" class="px-4 py-2 border text-left">
-                {{ col }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of selectedCompany()?.inventory" class="hover:bg-purple-50">
-              <td *ngFor="let col of selectedCompany()?.columns" class="px-4 py-2 border text-gray-700">
-                {{ row[col] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="text-xs text-gray-500 mt-3">
-        Mostrando {{ selectedCompany()?.inventory?.length }} filas
-      </p>
+  <!-- Detalle de inventario (expandido, no modal) -->
+  <section *ngIf="selectedCompany()" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-2xl font-bold text-purple-700 flex items-center">
+        <i class="fa-solid fa-building mr-2"></i>
+        {{ selectedCompany()?.company }}
+      </h3>
+      <button (click)="closeInventory()" class="text-red-600 font-semibold hover:underline flex items-center gap-1">
+        <i class="fa-solid fa-arrow-left"></i> Volver
+      </button>
     </div>
-  </div>
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="min-w-full text-sm">
+        <thead class="bg-purple-100 text-purple-800">
+          <tr>
+            <th *ngFor="let col of selectedCompany()?.columns" class="px-4 py-2 border text-left">
+              {{ col }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of selectedCompany()?.inventory" class="hover:bg-purple-50">
+            <td *ngFor="let col of selectedCompany()?.columns" class="px-4 py-2 border text-gray-700">
+              {{ row[col] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs text-gray-500 mt-3">
+      Mostrando {{ selectedCompany()?.inventory?.length }} filas
+    </p>
+  </section>
 </div>

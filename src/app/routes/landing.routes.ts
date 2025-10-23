@@ -78,6 +78,7 @@ export const landingRoutes = [
       { path: 'contacto', loadComponent: () => import('../pages/contacto/contacto.component').then(m => m.ContactoComponent) },
       { path: 'in', loadComponent: () => import('../pages/login/login.component').then(m => m.LoginComponent) },
       { path: 'registro', loadComponent: () => import('../components/users/create-user/create-user.component').then(m => m.CreateUserComponent) },
+      { path: 'test', loadComponent: () => import('../components/dashboard/inventory-uploader/inventory-uploader.component').then(m => m.InventoryUploaderComponent) },
     ]
   }
 ];

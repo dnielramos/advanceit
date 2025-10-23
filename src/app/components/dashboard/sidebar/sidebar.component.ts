@@ -135,6 +135,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
         ],
       },
       {
+        key: 'inventory-uploader',
+        label: 'Inventarios',
+        icon: faIcons,
+        roles: [Role.Admin, Role.User],
+        routerLink: '/dashboard/inventory-uploader',
+      },
+      {
         key: 'ordenes',
         label: 'Órdenes',
         roles: [Role.Admin, Role.User],

@@ -1,31 +1,70 @@
+// src/app/components/inventory-browser/inventory-browser.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, Inject, signal } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
-import { CompanyInventoriesService } from '../../../services/company-inventories.service';
-
+import { CompanyInventoriesService, InventoryPayload } from '../../../services/company-inventories.service';
 interface CompanyInventory {
+  id?: string;
   company: string;
   inventory: any[];
   columns: string[];
+  created_at?: string;
 }
 
 @Component({
-  imports: [FormsModule, CommonModule],
-  selector: 'app-inventory-uploader',
+  selector: 'app-inventory-browser',
   standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './inventory-uploader.component.html',
 })
-export class InventoryUploaderComponent {
+export class InventoryUploaderComponent implements OnInit {
+  private inventoriesService = inject(CompanyInventoriesService);
+
+  // Estado general
   companies = signal<CompanyInventory[]>([]);
+  selectedCompany = signal<CompanyInventory | null>(null);
+
+  // Para registrar inventario
   previewData = signal<any[]>([]);
   previewColumns = signal<string[]>([]);
-  selectedCompany = signal<CompanyInventory | null>(null);
   tempCompany = '';
   tempFile: File | null = null;
 
-  constructor(private companyInventoriesService: CompanyInventoriesService) {}
+  // Carga inicial
+  ngOnInit(): void {
+    this.loadAllInventories();
+  }
 
+  // ======================================================
+  // Cargar inventarios existentes
+  // ======================================================
+  loadAllInventories() {
+    this.inventoriesService.getAllInventories().subscribe({
+      next: (data: any[]) => {
+        const mapped: CompanyInventory[] = (data || []).map(item => ({
+          id: item.id,
+          company: item.company,
+          inventory: item.inventory ?? [],
+          columns: item.columns ?? (item.inventory?.[0] ? Object.keys(item.inventory[0]) : []),
+          created_at: item.created_at ?? item.createdAt ?? null,
+        }));
+        // Ordenar por fecha desc
+        this.companies.set(
+          mapped.sort((a, b) => {
+            const da = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const db = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return db - da;
+          })
+        );
+      },
+      error: (err) => console.error('Error cargando inventarios', err),
+    });
+  }
+
+  // ======================================================
+  // Subida de archivo Excel
+  // ======================================================
   handleFile(event: any) {
     const file = event.target.files[0];
     if (!file) return;
@@ -44,45 +83,36 @@ export class InventoryUploaderComponent {
     reader.readAsArrayBuffer(file);
   }
 
+  // ======================================================
+  // Guardar inventario en backend
+  // ======================================================
   saveInventory() {
     if (!this.tempCompany || this.previewData().length === 0) return;
-    const companyData: CompanyInventory = {
+
+    const payload: InventoryPayload = {
       company: this.tempCompany,
       inventory: this.previewData(),
-      columns: this.previewColumns(),
+      created_by: 'system', // aquí podrías poner el usuario logueado
     };
 
-    // 👇 Esto es lo que enviarías al backend
-    const payload = {
-      company: companyData.company,
-      inventory: companyData.inventory,
-      created_by: 'system', // Reemplaza con el ID del usuario actual
-    };
-
-    if (payload.inventory.length === 0) {
-      console.error('El inventario está vacío. No se enviará nada al backend.');
-      return;
-    }
-
-    this.companyInventoriesService.createInventory(payload).subscribe({
+    this.inventoriesService.createInventory(payload).subscribe({
       next: (response) => {
         console.log('Inventario creado con éxito:', response);
-        this.companies.update((list) => [...list, companyData]);
+        this.loadAllInventories(); // recargar lista
       },
-      error: (error) => {
-        console.error('Error al crear el inventario:', error);
-      },
+      error: (error) => console.error('Error al crear inventario:', error),
     });
 
-    console.log('Payload para el backend:', JSON.stringify(payload, null, 2));
-
-    this.companies.update((list) => [...list, companyData]);
+    // Reset
     this.previewData.set([]);
     this.previewColumns.set([]);
     this.tempCompany = '';
     this.tempFile = null;
   }
 
+  // ======================================================
+  // Ver detalle de inventario
+  // ======================================================
   viewInventory(company: CompanyInventory) {
     this.selectedCompany.set(company);
   }

@@ -1,12 +1,16 @@
 <div class="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8 text-slate-800 font-sans">
   <header class="mb-8">
-    <h1 class="text-3xl font-bold text-slate-900">Análisis General</h1>
+    <!-- <h1 class="text-3xl font-bold text-slate-900">Análisis General</h1> -->
     <p class="text-slate-500 mt-1">
-      Hola, <span class="font-semibold text-purple-600">{{ userGreeting }}</span>.
+      Hola, <span class="font-semibold text-slate-900">{{ userGreeting }}</span>.
     </p>
   </header>
 
   <main class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+    <app-location-map [address]="['México Benito Juárez Avenida México-Coyoacán 371', 'Bogotá Colombia', 'Yacuanquer Nariño Colombia']" class="lg:col-span-5"></app-location-map>
+
+
     <section class="bg-white rounded-xl p-6 shadow-md border border-slate-200 lg:col-span-3">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
         <h2 class="text-xl font-semibold text-slate-900 flex items-center mb-3 sm:mb-0">

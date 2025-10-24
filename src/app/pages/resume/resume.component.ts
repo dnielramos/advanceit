@@ -13,6 +13,7 @@ import { faChartLine, faChartPie, faBoxesStacked, faFilterCircleDollar, faTruckF
 // Servicio e Interfaces
 import { DashboardService, ChartData, ChartLineData, ApiDistributionData, ApiProductPerformanceData, ApiSalesFunnelData, ApiTimeSeriesData } from '../../services/dashboard.service';
 import { AuthService } from '../../services/auth.service';
+import { LocationMapComponent } from "../../components/dashboard/location-map/location-map.component";
 
 @Component({
   selector: 'app-resume',
@@ -20,8 +21,9 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     CommonModule,
     NgxChartsModule,
-    FontAwesomeModule
-  ],
+    FontAwesomeModule,
+    LocationMapComponent
+],
   // No es necesario proveer el servicio aquí si ya está en 'root'
   templateUrl: './resume.component.html',
 })

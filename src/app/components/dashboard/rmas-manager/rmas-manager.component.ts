@@ -27,6 +27,7 @@ import {
 // Lo incluimos aquí (y en providers) para que el ejemplo sea autocontenido.
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { ENVIRONMENT } from '../../../../enviroments/enviroment';
 
 // --- Modelos (Inferidos del controlador) ---
 // En una app real, estarían en `rma.model.ts`
@@ -63,7 +64,7 @@ export interface UpdateRmaStateDto {
 @Injectable()
 export class RmasService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3002/rmas'; // Ajusta a tu URL de API real
+  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/rmas`; // Ajusta a tu URL de API real
 
   findAllRmas(): Observable<{ total: number; data: Rma[] }> {
     return this.http.get<{ total: number; data: Rma[] }>(this.apiUrl);

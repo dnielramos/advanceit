@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 export interface InventoryPayload {
   company: string;
@@ -13,7 +14,7 @@ export interface InventoryPayload {
   providedIn: 'root',
 })
 export class CompanyInventoriesService {
-  private readonly apiUrl = 'http://localhost:3002/company-inventories';
+  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/company-inventories`;
 
   constructor(private http: HttpClient) {}
 

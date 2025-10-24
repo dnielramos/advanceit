@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 // --- Interfaces para tipado fuerte ---
 export interface RmaEvidence {
@@ -25,7 +26,7 @@ export interface RmaRequest {
   providedIn: 'root',
 })
 export class RmaService {
-  private readonly baseUrl = 'http://localhost:3002/rmas'; // 🔧 Ajusta según tu backend
+  private readonly baseUrl = `${ENVIRONMENT.apiUrlRender}/rmas`; // 🔧 Ajusta según tu backend
 
   constructor(private http: HttpClient) {}
 

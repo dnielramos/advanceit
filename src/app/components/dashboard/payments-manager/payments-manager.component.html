@@ -19,6 +19,12 @@
         <fa-icon [icon]="faExclamationTriangle"></fa-icon>
         <p class="font-bold">{{ error }}</p>
       </div>
+      }  @else if (!payments.length) {
+      <div class="text-center text-gray-400 p-8">
+        <fa-icon [icon]="faEye" size="3x" class="mb-3"></fa-icon>
+        <p class="font-semibold">Lo siento...</p>
+        <p class="text-sm">No encontré pagos con ese filtro.</p>
+      </div>
       } @else {
       <div class="space-y-3 pb-4">
         @for (payment of payments; track payment.id) {
@@ -102,11 +108,11 @@
             class="btn-action bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-semibold transition-colors">
             Fijar Fecha de Pago
           </button>
-          <button *ngIf="!selectedPayment?.comprobante" (click)="openActionModal('voucher')"
+          <button  *ngIf="selectedPayment?.estado === 'pendiente' || selectedPayment?.estado === 'atrasado' || selectedPayment?.estado === 'no_pagado'"(click)="openActionModal('voucher')"
             class="btn-action bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
             <fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante
           </button>
-          <button *ngIf="selectedPayment?.fechaPago" (click)="showVoucherModal()"
+          <button *ngIf="selectedPayment?.estado === 'pagado'" (click)="showVoucherModal()"
             class="btn-action bg-green-100 text-purple-600 hover:bg-green-200 flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
             <fa-icon [icon]="faEye"></fa-icon>Mirar Comprobante
           </button>
@@ -193,11 +199,11 @@
           class="w-full bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-3 rounded-lg font-semibold transition-colors">
           Fijar Fecha de Pago
         </button>
-        <button  (click)="openActionModal('voucher')"
+        <button  *ngIf="selectedPayment?.estado === 'pendiente' || selectedPayment?.estado === 'atrasado' || selectedPayment?.estado === 'no_pagado'" (click)="openActionModal('voucher')"
           class="w-full bg-green-100 text-green-700 hover:bg-green-200 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-colors">
           <fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante
         </button>
-        <button *ngIf="selectedPayment?.fechaPago" (click)="showVoucherModal()"
+        <button *ngIf="selectedPayment?.estado === 'pagado'" (click)="showVoucherModal()"
         class="w-full bg-purple-100 text-purple-600 hover:bg-purple-200 flex items-center  justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
             <fa-icon [icon]="faEye"></fa-icon>Mirar Comprobante
         </button>
@@ -262,7 +268,7 @@
       <select name="status" [(ngModel)]="updateStatus"
         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 mb-2">
         <option value="pendiente">Pendiente</option>
-        <option value="pagado">Pagado</option>
+        <!-- <option value="pagado">Pagado</option> -->
         <option value="no_pagado">No Pagado</option>
         <option value="atrasado">Atrasado</option>
       </select>

@@ -1,4 +1,5 @@
 <div class="bg-gray-50 min-h-screen font-sans text-gray-800 p-4 sm:p- lg:p-8">
+
   <app-header-crud titulo="Envíos" descripcion="Gestiona y actualiza los envíos." textoBotonActualizar="Refrescar"
     placeholderInput="Buscar por Orden, Guía o Transportadora..." [filterByStatus]="true"
     [filterStatusValues]="['preparando', 'en_transito', 'entregado', 'fallido']" (actualizar)="loadShippings()"

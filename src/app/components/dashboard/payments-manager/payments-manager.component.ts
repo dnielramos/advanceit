@@ -11,6 +11,7 @@ import { IconDefinition, faCashRegister, faCheck, faCircleNotch, faClock, faCred
 import { PaymentsService } from '../../../services/payments.service';
 import { Payment, PaymentStatus, PaymentMethod, CreatePaymentPayload } from '../../../models/payment.model';
 import { PaymentVoucherComponent } from "./payment-voucher/payment-voucher.component";
+import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 
 // Tipos para los helpers de la UI
 type StatusInfo = { [key in PaymentStatus]: { icon: IconDefinition; color: string; label: string } };
@@ -20,7 +21,7 @@ type ActionType = 'status' | 'date' | 'voucher';
 @Component({
   selector: 'app-payments-manager',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, PaymentVoucherComponent],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, PaymentVoucherComponent, HeaderCrudComponent],
   templateUrl: './payments-manager.component.html',
   styleUrls: ['./payments-manager.component.css']
 })
@@ -96,6 +97,40 @@ export class PaymentsManagerComponent implements OnInit {
         error: (err) => this.error = 'No se pudieron cargar los pagos.',
       });
   }
+
+
+  // --- Lógica de Filtros ---
+  handleFilterChange(filter: { texto: string; estado: string }): void {
+
+    this.isLoading = true;
+    this.error = null;
+    this.paymentsService.getAllPayments()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (data) => {
+          let filtered = data;
+
+          // Aplicar filtros
+          if (filter.texto) {
+            filtered = filtered.filter(payment => payment.order_id.includes(filter.texto) ||
+              payment.monto.toString().includes(filter.texto) ||
+              payment.estado.includes(filter.texto));
+          }
+          if (filter.estado) {
+            filtered = filtered.filter(payment => payment.estado === filter.estado);
+          }
+
+          this.payments = filtered;
+          this.updateSelectedPayment();
+        },
+        error: (err) => this.error = 'No se pudieron cargar los pagos.',
+      });
+  }
+
+  handleClearFilters(): void {
+    this.loadPayments();
+  }
+
 
   selectPayment(payment: Payment): void {
     this.selectedPayment = payment;

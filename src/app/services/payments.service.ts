@@ -20,7 +20,7 @@ export class PaymentsService {
   private readonly http = inject(HttpClient);
 
   // Es recomendable usar variables de entorno para esta URL.
-  private readonly apiUrl = `${ENVIRONMENT.apiUrl}/payments`;
+  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/payments`;
 
   /**
    * Crea un nuevo registro de pago.

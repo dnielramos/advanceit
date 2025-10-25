@@ -1,15 +1,12 @@
 <div class="bg-gray-50 min-h-screen font-sans text-gray-800 p-4 sm:p-6 lg:p-8">
 
-  <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-    <h1 class="text-3xl font-bold text-gray-800">Gestión de Pagos</h1>
-    <button (click)="openCreateModal()"
-      class="flex items-center gap-2 bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition-all duration-300">
-      <fa-icon [icon]="faPlus"></fa-icon>
-      Registrar Pago
-    </button>
-  </header>
+  <app-header-crud titulo="Pagos" descripcion="Gestion de pagos Advance." textoBotonActualizar="Refrescar"
+    placeholderInput="Buscar por Orden, Monto o Estado..." [filterByStatus]="true"
+    [filterStatusValues]="['pendiente', 'pagado', 'no_pagado', 'atrasado']" (actualizar)="loadPayments()"
+    (clearFilters)="handleClearFilters()" (filterChange)="handleFilterChange($event)">
+  </app-header-crud>
 
-  <main class="flex flex-col lg:flex-row lg:gap-8 lg:h-[calc(100vh-180px)]">
+  <main class="flex flex-col mt-6 lg:flex-row lg:gap-8 lg:h-[calc(100vh-180px)]">
 
     <!-- Lista de Pagos - Desktop: Scroll Interno, Mobile: Vista Normal -->
     <div class="w-full scroll-purple lg:w-1/3 xl:w-1/4 animate__animated animate__fadeInLeft lg:overflow-y-auto lg:h-full">

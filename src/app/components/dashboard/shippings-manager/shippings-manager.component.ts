@@ -27,6 +27,7 @@ import {
 import { UpdateStatusModalComponent } from './update-status-modal/update-status-modal.component';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 import { FilterData } from '../../../pages/dashboard/orders/order-filter/order-filter.component';
+import { ShippingViewerComponent } from "./shipping-viewer/shipping-viewer.component";
 
 @Component({
   selector: 'app-shippings-manager',
@@ -37,7 +38,8 @@ import { FilterData } from '../../../pages/dashboard/orders/order-filter/order-f
     FontAwesomeModule,
     UpdateStatusModalComponent,
     HeaderCrudComponent,
-  ],
+    ShippingViewerComponent
+],
   templateUrl: './shippings-manager.component.html',
 })
 export class ShippingsManagerComponent implements OnInit {
@@ -46,6 +48,7 @@ export class ShippingsManagerComponent implements OnInit {
   public allShippings: Shipping[] = [];
   public shippings: Shipping[] = [];
   public selectedShipping: Shipping | null = null;
+  public idShippingToView: string = '';
 
   public isLoading = true;
   public error: string | null = null;
@@ -315,4 +318,15 @@ export class ShippingsManagerComponent implements OnInit {
   getStatusInfo(status: ShippingStatus) {
     return this.statusInfo[status];
   }
+
+
+  public setShippingToView(id: string) {
+    this.idShippingToView = id;
+  }
+
+  public closeShippingViewer() {
+    this.idShippingToView = '';
+  }
+
 }
+

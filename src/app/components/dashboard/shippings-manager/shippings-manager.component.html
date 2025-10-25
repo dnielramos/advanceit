@@ -104,10 +104,10 @@
             {{ shipping.fechaEstimada | date: 'longDate' }}
           </p>
           @if (shipping?.estado === 'entregado') {
-            <p class="text-xs text-gray-600 mt-1">Fecha entrega real</p>
-            <p class="font-semibold text-lg text-gray-800">
-              {{ shipping.fechaEntregaReal | date: 'longDate' }}
-            </p>
+          <p class="text-xs text-gray-600 mt-1">Fecha entrega real</p>
+          <p class="font-semibold text-lg text-gray-800">
+            {{ shipping.fechaEntregaReal | date: 'longDate' }}
+          </p>
           }
         </div>
       </div>
@@ -124,14 +124,15 @@
         <span class="ml-1 text-gray-900">{{ shipping.transportadora }}</span>
       </div>
       <div class="col-span-1 sm:col-span-2 flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-        <fa-icon [icon]="getStatusInfo(shipping.estado).icon" size="lg" [ngClass]="getStatusInfo(shipping.estado).color"></fa-icon>
+        <fa-icon [icon]="getStatusInfo(shipping.estado).icon" size="lg"
+          [ngClass]="getStatusInfo(shipping.estado).color"></fa-icon>
         <span class="font-semibold text-lg text-gray-800">{{ getStatusInfo(shipping.estado).label }}</span>
       </div>
       @if (shipping.fechaEntregaReal) {
-        <div class="col-span-1 sm:col-span-2 text-sm">
-          <span class="font-semibold text-gray-700">Entregado el:</span>
-          <span class="ml-1 text-gray-900">{{ shipping.fechaEntregaReal | date: 'longDate' }}</span>
-        </div>
+      <div class="col-span-1 sm:col-span-2 text-sm">
+        <span class="font-semibold text-gray-700">Entregado el:</span>
+        <span class="ml-1 text-gray-900">{{ shipping.fechaEntregaReal | date: 'longDate' }}</span>
+      </div>
       }
     </div>
 
@@ -139,25 +140,36 @@
     <h3 class="text-lg font-bold text-gray-800 mb-4">Historial</h3>
     <div class="relative pl-6 border-l-2 border-violet-100 space-y-5">
       @for (event of shipping.historial; track event.timestamp) {
-        <div class="relative">
-          <div class="absolute -left-[30px] top-1 h-3 w-3 rounded-full"
-               [ngClass]="getStatusInfo(event.status).color.replace('text-', 'bg-')"></div>
-          <p class="text-xs text-gray-500">{{ event.timestamp | date: 'medium' }}</p>
-          <p class="font-medium text-gray-800 mt-0.5" [ngClass]="getStatusInfo(event.status).color">
-            {{ getStatusInfo(event.status).label }}
-          </p>
-          <p class="text-gray-700 text-sm mt-1">{{ event.description }}</p>
-        </div>
+      <div class="relative">
+        <div class="absolute -left-[30px] top-1 h-3 w-3 rounded-full"
+          [ngClass]="getStatusInfo(event.status).color.replace('text-', 'bg-')"></div>
+        <p class="text-xs text-gray-500">{{ event.timestamp | date: 'medium' }}</p>
+        <p class="font-medium text-gray-800 mt-0.5" [ngClass]="getStatusInfo(event.status).color">
+          {{ getStatusInfo(event.status).label }}
+        </p>
+        <!-- <button *ngIf="event.location"
+                  class="text-xs text-gray-500 underline mt-0.5"
+                  (click)="showLocationOnMap(event.location)">
+            Ver ubicación
+          </button> -->
+
+        <p class="text-gray-700 text-sm mt-1">{{ event.description }}</p>
+      </div>
       }
     </div>
 
     <!-- Botón mejorado para móviles -->
     <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+      <button (click)="setShippingToView(shipping.id)" *ngIf="shipping.guia && shipping.estado === 'en_transito'" class="font-bold text-sm text-purple-600 mr-4">
+        <fa-icon [icon]="faTruck" class="text-purple-500 mr-1"></fa-icon>
+        Ver Guia
+      </button>
       <button (click)="openUpdateStatusModal()"
-              class="flex items-center gap-2 bg-violet-600 text-white font-semibold py-3 px-5 rounded-lg shadow hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 min-w-[180px] justify-center">
+        class="flex items-center gap-2 bg-violet-600 text-white font-semibold py-3 px-5 rounded-lg shadow hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 min-w-[180px] justify-center">
         <fa-icon [icon]="faEdit"></fa-icon>
         <span>Actualizar Estado</span>
       </button>
+
     </div>
   </div>
   }
@@ -170,4 +182,12 @@
   [guiaImagePreview]="guiaImagePreview" [fileError]="fileError" (close)="closeUpdateStatusModal()"
   (submit)="handleUpdateStatusSubmit($event)" (fileSelected)="onFileSelected($event)">
 </app-update-status-modal>
+}
+
+
+@if (idShippingToView){
+
+  <app-shipping-viewer [shippingId]="idShippingToView" (close)="closeShippingViewer()">
+
+  </app-shipping-viewer>
 }

@@ -4,6 +4,7 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import { CompanyInventoriesService, InventoryPayload } from '../../../services/company-inventories.service';
+import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 interface CompanyInventory {
   id?: string;
   company: string;
@@ -15,7 +16,7 @@ interface CompanyInventory {
 @Component({
   selector: 'app-inventory-browser',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HeaderCrudComponent],
   templateUrl: './inventory-uploader.component.html',
 })
 export class InventoryUploaderComponent implements OnInit {
@@ -24,6 +25,11 @@ export class InventoryUploaderComponent implements OnInit {
   // Estado general
   companies = signal<CompanyInventory[]>([]);
   selectedCompany = signal<CompanyInventory | null>(null);
+  isCreateInventory = signal<boolean>(false);
+
+  // Para ver detalle de inventario
+  selectedInventory = computed(() => this.selectedCompany()?.inventory || []);
+  selectedColumns = computed(() => this.selectedCompany()?.columns || []);
 
   // Para registrar inventario
   previewData = signal<any[]>([]);
@@ -34,6 +40,47 @@ export class InventoryUploaderComponent implements OnInit {
   // Carga inicial
   ngOnInit(): void {
     this.loadAllInventories();
+  }
+
+
+  handleClearFilters() {
+    this.loadAllInventories();
+  }
+
+  onCloseCreateInventory() {
+    this.isCreateInventory.set(false);
+    this.tempCompany = '';
+    this.tempFile = null;
+    this.previewData.set([]);
+    this.previewColumns.set([]);
+  }
+
+
+  onCreateInventory() {
+    this.isCreateInventory.set(true);
+  }
+
+  handleFilterChange(event: {estado?: string, texto: string}) {
+    // Lógica para manejar el cambio de filtro
+    console.log('Filtro cambiado:', event);
+
+
+    this.inventoriesService.getAllInventories().subscribe({
+      next: (data: any[]) => {
+        const mapped: CompanyInventory[] = (data || []).map(item => ({
+          id: item.id,
+          company: item.company,
+          inventory: item.inventory ?? [],
+          columns: item.columns ?? (item.inventory?.[0] ? Object.keys(item.inventory[0]) : []),
+          created_at: item.created_at ?? item.createdAt ?? null,
+        }));
+        this.companies.set(mapped.filter(c => {
+          return (!event.estado || c.company === event.estado) &&
+                 (!event.texto || c.company.toLowerCase().includes(event.texto.toLowerCase()));
+        }));
+      },
+      error: (err) => console.error('Error cargando inventarios', err),
+    });
   }
 
   // ======================================================
@@ -99,6 +146,7 @@ export class InventoryUploaderComponent implements OnInit {
       next: (response) => {
         console.log('Inventario creado con éxito:', response);
         this.loadAllInventories(); // recargar lista
+        this.onCloseCreateInventory();
       },
       error: (error) => console.error('Error al crear inventario:', error),
     });

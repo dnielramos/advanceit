@@ -26,12 +26,12 @@
 <div *ngIf="filterByStatus || placeholderInput" class="mt-4 flex flex-col sm:flex-row gap-3 sm:gap-4 text-sm">
   <!-- Input de texto -->
   <input [(ngModel)]="filters.texto" (input)="onFilterChange()" [placeholder]="placeholderInput"
-    class="w-full sm:w-auto flex-grow rounded-lg border border-gray-200 bg-gray-50 shadow-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-200 focus:bg-white text-sm py-2.5 px-4 transition-all placeholder:text-gray-400 outline-none"
+    class="w-full sm:w-auto flex-grow rounded-lg border border-gray-300 bg-gray-50 shadow-s focus:border-orange-400 focus:ring-2 focus:ring-orange-200 focus:bg-white text-sm py-2.5 px-4 transition-all placeholder:text-gray-400 outline-none"
     type="text" />
 
   <!-- Select de estado (condicional) -->
   <select *ngIf="filterByStatus" [(ngModel)]="filters.estado" (change)="onFilterChange()"
-    class="w-full sm:w-auto flex-grow rounded-lg border border-gray-200 bg-gray-50 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:bg-white focus:text-gray-800 text-sm py-2.5 px-4 transition-all outline-none appearance-none">
+    class="w-full sm:w-auto flex-grow rounded-lg border border-gray-300 bg-gray-50 shadow-s focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:bg-white focus:text-gray-800 text-sm py-2.5 px-4 transition-all outline-none appearance-none">
     <option value="">Todos los estados</option>
     <option *ngFor="let item of filterStatusValues" [value]="item">
       {{ item | statuscap }}

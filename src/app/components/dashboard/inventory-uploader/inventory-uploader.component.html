@@ -1,18 +1,18 @@
 <div class="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white p-6 max-w-7xl mx-auto">
   <!-- Título principal -->
-  <header class="mb-10 text-center">
-    <h1 class="text-4xl font-extrabold text-purple-700 tracking-tight">
-      <i class="fa-solid fa-boxes-stacked mr-3"></i>
-      Gestión de Inventarios
-    </h1>
-    <p class="mt-2 text-gray-600 text-lg">
-      Administra, registra y consulta los inventarios de tus empresas fácilmente
-    </p>
-  </header>
+  <app-header-crud titulo="Inventarios" descripcion="Gestiona y actualiza los inventarios." textoBotonActualizar="Refrescar"
+    placeholderInput="Buscar por nombre..." [filterByStatus]="true"
+    [filterStatusValues]="['preparando', 'en_transito', 'entregado', 'fallido']" (actualizar)="loadAllInventories()"
+    [filterByStatus]="false"
+    [textoBotonNuevo]="'Nuevo'"
+    (crear)="onCreateInventory()"
+    (clearFilters)="handleClearFilters()" (filterChange)="handleFilterChange($event)">
+  </app-header-crud>
 
   <!-- Registrar inventario -->
-  <section class="bg-white shadow-lg rounded-2xl p-6 mb-10 border border-gray-200">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+
+  <section *ngIf="isCreateInventory()" class="bg-white fixed inset-0 hflex md:ml-48 top-8 overflow-y-auto mt-4 shadow-lg rounded-2xl p-6 mb-10 border border-gray-200">
+    <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
       <i class="fa-solid fa-upload text-purple-600 mr-3"></i>
       Registrar nuevo inventario
     </h2>
@@ -38,7 +38,14 @@
         [disabled]="!tempCompany || !previewData().length"
       >
         <i class="fa-solid fa-floppy-disk mr-2"></i>
-        Guardar Inventario
+        Registrar inventario
+      </button>
+      <button
+        (click)="onCloseCreateInventory()"
+        class="bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-medium shadow hover:bg-slate-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <i class="fa-solid fa-floppy-disk mr-2"></i>
+        Regresar
       </button>
     </div>
 
@@ -47,6 +54,7 @@
       <h3 class="text-lg font-semibold mb-4 text-gray-700 flex items-center">
         <i class="fa-solid fa-eye text-purple-600 mr-2"></i>
         Vista previa
+        <span class="text-xs text-gray-500 ml-2" *ngIf="previewData().length">({{ 'Mostrando 5 filas de '+  previewData().length }} filas)</span>
       </h3>
       <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full text-sm">
@@ -69,7 +77,7 @@
   </section>
 
   <!-- Lista de empresas -->
-  <section *ngIf="companies().length && !selectedCompany()" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200">
+  <section *ngIf="companies().length && !selectedCompany()" class="bg-white mt-6 rounded-2xl p-6 border  border-gray-200">
     <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
       <i class="fa-solid fa-building text-purple-600 mr-3"></i>
       Empresas registradas
@@ -117,7 +125,7 @@
   </section>
 
   <!-- Detalle de inventario (expandido, no modal) -->
-  <section *ngIf="selectedCompany()" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200">
+  <section *ngIf="selectedCompany()" class="bg-white shadow-lg rounded-2xl mt-6 p-6 border border-gray-200">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-2xl font-bold text-purple-700 flex items-center">
         <i class="fa-solid fa-building mr-2"></i>

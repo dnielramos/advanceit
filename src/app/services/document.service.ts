@@ -11,7 +11,7 @@ export class DocumentService {
 
   // Define la URL base de tu API de NestJS.
   // Es una MEJOR PRÁCTICA poner 'http://localhost:3000' en tu archivo environment.ts
-  private apiUrl = `${ENVIRONMENT.apiUrl}/documents`;
+  private apiUrl = `${ENVIRONMENT.apiUrlRender}/documents`;
 
   constructor(private http: HttpClient) { }
 

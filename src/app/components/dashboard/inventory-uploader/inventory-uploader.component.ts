@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
-import { CompanyInventoriesService, InventoryPayload } from '../../../services/company-inventories.service';
+import {
+  CompanyInventoriesService,
+  InventoryPayload,
+} from '../../../services/company-inventories.service';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 interface CompanyInventory {
   id?: string;
@@ -37,13 +40,37 @@ export class InventoryUploaderComponent implements OnInit {
   tempCompany = '';
   tempFile: File | null = null;
 
+  // Dentro de la clase InventoryUploaderComponent
+  searchText = signal<string>('');
+  filteredInventory = computed(() => {
+    const company = this.selectedCompany();
+    const text = this.searchText().toLowerCase().trim();
+
+    if (!company || !text) {
+      return company?.inventory || [];
+    }
+
+    const columns = company.columns || [];
+
+    return company.inventory.filter((row) =>
+      columns.some((col) => {
+        const value = row[col];
+        return value != null && String(value).toLowerCase().includes(text);
+      })
+    );
+  });
+
   // Carga inicial
   ngOnInit(): void {
     this.loadAllInventories();
   }
 
+  openDellSupport() {
+  window.open('https://www.dell.com/support/home/es-es', '_blank');
+}
 
   handleClearFilters() {
+    this.searchText.set('');
     this.loadAllInventories();
   }
 
@@ -55,32 +82,43 @@ export class InventoryUploaderComponent implements OnInit {
     this.previewColumns.set([]);
   }
 
-
   onCreateInventory() {
     this.isCreateInventory.set(true);
   }
 
-  handleFilterChange(event: {estado?: string, texto: string}) {
+  handleFilterChange(event: { estado?: string; texto: string }) {
     // Lógica para manejar el cambio de filtro
     console.log('Filtro cambiado:', event);
 
+    // Guardar el texto de búsqueda global
+    this.searchText.set(event.texto);
 
-    this.inventoriesService.getAllInventories().subscribe({
-      next: (data: any[]) => {
-        const mapped: CompanyInventory[] = (data || []).map(item => ({
-          id: item.id,
-          company: item.company,
-          inventory: item.inventory ?? [],
-          columns: item.columns ?? (item.inventory?.[0] ? Object.keys(item.inventory[0]) : []),
-          created_at: item.created_at ?? item.createdAt ?? null,
-        }));
-        this.companies.set(mapped.filter(c => {
-          return (!event.estado || c.company === event.estado) &&
-                 (!event.texto || c.company.toLowerCase().includes(event.texto.toLowerCase()));
-        }));
-      },
-      error: (err) => console.error('Error cargando inventarios', err),
-    });
+    // Si NO estás en detalle de inventario, filtra empresas
+    if (!this.selectedCompany()) {
+      this.inventoriesService.getAllInventories().subscribe({
+        next: (data: any[]) => {
+          const mapped: CompanyInventory[] = (data || []).map((item) => ({
+            id: item.id,
+            company: item.company,
+            inventory: item.inventory ?? [],
+            columns:
+              item.columns ??
+              (item.inventory?.[0] ? Object.keys(item.inventory[0]) : []),
+            created_at: item.created_at ?? item.createdAt ?? null,
+          }));
+
+          this.companies.set(
+            mapped.filter(
+              (c) =>
+                (!event.estado || c.company === event.estado) &&
+                (!event.texto ||
+                  c.company.toLowerCase().includes(event.texto.toLowerCase()))
+            )
+          );
+        },
+        error: (err) => console.error('Error cargando inventarios', err),
+      });
+    }
   }
 
   // ======================================================
@@ -89,11 +127,13 @@ export class InventoryUploaderComponent implements OnInit {
   loadAllInventories() {
     this.inventoriesService.getAllInventories().subscribe({
       next: (data: any[]) => {
-        const mapped: CompanyInventory[] = (data || []).map(item => ({
+        const mapped: CompanyInventory[] = (data || []).map((item) => ({
           id: item.id,
           company: item.company,
           inventory: item.inventory ?? [],
-          columns: item.columns ?? (item.inventory?.[0] ? Object.keys(item.inventory[0]) : []),
+          columns:
+            item.columns ??
+            (item.inventory?.[0] ? Object.keys(item.inventory[0]) : []),
           created_at: item.created_at ?? item.createdAt ?? null,
         }));
         // Ordenar por fecha desc

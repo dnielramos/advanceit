@@ -128,13 +128,13 @@ import { ENVIRONMENT } from '../../../enviroments/enviroment';
               >
                 {{ isLoading ? 'Iniciando...' : 'Iniciar Sesión' }}
               </button>
-              <button
+              <!-- <button
                 type="button"
                 (click)="goToRegister()"
                 class="w-full bg-gradient-to-r mt-4 from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white py-3 rounded-lg font-medium transition-transform transform hover:scale-105"
               >
                 Crear una cuenta de Advance
-              </button>
+              </button> -->
             </form>
             <div class="text-center mt-4">
               <a
@@ -211,6 +211,8 @@ export class LoginComponent {
   isLoading = false;
   forgotPassword = false;
   loginSuccess = false; // <-- 2. Nueva bandera para controlar la vista
+
+  // "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMjUxZDgyOS1iMWJhLTRmMTktOTA1NS03ZmYzODllMDljNzYiLCJlbWFpbCI6ImFkbWluQGFkdmFuY2VpdC5jbyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MjY5NjkzNiwiZXhwIjoxNzYzMzAxNzM2fQ.vvNGWnKLu4otrtK4RUNbbwm9kEH3smUOWAe9lndmgSQ"
 
   // Iconos
   faUser = faUser;

@@ -138,7 +138,7 @@ export class AuthService {
   }
 
    // --- NUEVO: Lógica para refrescar el token ---
-  refreshToken(): Observable<{ access_token: string }> {
+  refreshToken(): Observable<{ access_token: string, refresh_token: string }> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
       this.logout();
@@ -149,11 +149,14 @@ export class AuthService {
       'Authorization': `Bearer ${refreshToken}`
     });
 
-    return this.http.post<{ access_token: string }>(this.refreshUrl, {}, { headers }).pipe(
+    return this.http.post<{ access_token: string, refresh_token: string }>(this.refreshUrl, {}, { headers }).pipe(
+      
       tap(tokens => {
         // Guarda el nuevo access token cuando la llamada es exitosa
         localStorage.setItem('access_token', tokens.access_token);
+        localStorage.setItem('refresh_token', tokens.refresh_token);
         this.decodeAndStoreToken(tokens.access_token);
+
         console.log('Token refrescado exitosamente!');
       })
     );

@@ -9,6 +9,10 @@ import { BehaviorSubject, throwError } from 'rxjs';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
+// --- URLs que deben ser ignoradas por el interceptor ---
+// (Ajusta estas rutas a las de tu API)
+const BYPASS_URLS = ['/api/auth/login', '/api/auth/refresh'];
+
 // --- Lógica para manejar el estado del refresh fuera de la función ---
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
@@ -17,6 +21,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const accessToken = authService.getAccessToken();
 
+  // Si es una ruta de login o refresh, no añadimos el token
+  if (isBypassUrl(req.url, BYPASS_URLS)) {
+    return next(req);
+  }
+
   // Clona la petición para añadir el token de acceso si existe
   if (accessToken) {
     req = addTokenHeader(req, accessToken);
@@ -24,8 +33,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error) => {
-      // Si el error es 401, intentamos refrescar el token
-      if (error instanceof HttpErrorResponse && error.status === 401) {
+      // Si el error es 401 Y NO es una ruta de bypass, intentamos refrescar
+      if (
+        error instanceof HttpErrorResponse &&
+        error.status === 401 &&
+        !isBypassUrl(req.url, BYPASS_URLS) // <-- LA VALIDACIÓN CLAVE
+      ) {
         return handle401Error(req, next, authService);
       }
       // Para otros errores, simplemente los propagamos
@@ -44,6 +57,7 @@ const addTokenHeader = (request: HttpRequest<any>, token: string) => {
 };
 
 // --- Función para manejar el error 401 y la lógica de refresh ---
+// (Esta función es idéntica a la tuya, la lógica aquí es correcta)
 const handle401Error = (
   request: HttpRequest<any>,
   next: HttpHandlerFn,
@@ -75,4 +89,9 @@ const handle401Error = (
       switchMap((jwt) => next(addTokenHeader(request, jwt!)))
     );
   }
+};
+
+// --- Función helper para comprobar si la URL debe ser ignorada ---
+const isBypassUrl = (url: string, bypassUrls: string[]): boolean => {
+  return bypassUrls.some((bypassUrl) => url.endsWith(bypassUrl));
 };

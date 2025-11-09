@@ -95,26 +95,16 @@ export class ProductosComponent implements OnInit {
 
   onOutregister() {
     this.createUser = !this.createUser;
-
-    const html = document.documentElement;
-    const body = document.body;
-
-    if (this.comprarProductos) {
-      html.classList.add('no-scroll');
-      body.classList.add('no-scroll');
-    } else {
-      html.classList.remove('no-scroll');
-      body.classList.remove('no-scroll');
-    }
   }
   // Mensajes de bienvenida
   welcomeMessages = [
-    '¿Estás buscando algún producto en específico?',
-    'Puedes explorar nuestras categorías o buscar por marca.',
+    '¿Buscando algún producto en específico?',
+    'Explora nuestras categorías.',
+    'Explora nuestras Marcas.',
     '¿En que podemos ayudarte?',
     '¿podrías decirme qué estás buscando?',
     'Estamos aquí para ayudarte',
-    'Espero que hoy tengas un excelente día.',
+    'Espero que tengas un excelente día.',
   ];
   welcomeMessage = signal('¡Hola!  ¿En qué puedo ayudarte hoy?');
   productsFromDB: any[] = [];
@@ -181,7 +171,6 @@ export class ProductosComponent implements OnInit {
         this.productos
       );
     });
-
   }
 
   // Un método para trackear por índice
@@ -285,17 +274,6 @@ export class ProductosComponent implements OnInit {
 
   onMenucategories(): void {
     this.menuCategories = !this.menuCategories;
-
-    const html = document.documentElement;
-    const body = document.body;
-
-    // if (this.menuCategories) {
-    //   html.classList.add('no-scroll');
-    //   body.classList.add('no-scroll');
-    // } else {
-    //   html.classList.remove('no-scroll');
-    //   body.classList.remove('no-scroll');
-    // }
   }
 
   onComprarProductos(product: ProductoFinal | null): void {
@@ -303,29 +281,17 @@ export class ProductosComponent implements OnInit {
       this.addToCart(product);
     } else {
       this.comprarProductos = !this.comprarProductos;
-      const html = document.documentElement;
-      const body = document.body;
-
-      if (this.comprarProductos) {
-        html.classList.add('no-scroll');
-        body.classList.add('no-scroll');
-      } else {
-        html.classList.remove('no-scroll');
-        body.classList.remove('no-scroll');
-      }
     }
   }
 
   handleCreate(): void {
-    console.log('El usuario quiere registrarse.');
-    this.onComprarProductos(null);
-    this.createUser = true;
+    this.router.navigate(['/contacto']);
+
+    // this.onComprarProductos(null);
+    // this.createUser = true;
   }
 
   handleLogin(): void {
-    console.log(
-      'El usuario quiere iniciar sesión. Redirigiendo a la página de login...'
-    );
     this.onComprarProductos(null);
     this.router.navigate(['/in']);
   }

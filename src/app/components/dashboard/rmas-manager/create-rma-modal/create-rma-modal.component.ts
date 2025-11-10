@@ -37,9 +37,11 @@ export class CreateRmaModalComponent implements OnInit {
   inventory = signal<any[]>([]);
   selectedProducts = signal<any[]>([]);
   requestType = signal<'rma' | 'transfer'>('rma');
+  // Bridge reactivity from ReactiveForms to Signals
+  private companySelected = signal<boolean>(false);
   
   // Computed
-  isCompanySelected = computed(() => !!this.createForm?.get('company_id')?.value);
+  isCompanySelected = computed(() => this.companySelected());
   hasInventory = computed(() => this.inventory().length > 0);
 
   // Form
@@ -71,8 +73,10 @@ export class CreateRmaModalComponent implements OnInit {
     // Escuchar cambios en la empresa seleccionada
     this.createForm.get('company_id')?.valueChanges.subscribe(companyId => {
       console.log('🏢 Empresa seleccionada:', companyId);
-      if (companyId) {
-        this.loadInventoryByCompany(companyId);
+      const hasSelection = companyId !== null && companyId !== undefined && companyId !== '';
+      this.companySelected.set(!!hasSelection);
+      if (hasSelection) {
+        this.loadInventoryByCompany(companyId as any);
       } else {
         this.inventory.set([]);
         this.selectedProducts.set([]);

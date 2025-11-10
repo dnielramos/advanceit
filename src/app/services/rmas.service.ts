@@ -10,7 +10,7 @@ import { Rma, CreateRmaDto, UpdateRmaDataDto } from '../models/rma.model';
 export class RmasService {
   private readonly http = inject(HttpClient);
 
-  private readonly apiUrl = `${ENVIRONMENT.apiUrl}/rmas`;
+  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/rmas`;
 
   findAllRmas(): Observable<{ total: number; data: Rma[] }> {
     return this.http.get<{ total: number; data: Rma[] }>(this.apiUrl);

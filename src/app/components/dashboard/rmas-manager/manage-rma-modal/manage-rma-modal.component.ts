@@ -11,7 +11,22 @@ import {
   faExclamationTriangle,
   faBox,
   faBarcode,
-  faHashtag
+  faHashtag, 
+  faExchangeAlt,
+  faShoppingCart,
+  faCircle,
+  faCheckCircle,
+  faInfoCircle,
+  faFileAlt,
+  faStickyNote,
+  faImage,
+  faBoxes, 
+  faBoxOpen,
+  faSyncAlt,
+  faRandom,
+  faChevronDown,
+  faCommentAlt,
+  faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { RmasService } from '../../../../services/rmas.service';
 import { Rma, UpdateRmaDataDto } from '../../../../models/rma.model';
@@ -41,6 +56,21 @@ export class ManageRmaModalComponent implements OnInit {
   faBox = faBox;
   faBarcode = faBarcode;
   faHashtag = faHashtag;
+  faExchangeAlt = faExchangeAlt;
+  faShoppingCart = faShoppingCart;
+  faCircle = faCircle;
+  faCheckCircle = faCheckCircle;
+  faInfoCircle = faInfoCircle;
+  faFileAlt = faFileAlt;
+  faStickyNote = faStickyNote;
+  faImage = faImage;
+  faTrashAlt = faTrashAlt;
+  faBoxes = faBoxes;
+  faBoxOpen = faBoxOpen;
+  faSyncAlt = faSyncAlt;
+  faRandom = faRandom;
+  faChevronDown = faChevronDown;
+  faCommentAlt = faCommentAlt;
 
   // State
   isLoading = signal(false);

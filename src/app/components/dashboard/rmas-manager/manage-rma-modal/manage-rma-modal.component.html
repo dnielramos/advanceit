@@ -1,209 +1,331 @@
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 lg:pl-52">
-  <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-6 flex justify-between items-center sticky top-0 z-10">
-      <div>
-        <h2 class="text-2xl font-bold">Gestionar RMA: {{ rma.rma_number }}</h2>
-        <p class="text-sm text-purple-100 mt-1">
-          Pedido: {{ rma.order_id }} | Estado: 
-          <span class="font-semibold px-2 py-0.5 rounded-full" [ngClass]="getStateColor(rma.estado)">
-            {{ getStateLabel(rma.estado) }}
+<div
+  class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4 lg:pl-52 animate-fade-in">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-gray-100">
+    <!-- Header con diseño premium -->
+    <div
+      class="bg-gradient-to-r from-indigo-700 via-purple-700 to-violet-800 text-white p-6 flex justify-between items-center sticky top-0 z-10 shadow-lg">
+      <div class="flex flex-col">
+        <div class="flex items-center gap-3">
+          <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+            <fa-icon [icon]="faExchangeAlt" class="text-2xl text-white"></fa-icon>
+          </div>
+          <h2 class="text-2xl font-bold tracking-tight">Gestionar RMA: <span class="text-white/90 font-mono">{{
+              rma.rma_number }}</span></h2>
+        </div>
+        <p class="text-sm text-purple-100 mt-2 flex flex-wrap items-center gap-3">
+          <span class="flex items-center gap-1">
+            <fa-icon [icon]="faShoppingCart" class="text-purple-200"></fa-icon>
+            <span class="font-medium">Pedido:</span> {{ rma.order_id }}
+          </span>
+          <span class="flex items-center gap-1">
+            <fa-icon [icon]="faCircle" class="text-purple-200 text-xs"></fa-icon>
+            <span class="font-medium">Estado:</span>
+            <span class="px-3 py-0.5 rounded-full bg-white bg-opacity-20 backdrop-blur-sm"
+              [ngClass]="getStateColor(rma.estado)">
+              {{ getStateLabel(rma.estado) }}
+            </span>
           </span>
         </p>
       </div>
-      <button (click)="closeModal()" class="text-white hover:text-gray-200 transition-colors">
+      <button (click)="closeModal()"
+        class="text-white hover:text-white/80 transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-purple-700 rounded-lg p-2 bg-white/10 backdrop-blur-sm">
         <fa-icon [icon]="faTimes" class="text-2xl"></fa-icon>
       </button>
     </div>
 
-    <!-- Content -->
-    <div class="p-6">
-      <!-- Alerts -->
+    <!-- Content con mejor organización visual -->
+    <div class="p-6 bg-gray-50">
+      <!-- Alerts mejorados -->
       @if (error(); as errorMsg) {
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 rounded-lg mb-4 flex items-start" role="alert">
-          <fa-icon [icon]="faExclamationTriangle" class="mr-2 mt-0.5"></fa-icon>
-          <div>
-            <span class="font-medium">Error:</span> {{ errorMsg }}
+      <div class="bg-red-50 border-l-4 border-red-500 text-red-800 p-4 rounded-xl mb-6 shadow-sm animate-shake"
+        role="alert">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 mt-0.5">
+            <fa-icon [icon]="faExclamationTriangle" class="text-red-500 text-xl"></fa-icon>
+          </div>
+          <div class="ml-3 flex-1">
+            <p class="text-sm font-medium">Error:</p>
+            <p class="mt-1 text-sm">{{ errorMsg }}</p>
           </div>
         </div>
+      </div>
       }
 
       @if (success(); as successMsg) {
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-4 rounded-lg mb-4" role="alert">
-          <span class="font-medium">Éxito:</span> {{ successMsg }}
+      <div class="bg-green-50 border-l-4 border-green-500 text-green-800 p-4 rounded-xl mb-6 shadow-sm animate-fade-in"
+        role="alert">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 mt-0.5">
+            <fa-icon [icon]="faCheckCircle" class="text-green-500 text-xl"></fa-icon>
+          </div>
+          <div class="ml-3 flex-1">
+            <p class="text-sm font-medium">Éxito:</p>
+            <p class="mt-1 text-sm">{{ successMsg }}</p>
+          </div>
         </div>
+      </div>
       }
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Información General -->
-        <div class="lg:col-span-2">
-          <form [formGroup]="updateDataForm" (ngSubmit)="handleUpdateData()" class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div class="p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Información General</h3>
-              <div class="space-y-4">
-                <div>
-                  <label for="motivo" class="block text-sm font-medium text-gray-700 mb-1">
+        <!-- Información General - Panel principal -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Formulario de información general -->
+          <div
+            class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="border-b border-gray-100 bg-gradient-to-r from-purple-50 to-violet-50 px-6 py-4">
+              <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <fa-icon [icon]="faInfoCircle" class="text-purple-600"></fa-icon>
+                Información General
+              </h3>
+            </div>
+            <form [formGroup]="updateDataForm" (ngSubmit)="handleUpdateData()" class="p-6">
+              <div class="space-y-5">
+                <div class="form-group">
+                  <label for="motivo" class="block text-sm font-medium text-gray-800 mb-2 flex items-center gap-2">
+                    <fa-icon [icon]="faFileAlt" class="text-purple-500"></fa-icon>
                     Motivo de la Devolución
                   </label>
-                  <textarea 
-                    id="motivo" 
-                    formControlName="motivo" 
-                    rows="4" 
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" 
-                    placeholder="Describe el motivo...">
-                  </textarea>
+                  <div class="relative">
+                    <textarea id="motivo" formControlName="motivo" rows="4"
+                      class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[120px] resize-y hover:border-gray-400"
+                      placeholder="Describe el motivo de la devolución...">
+                    </textarea>
+                    <div class="absolute bottom-2 right-2 text-xs text-gray-500 pointer-events-none">
+                      {{ updateDataForm.get('motivo')?.value?.length || 0 }}/500
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label for="notas" class="block text-sm font-medium text-gray-700 mb-1">
+                <div class="form-group">
+                  <label for="notas" class="block text-sm font-medium text-gray-800 mb-2 flex items-center gap-2">
+                    <fa-icon [icon]="faStickyNote" class="text-purple-500"></fa-icon>
                     Notas Internas
                   </label>
-                  <textarea 
-                    id="notas" 
-                    formControlName="notas" 
-                    rows="3" 
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" 
+                  <textarea id="notas" formControlName="notas" rows="3"
+                    class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[100px] hover:border-gray-400"
                     placeholder="Notas visibles solo para el equipo...">
                   </textarea>
                 </div>
 
-                <div>
-                  <label for="evidencias" class="block text-sm font-medium text-gray-700 mb-1">
-                    Evidencias (JSON)
+                <!-- Productos del RMA - Reemplazando Evidencias (JSON) -->
+                <div class="form-group">
+                  <label class="block text-sm font-medium text-gray-800 mb-2 flex items-center gap-2">
+                    <fa-icon [icon]="faBoxes" class="text-purple-500"></fa-icon>
+                    Productos del RMA
                   </label>
-                  <textarea 
-                    id="evidencias" 
-                    formControlName="evidencias" 
-                    rows="5" 
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm font-mono" 
-                    placeholder='Ej: [{"url": "..."}]'>
-                  </textarea>
-                  @if (updateDataForm.get('evidencias')?.hasError('invalidJson')) {
-                    <p class="mt-1 text-xs text-red-600">El formato de las evidencias no es un JSON válido.</p>
-                  }
-                </div>
-              </div>
-            </div>
-            <div class="bg-gray-50 px-6 py-3 text-right">
-              <button 
-                type="submit" 
-                [disabled]="updateDataForm.invalid || isLoading()" 
-                class="inline-flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
-                @if (isLoading()) {
-                  <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
-                } @else {
-                  <fa-icon [icon]="faSave"></fa-icon>
-                }
-                <span>Guardar Cambios</span>
-              </button>
-            </div>
-          </form>
-
-          <!-- Productos del RMA (desde evidencias) -->
-          <div class="mt-6 bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div class="p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Productos del RMA</h3>
-              @if (getRmaItems().length === 0) {
-                <div class="text-center py-8 text-gray-500">No hay productos asociados a este RMA.</div>
-              } @else {
-                <div class="space-y-2 max-h-80 overflow-y-auto">
-                  @for (item of getRmaItems(); track item.product_id) {
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div class="flex items-start gap-3">
-                        <div class="mt-1 text-purple-600">
-                          <fa-icon [icon]="faBox"></fa-icon>
+                  <div class="border border-gray-300 rounded-xl bg-gray-50 p-4 min-h-[200px]">
+                    @if (getRmaItems().length === 0) {
+                    <div class="text-center py-12">
+                      <div class="flex justify-center mb-4">
+                        <div class="bg-purple-100/50 p-4 rounded-full">
+                          <fa-icon [icon]="faBoxOpen" class="text-purple-600 text-3xl"></fa-icon>
                         </div>
-                        <div>
-                          <p class="text-sm font-medium text-gray-900">{{ item.product_name }}</p>
-                          <div class="mt-1 flex flex-wrap items-center gap-2 text-xs">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                              <fa-icon [icon]="faHashtag"></fa-icon>
-                              {{ item.product_id }}
-                            </span>
-                            @if (item.serial) {
-                              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
-                                <fa-icon [icon]="faBarcode"></fa-icon>
-                                {{ item.serial }}
-                              </span>
-                            }
+                      </div>
+                      <p class="text-gray-600 font-medium">No hay productos asociados a este RMA.</p>
+                      <p class="text-gray-500 text-sm mt-1">Los productos se obtienen automáticamente del pedido asociado.</p>
+                    </div>
+                    } @else {
+                    <div class="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                      @for (item of getRmaItems(); track item.product_id) {
+                      <div
+                        class="border border-gray-200 rounded-lg p-3 bg-white hover:border-purple-300 hover:shadow-sm transition-all duration-300 group">
+                        <div class="flex items-start justify-between">
+                          <div class="flex items-start gap-3 flex-1">
+                            <div
+                              class="mt-1 p-1.5 bg-purple-100 rounded-lg text-purple-700 flex-shrink-0 group-hover:bg-purple-200 transition-colors">
+                              <fa-icon [icon]="faBox" class="text-lg"></fa-icon>
+                            </div>
+                            <div class="flex-1">
+                              <div class="flex justify-between items-start">
+                                <h4 class="text-sm font-bold text-gray-900">{{ item.product_name }}</h4>
+                                <span
+                                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-100">
+                                  <fa-icon [icon]="faTimes" class="mr-1 text-blue-600 text-xs"></fa-icon>
+                                  x{{ item.quantity }}
+                                </span>
+                              </div>
+                              <div class="mt-1.5 flex flex-wrap items-center gap-2">
+                                <span
+                                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 text-xs font-medium border border-purple-100">
+                                  <fa-icon [icon]="faHashtag" class="text-purple-600 text-xs"></fa-icon>
+                                  {{ item.product_id }}
+                                </span>
+                                @if (item.serial) {
+                                <span
+                                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-800 text-xs font-medium border border-gray-200">
+                                  <fa-icon [icon]="faBarcode" class="text-gray-600 text-xs"></fa-icon>
+                                  {{ item.serial }}
+                                </span>
+                                }
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div>
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                          x{{ item.quantity }}
-                        </span>
-                      </div>
+                      }
                     </div>
-                  }
+                    }
+                  </div>
                 </div>
-              }
+              </div>
+            </form>
+            <div class="bg-gray-50/50 px-6 py-4 border-t border-gray-100">
+              <button type="submit" [disabled]="updateDataForm.invalid || isLoading()"
+                class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 w-full md:w-auto">
+                @if (isLoading()) {
+                <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                } @else {
+                <fa-icon [icon]="faSave" class="text-lg"></fa-icon>
+                }
+                <span class="font-medium text-base">Guardar Cambios</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Gestionar Flujo -->
-        <div class="lg:col-span-1">
-          <form [formGroup]="updateStateForm" (ngSubmit)="handleUpdateState()" class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div class="p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Gestionar Flujo</h3>
-              <div class="space-y-4">
-                <div>
-                  <label for="nextState" class="block text-sm font-medium text-gray-700 mb-1">
+        <!-- Gestionar Flujo - Panel lateral -->
+        <div class="lg:col-span-1 space-y-6">
+          <!-- Formulario de gestión de flujo -->
+          <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-violet-50 px-6 py-4">
+              <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <fa-icon [icon]="faSyncAlt" class="text-indigo-600"></fa-icon>
+                Gestionar Flujo
+              </h3>
+            </div>
+            <form [formGroup]="updateStateForm" (ngSubmit)="handleUpdateState()" class="p-6">
+              <div class="space-y-5">
+                <div class="form-group">
+                  <label for="nextState" class="block text-sm font-medium text-gray-800 mb-2 flex items-center gap-2">
+                    <fa-icon [icon]="faRandom" class="text-indigo-500"></fa-icon>
                     Cambiar Estado a:
                   </label>
-                  <select 
-                    id="nextState" 
-                    formControlName="nextState" 
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm">
-                    <option value="" disabled>Selecciona un estado...</option>
-                    @for (opt of stateOptions; track opt[1]) {
-                      <option [value]="opt[1]">{{ opt[0] }}</option>
-                    }
-                  </select>
+                  <div class="relative">
+                    <select id="nextState" formControlName="nextState"
+                      class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 bg-white hover:border-gray-400 appearance-none">
+                      <option value="" disabled class="text-gray-500">Selecciona un estado...</option>
+                      @for (opt of stateOptions; track opt[1]) {
+                      <option [value]="opt[1]" class="py-2 px-3 hover:bg-indigo-50">{{ opt[0] }}</option>
+                      }
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <fa-icon [icon]="faChevronDown" class="text-gray-500"></fa-icon>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label for="stateNotas" class="block text-sm font-medium text-gray-700 mb-1">
+                <div class="form-group">
+                  <label for="stateNotas" class="block text-sm font-medium text-gray-800 mb-2 flex items-center gap-2">
+                    <fa-icon [icon]="faCommentAlt" class="text-indigo-500"></fa-icon>
                     Notas del Cambio de Estado
                   </label>
-                  <textarea 
-                    id="stateNotas" 
-                    formControlName="notas" 
-                    rows="3" 
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" 
-                    placeholder="Opcional: agrega una nota...">
+                  <textarea id="stateNotas" formControlName="notas" rows="3"
+                    class="block w-full outline-none rounded-xl border border-gray-300 shadow-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[100px] hover:border-gray-400"
+                    placeholder="Agrega una nota para este cambio de estado...">
                   </textarea>
                 </div>
               </div>
-            </div>
-            <div class="bg-gray-50 px-6 py-3 text-right">
-              <button 
-                type="submit" 
-                [disabled]="updateStateForm.invalid || isLoading()" 
-                class="inline-flex items-center space-x-2 w-full justify-center bg-gray-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
+            </form>
+            <div class="bg-gray-50/50 px-6 py-4 border-t border-gray-100">
+              <button type="submit" [disabled]="updateStateForm.invalid || isLoading()"
+                class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 w-full">
                 @if (isLoading()) {
-                  <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
+                <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                 } @else {
-                  <fa-icon [icon]="faPaperPlane"></fa-icon>
+                <fa-icon [icon]="faPaperPlane" class="text-lg"></fa-icon>
                 }
-                <span>Actualizar Estado</span>
+                <span class="font-medium text-base">Actualizar Estado</span>
               </button>
             </div>
-          </form>
+          </div>
 
-          <!-- Delete Button -->
-          <div class="mt-4">
-            <button 
-              (click)="handleDelete()" 
-              [disabled]="isLoading()" 
-              class="w-full inline-flex items-center justify-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition duration-150 disabled:opacity-50">
-              <fa-icon [icon]="faTrash"></fa-icon>
-              <span>Eliminar RMA</span>
-            </button>
+          <!-- Delete Button - Botón mejorado -->
+          <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="border-b border-gray-100 bg-gradient-to-r from-red-50 to-rose-50 px-6 py-4">
+              <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <fa-icon [icon]="faTrashAlt" class="text-red-600"></fa-icon>
+                Acciones Peligrosas
+              </h3>
+            </div>
+            <div class="p-6">
+              <p class="text-sm text-gray-600 mb-4">
+                <fa-icon [icon]="faExclamationTriangle" class="text-yellow-500 mr-1"></fa-icon>
+                Esta acción eliminará permanentemente este RMA y no se puede deshacer.
+              </p>
+              <button (click)="handleDelete()" [disabled]="isLoading()"
+                class="inline-flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-red-600 to-rose-600 text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 group">
+                <fa-icon [icon]="faTrash" class="text-lg group-hover:animate-bounce"></fa-icon>
+                <span class="font-medium text-base">Eliminar RMA</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shake {
+
+    10%,
+    90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+      transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+      transform: translate3d(4px, 0, 0);
+    }
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #a78bfa;
+    border-radius: 4px;
+    transition: background 0.3s;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #8b5cf6;
+  }
+</style>

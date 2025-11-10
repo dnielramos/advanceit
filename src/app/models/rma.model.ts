@@ -7,8 +7,12 @@ export interface Rma {
   estado: string;
   motivo: string;
   evidencias: any[];
+  historial ?: any[];
   notas: string | null;
-  created_at: Date;
+  fecha_solicitud ?: Date;
+  resolution ?: string;
+  fecha_resolucion ?: Date;
+  shipping_id ?: string;
 }
 
 export interface CreateRmaDto {

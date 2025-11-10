@@ -3,12 +3,12 @@
     <div class="p-4 md:p-6">
       <app-header-crud
         titulo="RMAs"
-        descripcion="Gestiona las solicitudes de devolución (RMA)"
-        textoBotonNuevo="Nueva RMA"
+        descripcion="Gestiona las solicitudes de devolución y traslado."
+        textoBotonNuevo="Nueva Solicitud"
         textoBotonActualizar="Actualizar"
         [filterByStatus]="true"
         [filterStatusValues]="availableStates"
-        placeholderInput="Buscar por RMA #, Pedido # o Motivo..."
+        placeholderInput="Buscar por solicitud, pedido o motivo..."
         (crear)="openCreateModal()"
         (actualizar)="loadRmas()"
         (filterChange)="handleFilterChange($event)"
@@ -69,12 +69,13 @@
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
-                  {{ rma.created_at | date: 'dd/MM/yyyy h:mm a' }}
+                  {{ rma.fecha_solicitud | date: 'dd/MM/yyyy h:mm a' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button (click)="selectRma(rma)" class="text-purple-600 hover:text-purple-900 font-medium">
-                    Ver / Gestionar
-                  </button>
+                  <span (click)="selectRma(rma)" class="text-purple-600 hover:text-purple-900 font-medium">
+                    <span><fa-icon [icon]="faEye"></fa-icon></span> 
+                    <span>Ver / Gestionar</span>
+                  </span>
                 </td>
               </tr>
             } @empty {

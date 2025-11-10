@@ -45,8 +45,20 @@ export class ManageRmaModalComponent implements OnInit {
   updateDataForm!: FormGroup;
   updateStateForm!: FormGroup;
 
-  // Estados posibles
-  possibleStates = ['Pendiente', 'Recibido', 'En Revisión', 'Aprobado', 'Rechazado', 'Cerrado'];
+  // Estados: UI en Español -> Backend en Inglés
+  private stateMapEsToEn: Record<string, string> = {
+    'Pendiente': 'pending_review',
+    'Aprobado': 'approved',
+    'Rechazado': 'rejected',
+    'En Tránsito': 'in_transit',
+    'Recibido': 'received',
+    'Inspeccionado': 'inspected',
+    'Resuelto': 'resolved',
+    'Cerrado': 'closed',
+  };
+
+  // Opciones para el selector: [labelEs, codeEn]
+  stateOptions: Array<[string, string]> = Object.entries(this.stateMapEsToEn);
 
   ngOnInit(): void {
     this.initializeForms();
@@ -60,7 +72,8 @@ export class ManageRmaModalComponent implements OnInit {
     });
 
     this.updateStateForm = this.fb.group({
-      nextState: [this.rma.estado, [Validators.required]],
+      // Siempre guardar en el form el código en inglés
+      nextState: [this.getStateCode(this.rma.estado), [Validators.required]],
       notas: [''],
     });
   }
@@ -120,12 +133,13 @@ export class ManageRmaModalComponent implements OnInit {
     this.success.set(null);
 
     const formValue = this.updateStateForm.value;
+    const stateCode = this.getStateCode(formValue.nextState);
 
-    this.rmaService.updateRmaState(this.rma.id, formValue.nextState, formValue.notas).subscribe({
+    this.rmaService.updateRmaState(this.rma.id, stateCode, formValue.notas).subscribe({
       next: (response) => {
         this.isLoading.set(false);
         this.success.set(response.message);
-        this.updateStateForm.reset({ nextState: formValue.nextState, notas: '' });
+        this.updateStateForm.reset({ nextState: stateCode, notas: '' });
         setTimeout(() => this.updated.emit(), 1500);
       },
       error: (err) => {
@@ -155,21 +169,46 @@ export class ManageRmaModalComponent implements OnInit {
     });
   }
 
-  getStateColor(estado: string): string {
-    switch (estado?.toLowerCase()) {
-      case 'pendiente':
+  getStateColor(state: string): string {
+    // Normalizar a código en inglés para colorear de forma consistente
+    const code = this.getStateCode(state).toLowerCase();
+    switch (code) {
+      case 'pending_review':
+      case 'in_review':
         return 'bg-yellow-100 text-yellow-800';
-      case 'en revisión':
-      case 'recibido':
+      case 'in_transit':
+      case 'received':
+      case 'inspected':
         return 'bg-blue-100 text-blue-800';
-      case 'aprobado':
+      case 'approved':
+      case 'resolved':
         return 'bg-green-100 text-green-800';
-      case 'rechazado':
-      case 'cerrado':
+      case 'rejected':
+      case 'closed':
         return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-purple-100 text-purple-800';
     }
+  }
+
+  // Helpers de traducción
+  private getStateCode(input: string): string {
+    if (!input) return '';
+    const normalized = input.toString().trim();
+    // Si ya viene en inglés
+    if (Object.values(this.stateMapEsToEn).includes(normalized)) {
+      return normalized;
+    }
+    // Si viene en español
+    const found = this.stateMapEsToEn[normalized];
+    return found || normalized;
+  }
+
+  getStateLabel(input: string): string {
+    if (!input) return '';
+    const code = this.getStateCode(input);
+    const entry = Object.entries(this.stateMapEsToEn).find(([, v]) => v === code);
+    return entry ? entry[0] : input;
   }
 
   closeModal(): void {

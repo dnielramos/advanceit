@@ -120,6 +120,13 @@ export const dashboardRoutes: Routes = [
             '../pages/filter-products/filter-products.component'
           ).then((m) => m.FilterProductsComponent),
       },
+      {
+        path: 'inventory-uploader/product/:id',
+        loadComponent: () =>
+          import('../pages/dashboard/inventory/product-detail/product-detail.component').then(
+            (m) => m.ProductDetailComponent
+          ),
+      },
 
       { path: 'cart', loadComponent: () => import('../components/cart/cart.component').then(m => m.CartComponent) },
       {

@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
 import {
   CompanyInventoriesService,
@@ -27,6 +28,7 @@ interface CompanyInventory {
 })
 export class InventoryUploaderComponent implements OnInit {
   private inventoriesService = inject(CompanyInventoriesService);
+  private router = inject(Router);
 
   faBuilding = faBuilding;
 
@@ -220,5 +222,21 @@ export class InventoryUploaderComponent implements OnInit {
   // ======================================================
   handleViewChange(mode: 'grid' | 'list') {
     this.viewMode.set(mode);
+  }
+
+  // ======================================================
+  // Navegar a detalle de producto
+  // ======================================================
+  viewProductDetail(product: any, index: number) {
+    const company = this.selectedCompany();
+    if (!company) return;
+
+    this.router.navigate(['/dashboard/inventory-uploader/product', index], {
+      state: {
+        product,
+        company: company.company,
+        columns: company.columns,
+      },
+    });
   }
 }

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, inject, signal, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -19,6 +20,7 @@ export class CreateRmaComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly companiesService = inject(CompaniesService);
   private readonly inventoryService = inject(CompanyInventoriesService);
+  private readonly router = inject(Router);
 
   @Output() created = new EventEmitter<void>();
 
@@ -27,6 +29,7 @@ export class CreateRmaComponent implements OnInit {
 
   isLoading = signal(false);
   error = signal<string | null>(null);
+  toast = signal<string | null>(null);
   companies = signal<Company[]>([]);
   inventory = signal<any[]>([]);
   selectedProducts = signal<any[]>([]);
@@ -51,6 +54,9 @@ export class CreateRmaComponent implements OnInit {
   ngOnInit(): void {
     this.loadCompanies();
 
+    // Restaurar borrador si existe
+    this.restoreDraft();
+
     this.createForm.get('request_type')?.valueChanges.subscribe((type) => {
       this.requestType.set(type);
       this.updateValidators();
@@ -65,7 +71,11 @@ export class CreateRmaComponent implements OnInit {
         this.inventory.set([]);
         this.selectedProducts.set([]);
       }
+      this.saveDraft();
     });
+
+    // Persistir borrador en cambios
+    this.createForm.valueChanges.subscribe(() => this.saveDraft());
   }
 
   updateValidators(): void {
@@ -155,12 +165,14 @@ export class CreateRmaComponent implements OnInit {
     const exists = current.find((p: any) => (p.id || p._id || p.sku) === productId);
     if (!exists) {
       this.selectedProducts.set([...current, { ...product, quantity: 1, id: productId }]);
+      this.saveDraft();
     }
   }
 
   removeProduct(productId: string): void {
     const current = this.selectedProducts();
     this.selectedProducts.set(current.filter((p: any) => (p.id || p._id || p.sku) !== productId));
+    this.saveDraft();
   }
 
   updateProductQuantity(productId: string, quantity: number): void {
@@ -169,6 +181,7 @@ export class CreateRmaComponent implements OnInit {
       (p.id || p._id || p.sku) === productId ? { ...p, quantity: Math.max(1, quantity) } : p
     );
     this.selectedProducts.set(updated);
+    this.saveDraft();
   }
 
   handleSubmit(): void {
@@ -213,6 +226,13 @@ export class CreateRmaComponent implements OnInit {
     this.rmaService.createRma(dto).subscribe({
       next: () => {
         this.isLoading.set(false);
+        // Limpiar borrador y notificar
+        this.clearDraft();
+        this.toast.set('Solicitud creada correctamente');
+        setTimeout(() => {
+          this.toast.set(null);
+          this.router.navigate(['/dashboard/rmas']);
+        }, 1200);
         this.created.emit();
       },
       error: (err) => {
@@ -220,5 +240,60 @@ export class CreateRmaComponent implements OnInit {
         this.error.set(`Error al crear la solicitud: ${err.error?.message || err.message}`);
       },
     });
+  }
+
+  // Navegar atrás
+  goBack(): void {
+    this.router.navigate(['/dashboard/rmas']);
+  }
+
+  // Contador seleccionados
+  selectedCount(): number {
+    return this.selectedProducts().length;
+  }
+
+  // Persistencia de borrador en localStorage
+  private draftKey = 'create_rma_draft_v1';
+
+  private saveDraft(): void {
+    try {
+      const data = {
+        form: this.createForm.value,
+        requestType: this.requestType(),
+        selectedProducts: this.selectedProducts(),
+      };
+      localStorage.setItem(this.draftKey, JSON.stringify(data));
+    } catch { /* noop */ }
+  }
+
+  private restoreDraft(): void {
+    try {
+      const raw = localStorage.getItem(this.draftKey);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data?.form) {
+        this.createForm.patchValue({
+          request_type: data.form.request_type || 'rma',
+          company_id: data.form.company_id || '',
+          motivo: data.form.motivo || '',
+          new_user: data.form.new_user || '',
+          new_location: data.form.new_location || '',
+        }, { emitEvent: false });
+        this.requestType.set(data.requestType || 'rma');
+      }
+      if (Array.isArray(data?.selectedProducts)) {
+        this.selectedProducts.set(data.selectedProducts);
+      }
+      // Disparar carga de inventario si hay empresa
+      const cid = this.createForm.get('company_id')?.value;
+      if (cid) {
+        this.companySelected.set(true);
+        this.loadInventoryByCompany(cid);
+      }
+    } catch { /* noop */ }
+  }
+
+  private clearDraft(): void {
+    try { localStorage.removeItem(this.draftKey); } catch { /* noop */ }
   }
 }

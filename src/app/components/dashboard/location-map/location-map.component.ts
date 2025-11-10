@@ -19,9 +19,9 @@ interface Location {
   standalone: true,
   imports: [CommonModule, HttpClientModule],
   template: `
-    <div class="w-full bg-white rounded-2xl border border-gray-200 overflow-hidden">
-      <!-- Header -->
-      <div class="bg-white p-2">
+    <div class="w-full h-full" [ngClass]="compact ? 'bg-white overflow-hidden' : 'bg-white rounded-2xl border border-gray-200 overflow-hidden'">
+      <!-- Header - Solo en modo normal -->
+      <div *ngIf="!compact" class="bg-white p-2">
         <div class="flex items-center gap-3">
           <i class="fas fa-map-marked-alt text-white text-2xl"></i>
           <h2 class="text-xl font-bold text-purple-600">Mapa de Ubicaciones</h2>
@@ -32,19 +32,19 @@ interface Location {
       </div>
 
       <!-- Loading State -->
-      <div *ngIf="isLoading" class="p-8 text-center">
-        <div class="inline-flex items-center gap-3 text-purple-600">
-          <i class="fas fa-spinner fa-spin text-2xl"></i>
-          <span class="text-lg font-medium">Buscando coordenadas...</span>
+      <div *ngIf="isLoading" [ngClass]="compact ? 'absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-sm z-[1000]' : 'p-8 text-center'">
+        <div class="inline-flex items-center gap-3 text-purple-600" [ngClass]="compact ? 'flex-col' : ''">
+          <i class="fas fa-spinner fa-spin" [ngClass]="compact ? 'text-3xl' : 'text-2xl'"></i>
+          <span [ngClass]="compact ? 'text-sm' : 'text-lg'" class="font-medium">{{ compact ? 'Buscando ubicación...' : 'Buscando coordenadas...' }}</span>
         </div>
       </div>
 
       <!-- Map Container -->
-      <div class="relative">
-        <div id="map-{{mapId}}" class="w-full h-[600px] bg-gray-100"></div>
+      <div class="relative" [ngClass]="compact ? 'h-full' : ''">
+        <div id="map-{{mapId}}" class="w-full bg-gray-100" [ngClass]="compact ? 'h-full' : 'h-[600px]'"></div>
 
-        <!-- Map Overlay Info -->
-        <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-4 border border-gray-200 max-w-xs z-[1000]">
+        <!-- Map Overlay Info - Solo en modo normal -->
+        <div *ngIf="!compact" class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-4 border border-gray-200 max-w-xs z-[1000]">
           <div class="flex items-center gap-2 text-gray-700 mb-2">
             <i class="fas fa-info-circle text-purple-600"></i>
             <span class="font-semibold text-sm">Controles</span>
@@ -58,12 +58,13 @@ interface Location {
       </div>
 
       <!-- Error Messages -->
-      <div *ngIf="errors.length > 0" class="p-4 bg-red-50 border-t border-red-100">
-        <div class="flex items-start gap-3">
-          <i class="fas fa-exclamation-triangle text-red-500 mt-1"></i>
-          <div class="flex-1">
-            <h4 class="font-semibold text-red-800 mb-1">No se pudieron geocodificar:</h4>
-            <ul class="text-sm text-red-700 space-y-1">
+      <div *ngIf="errors.length > 0" [ngClass]="compact ? 'absolute bottom-0 left-0 right-0 p-2 bg-red-50/95 backdrop-blur-sm border-t border-red-200 z-[1000]' : 'p-4 bg-red-50 border-t border-red-100'">
+        <div class="flex items-start gap-3" [ngClass]="compact ? 'items-center' : ''">
+          <i class="fas" [ngClass]="compact ? 'fa-exclamation-circle text-red-500' : 'fa-exclamation-triangle text-red-500 mt-1'"></i>
+          <div class="flex-1" [ngClass]="compact ? '' : ''">
+            <h4 *ngIf="!compact" class="font-semibold text-red-800 mb-1">No se pudieron geocodificar:</h4>
+            <span *ngIf="compact" class="font-medium text-xs text-red-700">No se pudo encontrar la ubicación</span>
+            <ul *ngIf="!compact" class="text-sm text-red-700 space-y-1">
               <li *ngFor="let error of errors" class="flex items-center gap-2">
                 <i class="fas fa-times-circle text-xs"></i>
                 {{ error }}
@@ -73,8 +74,8 @@ interface Location {
         </div>
       </div>
 
-      <!-- Locations Grid -->
-      <div class="p-6 bg-gray-50">
+      <!-- Locations Grid - Solo en modo normal -->
+      <div *ngIf="!compact" class="p-6 bg-gray-50">
         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
           <i class="fas fa-list text-purple-600"></i>
           Ubicaciones
@@ -144,6 +145,7 @@ interface Location {
   styles: [`
     :host {
       display: block;
+      height: 100%;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     }
 
@@ -177,11 +179,12 @@ interface Location {
 })
 export class LocationMapComponent implements OnInit, OnChanges {
   @Input({required: true}) address: string | string[] = [];
+  @Input() compact: boolean = false; // Modo compacto para vistas pequeñas
 
   locations: Location[] = [];
   errors: string[] = [];
   isLoading = false;
-  mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
+  mapId = Math.random().toString(36).substr(2, 9); // Sin prefijo "map-" porque se agrega en el template
 
   private map: any;
   private markers: any[] = [];
@@ -190,7 +193,17 @@ export class LocationMapComponent implements OnInit, OnChanges {
   constructor(private http: HttpClient) {}
 
   async ngOnInit() {
+    console.log('LocationMap ngOnInit - compact mode:', this.compact);
+    console.log('LocationMap address:', this.address);
+    console.log('LocationMap mapId:', this.mapId);
+    
     await this.loadLeaflet();
+    
+    // En modo compacto, esperar un poco más para que el DOM esté listo
+    if (this.compact) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
     this.initMap();
     await this.processAddresses();
   }
@@ -222,22 +235,63 @@ export class LocationMapComponent implements OnInit, OnChanges {
   }
 
   private initMap() {
-    if (!this.L || this.map) return;
+    if (!this.L) {
+      console.error('Leaflet library not loaded');
+      return;
+    }
+    
+    if (this.map) {
+      console.log('Map already initialized');
+      return;
+    }
 
     setTimeout(() => {
-      this.map = this.L.map(`map-${this.mapId}`).setView([20, -10], 2);
-
-      this.L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '',
-        maxZoom: 19
-      }).addTo(this.map);
-
-      // Apply purple tint
       const mapElement = document.getElementById(`map-${this.mapId}`);
-      if (mapElement) {
-        mapElement.style.filter = 'hue-rotate(280deg) saturate(0.8)';
+      console.log('Attempting to initialize map with id:', `map-${this.mapId}`);
+      console.log('Map element found:', !!mapElement);
+      
+      if (!mapElement) {
+        console.error('Map element not found:', `map-${this.mapId}`);
+        console.log('Available elements:', document.querySelectorAll('[id^="map-"]'));
+        return;
       }
-    }, 100);
+
+      console.log('Map element dimensions:', {
+        width: mapElement.offsetWidth,
+        height: mapElement.offsetHeight
+      });
+
+      try {
+        this.map = this.L.map(`map-${this.mapId}`, {
+          center: [20, -10],
+          zoom: 2,
+          scrollWheelZoom: true,
+          dragging: true
+        });
+
+        this.L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '',
+          maxZoom: 19
+        }).addTo(this.map);
+
+        // Apply purple tint
+        if (mapElement) {
+          mapElement.style.filter = 'hue-rotate(280deg) saturate(0.8)';
+        }
+
+        console.log('Map initialized successfully');
+
+        // Forzar redimensionamiento del mapa después de inicializar
+        setTimeout(() => {
+          if (this.map) {
+            this.map.invalidateSize();
+            console.log('Map invalidateSize called');
+          }
+        }, 300);
+      } catch (error) {
+        console.error('Error initializing map:', error);
+      }
+    }, this.compact ? 500 : 100);
   }
 
   private async processAddresses() {
@@ -367,8 +421,16 @@ export class LocationMapComponent implements OnInit, OnChanges {
     if (!this.map || !this.L || this.markers.length === 0) return;
 
     setTimeout(() => {
-      const group = this.L.featureGroup(this.markers);
-      this.map.fitBounds(group.getBounds(), { padding: [50, 50] });
+      if (this.markers.length === 1) {
+        // Para una sola ubicación, centrar con zoom apropiado
+        const marker = this.markers[0];
+        const latLng = marker.getLatLng();
+        this.map.setView(latLng, 13); // Zoom 13 es bueno para ciudades
+      } else {
+        // Para múltiples ubicaciones, ajustar bounds
+        const group = this.L.featureGroup(this.markers);
+        this.map.fitBounds(group.getBounds(), { padding: [50, 50] });
+      }
     }, 500);
   }
 }

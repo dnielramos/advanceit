@@ -19,6 +19,24 @@
       <fa-icon [icon]="faRotateRight"></fa-icon>
       <span class="hidden md:block">{{ textoBotonActualizar }}</span>
     </button>
+    
+    <!-- Botones de cambio de vista -->
+    <div *ngIf="showViewToggle" class="flex items-center bg-gray-200 rounded-full p-1">
+      <button (click)="changeView('grid')" [ngClass]="
+              currentView === 'grid'
+                ? 'bg-purple-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-300'
+            " class="px-3 py-2 rounded-full transition-colors duration-300">
+        <fa-icon [icon]="faTh"></fa-icon>
+      </button>
+      <button (click)="changeView('list')" [ngClass]="
+              currentView === 'list'
+                ? 'bg-purple-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-300'
+            " class="px-3 py-2 rounded-full transition-colors duration-300">
+        <fa-icon [icon]="faList"></fa-icon>
+      </button>
+    </div>
   </div>
 </header>
 

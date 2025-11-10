@@ -22,6 +22,7 @@ import { UserViewModalComponent } from './user-view-modal/user-view-modal.compon
 import { UserEditModalComponent } from './user-edit-modal/user-edit-modal.component';
 import { User } from '../../../models/user';
 import { UserAddModalComponent } from './user-add-modal/user-add-modal.component';
+import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 
 interface UserState {
   users: User[];
@@ -31,6 +32,7 @@ interface UserState {
   showAddModal: boolean;
   viewMode: 'grid' | 'list';
   searchTerm: string;
+  roleFilter: string;
   loading: boolean;
   error: string | null;
 }
@@ -44,8 +46,9 @@ interface UserState {
     FontAwesomeModule,
     UserViewModalComponent,
     UserEditModalComponent,
-    UserAddModalComponent
-  ],
+    UserAddModalComponent,
+    HeaderCrudComponent
+],
   providers: [UsersService],
   templateUrl: './user-list.component.html',
 })
@@ -68,19 +71,26 @@ export class UserListComponent {
     showAddModal: false,
     viewMode: 'grid',
     searchTerm: '',
+    roleFilter: '',
     loading: true,
     error: null,
   });
 
+  // Roles disponibles para filtrar
+  availableRoles: string[] = ['user', 'admin', 'cashier', 'warehouse'];
+
   filteredUsers = computed(() => {
     const users = this.state().users;
     const term = this.state().searchTerm.toLowerCase();
-    if (!term) return users;
-    return users.filter(
-      (user) =>
+    const roleFilter = this.state().roleFilter;
+    
+    return users.filter((user) => {
+      const matchesText = !term || 
         user.name.toLowerCase().includes(term) ||
-        user.email.toLowerCase().includes(term)
-    );
+        user.email.toLowerCase().includes(term);
+      const matchesRole = !roleFilter || user.type === roleFilter;
+      return matchesText && matchesRole;
+    });
   });
 
   constructor(private usersService: UsersService, library: FaIconLibrary) {
@@ -117,6 +127,22 @@ export class UserListComponent {
 
   updateSearchTerm(term: string): void {
     this.state.update((s) => ({ ...s, searchTerm: term }));
+  }
+
+  handleFilterChange(filters: { texto: string; estado: string }): void {
+    this.state.update((s) => ({ 
+      ...s, 
+      searchTerm: filters.texto,
+      roleFilter: filters.estado 
+    }));
+  }
+
+  handleClearFilters(): void {
+    this.state.update((s) => ({ 
+      ...s, 
+      searchTerm: '',
+      roleFilter: '' 
+    }));
   }
 
   setViewMode(mode: 'grid' | 'list'): void {
@@ -156,5 +182,9 @@ export class UserListComponent {
       selectedUser: null,
     }));
     if (refresh) this.loadUsers();
+  }
+
+  handleViewChange(mode: 'grid' | 'list'): void {
+    this.setViewMode(mode);
   }
 }

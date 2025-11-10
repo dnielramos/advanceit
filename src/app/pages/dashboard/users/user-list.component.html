@@ -1,53 +1,17 @@
 <div class="bg-gray-200 font-sans">
   <div class="container min-w-full">
     <div class=" rounded-2xl shadow-xl p-6 flex flex-col h-[calc(100vh-4rem)]">
-      <!-- CABECERA -->
-      <header class="mb-6 pb-4 border-b border-gray-200">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <h2 class="text-2xl font-extrabold text-gray-900">
-            Gestión de Usuarios
-          </h2>
-          <div class="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
-            <!-- Búsqueda -->
-            <div class="relative flex-grow">
-              <input type="text" [ngModel]="state().searchTerm" (ngModelChange)="updateSearchTerm($event)"
-                placeholder="Buscar nombre o email..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
-
-              <fa-icon [icon]="faSearch" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
-            </div>
-
-            <!-- Botón para agregar usuario - Nuevo -->
-            <button (click)="openAddModal()"
-              class="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-4 py-2.5 rounded-xl hover:from-purple-700 hover:to-purple-900 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-              <fa-icon [icon]="faUserPlus"></fa-icon>
-              <span class="hidden sm:inline font-medium">Agregar Usuario</span>
-              <span class="sm:hidden">Nuevo</span>
-            </button>
-
-            <!-- Vista Grid / Lista -->
-            <div class="flex items-center bg-gray-200 rounded-full p-1">
-              <button (click)="setViewMode('grid')" [ngClass]="
-                      state().viewMode === 'grid'
-                        ? 'bg-purple-600 text-white shadow-md'
-                        : 'text-gray-600 hover:bg-gray-300'
-                    " class="px-3 py-2 rounded-full transition-colors duration-300">
-                <fa-icon [icon]="faTh"></fa-icon>
-              </button>
-              <button (click)="setViewMode('list')" [ngClass]="
-                      state().viewMode === 'list'
-                        ? 'bg-purple-600 text-white shadow-md'
-                        : 'text-gray-600 hover:bg-gray-300'
-                    " class="px-3 py-2 rounded-full transition-colors duration-300">
-                <fa-icon [icon]="faList"></fa-icon>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <!-- HEADER CRUD ESTÁNDAR -->
+      <app-header-crud titulo="Usuarios" descripcion="Gestiona los usuarios del sistema"
+        textoBotonNuevo="Agregar Usuario" textoBotonActualizar="Actualizar" [filterByStatus]="true"
+        [filterStatusValues]="availableRoles" placeholderInput="Buscar por nombre o email..." [showViewToggle]="true"
+        [currentView]="state().viewMode" (crear)="openAddModal()" (actualizar)="loadUsers()"
+        (filterChange)="handleFilterChange($event)" (clearFilters)="handleClearFilters()"
+        (viewChange)="handleViewChange($event)">
+      </app-header-crud>
 
       <!-- CONTENIDO PRINCIPAL -->
-      <main class="flex-grow overflow-y-auto pr-2 custom-scrollbar">
+      <main class="flex-grow overflow-y-auto pr-2 pt-4 scroll-purple">
         <!-- Cargando -->
         @if (state().loading) {
         <div class="flex justify-center items-center h-full text-purple-600 animate-spin">

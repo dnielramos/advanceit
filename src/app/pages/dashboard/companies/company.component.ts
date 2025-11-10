@@ -8,6 +8,7 @@ import { CompanyDetailModalComponent } from "./company-detail-modal.component";
 import { CompanyEditModalComponent } from "./company-edit-modal";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 
 // ===== Listado principal =====
 @Component({
@@ -20,32 +21,26 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
     ReactiveFormsModule,
     FontAwesomeModule,
     CompanyDetailModalComponent,
-    CompanyEditModalComponent
+    CompanyEditModalComponent,
+    HeaderCrudComponent
   ],
   template: `
-    <section class="hflexy animate__animated animate__fadeIn bg-gradient-to-b from-purple-50 to-white">
+    <section class="hflexy animate__animated animate__fadeIn bg-slate-50">
       <div class="max-w-7xl mx-auto p-4 md:p-8">
 
-        <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 class="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-orange-800">Gestión de Empresas</h1>
-            <p class="text-gray-500">Gestiona las empresas que pueden comprar en tu plataforma.</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button class="btn-primary" (click)="openCreate()"><fa-icon [icon]="faPlus"></fa-icon> Nueva empresa</button>
-            <button class="btn-secondary" (click)="refresh()"><fa-icon [icon]="faRotateRight"></fa-icon> Actualizar</button>
-          </div>
-        </header>
-
-        <div class="mt-6 rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
-          <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-            <div class="flex-1 flex items-center gap-2 bg-gray-50 rounded-xl px-3">
-              <fa-icon [icon]="faSearch" class="text-gray-400"></fa-icon>
-              <input [(ngModel)]="query" (ngModelChange)="onQueryChange()" placeholder="Buscar por razón social o NIT" class="w-full bg-transparent py-2 focus:outline-none" />
-            </div>
-            <div class="text-sm text-gray-500">{{ filtered().length }} resultados</div>
-          </div>
-        </div>
+        <app-header-crud
+          titulo="Empresas"
+          descripcion="Gestiona las empresas que pueden comprar en tu plataforma"
+          textoBotonNuevo="Nueva Empresa"
+          textoBotonActualizar="Actualizar"
+          [filterByStatus]="true"
+          [filterStatusValues]="availableStates"
+          placeholderInput="Buscar por razón social o NIT..."
+          (crear)="openCreate()"
+          (actualizar)="refresh()"
+          (filterChange)="handleFilterChange($event)"
+          (clearFilters)="handleClearFilters()">
+        </app-header-crud>
 
         <div class="mt-6 overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow">
           <table class="min-w-full text-sm">
@@ -118,9 +113,13 @@ export class CompanyComponent {
   // === Properties ===
   data = signal<Company[]>([]);
   loading = signal<boolean>(false);
-  query = '';
+  query = signal<string>('');
+  estadoFilter = signal<string>('');
   page = signal<number>(0);
   pageSize = signal<number>(10);
+
+  // Estados disponibles para filtrar
+  availableStates: string[] = ['ACTIVO', 'INACTIVO'];
 
   // Modales
   showDetail = signal<boolean>(false);
@@ -130,10 +129,15 @@ export class CompanyComponent {
 
   // === Computed properties ===
   filtered = computed(() => {
-    const q = (this.query || '').toLowerCase().trim();
+    const q = (this.query() || '').toLowerCase().trim();
+    const estado = this.estadoFilter();
     const list = this.data();
-    if (!q) return list;
-    return list.filter(c => c.razon_social.toLowerCase().includes(q) || c.nit.toLowerCase().includes(q));
+    
+    return list.filter(c => {
+      const matchesText = !q || c.razon_social.toLowerCase().includes(q) || c.nit.toLowerCase().includes(q);
+      const matchesState = !estado || c.estado === estado;
+      return matchesText && matchesState;
+    });
   });
 
   totalPages = computed(() => Math.max(1, Math.ceil(this.filtered().length / this.pageSize())));
@@ -159,6 +163,18 @@ export class CompanyComponent {
 
   // === Methods ===
   onQueryChange() { this.page.set(0); }
+
+  handleFilterChange(filters: { texto: string; estado: string }): void {
+    this.query.set(filters.texto);
+    this.estadoFilter.set(filters.estado);
+    this.page.set(0);
+  }
+
+  handleClearFilters(): void {
+    this.query.set('');
+    this.estadoFilter.set('');
+    this.page.set(0);
+  }
 
   fetchAll() {
     this.loading.set(true);

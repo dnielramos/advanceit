@@ -1,4 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -25,6 +26,7 @@ import { ManageRmaModalComponent } from './manage-rma-modal/manage-rma-modal.com
 })
 export class RmaManagerComponent implements OnInit {
   private readonly rmaService = inject(RmasService);
+  private readonly router = inject(Router);
 
   // Iconos
   faSpinner = faSpinner;
@@ -142,7 +144,8 @@ export class RmaManagerComponent implements OnInit {
   }
 
   openCreateModal(): void {
-    this.showCreateModal.set(true);
+    // Redirigir a la nueva ruta de creación de solicitudes
+    this.router.navigate(['/dashboard/rmas/nueva']);
   }
 
   closeCreateModal(): void {

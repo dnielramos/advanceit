@@ -51,7 +51,6 @@ export class CreateRmaModalComponent implements OnInit {
     this.createForm = this.fb.group({
       request_type: ['rma', [Validators.required]],
       company_id: ['', [Validators.required]],
-      order_id: [''],
       motivo: [''],
       // Para traslados
       new_user: [''],
@@ -275,12 +274,6 @@ export class CreateRmaModalComponent implements OnInit {
 
     const formValue = this.createForm.value;
     
-    // Validar campos según tipo de solicitud
-    if (!formValue.order_id || formValue.order_id.length < 5) {
-      this.error.set('El ID del pedido debe tener al menos 5 caracteres.');
-      return;
-    }
-
     if (!formValue.motivo || formValue.motivo.length < 10) {
       this.error.set('El motivo debe tener al menos 10 caracteres.');
       return;
@@ -306,7 +299,7 @@ export class CreateRmaModalComponent implements OnInit {
     console.log('📦 Items a enviar:', items);
 
     const dto: CreateRmaDto = {
-      order_id: formValue.order_id,
+      order_id: 'system',
       motivo: formValue.motivo,
       items: items,
     };

@@ -1,0 +1,136 @@
+<div class="min-h-[calc(100vh-80px)] bg-slate-50 p-4 md:p-6">
+  <div class="max-w-6xl mx-auto bg-white rounded-lg shadow border border-gray-200">
+    <!-- Header page -->
+    <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-6 rounded-t-lg">
+      <h1 class="text-2xl font-bold">Nueva Solicitud</h1>
+      <p class="text-sm text-purple-100 mt-1">
+        {{ requestType() === 'rma' ? 'Devolución (RMA)' : 'Traslado de Equipo' }}
+      </p>
+    </div>
+
+    <div class="p-6">
+      @if (error(); as errorMsg) {
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 rounded-lg mb-4" role="alert">
+          <span class="font-medium">Error:</span> {{ errorMsg }}
+        </div>
+      }
+
+      <form [formGroup]="createForm" (ngSubmit)="handleSubmit()" class="space-y-6">
+        <!-- Tipo de Solicitud -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <label class="block text-sm font-medium text-gray-700 mb-3">
+            Tipo de Solicitud <span class="text-red-500">*</span>
+          </label>
+          <div class="flex flex-wrap gap-6">
+            <label class="flex items-center cursor-pointer">
+              <input type="radio" formControlName="request_type" value="rma" class="w-4 h-4 text-purple-600 focus:ring-purple-500" />
+              <span class="ml-2 text-sm text-gray-700">Devolución (RMA)</span>
+            </label>
+            <label class="flex items-center cursor-pointer">
+              <input type="radio" formControlName="request_type" value="transfer" class="w-4 h-4 text-purple-600 focus:ring-purple-500" />
+              <span class="ml-2 text-sm text-gray-700">Traslado de Equipo</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Empresa -->
+        <div>
+          <label for="company_id" class="block text-sm font-medium text-gray-700 mb-1">Empresa <span class="text-red-500">*</span></label>
+          <select id="company_id" formControlName="company_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm">
+            <option value="">Selecciona una empresa...</option>
+            @for (company of companies(); track company.id) {
+              <option [value]="company.id">{{ company.razon_social }} ({{ company.nit }})</option>
+            }
+          </select>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Inventario -->
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Inventario Disponible</h3>
+
+            @if (!isCompanySelected()) {
+              <div class="text-center py-8 text-gray-500">Selecciona una empresa para ver su inventario</div>
+            } @else if (isLoading()) {
+              <div class="flex justify-center items-center py-8">
+                <fa-icon [icon]="faSpinner" class="text-purple-600 text-2xl animate-spin"></fa-icon>
+                <span class="ml-3 text-gray-700">Cargando inventario...</span>
+              </div>
+            } @else if (!hasInventory()) {
+              <div class="text-center py-8 text-gray-500">No hay productos en el inventario de esta empresa</div>
+            } @else {
+              <div class="space-y-2 max-h-[28rem] overflow-y-auto">
+                @for (product of inventory(); track $index) {
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900">{{ product.name || product.product_name || 'Sin nombre' }}</p>
+                      <p class="text-xs text-gray-500">SKU: {{ product.sku || product.id || product._id || 'N/A' }}</p>
+                      @if (product.serial) { <p class="text-xs text-gray-500">Serial: {{ product.serial }}</p> }
+                      @if (product.current_user) { <p class="text-xs text-purple-600">Usuario: {{ product.current_user }}</p> }
+                      @if (product.location) { <p class="text-xs text-gray-500">Ubicación: {{ product.location }}</p> }
+                    </div>
+                    <button type="button" (click)="addProduct(product)" class="ml-2 p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">+ Agregar</button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Seleccionados -->
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Productos Seleccionados</h3>
+            @if (selectedProducts().length === 0) {
+              <div class="text-center py-8 text-gray-500">No has seleccionado productos</div>
+            } @else {
+              <div class="space-y-2 max-h-[28rem] overflow-y-auto">
+                @for (product of selectedProducts(); track $index) {
+                  <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900">{{ product.name || product.product_name || 'Sin nombre' }}</p>
+                      <p class="text-xs text-gray-500">SKU: {{ product.sku || product.id || product._id || 'N/A' }}</p>
+                      <div class="flex items-center mt-2 space-x-2">
+                        <label class="text-xs text-gray-600">Cantidad:</label>
+                        <input type="number" min="1" [value]="product.quantity" (input)="updateProductQuantity(product.id || product._id || product.sku, +$any($event.target).value)" class="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:border-purple-500 focus:ring-purple-500" />
+                      </div>
+                    </div>
+                    <button type="button" (click)="removeProduct(product.id || product._id || product.sku)" class="ml-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Eliminar</button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Información de la Solicitud -->
+        <div class="space-y-4">
+          <div>
+            <label for="create_motivo" class="block text-sm font-medium text-gray-700 mb-1">Motivo <span class="text-red-500">*</span></label>
+            <textarea id="create_motivo" formControlName="motivo" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" [placeholder]="requestType() === 'rma' ? 'Describe el motivo de la devolución... (mínimo 10 caracteres)' : 'Describe el motivo del traslado... (mínimo 10 caracteres)'"></textarea>
+          </div>
+
+          @if (requestType() === 'transfer') {
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
+              <div>
+                <label for="new_user" class="block text-sm font-medium text-gray-700 mb-1">Nuevo Usuario <span class="text-red-500">*</span></label>
+                <input type="text" id="new_user" formControlName="new_user" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" placeholder="Nombre del nuevo usuario" />
+              </div>
+              <div>
+                <label for="new_location" class="block text-sm font-medium text-gray-700 mb-1">Nueva Ubicación <span class="text-red-500">*</span></label>
+                <input type="text" id="new_location" formControlName="new_location" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" placeholder="Nueva ubicación del equipo" />
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end space-x-3 pt-4 border-t">
+          <button type="submit" [disabled]="isLoading()" class="inline-flex items-center space-x-2 bg-purple-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (isLoading()) { <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon> } @else { <fa-icon [icon]="faPaperPlane"></fa-icon> }
+            <span>{{ isLoading() ? 'Creando...' : 'Crear Solicitud' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

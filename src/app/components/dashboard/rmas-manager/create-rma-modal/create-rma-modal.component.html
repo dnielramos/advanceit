@@ -1,7 +1,7 @@
 <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 lg:pl-52 overflow-y-auto">
   <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full my-8">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-6 flex justify-between items-center sticky top-0 z-10">
+    <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-6 flex justify-between items-center rounded-t-lg border-b border-purple-700/40">
       <div>
         <h2 class="text-2xl font-bold">Nueva Solicitud</h2>
         <p class="text-sm text-purple-100 mt-1">
@@ -164,19 +164,6 @@
         <!-- Información de la Solicitud -->
         <div class="space-y-4">
           <div>
-            <label for="order_id" class="block text-sm font-medium text-gray-700 mb-1">
-              ID del Pedido / Referencia <span class="text-red-500">*</span>
-            </label>
-            <input 
-              type="text" 
-              id="order_id" 
-              formControlName="order_id" 
-              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" 
-              placeholder="Ej: ORD-12345 (mínimo 5 caracteres)" 
-            />
-          </div>
-
-          <div>
             <label for="create_motivo" class="block text-sm font-medium text-gray-700 mb-1">
               Motivo <span class="text-red-500">*</span>
             </label>
@@ -185,8 +172,7 @@
               formControlName="motivo" 
               rows="3" 
               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" 
-              [placeholder]="requestType() === 'rma' ? 'Describe el motivo de la devolución... (mínimo 10 caracteres)' : 'Describe el motivo del traslado... (mínimo 10 caracteres)'">
-            </textarea>
+              [placeholder]="requestType() === 'rma' ? 'Describe el motivo de la devolución... (mínimo 10 caracteres)' : 'Describe el motivo del traslado... (mínimo 10 caracteres)'"></textarea>
           </div>
 
           <!-- Campos adicionales para traslados -->

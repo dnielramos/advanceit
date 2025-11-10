@@ -92,6 +92,13 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
+        path: 'rmas/nueva',
+        loadComponent: () =>
+          import('../pages/dashboard/rmas/create-rma/create-rma.component').then(
+            (m) => m.CreateRmaComponent
+          ),
+      },
+      {
         path: 'cotizaciones',
         loadComponent: () =>
           import('../pages/dashboard/quotations/quotation.component').then(

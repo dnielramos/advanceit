@@ -22,14 +22,6 @@
         </div>
       }
 
-      <!-- Loading -->
-      @if (isLoading()) {
-        <div class="flex justify-center items-center p-8">
-          <fa-icon [icon]="faSpinner" class="text-purple-600 text-3xl animate-spin"></fa-icon>
-          <span class="ml-3 text-lg text-gray-700">Cargando...</span>
-        </div>
-      }
-
       <!-- Form -->
       <form [formGroup]="createForm" (ngSubmit)="handleSubmit()" class="space-y-6">
         
@@ -90,28 +82,37 @@
               <div class="text-center py-8 text-gray-500">
                 <p>Selecciona una empresa para ver su inventario</p>
               </div>
+            } @else if (isLoading()) {
+              <div class="flex justify-center items-center py-8">
+                <fa-icon [icon]="faSpinner" class="text-purple-600 text-2xl animate-spin"></fa-icon>
+                <span class="ml-3 text-gray-700">Cargando inventario...</span>
+              </div>
             } @else if (!hasInventory()) {
               <div class="text-center py-8 text-gray-500">
                 <p>No hay productos en el inventario de esta empresa</p>
               </div>
             } @else {
               <div class="space-y-2 max-h-96 overflow-y-auto">
-                @for (product of inventory(); track product.id) {
+                @for (product of inventory(); track $index) {
                   <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <div class="flex-1">
-                      <p class="text-sm font-medium text-gray-900">{{ product.name || product.product_name }}</p>
-                      <p class="text-xs text-gray-500">SKU: {{ product.sku || product.id }}</p>
+                      <p class="text-sm font-medium text-gray-900">{{ product.name || product.product_name || 'Sin nombre' }}</p>
+                      <p class="text-xs text-gray-500">SKU: {{ product.sku || product.id || product._id || 'N/A' }}</p>
                       @if (product.serial) {
                         <p class="text-xs text-gray-500">Serial: {{ product.serial }}</p>
                       }
                       @if (product.current_user) {
                         <p class="text-xs text-purple-600">Usuario: {{ product.current_user }}</p>
                       }
+                      @if (product.location) {
+                        <p class="text-xs text-gray-500">Ubicación: {{ product.location }}</p>
+                      }
                     </div>
                     <button 
                       type="button"
                       (click)="addProduct(product)"
-                      class="ml-2 p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                      class="ml-2 p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      title="Agregar producto">
                       <fa-icon [icon]="faPlus"></fa-icon>
                     </button>
                   </div>
@@ -130,26 +131,27 @@
               </div>
             } @else {
               <div class="space-y-2 max-h-96 overflow-y-auto">
-                @for (product of selectedProducts(); track product.id) {
+                @for (product of selectedProducts(); track $index) {
                   <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                     <div class="flex-1">
-                      <p class="text-sm font-medium text-gray-900">{{ product.name || product.product_name }}</p>
-                      <p class="text-xs text-gray-500">SKU: {{ product.sku || product.id }}</p>
+                      <p class="text-sm font-medium text-gray-900">{{ product.name || product.product_name || 'Sin nombre' }}</p>
+                      <p class="text-xs text-gray-500">SKU: {{ product.sku || product.id || product._id || 'N/A' }}</p>
                       <div class="flex items-center mt-2 space-x-2">
                         <label class="text-xs text-gray-600">Cantidad:</label>
                         <input 
                           type="number" 
                           min="1"
                           [value]="product.quantity"
-                          (input)="updateProductQuantity(product.id, +$any($event.target).value)"
+                          (input)="updateProductQuantity(product.id || product._id || product.sku, +$any($event.target).value)"
                           class="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:border-purple-500 focus:ring-purple-500"
                         />
                       </div>
                     </div>
                     <button 
                       type="button"
-                      (click)="removeProduct(product.id)"
-                      class="ml-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                      (click)="removeProduct(product.id || product._id || product.sku)"
+                      class="ml-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                      title="Eliminar producto">
                       <fa-icon [icon]="faTrash"></fa-icon>
                     </button>
                   </div>
@@ -170,11 +172,8 @@
               id="order_id" 
               formControlName="order_id" 
               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" 
-              placeholder="Ej: ORD-12345" 
+              placeholder="Ej: ORD-12345 (mínimo 5 caracteres)" 
             />
-            @if (createForm.get('order_id')?.touched && createForm.get('order_id')?.hasError('required')) {
-              <p class="mt-1 text-xs text-red-600">El ID del pedido es obligatorio.</p>
-            }
           </div>
 
           <div>
@@ -186,11 +185,8 @@
               formControlName="motivo" 
               rows="3" 
               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm" 
-              [placeholder]="requestType() === 'rma' ? 'Describe el motivo de la devolución...' : 'Describe el motivo del traslado...'">
+              [placeholder]="requestType() === 'rma' ? 'Describe el motivo de la devolución... (mínimo 10 caracteres)' : 'Describe el motivo del traslado... (mínimo 10 caracteres)'">
             </textarea>
-            @if (createForm.get('motivo')?.touched && createForm.get('motivo')?.hasError('required')) {
-              <p class="mt-1 text-xs text-red-600">El motivo es obligatorio.</p>
-            }
           </div>
 
           <!-- Campos adicionales para traslados -->
@@ -242,7 +238,7 @@
           </button>
           <button 
             type="submit" 
-            [disabled]="createForm.invalid || isLoading() || selectedProducts().length === 0" 
+            [disabled]="isLoading()" 
             class="inline-flex items-center space-x-2 bg-purple-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
             @if (isLoading()) {
               <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>

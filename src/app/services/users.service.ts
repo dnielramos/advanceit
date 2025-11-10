@@ -12,7 +12,14 @@ export interface CreateUserDto {
   name: string;
   email: string;
   password?: string;
-  role?: Role; // Usa los roles que tienes en tu backend
+  role?: Role; 
+  address?: string;
+  country?: string;
+  city?: string;
+  company?: string;
+  picture?: string;
+  type?: Role;
+  telephone?: string;
 }
 
 export interface UpdateUserDto {

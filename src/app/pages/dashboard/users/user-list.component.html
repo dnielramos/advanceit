@@ -17,6 +17,14 @@
               <fa-icon [icon]="faSearch" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
             </div>
 
+            <!-- Botón para agregar usuario - Nuevo -->
+            <button (click)="openAddModal()"
+              class="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-4 py-2.5 rounded-xl hover:from-purple-700 hover:to-purple-900 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+              <fa-icon [icon]="faUserPlus"></fa-icon>
+              <span class="hidden sm:inline font-medium">Agregar Usuario</span>
+              <span class="sm:hidden">Nuevo</span>
+            </button>
+
             <!-- Vista Grid / Lista -->
             <div class="flex items-center bg-gray-200 rounded-full p-1">
               <button (click)="setViewMode('grid')" [ngClass]="
@@ -155,4 +163,6 @@
 <app-user-view-modal [user]="state().selectedUser" (closeModal)="closeModal()"></app-user-view-modal>
 } @if (state().showEditModal) {
 <app-user-edit-modal [user]="state().selectedUser" (closeModal)="closeModal(true)"></app-user-edit-modal>
+} @if (state().showAddModal) {
+<app-user-add-modal (closeModalEvent)="closeModal(true)"></app-user-add-modal>
 }

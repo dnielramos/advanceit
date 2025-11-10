@@ -1,0 +1,187 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm animate__animated animate__fadeIn">
+  <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl">
+    <!-- Header con gradiente profesional -->
+    <div class="bg-gradient-to-r from-purple-700 to-purple-900 text-white p-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="bg-white bg-opacity-20 backdrop-blur-sm p-2 rounded-xl">
+            <fa-icon [icon]="faUserPlus" class="text-2xl text-white"></fa-icon>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold tracking-tight">Nuevo Usuario</h2>
+            <p class="text-purple-100 text-sm">Completa los datos para crear un nuevo usuario</p>
+          </div>
+        </div>
+        <button (click)="closeModal()" class="text-white hover:text-purple-200 transition-colors p-2 rounded-full hover:bg-white hover:bg-opacity-10 backdrop-blur-sm">
+          <fa-icon [icon]="faTimes" class="text-xl"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario con scroll suave -->
+    <div class="p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Sección de Información Personal -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+          <div class="flex items-center mb-4">
+            <div class="bg-purple-100 p-2 rounded-lg mr-3">
+              <fa-icon [icon]="faUser" class="text-purple-600"></fa-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800">Información Personal</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Nombre completo</label>
+              <div class="relative">
+                <fa-icon [icon]="faUser" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                <input formControlName="name" type="text" 
+                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                  placeholder="Juan Pérez">
+              </div>
+              @if (userForm.get('name')?.invalid && userForm.get('name')?.touched) {
+                <p class="mt-1 text-xs text-red-500">El nombre es requerido</p>
+              }
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+              <div class="relative">
+                <fa-icon [icon]="faEnvelope" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                <input formControlName="email" type="email" 
+                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                  placeholder="juan.perez@email.com">
+              </div>
+              @if (userForm.get('email')?.invalid && (userForm.get('email')?.touched || userForm.get('email')?.dirty)) {
+                <p class="mt-1 text-xs text-red-500">Email inválido</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Contacto -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+          <div class="flex items-center mb-4">
+            <div class="bg-purple-100 p-2 rounded-lg mr-3">
+              <fa-icon [icon]="faPhone" class="text-purple-600"></fa-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800">Contacto</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+              <div class="relative">
+                <fa-icon [icon]="faPhone" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                <input formControlName="telephone" type="tel" 
+                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                  placeholder="+57 300 123 4567">
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">País</label>
+              <div class="relative">
+                <fa-icon [icon]="faGlobe" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                <input formControlName="country" type="text" 
+                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                  placeholder="Colombia">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Dirección -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+          <div class="flex items-center mb-4">
+            <div class="bg-purple-100 p-2 rounded-lg mr-3">
+              <fa-icon [icon]="faMapMarkerAlt" class="text-purple-600"></fa-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800">Dirección</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Ciudad</label>
+              <div class="relative">
+                <fa-icon [icon]="faCity" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                <input formControlName="city" type="text" 
+                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                  placeholder="Bogotá">
+              </div>
+            </div>
+            
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-1">Dirección</label>
+              <div class="relative">
+                <fa-icon [icon]="faMapMarkerAlt" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                <input formControlName="address" type="text" 
+                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                  placeholder="Calle 123 #45-67">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Empresa y Rol -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+          <div class="flex items-center mb-4">
+            <div class="bg-purple-100 p-2 rounded-lg mr-3">
+              <fa-icon [icon]="faBuilding" class="text-purple-600"></fa-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800">Empresa y Rol</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Empresa</label>
+              <div class="relative">
+                <fa-icon [icon]="faBuilding" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                <input formControlName="company" type="text" 
+                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                  placeholder="Empresa S.A.">
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Rol</label>
+              <div class="relative">
+                <fa-icon [icon]="faShieldAlt" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                <select formControlName="type" 
+                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 appearance-none bg-white">
+                  <option value="user">Usuario</option>
+                  <option value="cashier">Cajero</option>
+                  <option value="warehouse">Bodeguero</option>
+                  <option value="admin">Administrador</option>
+                </select>
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <fa-icon [icon]="faChevronDown" class="text-slate-400"></fa-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer con acciones -->
+    <div class="bg-slate-50 border-t border-slate-200 p-4 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+      <button (click)="closeModal()" 
+        class="w-full sm:w-auto px-6 py-3 border border-slate-300 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-all duration-300 flex items-center justify-center space-x-2">
+        <fa-icon [icon]="faTimes"></fa-icon>
+        <span>Cancelar</span>
+      </button>
+      
+      <button (click)="onSubmit()" [disabled]="userForm.invalid || loading()" 
+        class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-xl font-medium hover:from-purple-700 hover:to-purple-900 transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:from-purple-600 disabled:hover:to-purple-800">
+        @if (loading() == true) {
+          <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
+          <span>Creando...</span>
+        } @else {
+          <fa-icon [icon]="faPlus"></fa-icon>
+          <span>Crear Usuario</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

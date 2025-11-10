@@ -1,7 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { QuotationService } from '../../../../services/quotation.service';
-import { PopulatedQuotation, Quotation, QuotationStatus } from '../../../../models/quotation.types';
-import { faPlus, faFileInvoice, faEye, faEdit, faCheckCircle, faTrashAlt, faTimes, faUser, faDollarSign, faCalendarAlt, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
+import {
+  PopulatedQuotation,
+  Quotation,
+  QuotationStatus,
+} from '../../../../models/quotation.types';
+import {
+  faPlus,
+  faFileInvoice,
+  faEye,
+  faEdit,
+  faCheckCircle,
+  faTrashAlt,
+  faTimes,
+  faUser,
+  faDollarSign,
+  faCalendarAlt,
+  faBoxOpen,
+} from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { QuotationFormComponent } from '../quotation-form/quotation-form.component';
 import { QuotationDetailComponent } from '../../quotations/quotation-detail/quotation-detail.component';
@@ -12,20 +28,26 @@ import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 
-
 @Component({
-  imports: [QuotationFormComponent, QuotationDetailComponent, QuotationCreateComponent, CommonModule, FontAwesomeModule, AngularToastifyModule],
+  imports: [
+    QuotationFormComponent,
+    QuotationDetailComponent,
+    QuotationCreateComponent,
+    CommonModule,
+    FontAwesomeModule,
+    AngularToastifyModule,
+  ],
   selector: 'app-quotation-list',
   templateUrl: './quotation-list.component.html',
 })
 export class QuotationListComponent implements OnInit {
-confirmDeletion(arg0: any) {
-throw new Error('Method not implemented.');
-}
-openStatusModal(arg0: any) {
-throw new Error('Method not implemented.');
-}
-  quotations: PopulatedQuotation[] = [];
+  confirmDeletion(arg0: any) {
+    throw new Error('Method not implemented.');
+  }
+  openStatusModal(arg0: any) {
+    throw new Error('Method not implemented.');
+  }
+  @Input({ required: true }) quotations: PopulatedQuotation[] = [];
   isLoading = true;
   isModalOpen = false;
   currentModal: 'create' | 'edit' | 'details' | 'status' | null = null;
@@ -33,7 +55,7 @@ throw new Error('Method not implemented.');
   modalTitle = '';
 
   //icons
-  toastQuotation : any;
+  toastQuotation: any;
 
   faPlus = faPlus;
   faFileInvoice = faFileInvoice;
@@ -47,8 +69,11 @@ throw new Error('Method not implemented.');
   faCalendarAlt = faCalendarAlt;
   faBoxOpen = faBoxOpen;
 
-  constructor(private quotationService: QuotationService, private router: Router, private toastService: ToastService) {
-
+  constructor(
+    private quotationService: QuotationService,
+    private router: Router,
+    private toastService: ToastService
+  ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state) {
       this.toastQuotation = navigation.extras.state;
@@ -56,12 +81,12 @@ throw new Error('Method not implemented.');
   }
 
   ngOnInit(): void {
-    this.fetchQuotations();
 
     if (this.toastQuotation) {
-      this.toastService.success(`Cotización creada exitosamente ${this.toastQuotation.id}`);
+      this.toastService.success(
+        `Cotización creada exitosamente ${this.toastQuotation.id}`
+      );
       this.toastQuotation = null;
-
     }
   }
 
@@ -75,12 +100,8 @@ throw new Error('Method not implemented.');
       error: (err) => {
         console.error('Error fetching quotations:', err);
         this.isLoading = false;
-      }
+      },
     });
-  }
-
-  openCreate(): void {
-   this.router.navigate(['/dashboard/advance-products']);
   }
 
   openEditModal(id: string): void {
@@ -107,7 +128,9 @@ throw new Error('Method not implemented.');
   handleSave(event: any): void {
     // Lógica para manejar el guardado, por ejemplo, cerrar el modal
     console.log('Cotización guardada:', event);
-    alert('Cotización guardada exitosamente. Hemos enviado un correo de confirmación.');
+    alert(
+      'Cotización guardada exitosamente. Hemos enviado un correo de confirmación.'
+    );
     this.closeModal();
   }
 

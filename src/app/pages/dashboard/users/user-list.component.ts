@@ -14,18 +14,21 @@ import {
   faUserSlash,
   faSpinner,
   faTimes,
-  faUsers
+  faUsers,
+  faUserPlus
 } from '@fortawesome/free-solid-svg-icons';
 import { UsersService } from '../../../services/users.service';
 import { UserViewModalComponent } from './user-view-modal/user-view-modal.component';
 import { UserEditModalComponent } from './user-edit-modal/user-edit-modal.component';
 import { User } from '../../../models/user';
+import { UserAddModalComponent } from './user-add-modal/user-add-modal.component';
 
 interface UserState {
   users: User[];
   selectedUser: User | null;
   showViewModal: boolean;
   showEditModal: boolean;
+  showAddModal: boolean;
   viewMode: 'grid' | 'list';
   searchTerm: string;
   loading: boolean;
@@ -41,6 +44,7 @@ interface UserState {
     FontAwesomeModule,
     UserViewModalComponent,
     UserEditModalComponent,
+    UserAddModalComponent
   ],
   providers: [UsersService],
   templateUrl: './user-list.component.html',
@@ -54,12 +58,14 @@ export class UserListComponent {
   faUserSlash = faUserSlash;
   faSpinner = faSpinner;
   faUsers = faUsers;
+  faUserPlus = faUserPlus;
 
   state = signal<UserState>({
     users: [],
     selectedUser: null,
     showViewModal: false,
     showEditModal: false,
+    showAddModal: false,
     viewMode: 'grid',
     searchTerm: '',
     loading: true,
@@ -86,7 +92,8 @@ export class UserListComponent {
       faSearch,
       faUserSlash,
       faSpinner,
-      faTimes
+      faTimes,
+      faUserPlus
     );
   }
 
@@ -116,6 +123,14 @@ export class UserListComponent {
     this.state.update((s) => ({ ...s, viewMode: mode }));
   }
 
+  // Agrega este método para abrir el modal de creación:
+  openAddModal(): void {
+    this.state.update((s) => ({
+      ...s,
+      showAddModal: true,
+    }));
+  }
+
   viewUser(user: User): void {
     this.state.update((s) => ({
       ...s,
@@ -137,6 +152,7 @@ export class UserListComponent {
       ...s,
       showViewModal: false,
       showEditModal: false,
+      showAddModal: false,
       selectedUser: null,
     }));
     if (refresh) this.loadUsers();

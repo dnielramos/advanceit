@@ -1,24 +1,24 @@
 <div
-  class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4 lg:pl-52 animate-fade-in">
+  class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 lg:pl-52 animate-fade-in">
   <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-gray-100">
     <!-- Header con diseño premium -->
     <div
-      class="bg-gradient-to-r from-indigo-700 via-purple-700 to-violet-800 text-white p-6 flex justify-between items-center sticky top-0 z-10 shadow-lg">
+      class="backdrop-blur-sm bg-white text-purple-600 p-6 flex justify-between items-center sticky top-0 z-10">
       <div class="flex flex-col">
         <div class="flex items-center gap-3">
-          <div class="bg-white bg-opacity-20 p-2 rounded-lg">
-            <fa-icon [icon]="faExchangeAlt" class="text-2xl text-white"></fa-icon>
+          <div class="bg-opacity-20 p-2 rounded-lg">
+            <fa-icon [icon]="faExchangeAlt" class="text-2xl text-purple-600"></fa-icon>
           </div>
-          <h2 class="text-2xl font-bold tracking-tight">Gestionar RMA: <span class="text-white/90 font-mono">{{
+          <h2 class="text-2xl font-bold tracking-tight">Gestionar RMA: <span class="text-purple-600 font-mono">{{
               rma.rma_number }}</span></h2>
         </div>
-        <p class="text-sm text-purple-100 mt-2 flex flex-wrap items-center gap-3">
+        <p class="text-sm text-purple-600 mt-2 flex flex-wrap items-center gap-3">
           <span class="flex items-center gap-1">
-            <fa-icon [icon]="faShoppingCart" class="text-purple-200"></fa-icon>
+            <fa-icon [icon]="faShoppingCart" class="text-purple-600"></fa-icon>
             <span class="font-medium">Pedido:</span> {{ rma.order_id }}
           </span>
-          <span class="flex items-center gap-1">
-            <fa-icon [icon]="faCircle" class="text-purple-200 text-xs"></fa-icon>
+          <span class="flex items-center font-bold gap-1">
+            <fa-icon [icon]="faCircle" class="text-purple-500 text-xs"></fa-icon>
             <span class="font-medium">Estado:</span>
             <span class="px-3 py-0.5 rounded-full bg-white bg-opacity-20 backdrop-blur-sm"
               [ngClass]="getStateColor(rma.estado)">
@@ -28,7 +28,7 @@
         </p>
       </div>
       <button (click)="closeModal()"
-        class="text-white hover:text-white/80 transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-purple-700 rounded-lg p-2 bg-white/10 backdrop-blur-sm">
+        class="text-purple-600 hover:text-purple-600/80 transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-purple-700 rounded-lg p-2 bg-white/10 backdrop-blur-sm outline-none">
         <fa-icon [icon]="faTimes" class="text-2xl"></fa-icon>
       </button>
     </div>
@@ -87,7 +87,7 @@
                   </label>
                   <div class="relative">
                     <textarea id="motivo" formControlName="motivo" rows="4"
-                      class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[120px] resize-y hover:border-gray-400"
+                      class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[120px] resize-y hover:border-gray-400 outline-none"
                       placeholder="Describe el motivo de la devolución...">
                     </textarea>
                     <div class="absolute bottom-2 right-2 text-xs text-gray-500 pointer-events-none">
@@ -102,7 +102,7 @@
                     Notas Internas
                   </label>
                   <textarea id="notas" formControlName="notas" rows="3"
-                    class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[100px] hover:border-gray-400"
+                    class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[100px] hover:border-gray-400 outline-none"
                     placeholder="Notas visibles solo para el equipo...">
                   </textarea>
                 </div>
@@ -171,7 +171,7 @@
             </form>
             <div class="bg-gray-50/50 px-6 py-4 border-t border-gray-100">
               <button type="submit" [disabled]="updateDataForm.invalid || isLoading()"
-                class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 w-full md:w-auto">
+                class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 w-full md:w-auto outline-none">
                 @if (isLoading()) {
                 <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                 } @else {
@@ -202,7 +202,7 @@
                   </label>
                   <div class="relative">
                     <select id="nextState" formControlName="nextState"
-                      class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 bg-white hover:border-gray-400 appearance-none">
+                      class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 bg-white hover:border-gray-400 appearance-none outline-none">
                       <option value="" disabled class="text-gray-500">Selecciona un estado...</option>
                       @for (opt of stateOptions; track opt[1]) {
                       <option [value]="opt[1]" class="py-2 px-3 hover:bg-indigo-50">{{ opt[0] }}</option>
@@ -220,7 +220,7 @@
                     Notas del Cambio de Estado
                   </label>
                   <textarea id="stateNotas" formControlName="notas" rows="3"
-                    class="block w-full outline-none rounded-xl border border-gray-300 shadow-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[100px] hover:border-gray-400"
+                    class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-30 sm:text-sm transition-all duration-300 p-3 min-h-[100px] hover:border-gray-400 outline-none"
                     placeholder="Agrega una nota para este cambio de estado...">
                   </textarea>
                 </div>
@@ -228,7 +228,7 @@
             </form>
             <div class="bg-gray-50/50 px-6 py-4 border-t border-gray-100">
               <button type="submit" [disabled]="updateStateForm.invalid || isLoading()"
-                class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 w-full">
+                class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 w-full outline-none">
                 @if (isLoading()) {
                 <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                 } @else {
@@ -253,7 +253,7 @@
                 Esta acción eliminará permanentemente este RMA y no se puede deshacer.
               </p>
               <button (click)="handleDelete()" [disabled]="isLoading()"
-                class="inline-flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-red-600 to-rose-600 text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 group">
+                class="inline-flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-red-600 to-rose-600 text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:-translate-y-0 group outline-none">
                 <fa-icon [icon]="faTrash" class="text-lg group-hover:animate-bounce"></fa-icon>
                 <span class="font-medium text-base">Eliminar RMA</span>
               </button>
@@ -327,5 +327,11 @@
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #8b5cf6;
+  }
+
+  /* Fix adicional para navegadores que no respetan outline-none */
+  input:focus, textarea:focus, select:focus, button:focus {
+    outline: none !important;
+    box-shadow: none !important;
   }
 </style>

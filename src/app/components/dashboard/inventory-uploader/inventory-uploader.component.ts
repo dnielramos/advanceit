@@ -8,6 +8,9 @@ import {
   InventoryPayload,
 } from '../../../services/company-inventories.service';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBuilding } from '@fortawesome/free-solid-svg-icons';
+
 interface CompanyInventory {
   id?: string;
   company: string;
@@ -19,11 +22,13 @@ interface CompanyInventory {
 @Component({
   selector: 'app-inventory-browser',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderCrudComponent],
+  imports: [CommonModule, FormsModule, HeaderCrudComponent, FontAwesomeModule],
   templateUrl: './inventory-uploader.component.html',
 })
 export class InventoryUploaderComponent implements OnInit {
   private inventoriesService = inject(CompanyInventoriesService);
+
+  faBuilding = faBuilding;
 
   // Estado general
   companies = signal<CompanyInventory[]>([]);
@@ -42,6 +47,7 @@ export class InventoryUploaderComponent implements OnInit {
 
   // Dentro de la clase InventoryUploaderComponent
   searchText = signal<string>('');
+  viewMode = signal<'grid' | 'list'>('grid');
   filteredInventory = computed(() => {
     const company = this.selectedCompany();
     const text = this.searchText().toLowerCase().trim();
@@ -207,5 +213,12 @@ export class InventoryUploaderComponent implements OnInit {
 
   closeInventory() {
     this.selectedCompany.set(null);
+  }
+
+  // ======================================================
+  // Cambio de vista
+  // ======================================================
+  handleViewChange(mode: 'grid' | 'list') {
+    this.viewMode.set(mode);
   }
 }

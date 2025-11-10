@@ -98,6 +98,48 @@
               </button>
             </div>
           </form>
+
+          <!-- Productos del RMA (desde evidencias) -->
+          <div class="mt-6 bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div class="p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Productos del RMA</h3>
+              @if (getRmaItems().length === 0) {
+                <div class="text-center py-8 text-gray-500">No hay productos asociados a este RMA.</div>
+              } @else {
+                <div class="space-y-2 max-h-80 overflow-y-auto">
+                  @for (item of getRmaItems(); track item.product_id) {
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div class="flex items-start gap-3">
+                        <div class="mt-1 text-purple-600">
+                          <fa-icon [icon]="faBox"></fa-icon>
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium text-gray-900">{{ item.product_name }}</p>
+                          <div class="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                              <fa-icon [icon]="faHashtag"></fa-icon>
+                              {{ item.product_id }}
+                            </span>
+                            @if (item.serial) {
+                              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                                <fa-icon [icon]="faBarcode"></fa-icon>
+                                {{ item.serial }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                          x{{ item.quantity }}
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
         </div>
 
         <!-- Gestionar Flujo -->

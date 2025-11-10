@@ -8,7 +8,10 @@ import {
   faPaperPlane, 
   faTrash, 
   faSpinner,
-  faExclamationTriangle 
+  faExclamationTriangle,
+  faBox,
+  faBarcode,
+  faHashtag
 } from '@fortawesome/free-solid-svg-icons';
 import { RmasService } from '../../../../services/rmas.service';
 import { Rma, UpdateRmaDataDto } from '../../../../models/rma.model';
@@ -35,6 +38,9 @@ export class ManageRmaModalComponent implements OnInit {
   faTrash = faTrash;
   faSpinner = faSpinner;
   faExclamationTriangle = faExclamationTriangle;
+  faBox = faBox;
+  faBarcode = faBarcode;
+  faHashtag = faHashtag;
 
   // State
   isLoading = signal(false);
@@ -62,6 +68,23 @@ export class ManageRmaModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForms();
+  }
+
+  // Extraer y normalizar productos desde evidencias (puede venir string o array)
+  getRmaItems(): Array<{ product_id: string; product_name: string; quantity: number; serial: string }>{
+    try {
+      const raw = (this.rma as any)?.evidencias;
+      const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!Array.isArray(data)) return [];
+      return data.map((it: any, idx: number) => ({
+        product_id: it.product_id || it.id || `item-${idx}`,
+        product_name: it.product_name || it.name || 'Producto',
+        quantity: Number(it.quantity ?? 1) || 1,
+        serial: it.serial || it.product_id || '',
+      }));
+    } catch {
+      return [];
+    }
   }
 
   initializeForms(): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -71,6 +71,9 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
   currentStep = 1;
   currentDate = new Date();
   private subscriptions = new Subscription();
+  private detailsValueChangesSub?: Subscription;
+  private isLoadingCartProducts = false;
+  private lastCartItemsCount = 0;
 
   // Datos para el resumen
   selectedUser: User | undefined;
@@ -101,7 +104,8 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private toastService: ToastService,
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     const currentUserId = this.authService.getUserId();
 
@@ -138,12 +142,99 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
     return this.quotationForm.get('details') as FormArray;
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   private initializeUserDataAndSubscriptions(): void {
-    // Suscripción a cambios en los productos (siempre activa)
-    const detailsSub = this.details.valueChanges.subscribe(() =>
-      this.recalculateTotals()
-    );
-    this.subscriptions.add(detailsSub);
+    // ✅ SUSCRIPCIÓN AL CARRITO - Cargar productos automáticamente
+    const cartSub = this.cartService.getCart().subscribe((items) => {
+      console.log('🛒 Carrito actualizado, productos recibidos:', items.length);
+      
+      // Evitar cargas duplicadas
+      if (this.isLoadingCartProducts) {
+        console.log('⏭️ Ya está cargando productos, saltando...');
+        return;
+      }
+      
+      // Si el número de productos no cambió, no recargar
+      if (items.length === this.lastCartItemsCount && items.length === this.details.length) {
+        console.log('⏭️ No hay cambios en el carrito, saltando recarga...');
+        return;
+      }
+      
+      this.isLoadingCartProducts = true;
+      this.lastCartItemsCount = items.length;
+      
+      // DESUSCRIBIRSE temporalmente de valueChanges para evitar múltiples eventos
+      if (this.detailsValueChangesSub) {
+        this.detailsValueChangesSub.unsubscribe();
+      }
+      
+      // Limpiar productos anteriores
+      while (this.details.length > 0) {
+        this.details.removeAt(0);
+      }
+      
+      // Agregar TODOS los productos del carrito de una sola vez
+      const productGroups: FormGroup[] = [];
+      
+      items.forEach((cartItem: any, index: number) => {
+        const product = cartItem.product;
+        const quantity = cartItem.quantity || 1;
+        
+        console.log(`➕ Agregando producto ${index + 1}/${items.length}:`, product.nombre || product.SKU);
+        
+        productGroups.push(
+          this.fb.group({
+            product_id: [product.id || product.SKU, Validators.required],
+            product_name: [product.nombre || 'Producto'],
+            product_description: [product.descripcion || ''],
+            product_image: [product.imagen || ''],
+            quantity: [quantity, [Validators.required, Validators.min(1)]],
+            unit_price: [
+              product.precio || product.precioRetail || 0,
+              [Validators.required, Validators.min(0)]
+            ],
+          })
+        );
+      });
+      
+      // Agregar todos los productos al FormArray
+      productGroups.forEach((group, idx) => {
+        this.details.push(group);
+        console.log(`📦 Producto ${idx + 1} agregado al FormArray`);
+      });
+      
+      console.log('✅ Total productos en FormArray:', this.details.length);
+      console.log('📋 Detalles del FormArray:', this.details.controls.map((c, i) => ({
+        index: i,
+        name: c.value.product_name,
+        quantity: c.value.quantity
+      })));
+      
+      // RE-SUSCRIBIRSE a valueChanges
+      this.detailsValueChangesSub = this.details.valueChanges.subscribe(() => {
+        this.recalculateTotals();
+      });
+      this.subscriptions.add(this.detailsValueChangesSub);
+      
+      // Marcar para verificación en el próximo ciclo
+      this.cdr.markForCheck();
+      
+      // Recalcular después de cargar productos
+      if (this.selectedCompany) {
+        setTimeout(() => {
+          this.recalculateTotals();
+          this.cdr.markForCheck();
+          this.isLoadingCartProducts = false;
+          console.log('✅ Carga de productos completada');
+        }, 0);
+      } else {
+        this.isLoadingCartProducts = false;
+      }
+    });
+    this.subscriptions.add(cartSub);
 
     if (this.userRole === Role.Admin) {
       this.users$ = this.usersService.getUsers();
@@ -154,13 +245,25 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
         .get('company_id')!
         .valueChanges.subscribe((companyId) => {
           if (companyId) {
-            this.companies$.pipe(take(1)).subscribe((companies) => {
-              this.selectedCompany = companies.find((c) => c.id === companyId);
+            this.companiesService.findById(companyId).pipe(take(1)).subscribe((company) => {
+              this.selectedCompany = company;
               this.recalculateTotals(); // Recalcular al cambiar de empresa
             });
           }
         });
       this.subscriptions.add(companySub);
+      
+      // Suscripción a cambios en el usuario (solo para admin)
+      const userSub = this.quotationForm
+        .get('user_id')!
+        .valueChanges.subscribe((userId) => {
+          if (userId) {
+            this.usersService.getUserById(userId).pipe(take(1)).subscribe((user) => {
+              this.selectedUser = user;
+            });
+          }
+        });
+      this.subscriptions.add(userSub);
     } else if (this.userRole === Role.User) {
       const userId = this.authService.getUserId();
       if (!userId) return;
@@ -287,10 +390,11 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
         if (this.userRole === Role.User) {
           return !!this.selectedUser && !!this.selectedCompany;
         } else {
-          return (
-            this.quotationForm.get('company_id')!.valid &&
-            this.quotationForm.get('user_id')!.valid
-          );
+          // Para Admin: verificar que los campos sean válidos Y que los datos estén cargados
+          const formIsValid = this.quotationForm.get('company_id')!.valid &&
+            this.quotationForm.get('user_id')!.valid;
+          const dataIsLoaded = !!this.selectedUser && !!this.selectedCompany;
+          return formIsValid && dataIsLoaded;
         }
       case 2:
         return this.details.valid && this.details.length > 0;
@@ -300,28 +404,43 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
   }
 
   nextStep(): void {
+    console.log('🚀 nextStep llamado, paso actual:', this.currentStep);
+    console.log('📊 Productos en carrito:', this.details.length);
+    console.log('👤 Usuario seleccionado:', this.selectedUser?.name);
+    console.log('🏢 Empresa seleccionada:', this.selectedCompany?.razon_social);
+    
     if (!this.isStepValid(this.currentStep)) {
+      console.log('❌ Validación falló en paso', this.currentStep);
       this.toastService.error(
         'Por favor, completa todos los campos requeridos.'
       );
       return;
     }
 
-    if (this.currentStep === 2 && this.userRole === Role.Admin) {
-      const userId = this.quotationForm.get('user_id')?.value;
-      this.users$.pipe(take(1)).subscribe((users) => {
-        this.selectedUser = users.find((u) => u.id === userId);
-      });
-    }
     this.currentStep++;
+    console.log('✅ Avanzando al paso:', this.currentStep);
+    
+    // Forzar detección de cambios y recalcular totales
+    setTimeout(() => {
+      this.recalculateTotals();
+      this.cdr.markForCheck();
+      console.log('💰 Totales recalculados - Gran Total:', this.granTotal);
+    }, 0);
   }
 
   prevStep(): void {
     this.currentStep--;
+    // Forzar detección de cambios al retroceder
+    setTimeout(() => {
+      this.recalculateTotals();
+      this.cdr.markForCheck();
+    }, 0);
   }
 
   removeDetail(index: number): void {
     this.details.removeAt(index);
+    this.recalculateTotals();
+    this.cdr.markForCheck();
   }
 
   openProductModal(): void {
@@ -371,10 +490,17 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.isLoading = false;
         this.cartService.clearCart();
-        this.router.navigate(['/dashboard/cotizaciones']);
+        
+        // Mostrar mensaje de éxito con información del correo
+        const userEmail = this.selectedUser?.email || 'el usuario';
         this.toastService.success(
-          `Cotización #${response.id} creada con éxito.`
+          `✅ Cotización #${response.id} creada exitosamente. Se ha enviado una notificación a ${userEmail}.`
         );
+        
+        // Redirigir después de 2 segundos para que el usuario vea el mensaje
+        setTimeout(() => {
+          this.router.navigate(['/dashboard/cotizaciones']);
+        }, 2000);
       },
       error: (error) => {
         this.isLoading = false;

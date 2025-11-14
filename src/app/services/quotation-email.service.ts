@@ -11,6 +11,7 @@ export interface QuotationEmailData {
   razonSocial: string;
   nombreContacto: string;
   emailContacto: string;
+  fechaCotizacion: string;
   diasValidez: number;
   esOrdenDeContado: boolean;
   condicionesPago: string;
@@ -30,6 +31,7 @@ export interface QuotationEmailData {
   baseParaIVA: number;
   valorIVA: number;
   granTotal: number;
+  anioActual: number;
 }
 
 export interface QuotationEmailResponse {

@@ -490,23 +490,74 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
 
     this.quotationService.create(payload).subscribe({
       next: (response) => {
-        this.isLoading = false;
+        const userEmail = this.selectedUser?.email || '';
+        const formValue = this.quotationForm.value;
+        
+        console.log('📦 Form details antes de mapear:', formValue.details);
+        
+        const fechaActual = new Date();
+        const fechaCotizacion = fechaActual.toLocaleDateString('es-CO', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        const emailData = {
+          to: userEmail,
+          numeroCotizacion: response.id.toString(),
+          nombreCliente: this.selectedUser?.name || '',
+          razonSocial: this.selectedCompany?.razon_social || '',
+          nombreContacto: this.selectedUser?.name || '',
+          emailContacto: userEmail,
+          fechaCotizacion: fechaCotizacion,
+          diasValidez: formValue.validity_days || 30,
+          esOrdenDeContado: this.esOrdenDeContado,
+          condicionesPago: formValue.payment_conditions || 'Contado',
+          creditoCubreOrden: this.creditoCubreOrden,
+          creditoDisponible: this.creditoDisponible,
+          productos: formValue.details.map((d: any) => ({
+            nombre: d.product_name || 'Producto',
+            descripcion: d.product_description || '',
+            cantidad: d.quantity,
+            precioUnitario: d.unit_price,
+            subtotal: d.quantity * d.unit_price,
+          })),
+          subtotal: this.subtotal,
+          totalDescuentos: this.totalDescuentos,
+          valorBaseDescuentos: this.valorBaseDescuentos,
+          valorLogistica: this.valorLogistica,
+          baseParaIVA: this.baseParaIVA,
+          valorIVA: this.valorIVA,
+          granTotal: this.granTotal,
+          anioActual: fechaActual.getFullYear(),
+        };
+        
+        console.log('📧 Email data a enviar:', emailData);
+        console.log('📧 Productos mapeados:', emailData.productos);
+        
         this.cartService.clearCart();
-        
-        // Mostrar mensaje de éxito con información del correo
-        const userEmail = this.selectedUser?.email || 'el usuario';
 
-
-        // this.quotationEmailService.sendQuotationEmail(response.id, userEmail);
-
-        this.toastService.success(
-          `✅ Cotización #${response.id} creada exitosamente. Se ha enviado una notificación a ${userEmail}.`
-        );
-        
-        // Redirigir después de 2 segundos para que el usuario vea el mensaje
-        setTimeout(() => {
-          this.router.navigate(['/dashboard/cotizaciones']);
-        }, 2000);
+        this.quotationEmailService.sendQuotationEmail(emailData).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.toastService.success(
+              `✅ Cotización #${response.id} creada exitosamente. Se ha enviado una notificación a ${userEmail}.`
+            );
+            setTimeout(() => {
+              this.router.navigate(['/dashboard/cotizaciones']);
+            }, 2000);
+          },
+          error: (emailError) => {
+            this.isLoading = false;
+            console.error('Error al enviar correo:', emailError);
+            this.toastService.info(
+              `✅ Cotización #${response.id} creada exitosamente, pero no se pudo enviar el correo de notificación.`
+            );
+            setTimeout(() => {
+              this.router.navigate(['/dashboard/cotizaciones']);
+            }, 2000);
+          },
+        });
       },
       error: (error) => {
         this.isLoading = false;

@@ -86,6 +86,7 @@ export class NexsysComponent implements OnInit, OnDestroy {
   error = signal<string | null>(null);
   viewMode = signal<'grid' | 'list'>('grid');
   showFilters = signal<boolean>(false);
+  showSearch = signal<boolean>(false);
 
   // Pagination
   pagination = signal<PaginationInfo>({
@@ -310,6 +311,10 @@ export class NexsysComponent implements OnInit, OnDestroy {
 
   toggleViewMode(): void {
     this.viewMode.update((mode) => (mode === 'grid' ? 'list' : 'grid'));
+  }
+
+  toggleSearch(): void {
+    this.showSearch.update((s) => !s);
   }
 
   refreshData(): void {

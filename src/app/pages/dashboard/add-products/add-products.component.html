@@ -26,11 +26,17 @@
             <fa-icon [icon]="viewMode() === 'grid' ? faList : faGrid"></fa-icon>
             <span class="hidden sm:inline">{{ viewMode() === 'grid' ? 'Lista' : 'Cuadrícula' }}</span>
           </button>
+
+          <button (click)="toggleSearch()"
+            class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+            <fa-icon [icon]="faSearch"></fa-icon>
+            <span class="hidden sm:inline">Buscar</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+    <div *ngIf="showSearch()" class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
       <form [formGroup]="searchForm" class="space-y-4">
 
         <div class="flex flex-wrap items-center gap-4">

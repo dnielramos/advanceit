@@ -134,4 +134,31 @@ export class ProductDetailComponent implements OnInit {
     }
     return city;
   }
+
+  // Logo helpers
+  private normalizeCompanyForLogo(name: string): string {
+    return (name || '').toLowerCase().replace(/\s+/g, '');
+  }
+
+  getCompanyLogo(name: string): string {
+    const base = `assets/logos/${this.normalizeCompanyForLogo(name)}`;
+    return `${base}.png`;
+  }
+
+  onLogoError(event: Event, name: string): void {
+    const img = event.target as HTMLImageElement;
+    const base = `assets/logos/${this.normalizeCompanyForLogo(name)}`;
+    if (img && (img as any).dataset && (img as any).dataset['fallback'] !== 'jpg') {
+      img.src = `${base}.jpg`;
+      (img as any).dataset['fallback'] = 'jpg';
+    } else {
+      img.src = 'logo.png';
+    }
+  }
+
+  capitalizeCompany(name: string): string {
+    if (!name) return '';
+    const lower = name.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }
 }

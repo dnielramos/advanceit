@@ -79,13 +79,10 @@
         <div class="flex justify-between items-start">
 
 
-          <h3 class="text-lg font-semibold text-gray-900 group-hover:text-purple-700 flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-              stroke="currentColor" class="size-5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
-            </svg>
-            {{ c.company }}
+          <h3 class="text-lg font-semibold text-orange-600 group-hover:text-purple-700 flex items-center gap-2">
+            <img [src]="getCompanyLogo(c.company)" (error)="onLogoError($event, c.company)" alt="logo"
+              class="w-25 h-10 rounded-sm object-contain" />
+            {{ capitalizeCompany(c.company) }}
           </h3>
           <span class="text-sm text-gray-500">{{ c.inventory.length }} filas</span>
         </div>
@@ -146,11 +143,10 @@
           <tr *ngFor="let c of companies()" class="hover:bg-gray-50 transition-colors cursor-pointer" (click)="viewInventory(c)">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
-                <div class="flex-shrink-0 h-10 w-10 text-purple-600 rounded-lg flex items-center justify-center">
-                  <fa-icon [icon]="faBuilding" class="text-purple-600"></fa-icon>
-                </div>
+                <img [src]="getCompanyLogo(c.company)" (error)="onLogoError($event, c.company)" alt="logo"
+                  class="h-10 w-25 rounded object-contain bg-white border border-gray-200" />
                 <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">{{ c.company }}</div>
+                  <div class="text-sm font-medium text-gray-900">{{ capitalizeCompany(c.company) }}</div>
                 </div>
               </div>
             </td>
@@ -197,7 +193,7 @@
         </svg>
 
         <p class="flex items-center gap-2">
-          {{ selectedCompany()?.company }}
+          {{ capitalizeCompany(selectedCompany()?.company || '') }}
           <span class="text-xs text-orange-600"> Mostrando {{ filteredInventory().length }} ítem(s)</span>
         </p>
       </h3>

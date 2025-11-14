@@ -63,6 +63,13 @@ export class UsersService {
   }
 
   /**
+   * Crea un usuario usando el endpoint /users/payload
+   */
+  createUserWithPayload(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/payload`, { data });
+  }
+
+  /**
    * Obtiene un usuario por su ID.
    * @param id El ID del usuario.
    * @returns Un Observable con el usuario encontrado.

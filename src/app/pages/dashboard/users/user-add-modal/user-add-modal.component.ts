@@ -56,6 +56,7 @@ export class UserAddModalComponent {
 
   // Señales y eventos
   loading = signal(false);
+  showFullForm = signal(false);
   @Output() closeModalEvent = new EventEmitter<boolean>();
 
   // Formulario reactivo
@@ -73,7 +74,7 @@ export class UserAddModalComponent {
       country: [''],
       city: [''],
       address: [''],
-      company: [''],
+      company: ['', [Validators.required]],
       type: ['user', Validators.required],
       picture: ['https://placehold.co/150x150/663399/FFFFFF?text=U']
     });
@@ -87,23 +88,61 @@ export class UserAddModalComponent {
     }
 
     this.loading.set(true);
-    
-    const newUser: Omit<User, 'id' | 'createdAt' | 'updatedAt'> = {
-      ...this.userForm.value,
-      picture: this.userForm.value.picture || 'https://placehold.co/150x150/663399/FFFFFF?text=' + this.userForm.value.name.charAt(0)
+
+    const form = this.userForm.value;
+    const picture = form.picture || `https://placehold.co/150x150/663399/FFFFFF?text=${(form.name || 'U').charAt(0)}`;
+
+    if (!this.showFullForm()) {
+      const minimalPayload = {
+        name: form.name,
+        email: form.email,
+        company: form.company,
+        type: form.type,
+        picture,
+        password: 'advance@2025',
+      };
+
+      this.usersService.createUser(minimalPayload).subscribe({
+        next: () => {
+          this.toastr.success('Usuario creado exitosamente (contraseña automática: advance@2025)');
+          this.closeModalEvent.emit(true);
+        },
+        error: (error: any) => {
+          console.error('Error creating user:', error);
+          this.toastr.error('Error al crear el usuario. Intente nuevamente.');
+          this.loading.set(false);
+        }
+      });
+      return;
+    }
+
+    const fullData = {
+      name: form.name,
+      email: form.email,
+      telephone: form.telephone || '',
+      country: form.country || '',
+      city: form.city || '',
+      address: form.address || '',
+      company: form.company,
+      type: form.type,
+      picture,
     };
 
-    this.usersService.createUser(newUser).subscribe({
+    this.usersService.createUserWithPayload(fullData).subscribe({
       next: () => {
-        this.toastr.success('Usuario creado exitosamente');
+        this.toastr.success('Usuario creado con todos los campos');
         this.closeModalEvent.emit(true);
       },
       error: (error: any) => {
-        console.error('Error creating user:', error);
-        this.toastr.error('Error al crear el usuario. Intente nuevamente.');
+        console.error('Error creating user with payload:', error);
+        this.toastr.error('Error al crear el usuario con todos los campos. Intente nuevamente.');
         this.loading.set(false);
       }
     });
+  }
+
+  toggleFullForm(): void {
+    this.showFullForm.update(v => !v);
   }
 
   closeModal(refresh: boolean = false): void {

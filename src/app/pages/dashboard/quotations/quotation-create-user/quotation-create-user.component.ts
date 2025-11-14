@@ -152,41 +152,41 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
     // ✅ SUSCRIPCIÓN AL CARRITO - Cargar productos automáticamente
     const cartSub = this.cartService.getCart().subscribe((items) => {
       console.log('🛒 Carrito actualizado, productos recibidos:', items.length);
-      
+
       // Evitar cargas duplicadas
       if (this.isLoadingCartProducts) {
         console.log('⏭️ Ya está cargando productos, saltando...');
         return;
       }
-      
+
       // Si el número de productos no cambió, no recargar
       if (items.length === this.lastCartItemsCount && items.length === this.details.length) {
         console.log('⏭️ No hay cambios en el carrito, saltando recarga...');
         return;
       }
-      
+
       this.isLoadingCartProducts = true;
       this.lastCartItemsCount = items.length;
-      
+
       // DESUSCRIBIRSE temporalmente de valueChanges para evitar múltiples eventos
       if (this.detailsValueChangesSub) {
         this.detailsValueChangesSub.unsubscribe();
       }
-      
+
       // Limpiar productos anteriores
       while (this.details.length > 0) {
         this.details.removeAt(0);
       }
-      
+
       // Agregar TODOS los productos del carrito de una sola vez
       const productGroups: FormGroup[] = [];
-      
+
       items.forEach((cartItem: any, index: number) => {
         const product = cartItem.product;
         const quantity = cartItem.quantity || 1;
-        
+
         console.log(`➕ Agregando producto ${index + 1}/${items.length}:`, product.nombre || product.SKU);
-        
+
         productGroups.push(
           this.fb.group({
             product_id: [product.id || product.SKU, Validators.required],
@@ -201,29 +201,29 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
           })
         );
       });
-      
+
       // Agregar todos los productos al FormArray
       productGroups.forEach((group, idx) => {
         this.details.push(group);
         console.log(`📦 Producto ${idx + 1} agregado al FormArray`);
       });
-      
+
       console.log('✅ Total productos en FormArray:', this.details.length);
       console.log('📋 Detalles del FormArray:', this.details.controls.map((c, i) => ({
         index: i,
         name: c.value.product_name,
         quantity: c.value.quantity
       })));
-      
+
       // RE-SUSCRIBIRSE a valueChanges
       this.detailsValueChangesSub = this.details.valueChanges.subscribe(() => {
         this.recalculateTotals();
       });
       this.subscriptions.add(this.detailsValueChangesSub);
-      
+
       // Marcar para verificación en el próximo ciclo
       this.cdr.markForCheck();
-      
+
       // Recalcular después de cargar productos
       if (this.selectedCompany) {
         setTimeout(() => {
@@ -254,7 +254,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
           }
         });
       this.subscriptions.add(companySub);
-      
+
       // Suscripción a cambios en el usuario (solo para admin)
       const userSub = this.quotationForm
         .get('user_id')!
@@ -410,7 +410,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
     console.log('📊 Productos en carrito:', this.details.length);
     console.log('👤 Usuario seleccionado:', this.selectedUser?.name);
     console.log('🏢 Empresa seleccionada:', this.selectedCompany?.razon_social);
-    
+
     if (!this.isStepValid(this.currentStep)) {
       console.log('❌ Validación falló en paso', this.currentStep);
       this.toastService.error(
@@ -421,7 +421,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
 
     this.currentStep++;
     console.log('✅ Avanzando al paso:', this.currentStep);
-    
+
     // Forzar detección de cambios y recalcular totales
     setTimeout(() => {
       this.recalculateTotals();
@@ -492,16 +492,16 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
       next: (response) => {
         const userEmail = this.selectedUser?.email || '';
         const formValue = this.quotationForm.value;
-        
+
         console.log('📦 Form details antes de mapear:', formValue.details);
-        
+
         const fechaActual = new Date();
         const fechaCotizacion = fechaActual.toLocaleDateString('es-CO', {
           year: 'numeric',
           month: 'long',
           day: 'numeric'
         });
-        
+
         const emailData = {
           to: userEmail,
           numeroCotizacion: response.id.toString(),
@@ -512,7 +512,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
           fechaCotizacion: fechaCotizacion,
           diasValidez: formValue.validity_days || 30,
           esOrdenDeContado: this.esOrdenDeContado,
-          condicionesPago: formValue.payment_conditions || 'Contado',
+          condicionesPago: formValue.term === '0' || formValue.term === 0 ? 'Contado' : `Crédito ${formValue.term} días`,
           creditoCubreOrden: this.creditoCubreOrden,
           creditoDisponible: this.creditoDisponible,
           productos: formValue.details.map((d: any) => ({
@@ -531,10 +531,10 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
           granTotal: this.granTotal,
           anioActual: fechaActual.getFullYear(),
         };
-        
+
         console.log('📧 Email data a enviar:', emailData);
         console.log('📧 Productos mapeados:', emailData.productos);
-        
+
         this.cartService.clearCart();
 
         this.quotationEmailService.sendQuotationEmail(emailData).subscribe({

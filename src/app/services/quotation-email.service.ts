@@ -44,7 +44,7 @@ export interface QuotationEmailResponse {
   providedIn: 'root',
 })
 export class QuotationEmailService {
-  private apiUrl = `${ENVIRONMENT.apiUrl}/quotation-mail/send`;
+  private apiUrl = `${ENVIRONMENT.apiUrlRender}/quotation-mail/send`;
 
   constructor(private http: HttpClient) {}
 

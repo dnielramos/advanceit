@@ -85,14 +85,14 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
-        path: 'rmas',
+        path: 'solicitudes',
         loadComponent: () =>
           import('../components/dashboard/rmas-manager/rmas-manager.component').then(
             (m) => m.RmaManagerComponent
           ),
       },
       {
-        path: 'rmas/nueva',
+        path: 'solicitudes/nueva',
         loadComponent: () =>
           import('../pages/dashboard/rmas/create-rma/create-rma.component').then(
             (m) => m.CreateRmaComponent

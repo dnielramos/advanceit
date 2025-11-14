@@ -36,6 +36,7 @@ import { CartService } from '../../../../services/cart.service';
 import { CreateFullQuotationDto } from '../../../../models/quotation.types';
 import { CreationMode } from '../../../../models/creation-mode';
 import { User } from '../../../../models/user';
+import { QuotationEmailService } from '../../../../services/quotation-email.service';
 
 // Registrar iconos
 library.add(
@@ -99,6 +100,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private quotationService: QuotationService,
+    private quotationEmailService: QuotationEmailService,
     private companiesService: CompaniesService,
     private usersService: UsersService,
     private authService: AuthService,
@@ -493,6 +495,10 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
         
         // Mostrar mensaje de éxito con información del correo
         const userEmail = this.selectedUser?.email || 'el usuario';
+
+
+        // this.quotationEmailService.sendQuotationEmail(response.id, userEmail);
+
         this.toastService.success(
           `✅ Cotización #${response.id} creada exitosamente. Se ha enviado una notificación a ${userEmail}.`
         );

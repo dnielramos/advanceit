@@ -162,11 +162,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
         // ],
       },
       {
-        key: 'rmas',
-        label: 'RMA Manager',
+        key: 'solicitudes',
+        label: 'Solicitudes',
         roles: [Role.Admin, Role.User],
         icon: faFileLines,
-        routerLink: '/dashboard/rmas',
+        routerLink: '/dashboard/solicitudes',
         // subItems: [
         //   { label: 'Ver Órdenes', routerLink: '/dashboard/orders' },
         // ],

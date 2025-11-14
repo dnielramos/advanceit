@@ -145,7 +145,7 @@ export class RmaManagerComponent implements OnInit {
 
   openCreateModal(): void {
     // Redirigir a la nueva ruta de creación de solicitudes
-    this.router.navigate(['/dashboard/rmas/nueva']);
+    this.router.navigate(['/dashboard/solicitudes/nueva']);
   }
 
   closeCreateModal(): void {

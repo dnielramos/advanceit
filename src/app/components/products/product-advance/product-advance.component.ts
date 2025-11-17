@@ -10,6 +10,7 @@ import {
   faLayerGroup,
   faTag,
   faCodeBranch,
+  faWandSparkles
 } from '@fortawesome/free-solid-svg-icons';
 import { ProductoFinal } from '../../../models/Productos';
 import { Router, RouterLink } from '@angular/router';
@@ -42,6 +43,7 @@ export class ProductAdvanceComponent implements OnChanges {
 
   logged: boolean = true;
 
+  faWandSparkles = faWandSparkles;
   faShoppingCart = faShoppingCart;
   faEye = faEye;
   faSearch = faSearch;

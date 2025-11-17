@@ -6,7 +6,6 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { provideAnimations } from '@angular/platform-browser/animations'; // Importa provideAnimations
 
 import { routes } from './app.routes';
-import { jwtInterceptor } from './security/jwt.interceptor';
 import { authInterceptor } from './security/auth.interceptor';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>

@@ -1,0 +1,41 @@
+<!-- src/app/components/image-generator/image-generator.component.html -->
+<div class="image-generator-container">
+  <h2>Generador de Imágenes con Gemini</h2>
+  
+  <div class="input-section">
+    <textarea
+      [(ngModel)]="prompt"
+      placeholder="Describe la imagen que quieres crear..."
+      rows="4"
+      [disabled]="isLoading"
+      (keyup.enter)="generateImage()"
+    ></textarea>
+    
+    <div class="rate-limits">
+      <span>Límites (nivel gratuito): {{rateLimits.rpm}} solicitudes/minuto, {{rateLimits.rpd}} solicitudes/día</span>
+    </div>
+    
+    <button 
+      (click)="generateImage()" 
+      [disabled]="isLoading || !prompt.trim()"
+      class="generate-btn"
+    >
+      <span *ngIf="!isLoading">Generar Imagen</span>
+      <span *ngIf="isLoading">Generando...</span>
+    </button>
+  </div>
+  
+  <div class="error-section" *ngIf="error">
+    <div class="error-message">{{ error }}</div>
+  </div>
+  
+  <div class="result-section" *ngIf="generatedImageUrl">
+    <div class="image-container">
+      <img [src]="generatedImageUrl" alt="Imagen generada por Gemini" />
+    </div>
+    
+    <button (click)="downloadImage()" class="download-btn">
+      Descargar Imagen
+    </button>
+  </div>
+</div>

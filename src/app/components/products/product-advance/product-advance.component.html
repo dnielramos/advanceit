@@ -9,6 +9,18 @@
       <img [src]="producto.marca | logo" [alt]="'Marca: ' + producto.marca" class="h-10 w-auto object-contain" />
     </div>
   </div>
+  <!-- boton de IA con posicionamiento absoluto-->
+  <div class="absolute top-2 left-2 z-10">
+    <div class="bg-white rounded-2xl p-2 flex items-center justify-center cursor-pointer hover:font-bold" title="Este es un modo de experimento y puede contener errores. Funciona solo para administradores.">
+      <p class="w-5">
+        <fa-icon [icon]="faWandSparkles" ></fa-icon>
+      </p>
+      <p class="flex flex-col">
+        <span class="text-xs text-purple-600">Generar Imagen</span>
+        <span class="text-[8px] text-orange-700">Modo Experimental</span>
+      </p>
+    </div>
+  </div>
 
   <div class="p-4 flex flex-col flex-grow">
     <!-- Nombre del producto -->

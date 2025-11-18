@@ -13,7 +13,7 @@
 
   <!-- boton de IA con posicionamiento absoluto-->
   <div class="absolute top-2 left-2 z-10" (click)="generarDescripcionTexto($event)">
-    <div class="bg-white rounded-2xl p-2 flex items-center justify-center cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105" title="Consulta a Luna AI sobre este producto">
+    <div class="bg-white rounded-2xl p-2 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110" title="Consulta a Luna AI sobre este producto">
       <p class="w-5">
         <fa-icon [icon]="faWandSparkles" class="text-purple-600"></fa-icon>
       </p>
@@ -111,35 +111,36 @@
 
 <!-- Luna AI Modal -->
 @if (showLunaModal) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn"
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn"
      (click)="closeModal($event)">
   
   <div class="bg-gradient-to-br from-white via-purple-50 to-orange-50 rounded-3xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden transform transition-all duration-300 animate-slideUp"
        (click)="$event.stopPropagation()">
     
     <!-- Header -->
-    <div class="bg-gradient-to-r from-purple-600 to-orange-500 p-6 relative">
-      <div class="flex items-center justify-between">
+    <div class="bg-gradient-to-r from-purple-600 to-orange-500 p-4 relative">
+      <div class="relative flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="bg-white rounded-full p-3 shadow-lg">
-            <fa-icon [icon]="faWandSparkles" class="text-purple-600 text-2xl"></fa-icon>
+          <div class="rounded-full p-2">
+            <fa-icon [icon]="faWandSparkles" class="text-white text-2xl"></fa-icon>
           </div>
           <div>
-            <h2 class="text-2xl font-bold text-white">Luna AI</h2>
-            <p class="text-purple-100 text-sm">Asistente Inteligente de Productos</p>
+            <h2 class="text-2xl font-bold text-white">Luna AI <span class="text-purple-700 p-1 rounded-2xl text-[10px] bg-purple-100">Modo Experimental</span></h2>
+            <p class="text-purple-100 text-sm">Asistente Inteligente Artificial de Advance</p>
           </div>
         </div>
         <button (click)="closeModal($event)" 
-                class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200">
+                class="text-white hover:scale-105 cursor-pointer hover:bg-opacity-20 rounded-full p-2 transition-all duration-200">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
+
       </div>
     </div>
 
     <!-- Content -->
-    <div class="p-8 min-h-[400px] flex flex-col">
+    <div class="p-8 min-h-[400px] max-h-[80vh] overflow-y-auto flex flex-col">
       
       <!-- Loading States -->
       @if (modalLoadingStage > 0) {
@@ -240,13 +241,14 @@
       @if (modalLoadingStage === 0 && modalText) {
       <div class="flex-1 flex flex-col">
         
-        <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-purple-100 flex-1">
+        <div class="bg-white rounded-2xl p-4 shadow-lg border-2 border-purple-100 flex-1">
           <div class="flex items-start gap-3 mb-4">
-            <div class="bg-gradient-to-br from-purple-600 to-orange-500 rounded-full p-2 flex-shrink-0">
-              <fa-icon [icon]="faWandSparkles" class="text-white text-sm"></fa-icon>
+            <div class="rounded-full flex-shrink-0">
+              <!-- <fa-icon [icon]="faWandSparkles" class="text-purple-500 text-sm"></fa-icon> -->
+              <img src="imagelogo.png" alt="logo" class="w-10 h-10">
             </div>
             <div class="flex-1">
-              <h3 class="font-bold text-gray-800 mb-1">Análisis de Luna AI</h3>
+              <h3 class="font-bold text-purple-600 mb-1">Análisis de Luna AI</h3>
               <p class="text-xs text-gray-500">{{ producto.nombre }}</p>
             </div>
           </div>
@@ -261,7 +263,7 @@
         <!-- Action Buttons -->
         <div class="mt-6 flex gap-3 justify-end">
           <button (click)="closeModal($event)"
-                  class="px-6 py-3 bg-gradient-to-r from-purple-600 to-orange-500 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+                  class="px-6 py-3 bg-purple-600 cursor-pointer text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200">
             Entendido
           </button>
         </div>

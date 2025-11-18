@@ -9,18 +9,23 @@
       <img [src]="producto.marca | logo" [alt]="'Marca: ' + producto.marca" class="h-10 w-auto object-contain" />
     </div>
   </div>
+
+
   <!-- boton de IA con posicionamiento absoluto-->
-  <div class="absolute top-2 left-2 z-10">
-    <div class="bg-white rounded-2xl p-2 flex items-center justify-center cursor-pointer hover:font-bold" title="Este es un modo de experimento y puede contener errores. Funciona solo para administradores.">
+  <div class="absolute top-2 left-2 z-10" (click)="generarDescripcionTexto($event)">
+    <div class="bg-white rounded-2xl p-2 flex items-center justify-center cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105" title="Consulta a Luna AI sobre este producto">
       <p class="w-5">
-        <fa-icon [icon]="faWandSparkles" ></fa-icon>
+        <fa-icon [icon]="faWandSparkles" class="text-purple-600"></fa-icon>
       </p>
       <p class="flex flex-col">
-        <span class="text-xs text-purple-600">Generar Imagen</span>
+        <span class="text-xs text-purple-600 font-semibold">Luna AI</span>
         <span class="text-[8px] text-orange-700">Modo Experimental</span>
       </p>
     </div>
   </div>
+
+
+
 
   <div class="p-4 flex flex-col flex-grow">
     <!-- Nombre del producto -->
@@ -71,9 +76,8 @@
     <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none">
     </div>
 
-
-  <!-- Precio y botón de compra -->
-  <div class="flex justify-between items-center mt-auto">
+    <!-- Precio y botón de compra -->
+    <div class="flex justify-between items-center mt-auto">
 
 
     <div *ngIf="logged" class="flex flex-col w-[90%] align-center justify-center items-center">
@@ -94,13 +98,177 @@
 
     </div>
 
-    <button
-      class="bg-gradient-to-r w-45 gap-2 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105 hover:-rotate-5"
-      (click)="addToCart($event, producto)" [disabled]="!producto.disponibilidad"
-      [ngClass]="producto.disponibilidad ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400 cursor-not-allowed'">
-      <span class="text-sm">Añadir</span>
-      <fa-icon [icon]="faShoppingCart"></fa-icon>
-    </button>
+      <button
+        class="bg-gradient-to-r w-45 gap-2 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105 hover:-rotate-5"
+        (click)="addToCart($event, producto)" [disabled]="!producto.disponibilidad"
+        [ngClass]="producto.disponibilidad ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400 cursor-not-allowed'">
+        <span class="text-sm">Añadir</span>
+        <fa-icon [icon]="faShoppingCart"></fa-icon>
+      </button>
+    </div>
   </div>
 </div>
+
+<!-- Luna AI Modal -->
+@if (showLunaModal) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn"
+     (click)="closeModal($event)">
+  
+  <div class="bg-gradient-to-br from-white via-purple-50 to-orange-50 rounded-3xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden transform transition-all duration-300 animate-slideUp"
+       (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-orange-500 p-6 relative">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-white rounded-full p-3 shadow-lg">
+            <fa-icon [icon]="faWandSparkles" class="text-purple-600 text-2xl"></fa-icon>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-white">Luna AI</h2>
+            <p class="text-purple-100 text-sm">Asistente Inteligente de Productos</p>
+          </div>
+        </div>
+        <button (click)="closeModal($event)" 
+                class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-8 min-h-[400px] flex flex-col">
+      
+      <!-- Loading States -->
+      @if (modalLoadingStage > 0) {
+      <div class="flex-1 flex flex-col items-center justify-center space-y-6">
+        
+        <!-- Animated Luna Icon -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-purple-400 rounded-full blur-2xl opacity-50 animate-pulse"></div>
+          <div class="relative bg-gradient-to-br from-purple-600 to-orange-500 rounded-full p-8 shadow-xl animate-bounce">
+            <fa-icon [icon]="faWandSparkles" class="text-white text-5xl"></fa-icon>
+          </div>
+        </div>
+
+        <!-- Loading Messages -->
+        <div class="text-center space-y-3">
+          <div class="flex items-center justify-center gap-2">
+            <div class="flex space-x-1">
+              <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+              <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+              <div class="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+            </div>
+          </div>
+          
+          <div class="space-y-2">
+            <p class="text-lg font-semibold" 
+               [ngClass]="{
+                 'text-purple-600': modalLoadingStage === 1,
+                 'text-gray-400': modalLoadingStage !== 1
+               }">
+              @if (modalLoadingStage === 1) {
+              <span class="inline-flex items-center gap-2">
+                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Consultando whitepapers corporativos...
+              </span>
+              } @else {
+              <span class="inline-flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Whitepapers consultados
+              </span>
+              }
+            </p>
+
+            <p class="text-lg font-semibold"
+               [ngClass]="{
+                 'text-purple-600': modalLoadingStage === 2,
+                 'text-gray-400': modalLoadingStage !== 2
+               }">
+              @if (modalLoadingStage === 2) {
+                <span class="inline-flex items-center gap-2">
+                  <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Revisando detalles del producto...
+                </span>
+              } @else if (modalLoadingStage < 2) {
+                <span>Revisando detalles del producto...</span>
+              } @else {
+                <span class="inline-flex items-center gap-2">
+                  <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  Detalles revisados
+                </span>
+              }
+            </p>
+
+            <p class="text-lg font-semibold"
+               [ngClass]="{
+                 'text-purple-600': modalLoadingStage === 3,
+                 'text-gray-400': modalLoadingStage < 3
+               }">
+              @if (modalLoadingStage === 3) {
+              <span class="inline-flex items-center gap-2">
+                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generando análisis inteligente...
+              </span>
+              } @else {
+              <span>
+                Generando análisis inteligente...
+              </span>
+              }
+            </p>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- AI Response with Typewriter Effect -->
+      @if (modalLoadingStage === 0 && modalText) {
+      <div class="flex-1 flex flex-col">
+        
+        <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-purple-100 flex-1">
+          <div class="flex items-start gap-3 mb-4">
+            <div class="bg-gradient-to-br from-purple-600 to-orange-500 rounded-full p-2 flex-shrink-0">
+              <fa-icon [icon]="faWandSparkles" class="text-white text-sm"></fa-icon>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-bold text-gray-800 mb-1">Análisis de Luna AI</h3>
+              <p class="text-xs text-gray-500">{{ producto.nombre }}</p>
+            </div>
+          </div>
+          
+          <div class="prose prose-sm max-w-none">
+            <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              {{ modalText }}@if (isTyping) {<span class="inline-block w-2 h-4 bg-purple-600 ml-1 animate-pulse"></span>}
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-6 flex gap-3 justify-end">
+          <button (click)="closeModal($event)"
+                  class="px-6 py-3 bg-gradient-to-r from-purple-600 to-orange-500 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+            Entendido
+          </button>
+        </div>
+      </div>
+      }
+
+    </div>
+  </div>
 </div>
+}

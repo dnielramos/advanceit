@@ -37,7 +37,7 @@ export class GeminiTtsService {
   private readonly apiUrl = 'https://generativelanguage.googleapis.com/v1beta';
   private readonly model = 'gemini-2.5-flash-tts-preview'; // Modelo TTS de nivel gratuito
   private readonly apiKey = 'AIzaSyA58KY6P7ST5tksvy8ZtfrrqBjIaQH1qWU';
-  
+
   // Señales reactivas para estado
   isLoading = signal(false);
   error = signal<string | null>(null);
@@ -58,7 +58,7 @@ export class GeminiTtsService {
     this.error.set(null);
 
     const prompt = this.createProductPrompt(product, language);
-    
+
     const requestBody = {
       contents: [{
         parts: [{
@@ -86,12 +86,12 @@ export class GeminiTtsService {
       { headers: this.getHeaders() }
     ).pipe(
       map(response => this.processAudioResponse(response)),
-      retryWhen(errors => 
+      retryWhen(errors =>
         errors.pipe(
           mergeMap((error: HttpErrorResponse, retryCount: number) => {
             if (error.status === 429 && retryCount < 2) {
               const delay = Math.pow(2, retryCount) * 1000;
-              console.log(`Reintentando generación de audio en ${delay/1000}s... (intento ${retryCount + 1})`);
+              console.log(`Reintentando generación de audio en ${delay / 1000}s... (intento ${retryCount + 1})`);
               return timer(delay);
             }
             return throwError(() => error);
@@ -115,11 +115,11 @@ export class GeminiTtsService {
   convertBase64ToAudioBlob(base64Audio: string, format: string = 'audio/mp3'): Blob {
     const byteCharacters = atob(base64Audio);
     const byteNumbers = new Array(byteCharacters.length);
-    
+
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
-    
+
     const byteArray = new Uint8Array(byteNumbers);
     return new Blob([byteArray], { type: format });
   }
@@ -153,16 +153,16 @@ export class GeminiTtsService {
   playAudio(base64Audio: string, format: string = 'audio/mp3'): void {
     const audioUrl = this.createAudioUrl(base64Audio, format);
     const audio = new Audio(audioUrl);
-    
+
     audio.onended = () => {
       this.revokeAudioUrl(audioUrl);
     };
-    
+
     audio.onerror = (e) => {
       console.error('Error al reproducir audio:', e);
       this.revokeAudioUrl(audioUrl);
     };
-    
+
     audio.play().catch(error => {
       console.error('Error al iniciar reproducción:', error);
       this.revokeAudioUrl(audioUrl);
@@ -183,7 +183,7 @@ export class GeminiTtsService {
 
   private createProductPrompt(product: Product, language: string): string {
     const isSpanish = language.startsWith('es');
-    
+
     if (isSpanish) {
       return `Actúa como un experto en marketing y ventas. Describe de manera profesional y atractiva el producto "${product.name}" para una presentación de audio. Incluye:
 
@@ -222,7 +222,7 @@ Describe the product in a fluid paragraph of approximately 150-200 words, ideal 
       'it-IT': 'it-IT-Neural2-F',    // Voz femenina italiana
       'pt-BR': 'pt-BR-Neural2-F',    // Voz femenina brasileña
     };
-    
+
     return voiceMap[language] || 'es-ES-Neural2-F';
   }
 
@@ -298,7 +298,7 @@ Describe the product in a fluid paragraph of approximately 150-200 words, ideal 
 
   private handleApiError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Error desconocido en la generación de audio';
-    
+
     if (error.error instanceof ErrorEvent) {
       errorMessage = `Error del cliente: ${error.error.message}`;
     } else {
@@ -323,7 +323,7 @@ Describe the product in a fluid paragraph of approximately 150-200 words, ideal 
           errorMessage = `Error ${error.status}: ${error.message}`;
       }
     }
-    
+
     console.error('GeminiTtsService Error:', error);
     this.error.set(errorMessage);
     return throwError(() => new Error(errorMessage));
@@ -332,7 +332,7 @@ Describe the product in a fluid paragraph of approximately 150-200 words, ideal 
   private updateRateLimits(): void {
     const currentLimits = this.rateLimitInfo();
     const now = new Date();
-    
+
     // Resta una solicitud y actualiza el tiempo de reset (24 horas para RPD)
     this.rateLimitInfo.set({
       remainingRequests: Math.max(0, currentLimits.remainingRequests - 1),
@@ -347,6 +347,23 @@ Describe the product in a fluid paragraph of approximately 150-200 words, ideal 
       remainingRequests: 0,
       remainingTokens: 0,
       resetTime: new Date(Date.now() + 60000) // 1 minuto para RPM
+    });
+  }
+
+  // En el servicio, agrega estos métodos si no existen:
+
+  toPromise<T>(observable: Observable<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const subscription = observable.subscribe({
+        next: value => {
+          subscription.unsubscribe();
+          resolve(value);
+        },
+        error: err => {
+          subscription.unsubscribe();
+          reject(err);
+        }
+      });
     });
   }
 }

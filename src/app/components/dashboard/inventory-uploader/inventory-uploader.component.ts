@@ -37,6 +37,15 @@ export class InventoryUploaderComponent implements OnInit {
   selectedCompany = signal<CompanyInventory | null>(null);
   isCreateInventory = signal<boolean>(false);
 
+  // Estados de carga y progreso
+  isLoadingCompanies = signal<boolean>(false);
+  isProcessingFile = signal<boolean>(false);
+  isSavingInventory = signal<boolean>(false);
+  fileUploadProgress = signal<number>(0);
+  fileSize = signal<string>('');
+  fileError = signal<string>('');
+  uploadStatus = signal<'idle' | 'reading' | 'saving' | 'success' | 'error'>('idle');
+
   // Para ver detalle de inventario
   selectedInventory = computed(() => this.selectedCompany()?.inventory || []);
   selectedColumns = computed(() => this.selectedCompany()?.columns || []);
@@ -69,6 +78,7 @@ export class InventoryUploaderComponent implements OnInit {
   });
 
   // Carga inicial
+  // Carga inicial
   ngOnInit(): void {
     this.loadAllInventories();
   }
@@ -88,6 +98,12 @@ export class InventoryUploaderComponent implements OnInit {
     this.tempFile = null;
     this.previewData.set([]);
     this.previewColumns.set([]);
+    this.fileError.set('');
+    this.fileSize.set('');
+    this.fileUploadProgress.set(0);
+    this.uploadStatus.set('idle');
+    this.isProcessingFile.set(false);
+    this.isSavingInventory.set(false);
   }
 
   onCreateInventory() {
@@ -133,6 +149,7 @@ export class InventoryUploaderComponent implements OnInit {
   // Cargar inventarios existentes
   // ======================================================
   loadAllInventories() {
+    this.isLoadingCompanies.set(true);
     this.inventoriesService.getAllInventories().subscribe({
       next: (data: any[]) => {
         const mapped: CompanyInventory[] = (data || []).map((item) => ({
@@ -152,8 +169,12 @@ export class InventoryUploaderComponent implements OnInit {
             return db - da;
           })
         );
+        this.isLoadingCompanies.set(false);
       },
-      error: (err) => console.error('Error cargando inventarios', err),
+      error: (err) => {
+        console.error('Error cargando inventarios', err);
+        this.isLoadingCompanies.set(false);
+      },
     });
   }
 
@@ -163,18 +184,75 @@ export class InventoryUploaderComponent implements OnInit {
   handleFile(event: any) {
     const file = event.target.files[0];
     if (!file) return;
+
+    // Limpiar errores previos
+    this.fileError.set('');
+    this.uploadStatus.set('idle');
+
+    // Validar archivo
+    const validation = this.inventoriesService.validateFile(file);
+    if (!validation.isValid) {
+      this.fileError.set(validation.error || 'Archivo inválido');
+      this.uploadStatus.set('error');
+      return;
+    }
+
     this.tempFile = file;
+    this.fileSize.set(this.inventoriesService.getReadableFileSize(file.size));
+    this.isProcessingFile.set(true);
+    this.uploadStatus.set('reading');
+    this.fileUploadProgress.set(0);
 
     const reader = new FileReader();
-    reader.onload = (e: any) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const firstSheet = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[firstSheet];
-      const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-      this.previewData.set(json);
-      this.previewColumns.set(Object.keys(json[0] || {}));
+
+    // Simular progreso de lectura
+    reader.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const progress = (event.loaded / event.total) * 100;
+        this.fileUploadProgress.set(progress);
+        this.inventoriesService.updateProgress(event.loaded, event.total);
+      }
     };
+
+    reader.onload = (e: any) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[firstSheet];
+        const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+        if (json.length === 0) {
+          this.fileError.set('El archivo Excel está vacío o no contiene datos válidos.');
+          this.uploadStatus.set('error');
+          this.isProcessingFile.set(false);
+          return;
+        }
+
+        this.previewData.set(json);
+        this.previewColumns.set(Object.keys(json[0] || {}));
+        this.uploadStatus.set('success');
+        this.fileUploadProgress.set(100);
+
+        // Limpiar progreso después de 1.5 segundos
+        setTimeout(() => {
+          this.fileUploadProgress.set(0);
+        }, 1500);
+      } catch (error) {
+        console.error('Error al procesar archivo:', error);
+        this.fileError.set('Error al procesar el archivo. Verifica que sea un Excel válido.');
+        this.uploadStatus.set('error');
+      } finally {
+        this.isProcessingFile.set(false);
+      }
+    };
+
+    reader.onerror = () => {
+      this.fileError.set('Error al leer el archivo.');
+      this.uploadStatus.set('error');
+      this.isProcessingFile.set(false);
+    };
+
     reader.readAsArrayBuffer(file);
   }
 
@@ -183,6 +261,9 @@ export class InventoryUploaderComponent implements OnInit {
   // ======================================================
   saveInventory() {
     if (!this.tempCompany || this.previewData().length === 0) return;
+
+    this.isSavingInventory.set(true);
+    this.uploadStatus.set('saving');
 
     const payload: InventoryPayload = {
       company: this.tempCompany,
@@ -193,17 +274,26 @@ export class InventoryUploaderComponent implements OnInit {
     this.inventoriesService.createInventory(payload).subscribe({
       next: (response) => {
         console.log('Inventario creado con éxito:', response);
-        this.loadAllInventories(); // recargar lista
-        this.onCloseCreateInventory();
-      },
-      error: (error) => console.error('Error al crear inventario:', error),
-    });
+        this.uploadStatus.set('success');
+        this.isSavingInventory.set(false);
 
-    // Reset
-    this.previewData.set([]);
-    this.previewColumns.set([]);
-    this.tempCompany = '';
-    this.tempFile = null;
+        // Mostrar éxito por 2 segundos y luego limpiar
+        setTimeout(() => {
+          this.loadAllInventories(); // recargar lista
+          this.onCloseCreateInventory();
+          this.uploadStatus.set('idle');
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Error al crear inventario:', error);
+        this.fileError.set(
+          error?.error?.message ||
+            'Error al guardar el inventario. Intenta nuevamente.'
+        );
+        this.uploadStatus.set('error');
+        this.isSavingInventory.set(false);
+      },
+    });
   }
 
   // ======================================================

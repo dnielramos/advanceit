@@ -16,24 +16,79 @@
       Registrar nuevo inventario
     </h2>
 
-    <div class="flex flex-col md:flex-row items-center gap-4">
+    <!-- Sección de entrada de datos -->
+    <div class="flex flex-col md:flex-row items-center gap-4 mb-6">
       <input type="text" placeholder="Nombre de la empresa" [(ngModel)]="tempCompany"
-        class="border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500" />
+        [disabled]="isProcessingFile() || isSavingInventory()"
+        class="border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition" />
 
-      <input type="file" accept=".xlsx,.xls" (change)="handleFile($event)"
-        class="w-full md:w-1/3 text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200" />
+      <div class="w-full md:w-1/3 relative">
+        <input type="file" accept=".xlsx,.xls,.csv" (change)="handleFile($event)"
+          [disabled]="isProcessingFile() || isSavingInventory()"
+          class="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed transition" />
+        <p class="text-xs text-gray-500 mt-1">Máx. 50 MB (Excel/CSV)</p>
+      </div>
 
       <button (click)="saveInventory()"
-        class="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium shadow hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        [disabled]="!tempCompany || !previewData().length">
-        <i class="fa-solid fa-floppy-disk mr-2"></i>
-        Registrar inventario
+        [disabled]="!tempCompany || !previewData().length || isProcessingFile() || isSavingInventory()"
+        class="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium shadow hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2">
+        <span *ngIf="!isSavingInventory()">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Registrar inventario
+        </span>
+        <span *ngIf="isSavingInventory()" class="flex items-center gap-2">
+          <i class="fa-solid fa-spinner animate-spin"></i>
+          Guardando...
+        </span>
       </button>
       <button (click)="onCloseCreateInventory()"
-        class="bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-medium shadow hover:bg-slate-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-        <i class="fa-solid fa-floppy-disk mr-2"></i>
-        Regresar
+        [disabled]="isProcessingFile() || isSavingInventory()"
+        class="bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-medium shadow hover:bg-slate-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+        <i class="fa-solid fa-times mr-2"></i>
+        Cancelar
       </button>
+    </div>
+
+    <!-- Indicador de error -->
+    <div *ngIf="fileError()" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+      <i class="fa-solid fa-circle-exclamation text-red-600 mt-1 text-lg"></i>
+      <div>
+        <p class="text-red-800 font-medium">Error</p>
+        <p class="text-red-700 text-sm">{{ fileError() }}</p>
+      </div>
+    </div>
+
+    <!-- Indicador de progreso de lectura de archivo -->
+    <div *ngIf="isProcessingFile()" class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium text-blue-800">Leyendo archivo: {{ fileSize() }}</span>
+        <span class="text-sm text-blue-700">{{ fileUploadProgress() | number:'1.0-0' }}%</span>
+      </div>
+      <div class="w-full h-2 bg-blue-200 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+          [style.width.%]="fileUploadProgress()"></div>
+      </div>
+      <p class="text-xs text-blue-700 mt-2 flex items-center gap-1">
+        <i class="fa-solid fa-hourglass-half animate-spin"></i>
+        Procesando archivo Excel...
+      </p>
+    </div>
+
+    <!-- Indicador de progreso de guardado -->
+    <div *ngIf="isSavingInventory()" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-spinner animate-spin text-green-600 text-lg"></i>
+        <span class="text-sm font-medium text-green-800">Guardando inventario en el servidor...</span>
+      </div>
+      <div class="w-full h-2 bg-green-200 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-green-500 to-emerald-500 animate-pulse"></div>
+      </div>
+    </div>
+
+    <!-- Indicador de éxito -->
+    <div *ngIf="uploadStatus() === 'success' && !isProcessingFile() && !isSavingInventory()" class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3">
+      <i class="fa-solid fa-check-circle text-emerald-600 text-xl"></i>
+      <p class="text-emerald-800 font-medium">¡Inventario procesado correctamente!</p>
     </div>
 
     <!-- Vista previa -->
@@ -41,8 +96,7 @@
       <h3 class="text-lg font-semibold mb-4 text-gray-700 flex items-center">
         <i class="fa-solid fa-eye text-purple-600 mr-2"></i>
         Vista previa
-        <span class="text-xs text-gray-500 ml-2" *ngIf="previewData().length">({{ 'Mostrando 5 filas de '+
-          previewData().length }} filas)</span>
+        <span class="text-xs text-gray-500 ml-2">({{ previewData().length }} filas encontradas)</span>
       </h3>
       <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full text-sm">
@@ -60,20 +114,48 @@
           </tbody>
         </table>
       </div>
-      <p class="text-xs text-gray-500 mt-3">* Solo se muestran las primeras 5 filas</p>
+      <p class="text-xs text-gray-500 mt-3">* Se muestran las primeras 5 filas. Se cargarán {{ previewData().length }} en total.</p>
     </div>
   </section>
 
   <!-- Lista de empresas -->
   <section *ngIf="companies().length && !selectedCompany()"
     class="bg-white mt-6 rounded-2xl p-6 border border-gray-200">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
       <i class="fa-solid fa-building text-purple-600 mr-3"></i>
       Empresas registradas
+      <span *ngIf="isLoadingCompanies()" class="ml-3 text-sm text-gray-500 flex items-center gap-1">
+        <i class="fa-solid fa-spinner animate-spin"></i>
+        Cargando...
+      </span>
     </h2>
 
+    <!-- Loaders while loading companies -->
+    <div *ngIf="isLoadingCompanies()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div *ngFor="let i of [1,2,3]" class="border border-gray-200 rounded-xl p-5 bg-white animate-pulse">
+        <div class="flex justify-between items-start mb-4">
+          <div class="flex items-center gap-2 w-2/3">
+            <div class="w-10 h-10 bg-gray-300 rounded-sm"></div>
+            <div class="h-6 bg-gray-300 rounded w-full"></div>
+          </div>
+          <div class="h-4 w-16 bg-gray-300 rounded"></div>
+        </div>
+        <div class="space-y-3">
+          <div class="h-4 bg-gray-300 rounded w-full"></div>
+          <div class="flex gap-2">
+            <div class="h-6 w-16 bg-purple-200 rounded-full"></div>
+            <div class="h-6 w-16 bg-purple-200 rounded-full"></div>
+            <div class="h-6 w-16 bg-purple-200 rounded-full"></div>
+          </div>
+          <div class="pt-2">
+            <div class="h-6 bg-gray-200 rounded w-1/3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Vista Grid -->
-    <div *ngIf="viewMode() === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngIf="viewMode() === 'grid' && !isLoadingCompanies()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div *ngFor="let c of companies()" (click)="viewInventory(c)"
         class="group border border-gray-200 rounded-xl p-5 bg-white hover:shadow-md hover:border-purple-300 cursor-pointer transition">
         <div class="flex justify-between items-start">
@@ -118,7 +200,7 @@
     </div>
 
     <!-- Vista Tabla -->
-    <div *ngIf="viewMode() === 'list'" class="overflow-x-auto border border-gray-200 rounded-lg">
+    <div *ngIf="viewMode() === 'list' && !isLoadingCompanies()" class="overflow-x-auto border border-gray-200 rounded-lg">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -180,6 +262,67 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Loader para tabla en vista list -->
+    <div *ngIf="viewMode() === 'list' && isLoadingCompanies()" class="border border-gray-200 rounded-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Empresa
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Productos
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+              Fecha Creación
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Columnas
+            </th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let i of [1,2,3,4,5]" class="animate-pulse">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gray-300 rounded"></div>
+                <div class="h-4 w-24 bg-gray-300 rounded"></div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="h-6 w-16 bg-gray-300 rounded-full"></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap hidden md:table-cell">
+              <div class="h-4 w-28 bg-gray-300 rounded"></div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex gap-2">
+                <div class="h-6 w-14 bg-gray-300 rounded"></div>
+                <div class="h-6 w-14 bg-gray-300 rounded"></div>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="h-6 w-12 bg-gray-300 rounded mx-auto"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mensaje sin datos -->
+    <div *ngIf="!isLoadingCompanies() && !companies().length" class="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+      <i class="fa-solid fa-inbox text-4xl text-gray-400 mb-3 inline-block"></i>
+      <p class="text-gray-600 font-medium mb-2">No hay inventarios registrados</p>
+      <p class="text-gray-500 text-sm mb-4">Comienza registrando un nuevo inventario</p>
+      <button (click)="onCreateInventory()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+        <i class="fa-solid fa-plus mr-2"></i>
+        Registrar inventario
+      </button>
+    </div>
   </section>
 
   <!-- Detalle de inventario (expandido, no modal) -->
@@ -211,15 +354,15 @@
     <div *ngIf="viewMode() === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div *ngFor="let row of filteredInventory(); let i = index" (click)="viewProductDetail(row, i)"
         class="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
-        
+
         <!-- Borde superior -->
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-indigo-600"></div>
-        
+
         <div class="p-6">
           <!-- Icono y título -->
           <div class="flex items-start gap-4 mb-4">
             <div class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                 class="w-6 h-6 text-purple-600 group-hover:text-white transition-colors">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
               </svg>
@@ -255,7 +398,7 @@
           <div class="relative overflow-hidden max-h-24">
             <div class="space-y-2 text-xs text-gray-600">
               <ng-container *ngFor="let col of selectedCompany()?.columns?.slice(0, 4)">
-                <div *ngIf="!['Laptop Model', 'Laptop Model ', 'Service Tag Laptop', 'First Name', 'Last Name ', 'City '].includes(col)" 
+                <div *ngIf="!['Laptop Model', 'Laptop Model ', 'Service Tag Laptop', 'First Name', 'Last Name ', 'City '].includes(col)"
                   class="flex justify-between">
                   <span class="font-medium text-gray-500">{{ col }}:</span>
                   <span class="truncate ml-2">{{ row[col] }}</span>
@@ -270,7 +413,7 @@
           <div class="mt-4 pt-4 border-t border-gray-100">
             <div class="flex items-center justify-between text-purple-600 group-hover:text-purple-700">
               <span class="text-sm font-medium">Ver detalles completos</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                 class="w-5 h-5 transform group-hover:translate-x-1 transition-transform">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
@@ -301,7 +444,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let row of filteredInventory(); let i = index" (click)="viewProductDetail(row, i)" 
+          <tr *ngFor="let row of filteredInventory(); let i = index" (click)="viewProductDetail(row, i)"
             class="hover:bg-purple-50 transition-colors cursor-pointer">
             <td *ngFor="let col of selectedColumns()" class="px-6 py-4 text-sm text-gray-900">
               <div class="flex items-center gap-2">

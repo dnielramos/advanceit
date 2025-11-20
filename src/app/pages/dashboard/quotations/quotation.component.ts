@@ -25,6 +25,12 @@ export class QuotationComponent {
   selectedQuotation = signal<Quotation | PopulatedQuotation | null>(null);
   editingQuotation = signal<Quotation | PopulatedQuotation | null>(null);
   isLoading = signal(false);
+  // view mode shared with child
+  viewMode = signal<'grid' | 'list'>('grid');
+
+  onViewChange(mode: 'grid' | 'list'): void {
+    this.viewMode.set(mode);
+  }
 
   constructor(
     private quotationService: QuotationService,

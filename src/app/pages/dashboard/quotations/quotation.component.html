@@ -3,9 +3,10 @@
 
     <app-header-crud titulo="Cotizaciones" descripcion="Gestiona todas tus cotizaciones desde este panel." textoBotonNuevo="Cotizar" (crear)="openCreateQuotation()"
       (openCreate)="openCreateQuotation()" (filterChange)="filterQuotations($event)" [filterByStatus]="true"
-  [filterStatusValues]="['sent', 'approved', 'rejected', 'expired']" (clearFilters)="filterQuotations({ texto: '', estado: '' })" (actualizar)="loadQuotations()"></app-header-crud>
+      [filterStatusValues]="['sent', 'approved', 'rejected', 'expired']" (clearFilters)="filterQuotations({ texto: '', estado: '' })" (actualizar)="loadQuotations()"
+      [showViewToggle]="true" [currentView]="viewMode()" (viewChange)="onViewChange($event)"></app-header-crud>
   </header>
 
-  <app-quotation-list [quotations]="quotations()" (openDetails)="openDetailsModal($event)" (openEdit)="openEditModal($event)"
+  <app-quotation-list [quotations]="quotations()" [externalView]="viewMode()" (openDetails)="openDetailsModal($event)" (openEdit)="openEditModal($event)"
     (refreshList)="loadQuotations()"></app-quotation-list>
 </div>

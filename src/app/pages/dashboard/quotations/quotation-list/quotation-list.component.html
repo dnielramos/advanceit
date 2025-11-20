@@ -1,78 +1,129 @@
 <lib-toastify-toast-container *ngIf="toastQuotation"></lib-toastify-toast-container>
 
-<div class="p-8 bg-slate-50 hflexy">
+<div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple">
 
-  <!-- <div class="px-4 py-2 shadow-md shadow-purple-50 my-4 lg:flex lg:items-center lg:justify-between rounded-xl bg-white ">
-    <label class="sr-only" for="search">Buscar cotizaciones...</label>
-    <input type="text" id="search" placeholder="Buscar cotizaciones..." class="px-4 bg-gray-100 w-full lg:w-[90%] py-2  rounded-lg my-4 focus:inset-0">
-    <p class="text-sm text-gray-500">Resultados: {{ quotations.length }}</p>
-  </div> -->
+  <!-- Vista Grid (Tarjetas) -->
+  <div *ngIf="viewMode() === 'grid'" class="space-y-4">
+    <div *ngIf="quotations.length > 0"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
+      <div *ngFor="let q of quotations"
+        class="bg-white p-6 rounded-xl shadow-lg shadow-purple-50 transition-all duration-300 transform border-t-4 border-purple-500">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-sm font-semibold text-gray-900">{{ q.company.razon_social }}</h2>
+          <span [class]="getStatusColor(q.status)" class="text-sm font-medium px-3 py-1 rounded-full capitalize">
+            {{ getStatusText(q.status) }}
+          </span>
+        </div>
+        <div class="text-gray-600 text-sm mb-4">
+          <p class="truncate">Responsable: {{ q.user.name }}</p>
+          <p>Total: ${{ q.total }}</p>
+          <p>Validez: {{ q.validity_days }} días</p>
+        </div>
 
-  <div *ngIf="quotations.length > 0"
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
-    <div *ngFor="let q of quotations"
-      class="bg-white p-6 rounded-xl shadow-lg shadow-purple-50 transition-all duration-300 transform border-t-4 border-purple-500">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-sm font-semibold text-gray-900">{{ q.company.razon_social }}</h2>
-        <span [class]="getStatusColor(q.status)" class="text-sm font-medium px-3 py-1 rounded-full capitalize">
-          {{ getStatusText(q.status) }}
-        </span>
+        <div class="flex justify-end space-x-2 mt-4">
+          <button (click)="openDetailsModal(q.id)"
+            class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
+            title="Ver detalles">
+            <fa-icon [icon]="faEye"></fa-icon>
+          </button>
+          <button (click)="openEditModal(q.id)"
+            class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
+            title="Editar">
+            <fa-icon [icon]="faEdit"></fa-icon>
+          </button>
+          <button (click)="openStatusModal(q.id)"
+            class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
+            title="Cambiar estado">
+            <fa-icon [icon]="faCheckCircle"></fa-icon>
+          </button>
+          <button (click)="confirmDeletion(q.id)"
+            class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-colors duration-200"
+            title="Eliminar">
+            <fa-icon [icon]="faTrashAlt"></fa-icon>
+          </button>
+        </div>
       </div>
-      <div class="text-gray-600 text-sm mb-4">
-        <p class="truncate">Responsable: {{ q.user.name }}</p>
-        <!-- <p class="truncate">Usuario: {{ q.user_id?.name }}</p> -->
-        <p>Total: ${{ q.total }}</p>
-        <p>Validez: {{ q.validity_days }} días</p>
-        <!-- <p>Expiracion: {{ q.expiration_date | date: 'shortDate' }}</p> -->
-      </div>
+    </div>
 
-      <div class="flex justify-end space-x-2 mt-4">
-        <button (click)="openDetailsModal(q.id)"
-          class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
-          title="Ver detalles">
-          <fa-icon [icon]="faEye"></fa-icon>
-        </button>
-        <button (click)="openEditModal(q.id)"
-          class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
-          title="Editar">
-          <fa-icon [icon]="faEdit"></fa-icon>
-        </button>
-        <button (click)="openStatusModal(q.id)"
-          class="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-full transition-colors duration-200"
-          title="Cambiar estado">
-          <fa-icon [icon]="faCheckCircle"></fa-icon>
-        </button>
-        <button (click)="confirmDeletion(q.id)"
-          class="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-colors duration-200"
-          title="Eliminar">
-          <fa-icon [icon]="faTrashAlt"></fa-icon>
-        </button>
-      </div>
+    <div *ngIf="quotations.length === 0"
+      class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn">
+      <fa-icon [icon]="faBoxOpen" class="text-purple-500 mb-4 text-5xl drop-shadow-sm"></fa-icon>
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">
+        No hay cotizaciones
+      </h2>
+      <p class="text-gray-500 text-sm text-center max-w-md">
+        Aún no has agregado productos o cotizaciones.
+        Empieza creando una nueva para verla aquí.
+      </p>
     </div>
   </div>
 
-  <div *ngIf="quotations.length === 0"
-    class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn">
-    <!-- Ícono -->
-    <fa-icon [icon]="faBoxOpen" class="text-purple-500 mb-4 text-5xl drop-shadow-sm"></fa-icon>
-
-    <!-- Título -->
-    <h2 class="text-xl font-semibold text-gray-700 mb-2">
-      No hay cotizaciones
-    </h2>
-
-    <!-- Descripción -->
-    <p class="text-gray-500 text-sm text-center max-w-md">
-      Aún no has agregado productos o cotizaciones.
-      Empieza creando una nueva para verla aquí.
-    </p>
-
-    <!-- Botón de acción -->
-    <!-- <button
-      (click)="openCreate()"
-      class="mt-6 px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow transition-all duration-300">
-      Crear cotización
-    </button> -->
+  <!-- Vista Lista (Tabla) -->
+  <div *ngIf="viewMode() === 'list'" class="mt-4 overflow-x-auto">
+    <div class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden">
+      <table class="w-full">
+        <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+          <tr>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Empresa</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Responsable</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Total</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Validez (días)</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Estado</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr *ngFor="let q of quotations; let odd = odd"
+            [class]="odd ? 'bg-white' : 'bg-gray-50'"
+            class="hover:bg-purple-50 transition-colors">
+            <td class="px-6 py-4 text-sm font-medium text-gray-900">
+              {{ q.company.razon_social }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600">
+              {{ q.user.name }}
+            </td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900">
+              ${{ q.total | number: '1.2-2' }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600">
+              {{ q.validity_days }} días
+            </td>
+            <td class="px-6 py-4 text-sm">
+              <span [class]="getStatusColor(q.status)" class="px-3 py-1 rounded-full text-xs font-medium capitalize">
+                {{ getStatusText(q.status) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm space-x-2">
+              <button (click)="openDetailsModal(q.id)"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
+                title="Ver">
+                <fa-icon [icon]="faEye"></fa-icon>
+              </button>
+              <button (click)="openEditModal(q.id)"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
+                title="Editar">
+                <fa-icon [icon]="faEdit"></fa-icon>
+              </button>
+              <button (click)="openStatusModal(q.id)"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
+                title="Cambiar estado">
+                <fa-icon [icon]="faCheckCircle"></fa-icon>
+              </button>
+              <button (click)="confirmDeletion(q.id)"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
+                title="Eliminar">
+                <fa-icon [icon]="faTrashAlt"></fa-icon>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="quotations.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+              No hay cotizaciones disponibles
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

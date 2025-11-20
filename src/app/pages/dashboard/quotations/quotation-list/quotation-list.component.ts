@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { QuotationService } from '../../../../services/quotation.service';
 import {
   PopulatedQuotation,
@@ -27,6 +27,7 @@ import { QuotationCreateComponent } from '../quotation-create/quotation-create.c
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
+import { HeaderCrudComponent } from '../../../../shared/header-dashboard/heeader-crud.component';
 
 @Component({
   imports: [
@@ -48,6 +49,12 @@ export class QuotationListComponent implements OnInit {
     throw new Error('Method not implemented.');
   }
   @Input({ required: true }) quotations: PopulatedQuotation[] = [];
+  // View mode signal
+  viewMode = signal<'grid' | 'list'>('grid');
+  // Allow parent to control view mode
+  @Input() set externalView(mode: 'grid' | 'list' | undefined) {
+    if (mode) this.viewMode.set(mode);
+  }
   isLoading = true;
   isModalOpen = false;
   currentModal: 'create' | 'edit' | 'details' | 'status' | null = null;
@@ -88,6 +95,10 @@ export class QuotationListComponent implements OnInit {
       );
       this.toastQuotation = null;
     }
+  }
+
+  handleViewChange(mode: 'grid' | 'list'): void {
+    this.viewMode.set(mode);
   }
 
   fetchQuotations(): void {

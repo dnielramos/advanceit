@@ -20,7 +20,7 @@ export interface UploadProgress {
   providedIn: 'root',
 })
 export class CompanyInventoriesService {
-  private readonly apiUrl = `${ENVIRONMENT.apiUrl}/company-inventories`;
+  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/company-inventories`;
   private readonly MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB en bytes
   private uploadProgress$ = new Subject<UploadProgress>();
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrdersService, Order } from '../../../services/orders.service';
 import { QuotationService } from '../../../services/quotation.service';
@@ -55,6 +55,9 @@ export class OrdersComponent implements OnInit {
 
   allOrders: Order[] = [];
   filteredOrders: Order[] = [];
+
+  // View mode signal
+  viewMode = signal<'grid' | 'list'>('grid');
 
   filters = {
     texto : '',
@@ -216,6 +219,10 @@ export class OrdersComponent implements OnInit {
   handleClearFilters(): void {
     this.filters = { texto: '', estado: '' };
     this.applyFilters();
+  }
+
+  handleViewChange(mode: 'grid' | 'list'): void {
+    this.viewMode.set(mode);
   }
 
   handleCreateOrder(newOrderData: Omit<Order, 'id'>): void {

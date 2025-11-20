@@ -2,7 +2,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { CacheService } from './cache.service';
 import { ProductoFinal } from '../models/Productos';
 import { CartItem } from './cart.service';
 
@@ -43,26 +44,36 @@ export class OrdersService {
   private readonly apiUrl = `${this.baseURL}/orders`;
   private readonly productSearchUrl = `${this.baseURL}/advance-products/by-sku`; // Asumo que esta ruta existe
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cache: CacheService) {}
 
   // --- Métodos para Órdenes ---
 
-  getOrders(): Observable<Order[]> {
-    return this.http
-      .get<Order[]>(this.apiUrl)
-      .pipe(catchError(this.handleError));
+  getOrders(forceRefresh = false): Observable<Order[]> {
+    const key = `${this.apiUrl}::all`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<Order[]>(this.apiUrl);
+    return this.cache.getOrFetch<Order[]>(key, fetch$);
   }
 
-  getOrderById(id: string): Observable<Order> {
-    return this.http
-      .get<Order>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+  getOrderById(id: string, forceRefresh = false): Observable<Order> {
+    const key = `${this.apiUrl}/${id}`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<Order>(`${this.apiUrl}/${id}`);
+    return this.cache.getOrFetch<Order>(key, fetch$);
   }
 
   createOrder(order: Omit<Order, 'id'>): Observable<Order> {
     return this.http
       .post<Order>(this.apiUrl, order)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap((res: any) => {
+          // invalidar listas y prefijos
+          this.cache.invalidate(`${this.apiUrl}::all`);
+          this.cache.invalidate(`${this.apiUrl}`, true);
+          if (res && res.id) this.cache.invalidate(`${this.apiUrl}/${res.id}`);
+        }),
+        catchError(this.handleError)
+      );
   }
 
   updateOrder(
@@ -71,7 +82,14 @@ export class OrdersService {
   ): Observable<Order> {
     return this.http
       .put<Order>(`${this.apiUrl}/${id}`, order)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(() => {
+          this.cache.invalidate(`${this.apiUrl}/${id}`);
+          this.cache.invalidate(`${this.apiUrl}::all`);
+          this.cache.invalidate(`${this.apiUrl}`, true);
+        }),
+        catchError(this.handleError)
+      );
   }
 
   updateOrderStatus(
@@ -80,21 +98,35 @@ export class OrdersService {
   ): Observable<Order> {
     return this.http
       .patch<Order>(`${this.apiUrl}/${id}/status`, { status })
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(() => {
+          this.cache.invalidate(`${this.apiUrl}/${id}`);
+          this.cache.invalidate(`${this.apiUrl}::all`);
+        }),
+        catchError(this.handleError)
+      );
   }
 
   deleteOrder(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(() => {
+          this.cache.invalidate(`${this.apiUrl}/${id}`);
+          this.cache.invalidate(`${this.apiUrl}::all`);
+          this.cache.invalidate(`${this.apiUrl}`, true);
+        }),
+        catchError(this.handleError)
+      );
   }
 
   // --- Métodos para Productos relacionados a una Orden ---
 
-  getOrderProducts(orderId: string): Observable<OrderProducts[]> {
-    return this.http
-      .get<OrderProducts[]>(`${this.apiUrl}/${orderId}/products`)
-      .pipe(catchError(this.handleError));
+  getOrderProducts(orderId: string, forceRefresh = false): Observable<OrderProducts[]> {
+    const key = `${this.apiUrl}/${orderId}/products`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<OrderProducts[]>(`${this.apiUrl}/${orderId}/products`);
+    return this.cache.getOrFetch<OrderProducts[]>(key, fetch$);
   }
 
 

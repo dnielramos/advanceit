@@ -44,6 +44,13 @@ export class RmaManagerComponent implements OnInit {
   searchQuery = signal<string>('');
   estadoFilter = signal<string>('');
 
+  // View mode (list by default to preserve current UI)
+  viewMode = signal<'grid' | 'list'>('list');
+
+  onViewChange(mode: 'grid' | 'list') {
+    this.viewMode.set(mode);
+  }
+
   // Mapa de estados ES -> EN para filtros
   private stateMapEsToEn: Record<string, string> = {
     'Pendiente': 'pending_review',

@@ -21,7 +21,10 @@ import {
   faCheckCircle,
   faCircleExclamation,
   faChevronRight,
-  faCalendarDay
+  faCalendarDay,
+  faTrash,
+  faPen,
+  faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 
 interface CompanyInventory {
@@ -54,6 +57,9 @@ export class InventoryUploaderComponent implements OnInit {
   faCircleExclamation = faCircleExclamation;
   faChevronRight = faChevronRight;
   faCalendarDay = faCalendarDay;
+  faTrash = faTrash;
+  faPen = faPen;
+  faExclamationTriangle = faExclamationTriangle;
 
   // Estado general
   companies = signal<CompanyInventory[]>([]);
@@ -389,6 +395,34 @@ export class InventoryUploaderComponent implements OnInit {
     } else {
       img.src = 'logo.png';
     }
+  }
+
+  // ======================================================
+  // Eliminar inventario
+  // ======================================================
+  confirmDeleteInventory(id: string | undefined, companyName: string) {
+    if (!id) return;
+
+    const confirmed = confirm(
+      `¿Estás seguro de que deseas eliminar el inventario de "${companyName}"? Esta acción no se puede deshacer.`
+    );
+
+    if (!confirmed) return;
+
+    this.inventoriesService.deleteInventory(id).subscribe({
+      next: () => {
+        // Remover de la lista local
+        this.companies.set(this.companies().filter(c => c.id !== id));
+        // Cerrar detalle si está abierto
+        if (this.selectedCompany()?.id === id) {
+          this.closeInventory();
+        }
+      },
+      error: (err) => {
+        console.error('Error al eliminar inventario:', err);
+        alert('Error al eliminar el inventario. Intenta nuevamente.');
+      },
+    });
   }
 
   capitalizeCompany(name: string): string {

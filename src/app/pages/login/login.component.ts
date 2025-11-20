@@ -10,16 +10,16 @@ import {
 import {
   faUser,
   faLock,
-  faCircleCheck,
-} from '@fortawesome/free-solid-svg-icons'; // <-- 1. Importa el ícono de check
+} from '@fortawesome/free-solid-svg-icons';
 import { AuthService, Role } from '../../services/auth.service';
+import { AdvanceLoaderComponent } from '../../components/advance-loader/advance-loader.component';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 import { ENVIRONMENT } from '../../../enviroments/enviroment';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, FaIconComponent, AngularToastifyModule],
+  imports: [CommonModule, FormsModule, FaIconComponent, AngularToastifyModule, AdvanceLoaderComponent],
   template: `
     <div
       class="hero-sectionS fixed mt-0 z-50 flex bg-linear-to-b from-white to-purple-200 items-center justify-center"
@@ -35,7 +35,7 @@ import { ENVIRONMENT } from '../../../enviroments/enviroment';
 
         <!-- Contenedor principal que cambia entre el formulario y el mensaje de éxito -->
         <div
-          class="bg-white rounded-4xl shadow-xl p-8 w-full max-w-md transition-all duration-500"
+          class="bg-white rounded-4xl p-8 w-full max-w-md transition-all duration-500"
         >
           <!-- FORMULARIO DE LOGIN (se muestra si loginSuccess es falso) -->
           <div *ngIf="!loginSuccess">
@@ -146,14 +146,9 @@ import { ENVIRONMENT } from '../../../enviroments/enviroment';
             </div>
           </div>
 
-          <!-- MENSAJE DE ÉXITO (se muestra si loginSuccess es verdadero) -->
-          <div *ngIf="loginSuccess" class="text-center py-8 animate-fade-in">
-            <fa-icon
-              [icon]="faCircleCheck"
-              class="text-green-500 text-6xl mb-4"
-            ></fa-icon>
-            <h2 class="text-3xl font-bold text-gray-800">¡Bienvenido!</h2>
-            <p class="text-gray-600 mt-2">Serás redirigido en un momento...</p>
+          <!-- LOADER ANIMADO (se muestra si loginSuccess es verdadero) -->
+          <div *ngIf="loginSuccess" class="text-center scale-90 py-8 animate-fade-in">
+            <app-advance-loader></app-advance-loader>
           </div>
         </div>
       </div>
@@ -217,7 +212,6 @@ export class LoginComponent {
   // Iconos
   faUser = faUser;
   faLock = faLock;
-  faCircleCheck = faCircleCheck; // <-- Agrega el nuevo ícono
 
   // --- Inyección de Dependencias ---
   private http = inject(HttpClient);
@@ -228,9 +222,8 @@ export class LoginComponent {
 
   private readonly apiUrl = `${this.baseURL}/auth/login`;
 
-  constructor(library: FaIconLibrary) {
-    // 3. Agrega todos los íconos a la librería
-    library.addIcons(faUser, faLock, faCircleCheck);
+  constructor(library: FaIconLibrary, toastService: ToastService) {
+    library.addIcons(faUser, faLock);
   }
 
   // --- Métodos del Componente ---
@@ -250,20 +243,22 @@ export class LoginComponent {
         next: (response) => {
           // --- 4. Lógica de éxito actualizada ---
           console.log('Login exitoso, token recibido.');
+          
           this.authService.handleLogin(response);
-
+          
           form.resetForm();
+          // this.toastService.success('Exito')
           this.loginSuccess = true;
 
           if (this.authService.hasRole(Role.Admin)) {
             setTimeout(() => {
               this.router.navigate(['/dashboard']);
-            }, 2000);
+            }, 3000);
           } else if (this.authService.hasRole(Role.User)) {
             setTimeout(() => {
               this.toastService.success('Bienvenido a la sección de productos');
               this.router.navigate(['/dashboard/advance-products']);
-            }, 2000);
+            }, 3000);
           }
         },
         error: (err) => {

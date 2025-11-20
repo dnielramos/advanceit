@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from "@angular/core";
+import { Component, signal, computed, inject, effect } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule } from "@angular/common/http";
 import { FontAwesomeModule, FaIconLibrary } from "@fortawesome/angular-fontawesome";
@@ -9,6 +9,7 @@ import { CompanyEditModalComponent } from "./company-edit-modal";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
+import { ViewportService } from '../../../services/viewport.service';
 
 // ===== Listado principal =====
 @Component({
@@ -33,7 +34,7 @@ import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-cr
           descripcion="Gestiona las empresas que pueden comprar en tu plataforma"
           textoBotonNuevo="Nueva Empresa"
           textoBotonActualizar="Actualizar"
-          [showViewToggle]="true"
+          [showViewToggle]="!isMobile()"
           [currentView]="viewMode()"
           (viewChange)="onViewChange($event)"
           [filterByStatus]="true"
@@ -189,8 +190,13 @@ export class CompanyComponent {
 
   // View mode (list by default to preserve current UI)
   viewMode = signal<'grid' | 'list'>('list');
+  private viewportService = inject(ViewportService);
+  readonly isMobile = this.viewportService.isMobile;
 
   onViewChange(mode: 'grid' | 'list') {
+    if (this.isMobile()) {
+      return;
+    }
     this.viewMode.set(mode);
   }
 
@@ -207,6 +213,11 @@ export class CompanyComponent {
   constructor() {
     this.fa.addIcons(faEye, faPen, faTrash, faPlus, faSearch, faXmark, faSpinner, faRotateRight);
     this.fetchAll();
+    effect(() => {
+      if (this.isMobile()) {
+        this.viewMode.set('grid');
+      }
+    });
   }
 
   // === Methods ===

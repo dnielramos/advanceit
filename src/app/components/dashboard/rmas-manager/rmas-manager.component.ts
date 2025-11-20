@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -9,6 +9,7 @@ import { RmasService } from '../../../services/rmas.service';
 import { Rma } from '../../../models/rma.model';
 import { CreateRmaModalComponent } from './create-rma-modal/create-rma-modal.component';
 import { ManageRmaModalComponent } from './manage-rma-modal/manage-rma-modal.component';
+import { ViewportService } from '../../../services/viewport.service';
 
 @Component({
   selector: 'app-rma-management',
@@ -46,8 +47,18 @@ export class RmaManagerComponent implements OnInit {
 
   // View mode (list by default to preserve current UI)
   viewMode = signal<'grid' | 'list'>('list');
+  private viewportService = inject(ViewportService);
+  readonly isMobile = this.viewportService.isMobile;
+  private enforceMobileView = effect(() => {
+    if (this.isMobile()) {
+      this.viewMode.set('grid');
+    }
+  });
 
   onViewChange(mode: 'grid' | 'list') {
+    if (this.isMobile()) {
+      return;
+    }
     this.viewMode.set(mode);
   }
 

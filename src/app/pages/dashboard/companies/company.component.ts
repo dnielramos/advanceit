@@ -33,6 +33,9 @@ import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-cr
           descripcion="Gestiona las empresas que pueden comprar en tu plataforma"
           textoBotonNuevo="Nueva Empresa"
           textoBotonActualizar="Actualizar"
+          [showViewToggle]="true"
+          [currentView]="viewMode()"
+          (viewChange)="onViewChange($event)"
           [filterByStatus]="true"
           [filterStatusValues]="availableStates"
           placeholderInput="Buscar por razón social o NIT..."
@@ -41,8 +44,8 @@ import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-cr
           (filterChange)="handleFilterChange($event)"
           (clearFilters)="handleClearFilters()">
         </app-header-crud>
-
-        <div class="mt-6 overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow">
+        <!-- List view (tabla) -->
+        <div *ngIf="viewMode() === 'list'" class="mt-4 overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow">
           <table class="min-w-full text-sm">
             <thead class="bg-gray-50 text-gray-600">
               <tr>
@@ -89,6 +92,44 @@ import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-cr
           <div *ngIf="loading()" class="p-10 flex items-center justify-center gap-2 text-gray-600"><fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon> Cargando...</div>
         </div>
 
+        <!-- Grid view (tarjetas) -->
+        <div *ngIf="viewMode() === 'grid'" class="mt-4">
+          <div *ngIf="!loading() && filtered().length===0" class="p-10 text-center text-gray-500">Sin resultados.</div>
+          <div *ngIf="loading()" class="p-10 flex items-center justify-center gap-2 text-gray-600"><fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon> Cargando...</div>
+          <div *ngIf="!loading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let c of paginated()" class="bg-white p-5 rounded-xl shadow-sm border-t-4 border-purple-500 transition hover:shadow-md">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-900">{{ c.razon_social }}</h3>
+                  <p class="text-xs text-gray-500 mt-1">NIT: {{ c.nit }}</p>
+                  <p class="text-xs text-gray-500 mt-1">{{ c.industria }}</p>
+                  <p class="text-xs text-gray-400 mt-2">{{ c.ciudad }}, {{ c.pais }}</p>
+                </div>
+                <div class="text-right">
+                  <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs"
+                        [class.bg-green-100]="c.estado==='ACTIVO'" [class.text-green-700]="c.estado==='ACTIVO'"
+                        [class.bg-gray-100]="c.estado!=='ACTIVO'" [class.text-gray-700]="c.estado!=='ACTIVO'">
+                    <span class="h-2 w-2 rounded-full" [class.bg-green-500]="c.estado==='ACTIVO'" [class.bg-gray-400]="c.estado!=='ACTIVO'"></span>
+                    {{ c.estado }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="mt-4 flex items-center justify-end gap-2">
+                <button class="icon-btn" (click)="openDetail(c.id)" title="Ver">
+                  <fa-icon [icon]="faEye"></fa-icon>
+                </button>
+                <button class="icon-btn" (click)="openEdit(c)" title="Editar">
+                  <fa-icon [icon]="faPen"></fa-icon>
+                </button>
+                <button class="icon-btn-danger" (click)="confirmDelete(c.id)" title="Eliminar">
+                  <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
           <div>Página {{ page() + 1 }} de {{ totalPages() }}</div>
           <div class="flex items-center gap-2">
@@ -132,7 +173,7 @@ export class CompanyComponent {
     const q = (this.query() || '').toLowerCase().trim();
     const estado = this.estadoFilter();
     const list = this.data();
-    
+
     return list.filter(c => {
       const matchesText = !q || c.razon_social.toLowerCase().includes(q) || c.nit.toLowerCase().includes(q);
       const matchesState = !estado || c.estado === estado;
@@ -145,6 +186,13 @@ export class CompanyComponent {
     const start = this.page() * this.pageSize();
     return this.filtered().slice(start, start + this.pageSize());
   });
+
+  // View mode (list by default to preserve current UI)
+  viewMode = signal<'grid' | 'list'>('list');
+
+  onViewChange(mode: 'grid' | 'list') {
+    this.viewMode.set(mode);
+  }
 
   faEye: IconProp = faEye;
   faPen: IconProp = faPen;

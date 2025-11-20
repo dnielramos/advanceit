@@ -10,7 +10,19 @@ import {
 } from '../../../services/company-inventories.service';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBuilding } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBuilding,
+  faUpload,
+  faFloppyDisk,
+  faSpinner,
+  faTimes,
+  faEye,
+  faHourglassHalf,
+  faCheckCircle,
+  faCircleExclamation,
+  faChevronRight,
+  faCalendarDay
+} from '@fortawesome/free-solid-svg-icons';
 
 interface CompanyInventory {
   id?: string;
@@ -30,7 +42,18 @@ export class InventoryUploaderComponent implements OnInit {
   private inventoriesService = inject(CompanyInventoriesService);
   private router = inject(Router);
 
+  // Icons
   faBuilding = faBuilding;
+  faUpload = faUpload;
+  faFloppyDisk = faFloppyDisk;
+  faSpinner = faSpinner;
+  faTimes = faTimes;
+  faEye = faEye;
+  faHourglassHalf = faHourglassHalf;
+  faCheckCircle = faCheckCircle;
+  faCircleExclamation = faCircleExclamation;
+  faChevronRight = faChevronRight;
+  faCalendarDay = faCalendarDay;
 
   // Estado general
   companies = signal<CompanyInventory[]>([]);
@@ -106,8 +129,23 @@ export class InventoryUploaderComponent implements OnInit {
     this.isSavingInventory.set(false);
   }
 
+  // Cerrar modal al hacer clic en el overlay (fondo oscuro)
+  closeModalOnOverlayClick(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      this.onCloseCreateInventory();
+    }
+  }
+
   onCreateInventory() {
-    this.isCreateInventory.set(true);
+    // Si estamos en detalle, cerrar primero para evitar superponer modales
+    if (this.selectedCompany()) {
+      this.closeInventory();
+      // Abrir modal después de cerrar el detalle (dar tiempo para animación)
+      setTimeout(() => this.isCreateInventory.set(true), 300);
+    } else {
+      // Si no hay detalle activo, abrir directamente
+      this.isCreateInventory.set(true);
+    }
   }
 
   handleFilterChange(event: { estado?: string; texto: string }) {

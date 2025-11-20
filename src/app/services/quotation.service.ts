@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { CacheService } from './cache.service';
 import {
   CreateFullQuotationDto,
   Quotation,
@@ -23,7 +24,7 @@ import { ENVIRONMENT } from '../../enviroments/enviroment';
 export class QuotationService {
   private apiUrl = `${ENVIRONMENT.apiUrlRender}/quotations`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cache: CacheService) {}
 
   /**
    * Maneja errores HTTP y lanza una excepción con un mensaje descriptivo.
@@ -61,27 +62,37 @@ export class QuotationService {
   ): Observable<Quotation & { details: QuotationDetail[] }> {
     return this.http
       .post<Quotation & { details: QuotationDetail[] }>(this.apiUrl, data)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap((res: any) => {
+          // invalidar listados y prefijos
+          this.cache.invalidate(`${this.apiUrl}::all`);
+          this.cache.invalidate(`${this.apiUrl}`, true);
+          if (res && res.id) this.cache.invalidate(`${this.apiUrl}/${res.id}`);
+        }),
+        catchError(this.handleError)
+      );
   }
 
   /**
    * Obtiene todas las cotizaciones existentes.
    * @returns Un Observable con una lista de cotizaciones.
    */
-  findAll(): Observable<Quotation[]> {
-    return this.http
-      .get<Quotation[]>(this.apiUrl)
-      .pipe(catchError(this.handleError));
+  findAll(forceRefresh = false): Observable<Quotation[]> {
+    const key = `${this.apiUrl}::all`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<Quotation[]>(this.apiUrl);
+    return this.cache.getOrFetch<Quotation[]>(key, fetch$).pipe(catchError(this.handleError));
   }
 
   /**
    * Obtiene todas las cotizaciones "pobladas" (con datos de usuario y compañía).
    * @returns Un Observable con una lista de cotizaciones pobladas.
    */
-  findAllPopulated(): Observable<PopulatedQuotation[]> {
-    return this.http
-      .get<PopulatedQuotation[]>(`${this.apiUrl}`)
-      .pipe(catchError(this.handleError));
+  findAllPopulated(forceRefresh = false): Observable<PopulatedQuotation[]> {
+    const key = `${this.apiUrl}::populated`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<PopulatedQuotation[]>(`${this.apiUrl}`);
+    return this.cache.getOrFetch<PopulatedQuotation[]>(key, fetch$).pipe(catchError(this.handleError));
   }
 
 
@@ -90,10 +101,11 @@ export class QuotationService {
    * @param id El ID de la cotización.
    * @returns Un Observable de la cotización.
    */
-  findOne(id: string): Observable<PopulatedQuotation> {
-    return this.http
-      .get<PopulatedQuotation>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+  findOne(id: string, forceRefresh = false): Observable<PopulatedQuotation> {
+    const key = `${this.apiUrl}/${id}`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<PopulatedQuotation>(`${this.apiUrl}/${id}`);
+    return this.cache.getOrFetch<PopulatedQuotation>(key, fetch$).pipe(catchError(this.handleError));
   }
 
   /**
@@ -108,7 +120,15 @@ export class QuotationService {
   ): Observable<Quotation & { details: QuotationDetail[] }> {
     return this.http
       .patch<Quotation & { details: QuotationDetail[] }>(`${this.apiUrl}/${id}`, data)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(() => {
+          this.cache.invalidate(`${this.apiUrl}/${id}`);
+          this.cache.invalidate(`${this.apiUrl}::all`);
+          this.cache.invalidate(`${this.apiUrl}`, true);
+          this.cache.invalidate(`${this.apiUrl}::populated`);
+        }),
+        catchError(this.handleError)
+      );
   }
 
   /**
@@ -126,6 +146,13 @@ export class QuotationService {
     const body = { status, approved_by: approvedBy };
     return this.http
       .patch<Quotation>(`${this.apiUrl}/${id}/status`, body)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(() => {
+          this.cache.invalidate(`${this.apiUrl}/${id}`);
+          this.cache.invalidate(`${this.apiUrl}::all`);
+          this.cache.invalidate(`${this.apiUrl}::populated`);
+        }),
+        catchError(this.handleError)
+      );
   }
 }

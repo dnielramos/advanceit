@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrdersService, Order } from '../../../services/orders.service';
 import { QuotationService } from '../../../services/quotation.service';
@@ -22,6 +22,7 @@ import { PaymentsService } from '../../../services/payments.service';
 import { PaymentMethod, PaymentStatus } from '../../../models/payment.model';
 import { AuthService, Role } from '../../../services/auth.service';
 import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
+import { ViewportService } from '../../../services/viewport.service';
 
 @Component({
   selector: 'app-orders',
@@ -58,6 +59,8 @@ export class OrdersComponent implements OnInit {
 
   // View mode signal
   viewMode = signal<'grid' | 'list'>('grid');
+  private viewportService = inject(ViewportService);
+  readonly isMobile = this.viewportService.isMobile;
 
   filters = {
     texto : '',
@@ -101,7 +104,13 @@ export class OrdersComponent implements OnInit {
     private authService: AuthService,
     private quotationService: QuotationService,
     private productsService: ProductsService
-  ) {}
+  ) {
+    effect(() => {
+      if (this.isMobile()) {
+        this.viewMode.set('grid');
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadOrders();
@@ -222,6 +231,9 @@ export class OrdersComponent implements OnInit {
   }
 
   handleViewChange(mode: 'grid' | 'list'): void {
+    if (this.isMobile()) {
+      return;
+    }
     this.viewMode.set(mode);
   }
 

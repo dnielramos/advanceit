@@ -19,7 +19,7 @@
   [filterByStatus]="true"
   [filterStatusValues]="['pagado', 'no_pagado', 'pendiente', 'cancelado']"
   placeholderInput="Número de orden (ej. ORD-123)"
-  [showViewToggle]="true"
+  [showViewToggle]="!isMobile()"
   [currentView]="viewMode()"
   (actualizar)="loadOrders()"
   (filterChange)="handleFilterChange($event)"

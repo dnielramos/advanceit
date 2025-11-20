@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QuotationService } from '../../../services/quotation.service';
 import { QuotationListComponent } from './quotation-list/quotation-list.component';
@@ -6,6 +6,7 @@ import { QuotationDetailComponent } from '../quotations/quotation-detail/quotati
 import { PopulatedQuotation, Quotation } from '../../../models/quotation.types';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 import { Router } from '@angular/router';
+import { ViewportService } from '../../../services/viewport.service';
 
 @Component({
   selector: 'app-quotation',
@@ -27,8 +28,13 @@ export class QuotationComponent {
   isLoading = signal(false);
   // view mode shared with child
   viewMode = signal<'grid' | 'list'>('grid');
+  private viewportService = inject(ViewportService);
+  readonly isMobile = this.viewportService.isMobile;
 
   onViewChange(mode: 'grid' | 'list'): void {
+    if (this.isMobile()) {
+      return;
+    }
     this.viewMode.set(mode);
   }
 
@@ -36,6 +42,11 @@ export class QuotationComponent {
     private quotationService: QuotationService,
     private router: Router
   ) {
+    effect(() => {
+      if (this.isMobile()) {
+        this.viewMode.set('grid');
+      }
+    });
     this.loadQuotations();
   }
 

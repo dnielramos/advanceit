@@ -2,7 +2,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
+import { CacheService } from './cache.service';
 
 export interface InventoryPayload {
   company: string;
@@ -21,40 +23,74 @@ export interface UploadProgress {
 })
 export class CompanyInventoriesService {
   private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/company-inventories`;
+  // TTL por defecto para GET caches (ms)
+  private readonly DEFAULT_TTL = 5 * 60 * 1000; // 5 minutos por defecto
   private readonly MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB en bytes
   private uploadProgress$ = new Subject<UploadProgress>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cache: CacheService) {}
 
   // CREATE
   createInventory(payload: InventoryPayload): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, payload);
+    return this.http.post(`${this.apiUrl}`, payload).pipe(
+      tap((res: any) => {
+        // Invalidar listas que podrían verse afectadas
+        this.cache.invalidate(`${this.apiUrl}::all`);
+        this.cache.invalidate(`${this.apiUrl}/by-company`, true);
+        // Si la API devuelve el id del nuevo inventario, invalidar su clave
+        if (res && res.id) this.cache.invalidate(`${this.apiUrl}/${res.id}`);
+      })
+    );
   }
 
   // READ - ALL
-  getAllInventories(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}`);
+  // forceRefresh = true -> ignora cache y rehace la petición
+  getAllInventories(forceRefresh = false): Observable<any[]> {
+    const key = `${this.apiUrl}::all`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<any[]>(`${this.apiUrl}`);
+    return this.cache.getOrFetch<any[]>(key, fetch$, this.DEFAULT_TTL);
   }
 
   // READ - BY COMPANY
-  getInventoryByCompany(company: string): Observable<any[]> {
+  // Se cachea por company. forceRefresh para invalidar.
+  getInventoryByCompany(company: string, forceRefresh = false): Observable<any[]> {
     const params = new HttpParams().set('company', company);
-    return this.http.get<any[]>(`${this.apiUrl}/by-company`, { params });
+    const key = `${this.apiUrl}/by-company::company=${company}`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<any[]>(`${this.apiUrl}/by-company`, { params });
+    return this.cache.getOrFetch<any[]>(key, fetch$, this.DEFAULT_TTL);
   }
 
   // READ - BY ID
-  getInventoryById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  getInventoryById(id: string, forceRefresh = false): Observable<any> {
+    const key = `${this.apiUrl}/${id}`;
+    if (forceRefresh) this.cache.invalidate(key);
+    const fetch$ = this.http.get<any>(`${this.apiUrl}/${id}`);
+    return this.cache.getOrFetch<any>(key, fetch$, this.DEFAULT_TTL);
   }
 
   // UPDATE
   updateInventory(id: string, newData: any, updatedBy: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${id}`, { newData, updatedBy });
+    return this.http.patch(`${this.apiUrl}/${id}`, { newData, updatedBy }).pipe(
+      tap(() => {
+        // Invalidar cache relacionada
+        this.cache.invalidate(`${this.apiUrl}/${id}`);
+        this.cache.invalidate(`${this.apiUrl}::all`);
+        this.cache.invalidate(`${this.apiUrl}/by-company`, true);
+      })
+    );
   }
 
   // DELETE
   deleteInventory(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this.cache.invalidate(`${this.apiUrl}/${id}`);
+        this.cache.invalidate(`${this.apiUrl}::all`);
+        this.cache.invalidate(`${this.apiUrl}/by-company`, true);
+      })
+    );
   }
 
   // ============================================

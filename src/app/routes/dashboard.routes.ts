@@ -78,6 +78,13 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
+        path: 'companies/:id',
+        loadComponent: () =>
+          import('../pages/dashboard/companies/company-detail/company-detail.component').then(
+            (m) => m.CompanyDetailComponent
+          ),
+      },
+      {
         path: 'payments',
         loadComponent: () =>
           import('../components/dashboard/payments-manager/payments-manager.component').then(

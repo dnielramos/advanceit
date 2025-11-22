@@ -1,4 +1,5 @@
 import { Component, signal, computed, inject, effect } from "@angular/core";
+import { Router } from '@angular/router';
 import { CommonModule } from "@angular/common";
 import { HttpClientModule } from "@angular/common/http";
 import { FontAwesomeModule, FaIconLibrary } from "@fortawesome/angular-fontawesome";
@@ -34,6 +35,7 @@ import { SkeletonTableComponent } from '../../../components/skeleton-table/skele
 export class CompanyComponent {
   private service = inject(CompaniesService);
   private fa = inject(FaIconLibrary);
+  private router = inject(Router);
 
   // === Properties ===
   data = signal<Company[]>([]);
@@ -146,8 +148,7 @@ export class CompanyComponent {
 
   // Modales
   openDetail(id: string) {
-    this.selectedId.set(id);
-    this.showDetail.set(true);
+    this.router.navigate(['/dashboard/companies', id]);
   }
   closeDetail() {
     this.showDetail.set(false);

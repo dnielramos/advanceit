@@ -83,7 +83,7 @@
         <!-- Card Footer / Actions -->
         <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center gap-2">
           <button (click)="openDetailsModal(q.id)"
-            class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 hover:shadow-md transition-all duration-200 border border-transparent hover:border-gray-100"
+            class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100"
             title="Ver detalles">
             <fa-icon [icon]="faEye"></fa-icon>
             <span>Ver</span>
@@ -128,7 +128,7 @@
   <!-- Vista Lista (Tabla) -->
   <div *ngIf="viewMode() === 'list'" class="mt-4 overflow-x-auto">
     <!-- Skeleton Loader -->
-    <app-skeleton-table *ngIf="isLoading" [rowCount]="8" [columnCount]="6"></app-skeleton-table>
+    <app-skeleton-table *ngIf="isLoading" [rowCount]="8" [columnCount]="7"></app-skeleton-table>
 
     <!-- Actual Content -->
     <div *ngIf="!isLoading" class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden">
@@ -137,6 +137,7 @@
           <tr>
             <th class="px-6 py-4 text-left text-sm font-semibold">Empresa</th>
             <th class="px-6 py-4 text-left text-sm font-semibold">Responsable</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Fecha</th>
             <th class="px-6 py-4 text-left text-sm font-semibold">Total</th>
             <th class="px-6 py-4 text-left text-sm font-semibold">Validez (días)</th>
             <th class="px-6 py-4 text-left text-sm font-semibold">Estado</th>
@@ -151,6 +152,9 @@
             </td>
             <td class="px-6 py-4 text-sm text-gray-600">
               {{ q.user.name }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600">
+              {{ q.creation_date | date:'dd MMM yyyy' }}
             </td>
             <td class="px-6 py-4 text-sm font-medium text-gray-900">
               ${{ q.total | number: '1.2-2' }}
@@ -187,7 +191,7 @@
             </td>
           </tr>
           <tr *ngIf="quotations.length === 0">
-            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
               No hay cotizaciones disponibles
             </td>
           </tr>

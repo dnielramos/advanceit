@@ -23,6 +23,7 @@ import { PaymentMethod, PaymentStatus } from '../../../models/payment.model';
 import { AuthService, Role } from '../../../services/auth.service';
 import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 import { ViewportService } from '../../../services/viewport.service';
+import { ViewModeService } from '../../../services/view-mode.service';
 import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
 import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -64,7 +65,8 @@ export class OrdersComponent implements OnInit {
   filteredOrders: Order[] = [];
 
   // View mode signal
-  viewMode = signal<'grid' | 'list'>('grid');
+  private viewModeService = inject(ViewModeService);
+  viewMode = this.viewModeService.viewMode;
   private viewportService = inject(ViewportService);
   readonly isMobile = this.viewportService.isMobile;
 
@@ -122,11 +124,7 @@ export class OrdersComponent implements OnInit {
     private productsService: ProductsService,
     private router: Router
   ) {
-    effect(() => {
-      if (this.isMobile()) {
-        this.viewMode.set('grid');
-      }
-    });
+    // Effect removed as it is handled in ViewModeService
   }
 
   ngOnInit(): void {
@@ -252,10 +250,7 @@ export class OrdersComponent implements OnInit {
   }
 
   handleViewChange(mode: 'grid' | 'list'): void {
-    if (this.isMobile()) {
-      return;
-    }
-    this.viewMode.set(mode);
+    this.viewModeService.setViewMode(mode);
   }
 
   handleCreateOrder(newOrderData: Omit<Order, 'id'>): void {

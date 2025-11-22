@@ -13,6 +13,7 @@ import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-cr
 import { ViewportService } from '../../../services/viewport.service';
 import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
 import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
+import { ViewModeService } from '../../../services/view-mode.service';
 
 // ===== Listado principal =====
 @Component({
@@ -74,15 +75,13 @@ export class CompanyComponent {
   });
 
   // View mode (list by default to preserve current UI)
-  viewMode = signal<'grid' | 'list'>('list');
+  private viewModeService = inject(ViewModeService);
+  viewMode = this.viewModeService.viewMode;
   private viewportService = inject(ViewportService);
   readonly isMobile = this.viewportService.isMobile;
 
   onViewChange(mode: 'grid' | 'list') {
-    if (this.isMobile()) {
-      return;
-    }
-    this.viewMode.set(mode);
+    this.viewModeService.setViewMode(mode);
   }
 
   faEye: IconProp = faEye;
@@ -102,11 +101,6 @@ export class CompanyComponent {
   constructor() {
     this.fa.addIcons(faEye, faPen, faTrash, faPlus, faSearch, faXmark, faSpinner, faRotateRight, faBuilding, faMapMarkerAlt, faIndustry, faGlobe);
     this.fetchAll();
-    effect(() => {
-      if (this.isMobile()) {
-        this.viewMode.set('grid');
-      }
-    });
   }
 
   // === Methods ===

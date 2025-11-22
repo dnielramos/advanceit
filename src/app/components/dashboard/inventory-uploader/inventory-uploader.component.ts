@@ -28,6 +28,7 @@ import {
   faPen,
   faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
+import { ViewModeService } from '../../../services/view-mode.service';
 
 interface CompanyInventory {
   id?: string;
@@ -89,7 +90,8 @@ export class InventoryUploaderComponent implements OnInit {
 
   // Dentro de la clase InventoryUploaderComponent
   searchText = signal<string>('');
-  viewMode = signal<'grid' | 'list'>('grid');
+  private viewModeService = inject(ViewModeService);
+  viewMode = this.viewModeService.viewMode;
   filteredInventory = computed(() => {
     const company = this.selectedCompany();
     const text = this.searchText().toLowerCase().trim();
@@ -356,8 +358,11 @@ export class InventoryUploaderComponent implements OnInit {
   // ======================================================
   // Cambio de vista
   // ======================================================
+  // ======================================================
+  // Cambio de vista
+  // ======================================================
   handleViewChange(mode: 'grid' | 'list') {
-    this.viewMode.set(mode);
+    this.viewModeService.setViewMode(mode);
   }
 
   // ======================================================

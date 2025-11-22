@@ -3,7 +3,7 @@
   <!-- Header -->
   <app-header-crud titulo="Usuarios" descripcion="Gestiona los usuarios del sistema" textoBotonNuevo="Agregar Usuario"
     textoBotonActualizar="Refrescar" [filterByStatus]="true" [filterStatusValues]="availableRoles"
-    placeholderInput="Buscar por nombre o email..." [showViewToggle]="true" [currentView]="state().viewMode"
+    placeholderInput="Buscar por nombre o email..." [showViewToggle]="true" [currentView]="viewMode()"
     (crear)="openAddModal()" (actualizar)="loadUsers()" (filterChange)="handleFilterChange($event)"
     (clearFilters)="handleClearFilters()" (viewChange)="handleViewChange($event)">
   </app-header-crud>
@@ -12,7 +12,7 @@
   <div class="flex-1 overflow-y-auto mt-6 pr-2">
 
     <!-- Grid View -->
-    @if (state().viewMode === 'grid') {
+    @if (viewMode() === 'grid') {
     <!-- Loading State -->
     @if (state().loading) {
     <app-skeleton-card [count]="8"></app-skeleton-card>
@@ -113,7 +113,7 @@
     }
 
     <!-- List View -->
-    @if (state().viewMode === 'list') {
+    @if (viewMode() === 'list') {
     <!-- Loading State -->
     @if (state().loading) {
     <app-skeleton-table [rowCount]="8" [columnCount]="4"></app-skeleton-table>

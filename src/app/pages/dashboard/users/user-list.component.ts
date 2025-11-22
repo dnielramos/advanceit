@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -25,6 +25,7 @@ import { UserAddModalComponent } from './user-add-modal/user-add-modal.component
 import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
 import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
+import { ViewModeService } from '../../../services/view-mode.service';
 
 interface UserState {
   users: User[];
@@ -32,7 +33,6 @@ interface UserState {
   showViewModal: boolean;
   showEditModal: boolean;
   showAddModal: boolean;
-  viewMode: 'grid' | 'list';
   searchTerm: string;
   roleFilter: string;
   loading: boolean;
@@ -58,6 +58,9 @@ interface UserState {
   templateUrl: './user-list.component.html',
 })
 export class UserListComponent {
+  private viewModeService = inject(ViewModeService);
+  viewMode = this.viewModeService.viewMode;
+  
   faEye = faEye;
   faPen = faPen;
   faTh = faTh;
@@ -75,7 +78,6 @@ export class UserListComponent {
     showViewModal: false,
     showEditModal: false,
     showAddModal: false,
-    viewMode: 'grid',
     searchTerm: '',
     roleFilter: '',
     loading: true,
@@ -152,10 +154,6 @@ export class UserListComponent {
     }));
   }
 
-  setViewMode(mode: 'grid' | 'list'): void {
-    this.state.update((s) => ({ ...s, viewMode: mode }));
-  }
-
   // Agrega este método para abrir el modal de creación:
   openAddModal(): void {
     this.state.update((s) => ({
@@ -192,6 +190,6 @@ export class UserListComponent {
   }
 
   handleViewChange(mode: 'grid' | 'list'): void {
-    this.setViewMode(mode);
+    this.viewModeService.setViewMode(mode);
   }
 }

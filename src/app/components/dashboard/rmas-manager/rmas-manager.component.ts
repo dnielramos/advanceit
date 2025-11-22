@@ -3,26 +3,41 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faSpinner, faEye } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faSpinner, 
+  faEye, 
+  faClipboardList,
+  faCalendarAlt,
+  faBoxOpen,
+  faUser,
+  faEdit,
+  faTrashAlt,
+  faCheckCircle,
+  faTimes,
+  faFileAlt
+} from '@fortawesome/free-solid-svg-icons';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 import { RmasService } from '../../../services/rmas.service';
 import { Rma } from '../../../models/rma.model';
 import { CreateRmaModalComponent } from './create-rma-modal/create-rma-modal.component';
 import { ManageRmaModalComponent } from './manage-rma-modal/manage-rma-modal.component';
 import { ViewportService } from '../../../services/viewport.service';
+import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
+import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
 
 @Component({
   selector: 'app-rma-management',
   standalone: true,
-  // Importamos módulos clave para un componente standalone
   imports: [
     CommonModule,
     FontAwesomeModule,
     HeaderCrudComponent,
     CreateRmaModalComponent,
     ManageRmaModalComponent,
+    SkeletonCardComponent,
+    SkeletonTableComponent,
   ],
-  templateUrl: './rma-manager.component.html',
+  templateUrl: './rmas-manager.component.html',
   // No hay 'styleUrls' ya que todo el estilo está en el HTML con Tailwind
 })
 export class RmaManagerComponent implements OnInit {
@@ -32,6 +47,15 @@ export class RmaManagerComponent implements OnInit {
   // Iconos
   faSpinner = faSpinner;
   faEye = faEye;
+  faClipboardList = faClipboardList;
+  faCalendarAlt = faCalendarAlt;
+  faBoxOpen = faBoxOpen;
+  faUser = faUser;
+  faEdit = faEdit;
+  faTrashAlt = faTrashAlt;
+  faCheckCircle = faCheckCircle;
+  faTimes = faTimes;
+  faFileAlt = faFileAlt;
 
   // Estados de la UI manejados con Signals
   allRmas = signal<Rma[]>([]);

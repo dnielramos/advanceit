@@ -17,6 +17,7 @@ import {
   faDollarSign,
   faCalendarAlt,
   faBoxOpen,
+  faBuilding,
 } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { QuotationFormComponent } from '../quotation-form/quotation-form.component';
@@ -78,6 +79,7 @@ export class QuotationListComponent implements OnInit {
   faUser = faUser;
   faDollarSign = faDollarSign;
   faCalendarAlt = faCalendarAlt;
+  faBuilding = faBuilding;
   faBoxOpen = faBoxOpen;
 
   constructor(

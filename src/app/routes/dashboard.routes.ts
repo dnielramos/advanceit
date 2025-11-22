@@ -99,6 +99,13 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
+        path: 'solicitudes/:id',
+        loadComponent: () =>
+          import('../pages/dashboard/rmas/rma-detail/rma-detail.component').then(
+            (m) => m.RmaDetailComponent
+          ),
+      },
+      {
         path: 'cotizaciones',
         loadComponent: () =>
           import('../pages/dashboard/quotations/quotation.component').then(

@@ -19,8 +19,7 @@ import {
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 import { RmasService } from '../../../services/rmas.service';
 import { Rma } from '../../../models/rma.model';
-import { CreateRmaModalComponent } from './create-rma-modal/create-rma-modal.component';
-import { ManageRmaModalComponent } from './manage-rma-modal/manage-rma-modal.component';
+
 import { ViewportService } from '../../../services/viewport.service';
 import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
 import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
@@ -32,8 +31,6 @@ import { SkeletonTableComponent } from '../../../components/skeleton-table/skele
     CommonModule,
     FontAwesomeModule,
     HeaderCrudComponent,
-    CreateRmaModalComponent,
-    ManageRmaModalComponent,
     SkeletonCardComponent,
     SkeletonTableComponent,
   ],
@@ -59,9 +56,6 @@ export class RmaManagerComponent implements OnInit {
 
   // Estados de la UI manejados con Signals
   allRmas = signal<Rma[]>([]);
-  selectedRma = signal<Rma | null>(null);
-  showCreateModal = signal(false);
-  showManageModal = signal(false);
   isLoading = signal(false);
   error = signal<string | null>(null);
 
@@ -190,43 +184,13 @@ export class RmaManagerComponent implements OnInit {
     this.router.navigate(['/dashboard/solicitudes/nueva']);
   }
 
-  closeCreateModal(): void {
-    this.showCreateModal.set(false);
-  }
 
-  handleRmaCreated(): void {
-    this.closeCreateModal();
-    this.loadRmas();
-  }
 
   selectRma(rma: Rma): void {
-    this.isLoading.set(true);
-    this.error.set(null);
-    this.rmaService.findRmaById(rma.id).subscribe({
-      next: (response) => {
-        this.selectedRma.set(response.data);
-        this.showManageModal.set(true);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        this.error.set(`Error al cargar la RMA: ${err.error?.message || err.message}`);
-        this.isLoading.set(false);
-      },
-    });
+    this.router.navigate(['/dashboard/solicitudes', rma.id]);
   }
 
-  closeManageModal(): void {
-    this.showManageModal.set(false);
-    this.selectedRma.set(null);
-  }
-
-  handleRmaUpdated(): void {
-    this.closeManageModal();
-    this.loadRmas();
-  }
-
-  handleRmaDeleted(): void {
-    this.closeManageModal();
+  refreshData(): void {
     this.loadRmas();
   }
 

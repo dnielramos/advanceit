@@ -5,9 +5,10 @@
         <app-header-crud titulo="Solicitudes RMA"
             descripcion="Gestiona las solicitudes de devolución de forma eficiente" textoBotonNuevo="Nueva Solicitud"
             textoBotonActualizar="Actualizar" [filterByStatus]="true" [filterStatusValues]="availableStates"
-            placeholderInput="Buscar por RMA, orden o motivo..." (crear)="openCreateModal()" (actualizar)="loadRmas()"
-            (filterChange)="handleFilterChange($event)" (clearFilters)="handleClearFilters()" [showViewToggle]="true"
-            [currentView]="viewMode()" (viewChange)="onViewChange($event)">
+            placeholderInput="Buscar por RMA, orden o motivo..." (crear)="openCreateModal()"
+            (actualizar)="refreshData()" (filterChange)="handleFilterChange($event)"
+            (clearFilters)="handleClearFilters()" [showViewToggle]="true" [currentView]="viewMode()"
+            (viewChange)="onViewChange($event)">
         </app-header-crud>
     </header>
 
@@ -175,23 +176,3 @@
         </div>
     </div>
 </div>
-
-<!-- Modal para gestionar RMA -->
-@if (showManageModal() && selectedRma()) {
-<div class="fixed inset-0 bg-gray-900/50 flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn">
-    <div
-        class="bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate__animated animate__zoomIn">
-        <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
-            <h2 class="text-2xl font-bold text-gray-800">Detalles de Solicitud RMA</h2>
-            <button (click)="closeManageModal()"
-                class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
-                <fa-icon [icon]="faTimes" class="text-xl"></fa-icon>
-            </button>
-        </div>
-
-        <app-manage-rma-modal [rma]="selectedRma()!" (close)="closeManageModal()" (updated)="handleRmaUpdated()"
-            (deleted)="handleRmaDeleted()">
-        </app-manage-rma-modal>
-    </div>
-</div>
-}

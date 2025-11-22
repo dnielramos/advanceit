@@ -1,0 +1,287 @@
+<div class="min-h-screen bg-slate-50 p-4 sm:p-6 md:p-8">
+    <!-- Loading State -->
+    @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-20">
+        <fa-icon [icon]="faSpinner" class="text-purple-600 text-4xl animate-spin mb-4"></fa-icon>
+        <p class="text-gray-600">Cargando detalles de RMA...</p>
+    </div>
+    }
+
+    <!-- Error State -->
+    @if (error() && !isLoading()) {
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start gap-4">
+            <fa-icon [icon]="faExclamationTriangle" class="text-red-500 text-2xl"></fa-icon>
+            <div class="flex-1">
+                <h3 class="text-red-800 font-semibold mb-2">Error</h3>
+                <p class="text-red-700">{{ error() }}</p>
+                <button (click)="goBack()"
+                    class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    Volver a Solicitudes
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Main Content -->
+    @if (rma() && !isLoading()) {
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <!-- Breadcrumb & Title -->
+                <div>
+                    <nav class="text-sm text-gray-500 mb-2">
+                        <button (click)="goBack()" class="hover:text-purple-600 transition-colors">Solicitudes</button>
+                        <span class="mx-2">/</span>
+                        <span class="text-gray-900 font-medium">RMA #{{ rma()!.rma_number }}</span>
+                    </nav>
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-purple-100 rounded-lg text-purple-600">
+                            <fa-icon [icon]="faClipboardList" class="text-2xl"></fa-icon>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">RMA #{{ rma()!.rma_number }}</h1>
+                            <p class="text-sm text-gray-500">Orden: {{ rma()!.order_id }}</p>
+                        </div>
+                        <div>
+                            <span [class]="getStateColor(rma()!.estado)"
+                                class="px-3 py-1 rounded-full text-sm font-semibold uppercase tracking-wide">
+                                {{ getStateLabel(rma()!.estado) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-2">
+                    <button (click)="goBack()"
+                        class="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200">
+                        <fa-icon [icon]="faArrowLeft"></fa-icon>
+                        <span class="hidden md:inline">Volver</span>
+                    </button>
+                    <button (click)="handleDelete()" [disabled]="isSaving()"
+                        class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50">
+                        <fa-icon [icon]="faTrashAlt"></fa-icon>
+                        <span class="hidden md:inline">Eliminar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left Column - Details & Tabs -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Tabs -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <!-- Tab Headers -->
+                    <div class="flex border-b border-gray-200 bg-gray-50">
+                        <button (click)="setActiveTab('details')"
+                            [class]="activeTab() === 'details' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-500 hover:text-gray-700'"
+                            class="flex-1 px-6 py-3 text-sm font-semibold transition-colors">
+                            Detalles
+                        </button>
+                        <button (click)="setActiveTab('items')"
+                            [class]="activeTab() === 'items' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-500 hover:text-gray-700'"
+                            class="flex-1 px-6 py-3 text-sm font-semibold transition-colors">
+                            Productos
+                        </button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="p-6">
+                        <!-- Details Tab -->
+                        @if (activeTab() === 'details') {
+                        <div class="space-y-6">
+                            <!-- Basic Info -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">RMA
+                                        Number</label>
+                                    <p class="text-sm font-medium text-gray-900">{{ rma()!.rma_number }}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Order
+                                        ID</label>
+                                    <p class="text-sm font-medium text-gray-900">{{ rma()!.order_id }}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha de
+                                        Solicitud</label>
+                                    <div class="flex items-center gap-2 text-sm text-gray-700">
+                                        <fa-icon [icon]="faCalendarAlt" class="text-gray-400"></fa-icon>
+                                        <span>{{ rma()!.fecha_solicitud | date:'dd MMM yyyy, h:mm a' }}</span>
+                                    </div>
+                                </div>
+                                @if (rma()!.fecha_resolucion) {
+                                <div class="space-y-1">
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha de
+                                        Resolución</label>
+                                    <div class="flex items-center gap-2 text-sm text-gray-700">
+                                        <fa-icon [icon]="faCheckCircle" class="text-green-500"></fa-icon>
+                                        <span>{{ rma()!.fecha_resolucion | date:'dd MMM yyyy, h:mm a' }}</span>
+                                    </div>
+                                </div>
+                                }
+                            </div>
+
+                            <!-- Motivo -->
+                            <div class="space-y-2">
+                                <label
+                                    class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Motivo</label>
+                                <p class="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200">{{
+                                    rma()!.motivo }}</p>
+                            </div>
+
+                            <!-- Notas -->
+                            @if (rma()!.notas) {
+                            <div class="space-y-2">
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Notas</label>
+                                <p class="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200">{{
+                                    rma()!.notas }}</p>
+                            </div>
+                            }
+
+                            <!-- Resolution -->
+                            @if (rma()!.resolution) {
+                            <div class="space-y-2">
+                                <label
+                                    class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Resolución</label>
+                                <p class="text-sm text-gray-700 bg-green-50 p-4 rounded-lg border border-green-200">{{
+                                    rma()!.resolution }}</p>
+                            </div>
+                            }
+                        </div>
+                        }
+
+                        <!-- Items Tab -->
+                        @if (activeTab() === 'items') {
+                        <div class="space-y-4">
+                            @for (item of getRmaItems(); track $index) {
+                            <div
+                                class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-purple-300 transition-colors">
+                                <div class="p-3 bg-purple-100 rounded-lg text-purple-600">
+                                    <fa-icon [icon]="faBox" class="text-xl"></fa-icon>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900">{{ item.product_name }}</h4>
+                                    <p class="text-sm text-gray-500">SKU: {{ item.product_id }}</p>
+                                    @if (item.serial) {
+                                    <p class="text-sm text-gray-500">Serial: {{ item.serial }}</p>
+                                    }
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Cantidad</p>
+                                    <p class="text-lg font-bold text-purple-600">{{ item.quantity }}</p>
+                                </div>
+                            </div>
+                            } @empty {
+                            <div class="text-center py-8 text-gray-500">
+                                <fa-icon [icon]="faBoxOpen" class="text-4xl mb-2"></fa-icon>
+                                <p>No hay productos registrados</p>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Update Data Form -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <fa-icon [icon]="faEdit" class="text-purple-600"></fa-icon>
+                        Actualizar Datos
+                    </h2>
+                    <form [formGroup]="updateDataForm" (ngSubmit)="handleUpdateData()" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Motivo</label>
+                            <textarea formControlName="motivo" rows="3"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                placeholder="Descripción del motivo"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas</label>
+                            <textarea formControlName="notas" rows="3"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                placeholder="Notas adicionales"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Evidencias (JSON)</label>
+                            <textarea formControlName="evidencias" rows="4"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors font-mono text-xs"
+                                placeholder='[{"product_id": "...", "quantity": 1}]'></textarea>
+                            @if (updateDataForm.get('evidencias')?.hasError('invalidJson')) {
+                            <p class="text-red-500 text-sm mt-1">JSON inválido</p>
+                            }
+                        </div>
+                        <button type="submit" [disabled]="updateDataForm.invalid || isSaving()"
+                            class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold">
+                            @if (isSaving()) {
+                            <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
+                            } @else {
+                            <fa-icon [icon]="faSave"></fa-icon>
+                            }
+                            <span>Guardar Cambios</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column - Actions Panel -->
+            <div class="space-y-6">
+
+                <!-- Update State Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <fa-icon [icon]="faCheckCircle" class="text-purple-600"></fa-icon>
+                        Cambiar Estado
+                    </h2>
+                    <form [formGroup]="updateStateForm" (ngSubmit)="handleUpdateState()" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nuevo Estado</label>
+                            <select formControlName="nextState"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors">
+                                @for (option of stateOptions; track option[1]) {
+                                <option [value]="option[1]">{{ option[0] }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas (opcional)</label>
+                            <textarea formControlName="notas" rows="2"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                placeholder="Razón del cambio de estado"></textarea>
+                        </div>
+                        <button type="submit" [disabled]="updateStateForm.invalid || isSaving()"
+                            class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold">
+                            @if (isSaving()) {
+                            <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
+                            } @else {
+                            <fa-icon [icon]="faCheckCircle"></fa-icon>
+                            }
+                            <span>Actualizar Estado</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Info Card -->
+                <div class="bg-purple-50 rounded-xl border border-purple-200 p-6">
+                    <div class="flex items-start gap-3">
+                        <fa-icon [icon]="faInfoCircle" class="text-purple-600 text-xl mt-0.5"></fa-icon>
+                        <div class="text-sm text-purple-900">
+                            <p class="font-semibold mb-2">Información</p>
+                            <p>Los cambios se guardan inmediatamente. Asegúrate de revisar toda la información antes de
+                                actualizar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>

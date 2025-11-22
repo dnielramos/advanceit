@@ -21,6 +21,7 @@ import { RmasService } from '../../../services/rmas.service';
 import { Rma } from '../../../models/rma.model';
 
 import { ViewportService } from '../../../services/viewport.service';
+import { ViewModeService } from '../../../services/view-mode.service';
 import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
 import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
 
@@ -64,20 +65,13 @@ export class RmaManagerComponent implements OnInit {
   estadoFilter = signal<string>('');
 
   // View mode (list by default to preserve current UI)
-  viewMode = signal<'grid' | 'list'>('list');
+  private viewModeService = inject(ViewModeService);
+  viewMode = this.viewModeService.viewMode;
   private viewportService = inject(ViewportService);
   readonly isMobile = this.viewportService.isMobile;
-  private enforceMobileView = effect(() => {
-    if (this.isMobile()) {
-      this.viewMode.set('grid');
-    }
-  });
 
   onViewChange(mode: 'grid' | 'list') {
-    if (this.isMobile()) {
-      return;
-    }
-    this.viewMode.set(mode);
+    this.viewModeService.setViewMode(mode);
   }
 
   // Mapa de estados ES -> EN para filtros

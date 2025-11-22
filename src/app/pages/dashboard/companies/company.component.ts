@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, effect } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule } from "@angular/common/http";
 import { FontAwesomeModule, FaIconLibrary } from "@fortawesome/angular-fontawesome";
-import { faEye, faPen, faTrash, faPlus, faSearch, faXmark, faSpinner, faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPen, faTrash, faPlus, faSearch, faXmark, faSpinner, faRotateRight, faBuilding, faMapMarkerAlt, faIndustry, faGlobe } from "@fortawesome/free-solid-svg-icons";
 import { CompaniesService, Company } from "../../../services/companies.service";
 import { CompanyDetailModalComponent } from "./company-detail-modal.component";
 import { CompanyEditModalComponent } from "./company-edit-modal";
@@ -10,6 +10,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 import { ViewportService } from '../../../services/viewport.service';
+import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
+import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
 
 // ===== Listado principal =====
 @Component({
@@ -23,130 +25,11 @@ import { ViewportService } from '../../../services/viewport.service';
     FontAwesomeModule,
     CompanyDetailModalComponent,
     CompanyEditModalComponent,
-    HeaderCrudComponent
+    HeaderCrudComponent,
+    SkeletonCardComponent,
+    SkeletonTableComponent
   ],
-  template: `
-    <section class="hflexy animate__animated animate__fadeIn bg-slate-50">
-      <div class="max-w-7xl mx-auto p-4 md:p-8">
-
-        <app-header-crud
-          titulo="Empresas"
-          descripcion="Gestiona las empresas que pueden comprar en tu plataforma"
-          textoBotonNuevo="Nueva Empresa"
-          textoBotonActualizar="Actualizar"
-          [showViewToggle]="!isMobile()"
-          [currentView]="viewMode()"
-          (viewChange)="onViewChange($event)"
-          [filterByStatus]="true"
-          [filterStatusValues]="availableStates"
-          placeholderInput="Buscar por razón social o NIT..."
-          (crear)="openCreate()"
-          (actualizar)="refresh()"
-          (filterChange)="handleFilterChange($event)"
-          (clearFilters)="handleClearFilters()">
-        </app-header-crud>
-        <!-- List view (tabla) -->
-        <div *ngIf="viewMode() === 'list'" class="mt-4 overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow">
-          <table class="min-w-full text-sm">
-            <thead class="bg-gray-50 text-gray-600">
-              <tr>
-                <th class="px-4 py-3 text-left">Razón social</th>
-                <th class="px-4 py-3 text-left">NIT</th>
-                <th class="px-4 py-3 text-left">Industria</th>
-                <th class="px-4 py-3 text-left">Ubicación</th>
-                <th class="px-4 py-3 text-left">Estado</th>
-                <th class="px-4 py-3 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let c of paginated()" class="border-t border-gray-100 hover:bg-purple-50/40">
-                <td class="px-4 py-3 font-medium text-gray-900">{{ c.razon_social }}</td>
-                <td class="px-4 py-3 text-gray-700">{{ c.nit }}</td>
-                <td class="px-4 py-3 text-gray-700">{{ c.industria }}</td>
-                <td class="px-4 py-3 text-gray-700">{{ c.ciudad }}, {{ c.pais }}</td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs"
-                        [class.bg-green-100]="c.estado==='ACTIVO'" [class.text-green-700]="c.estado==='ACTIVO'"
-                        [class.bg-gray-100]="c.estado!=='ACTIVO'" [class.text-gray-700]="c.estado!=='ACTIVO'">
-                    <span class="h-2 w-2 rounded-full" [class.bg-green-500]="c.estado==='ACTIVO'" [class.bg-gray-400]="c.estado!=='ACTIVO'"></span>
-                    {{ c.estado }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-right">
-                  <div class="inline-flex items-center gap-2">
-                    <button class="icon-btn" (click)="openDetail(c.id)" title="Ver">
-                      <fa-icon [icon]="faEye"></fa-icon>
-                    </button>
-                    <button class="icon-btn" (click)="openEdit(c)" title="Editar">
-                      <fa-icon [icon]="faPen"></fa-icon>
-                    </button>
-                    <button class="icon-btn-danger" (click)="confirmDelete(c.id)" title="Eliminar">
-                      <fa-icon [icon]="faTrash"></fa-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div *ngIf="!loading() && filtered().length===0" class="p-10 text-center text-gray-500">Sin resultados.</div>
-          <div *ngIf="loading()" class="p-10 flex items-center justify-center gap-2 text-gray-600"><fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon> Cargando...</div>
-        </div>
-
-        <!-- Grid view (tarjetas) -->
-        <div *ngIf="viewMode() === 'grid'" class="mt-4">
-          <div *ngIf="!loading() && filtered().length===0" class="p-10 text-center text-gray-500">Sin resultados.</div>
-          <div *ngIf="loading()" class="p-10 flex items-center justify-center gap-2 text-gray-600"><fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon> Cargando...</div>
-          <div *ngIf="!loading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div *ngFor="let c of paginated()" class="bg-white p-5 rounded-xl shadow-sm border-t-4 border-purple-500 transition hover:shadow-md">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h3 class="text-sm font-semibold text-gray-900">{{ c.razon_social }}</h3>
-                  <p class="text-xs text-gray-500 mt-1">NIT: {{ c.nit }}</p>
-                  <p class="text-xs text-gray-500 mt-1">{{ c.industria }}</p>
-                  <p class="text-xs text-gray-400 mt-2">{{ c.ciudad }}, {{ c.pais }}</p>
-                </div>
-                <div class="text-right">
-                  <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs"
-                        [class.bg-green-100]="c.estado==='ACTIVO'" [class.text-green-700]="c.estado==='ACTIVO'"
-                        [class.bg-gray-100]="c.estado!=='ACTIVO'" [class.text-gray-700]="c.estado!=='ACTIVO'">
-                    <span class="h-2 w-2 rounded-full" [class.bg-green-500]="c.estado==='ACTIVO'" [class.bg-gray-400]="c.estado!=='ACTIVO'"></span>
-                    {{ c.estado }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="mt-4 flex items-center justify-end gap-2">
-                <button class="icon-btn" (click)="openDetail(c.id)" title="Ver">
-                  <fa-icon [icon]="faEye"></fa-icon>
-                </button>
-                <button class="icon-btn" (click)="openEdit(c)" title="Editar">
-                  <fa-icon [icon]="faPen"></fa-icon>
-                </button>
-                <button class="icon-btn-danger" (click)="confirmDelete(c.id)" title="Eliminar">
-                  <fa-icon [icon]="faTrash"></fa-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
-          <div>Página {{ page() + 1 }} de {{ totalPages() }}</div>
-          <div class="flex items-center gap-2">
-            <button class="btn-secondary" (click)="prevPage()" [disabled]="page()===0">Anterior</button>
-            <button class="btn-secondary" (click)="nextPage()" [disabled]="page()+1>=totalPages()">Siguiente</button>
-          </div>
-        </div>
-      </div>
-
-      <company-detail-modal *ngIf="showDetail()" [id]="selectedId()" (closed)="closeDetail()"></company-detail-modal>
-      <company-edit-modal *ngIf="showEdit()" [company]="selectedCompany()" (saved)="onSaved($event)" (close)="closeEdit()"></company-edit-modal>
-    </section>
-  `,
-  styles: [`
-
-  `]
+  templateUrl: './company.component.html'
 })
 export class CompanyComponent {
   private service = inject(CompaniesService);
@@ -209,9 +92,13 @@ export class CompanyComponent {
   faXmark: IconProp = faXmark;
   faSpinner: IconProp = faSpinner;
   faRotateRight: IconProp = faRotateRight;
+  faBuilding: IconProp = faBuilding;
+  faMapMarkerAlt: IconProp = faMapMarkerAlt;
+  faIndustry: IconProp = faIndustry;
+  faGlobe: IconProp = faGlobe;
 
   constructor() {
-    this.fa.addIcons(faEye, faPen, faTrash, faPlus, faSearch, faXmark, faSpinner, faRotateRight);
+    this.fa.addIcons(faEye, faPen, faTrash, faPlus, faSearch, faXmark, faSpinner, faRotateRight, faBuilding, faMapMarkerAlt, faIndustry, faGlobe);
     this.fetchAll();
     effect(() => {
       if (this.isMobile()) {

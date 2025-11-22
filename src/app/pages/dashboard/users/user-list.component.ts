@@ -23,6 +23,8 @@ import { UserEditModalComponent } from './user-edit-modal/user-edit-modal.compon
 import { User } from '../../../models/user';
 import { UserAddModalComponent } from './user-add-modal/user-add-modal.component';
 import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
+import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
+import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
 
 interface UserState {
   users: User[];
@@ -47,7 +49,10 @@ interface UserState {
     UserViewModalComponent,
     UserEditModalComponent,
     UserAddModalComponent,
-    HeaderCrudComponent
+    UserAddModalComponent,
+    HeaderCrudComponent,
+    SkeletonCardComponent,
+    SkeletonTableComponent
 ],
   providers: [UsersService],
   templateUrl: './user-list.component.html',
@@ -62,6 +67,7 @@ export class UserListComponent {
   faSpinner = faSpinner;
   faUsers = faUsers;
   faUserPlus = faUserPlus;
+  faTimes = faTimes;
 
   state = signal<UserState>({
     users: [],
@@ -114,8 +120,9 @@ export class UserListComponent {
   loadUsers(): void {
     this.state.update((s) => ({ ...s, loading: true, error: null }));
     this.usersService.getUsers().subscribe({
-      next: (data) =>
-        this.state.update((s) => ({ ...s, users: data, loading: false })),
+      next: (data) => {
+        this.state.update((s) => ({ ...s, users: data, loading: false }));
+      },
       error: () =>
         this.state.update((s) => ({
           ...s,

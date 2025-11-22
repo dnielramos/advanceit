@@ -25,6 +25,8 @@ import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-cr
 import { ViewportService } from '../../../services/viewport.service';
 import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
 import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEye, faEdit, faTrash, faCheck, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-orders',
@@ -37,7 +39,8 @@ import { SkeletonTableComponent } from '../../../components/skeleton-table/skele
     CreateOrderModalComponent,
     HeaderCrudComponent,
     SkeletonCardComponent,
-    SkeletonTableComponent
+    SkeletonTableComponent,
+    FontAwesomeModule
 ],
   templateUrl: './orders.component.html',
 })
@@ -104,6 +107,14 @@ export class OrdersComponent implements OnInit {
   // Loading state
   isLoading = signal(false);
 
+  
+  // FontAwesome icons
+  faEye = faEye;
+  faEdit = faEdit;
+  faTrash = faTrash;
+  faCheck = faCheck;
+  faBoxOpen = faBoxOpen;
+  
   constructor(
     private ordersService: OrdersService,
     private shippingService: ShippingsService,

@@ -1,69 +1,81 @@
 <div
-  class="bg-white rounded-lg shadow-sm p-4 transition hover:shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-4 my-4">
+  class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col">
 
-  <div class="flex-1">
-    <p class="font-semibold text-purple-600">Orden {{ order.numeroOrden }}</p>
-    <div *ngIf="user" class="flex items-center gap-2 mt-1">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-      </svg>
-      <p class="text-sm text-slate-700">{{ user.name }}</p>
+  <!-- Card Header -->
+  <div class="p-5 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white">
+    <div class="flex justify-between items-start gap-3">
+      <div class="flex items-start gap-3 overflow-hidden">
+        <div
+          class="p-2 bg-purple-100 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 shrink-0">
+          <fa-icon [icon]="faReceipt" class="text-lg"></fa-icon>
+        </div>
+        <div class="min-w-0">
+          <h2 class="text-base font-bold text-gray-900 truncate leading-tight mb-1"
+            [title]="'Orden ' + order.numeroOrden">
+            Orden #{{ order.numeroOrden }}
+          </h2>
+          <div *ngIf="user" class="flex items-center gap-1.5 text-xs text-gray-500">
+            <fa-icon [icon]="faUser" class="text-gray-400"></fa-icon>
+            <span class="truncate">{{ user.name }}</span>
+          </div>
+        </div>
+      </div>
+      <span [ngClass]="estadoPagoClass"
+        class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm">
+        {{ order.estadoPago === 'pagado' ? 'Procesado' : order.estadoPago.replace('_', ' ') }}
+      </span>
     </div>
-    <div class="flex items-center gap-2 mt-1">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-600" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-      </svg>
-      <p class="text-xs text-slate-600 font-medium">{{ order.productos.length }} Items</p>
-    </div>
-    <p class="text-xs text-slate-400 mt-1">{{ order.fecha | date: 'dd/MM/yyyy h:mm a' }}</p>
   </div>
 
-  <div class="flex items-center gap-4 md:gap-6">
-    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" *ngIf="order.estadoPago !== 'pagado'"
-      [ngClass]="estadoPagoClass">
-      {{ order.estadoPago.replace('_', ' ') }}
-    </span>
-    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" *ngIf="order.estadoPago == 'pagado'"
-      [ngClass]="estadoPagoClass">
-      {{ 'Procesado' }}
-    </span>
-    <p class="text-lg font-bold text-slate-800 w-28 text-right">${{ order.precioTotal | number:'1.2-2' }}</p>
+  <!-- Card Body -->
+  <div class="p-5 space-y-4 flex-1">
+    <!-- Precio Total -->
+    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100">
+      <div class="flex items-center gap-2">
+        <fa-icon [icon]="faDollarSign" class="text-purple-600"></fa-icon>
+        <span class="text-sm font-semibold text-gray-700">Total</span>
+      </div>
+      <p class="text-lg font-bold text-purple-700">${{ order.precioTotal | number:'1.2-2' }}</p>
+    </div>
+
+    <!-- Items Count -->
+    <div class="flex items-center gap-2 text-sm text-gray-600">
+      <fa-icon [icon]="faShoppingCart" class="text-gray-400"></fa-icon>
+      <span class="font-medium">{{ order.productos.length }} producto{{ order.productos.length !== 1 ? 's' : ''
+        }}</span>
+    </div>
+
+    <!-- Fecha -->
+    <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+      <div class="flex items-center gap-2 mb-1">
+        <fa-icon [icon]="faCalendarAlt" class="text-xs text-gray-400"></fa-icon>
+        <p class="text-xs text-gray-500 font-semibold">Fecha de Creación</p>
+      </div>
+      <p class="text-sm font-bold text-gray-700">
+        {{ order.fecha | date:'dd MMM yyyy, h:mm a' }}
+      </p>
+    </div>
   </div>
 
-  <div
-    class="flex items-center gap-1 border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-4 mt-3 md:mt-0">
-    <button *ngIf="order.estadoPago !== 'pagado' && role === Role.Admin && isLoggedIn" (click)="markAsPaid.emit(order)"
-      class="flex items-center gap-1.5 text-xs md:text-sm font-semibold text-green-600 px-3 py-1.5 rounded-md hover:bg-green-50 transition-colors"
-      aria-label="Marcar como pagada">
-      <fa-icon [icon]="faCodeCompare"></fa-icon> Procesar orden
-    </button>
-    <!-- <button *ngIf="order.estadoPago === 'pagado'"
-      class="flex items-center gap-1.5 text-sm font-semibold text-green-600 px-3 py-1.5 rounded-md hover:bg-green-50 transition-colors"
-      aria-label="Marcar como pagada">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="size-6">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-      </svg>
+  <!-- Card Footer / Actions -->
+  <div class="p-4 bg-gray-50 border-t border-gray-100">
+    <div class="flex flex-wrap gap-2">
+      <!-- Ver Detalles Button -->
+      <button (click)="view.emit(order)"
+        class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100"
+        title="Ver detalles">
+        <fa-icon [icon]="faEye"></fa-icon>
+        <span>Ver Detalles</span>
+      </button>
 
-      Ver factura
-    </button> -->
-    <button (click)="view.emit(order)"
-      class="p-2 text-slate-500 hover:text-purple-600 text-xs md:text-sm rounded-full hover:bg-slate-100 transition-colors"
-      aria-label="Ver">
-      <fa-icon [icon]="faEye" class="w-4 h-4"></fa-icon>
-      Mostrar detalles
-    </button>
-    <!-- <button (click)="edit.emit(order)"
-      class="p-2 text-slate-500 hover:text-purple-600 rounded-full hover:bg-slate-100 transition-colors"
-      aria-label="Editar">
-      <fa-icon [icon]="faPen" class="w-4 h-4"></fa-icon>
-    </button>
-    <button (click)="delete.emit(order)"
-      class="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
-      aria-label="Eliminar">
-      <fa-icon [icon]="faTrash" class="w-4 h-4"></fa-icon>
-    </button> -->
+      <!-- Procesar Button (only for unpaid orders and admins) -->
+      <button *ngIf="order.estadoPago !== 'pagado' && role === Role.Admin && isLoggedIn"
+        (click)="markAsPaid.emit(order)"
+        class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-all duration-200"
+        title="Procesar orden">
+        <fa-icon [icon]="faCheck"></fa-icon>
+        <span>Procesar</span>
+      </button>
+    </div>
   </div>
 </div>

@@ -3,31 +3,50 @@
   <!-- Modal de procesamiento de orden -->
   <div *ngIf="isProcessing" class="fixed inset-0 bg-black/40 flex items-center justify-center z-1000">
     <app-create-order-modal [order]="orderToProcess" (close)="isProcessing = false"
-      (processOrder)="handleProcessOrder($event); isProcessing = false"></app-create-order-modal>
+      (processOrder)="handleProcessOrder($event); isProcessing = false">
+    </app-create-order-modal>
   </div>
 
+  <!-- Header -->
   <app-header-crud titulo="Órdenes" descripcion="Administra las órdenes de compra" textoBotonActualizar="Refrescar"
-    [filterByStatus]="true" [filterStatusValues]="['pagado', 'no_pagado', 'pendiente', 'cancelado']"
-    placeholderInput="Número de orden (ej. ORD-123)" [showViewToggle]="!isMobile()" [currentView]="viewMode()"
+    [filterByStatus]="true" [filterStatusValues]="['pagado', 'no_pagado', 'pendiente', 'cancelado'
+
+]" placeholderInput="Número de orden (ej. ORD-123)" [showViewToggle]="!isMobile()" [currentView]="viewMode()"
     (actualizar)="loadOrders()" (filterChange)="handleFilterChange($event)" (clearFilters)="handleClearFilters()"
     (viewChange)="handleViewChange($event)">
   </app-header-crud>
 
   <!-- Vista Grid -->
-  <div *ngIf="viewMode() === 'grid'" class="flex-1 overflow-y-auto space-y-4 pr-2">
+  <div *ngIf="viewMode() === 'grid'" class="flex-1 overflow-y-auto mt-6 space-y-4 pr-2">
     <!-- Skeleton Loader -->
-    <app-skeleton-card *ngIf="isLoading()" [count]="5"></app-skeleton-card>
+    <app-skeleton-card *ngIf="isLoading()" [count]="6"></app-skeleton-card>
 
     <!-- Actual Content -->
-    <ng-container *ngIf="!isLoading()">
+    <div *ngIf="!isLoading() && filteredOrders.length > 0"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
       <app-order-card *ngFor="let order of filteredOrders" [order]="order" (markAsPaid)="processOrder($event)"
         (edit)="handleEditOrder(order)" (view)="handleViewOrder(order)" (delete)="handleDeleteOrder(order)"
-        (viewInvoice)="handleViewInvoice(order)"></app-order-card>
-    </ng-container>
+        (viewInvoice)="handleViewInvoice(order)">
+      </app-order-card>
+    </div>
+
+    <!-- Empty State -->
+    @if (!isLoading() && filteredOrders.length === 0) {
+    <div
+      class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn">
+      <fa-icon [icon]="faBoxOpen" class="text-purple-500 mb-4 text-5xl drop-shadow-sm"></fa-icon>
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">
+        No hay órdenes
+      </h2>
+      <p class="text-gray-500 text-sm text-center max-w-md">
+        No se encontraron órdenes que coincidan con los filtros aplicados.
+      </p>
+    </div>
+    }
   </div>
 
   <!-- Vista Lista/Tabla -->
-  <div *ngIf="viewMode() === 'list'" class="flex-1 overflow-x-auto">
+  <div *ngIf="viewMode() === 'list'" class="flex-1 overflow-x-auto mt-6">
     <!-- Skeleton Loader -->
     <app-skeleton-table *ngIf="isLoading()" [rowCount]="8" [columnCount]="5"></app-skeleton-table>
 
@@ -44,76 +63,65 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          <tr *ngFor="let order of filteredOrders; let odd = odd" [class]="odd ? 'bg-white' : 'bg-gray-50'"
-            class="hover:bg-purple-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-medium text-gray-900">
+          @for (order of filteredOrders; track order.id) {
+          <tr [class]="$index % 2 === 0 ? 'bg-white' : 'bg-gray-50'" class="hover:bg-purple-50 transition-colors">
+            <td class="px-6 py-4 text-sm font-medium text-purple-700">
               #{{ order.numeroOrden }}
             </td>
             <td class="px-6 py-4 text-sm">
               <span [ngClass]="{
-                'bg-green-100 text-green-800': order.estadoPago === 'pagado',
-                'bg-yellow-100 text-yellow-800': order.estadoPago === 'pendiente',
-                'bg-red-100 text-red-800': order.estadoPago === 'cancelado',
-                'bg-gray-100 text-gray-800': order.estadoPago === 'no_pagado'
-              }" class="px-3 py-1 rounded-full text-xs font-medium">
-                {{ order.estadoPago | titlecase }}
+                  'bg-green-100 text-green-800': order.estadoPago === 'pagado',
+                  'bg-yellow-100 text-yellow-800': order.estadoPago === 'pendiente',
+                  'bg-red-100 text-red-800': order.estadoPago === 'cancelado',
+                  'bg-gray-100 text-gray-800': order.estadoPago === 'no_pagado'
+                }" class="px-3 py-1 rounded-full text-xs font-medium capitalize">
+                {{ order.estadoPago === 'pagado' ? 'Procesado' : order.estadoPago.replace('_', ' ') }}
               </span>
             </td>
             <td class="px-6 py-4 text-sm font-medium text-gray-900">
               ${{ order.precioTotal | number: '1.2-2' }}
             </td>
             <td class="px-6 py-4 text-sm text-gray-600">
-              {{ order.fecha }}
+              {{ order.fecha | date:'dd MMM yyyy' }}
             </td>
             <td class="px-6 py-4 text-sm space-x-2">
               <button (click)="handleViewOrder(order)"
                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
                 title="Ver">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                  </path>
-                </svg>
+                <fa-icon [icon]="faEye"></fa-icon>
               </button>
               <button (click)="handleEditOrder(order)"
                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
                 title="Editar">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                  </path>
-                </svg>
+                <fa-icon [icon]="faEdit"></fa-icon>
               </button>
               <button (click)="processOrder(order)"
                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-green-600 hover:bg-green-100 transition-colors"
                 title="Procesar">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
+                <fa-icon [icon]="faCheck"></fa-icon>
               </button>
               <button (click)="handleDeleteOrder(order)"
                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-red-600 hover:bg-red-100 transition-colors"
                 title="Eliminar">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                  </path>
-                </svg>
+                <fa-icon [icon]="faTrash"></fa-icon>
               </button>
             </td>
           </tr>
+          } @empty {
+          @if (!isLoading()) {
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+              No se encontraron órdenes.
+            </td>
+          </tr>
+          }
+          }
         </tbody>
       </table>
     </div>
   </div>
 
-  <app-view-order-modal *ngIf="orderToView" [order]="orderToView" (close)="orderToView = null"></app-view-order-modal>
-
-  <div>
-    <div>
-      <p>-</p>
-    </div>
-  </div>
+  <!-- Modal de visualización de orden -->
+  <app-view-order-modal *ngIf="orderToView" [order]="orderToView" (close)="orderToView = null">
+  </app-view-order-modal>
 </div>

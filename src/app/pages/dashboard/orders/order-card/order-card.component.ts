@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPen, faEye, faCheckSquare, faTrash, faCodeCompare } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faEye, faCheckSquare, faTrash, faCodeCompare, faShoppingCart, faDollarSign, faCalendarAlt, faReceipt, faUser, faEdit, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '../../../../services/orders.service';
 import { AuthService, Role } from '../../../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
@@ -64,6 +64,13 @@ export class OrderCardComponent implements OnInit, OnDestroy{
   faCheckSquare = faCheckSquare;
   faTrash = faTrash;
   faCodeCompare = faCodeCompare;
+  faShoppingCart = faShoppingCart;
+  faDollarSign = faDollarSign;
+  faCalendarAlt = faCalendarAlt;
+  faReceipt = faReceipt;
+  faUser = faUser;
+  faEdit = faEdit;
+  faCheck = faCheck;
 
   get estadoPagoClass() {
     return {

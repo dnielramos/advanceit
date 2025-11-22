@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { OrdersService, Order } from '../../../services/orders.service';
 import { QuotationService } from '../../../services/quotation.service';
 import {
@@ -8,7 +9,6 @@ import {
   ResumenData,
 } from './order-filter/order-filter.component';
 import { OrderCardComponent } from './order-card/order-card.component';
-import { ViewOrderModalComponent } from './view-order-modal/view-order-modal.component';
 import { ProductoFinal } from '../../../models/Productos';
 import { ProductsService } from '../../../services/product.service';
 import { Quotation, QuotationDetail } from '../../../models/quotation.types';
@@ -35,7 +35,6 @@ import { faEye, faEdit, faTrash, faCheck, faBoxOpen } from '@fortawesome/free-so
   imports: [
     CommonModule,
     OrderCardComponent,
-    ViewOrderModalComponent,
     CreateOrderModalComponent,
     HeaderCrudComponent,
     SkeletonCardComponent,
@@ -82,8 +81,7 @@ export class OrdersComponent implements OnInit {
   };
 
   isCreateModalVisible = false;
-  orderToEdit: Order | null = null; // ¡NUEVO!
-  orderToView: Order | null = null;
+  orderToEdit: Order | null = null;
 
 
   // --- Propiedades para manejar el estado de la UI ---
@@ -121,7 +119,8 @@ export class OrdersComponent implements OnInit {
     private paymentsService: PaymentsService,
     private authService: AuthService,
     private quotationService: QuotationService,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private router: Router
   ) {
     effect(() => {
       if (this.isMobile()) {
@@ -168,11 +167,10 @@ export class OrdersComponent implements OnInit {
   }
 
   /**
-   * Se activa cuando el usuario hace clic en "Ver" en una tarjeta de orden.
-   * Establece la orden a visualizar, lo que causa que el modal se muestre.
+   * Navega a la página de detalles de la orden.
    */
   handleViewOrder(order: Order): void {
-    this.orderToView = order;
+    this.router.navigate(['/dashboard/ordenes', order.id]);
   }
 
   updateResumen(): void {

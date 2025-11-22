@@ -9,9 +9,8 @@
 
   <!-- Header -->
   <app-header-crud titulo="Órdenes" descripcion="Administra las órdenes de compra" textoBotonActualizar="Refrescar"
-    [filterByStatus]="true" [filterStatusValues]="['pagado', 'no_pagado', 'pendiente', 'cancelado'
-
-]" placeholderInput="Número de orden (ej. ORD-123)" [showViewToggle]="!isMobile()" [currentView]="viewMode()"
+    [filterByStatus]="true" [filterStatusValues]="['pagado', 'no_pagado', 'pendiente', 'cancelado']"
+    placeholderInput="Número de orden (ej. ORD-123)" [showViewToggle]="!isMobile()" [currentView]="viewMode()"
     (actualizar)="loadOrders()" (filterChange)="handleFilterChange($event)" (clearFilters)="handleClearFilters()"
     (viewChange)="handleViewChange($event)">
   </app-header-crud>
@@ -108,20 +107,14 @@
             </td>
           </tr>
           } @empty {
-          @if (!isLoading()) {
           <tr>
             <td colspan="5" class="px-6 py-12 text-center text-gray-500">
               No se encontraron órdenes.
             </td>
           </tr>
           }
-          }
         </tbody>
       </table>
     </div>
   </div>
-
-  <!-- Modal de visualización de orden -->
-  <app-view-order-modal *ngIf="orderToView" [order]="orderToView" (close)="orderToView = null">
-  </app-view-order-modal>
 </div>

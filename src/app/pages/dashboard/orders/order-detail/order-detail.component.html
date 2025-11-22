@@ -1,0 +1,291 @@
+<div class="min-h-screen bg-slate-50 p-4 sm:p-6 md:p-8">
+    <!-- Loading State (Skeleton) -->
+    @if (isLoading()) {
+    <div class="max-w-7xl mx-auto space-y-6 animate-pulse">
+        <!-- Header Skeleton -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="space-y-3">
+                    <div class="h-4 bg-gray-200 rounded w-32"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                        <div class="space-y-2">
+                            <div class="h-6 bg-gray-200 rounded w-48"></div>
+                            <div class="h-4 bg-gray-200 rounded w-32"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="h-10 bg-gray-200 rounded-lg w-24"></div>
+                    <div class="h-10 bg-gray-200 rounded-lg w-24"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column Skeleton -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div class="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+                    <div class="space-y-4">
+                        @for (i of [1, 2, 3]; track i) {
+                        <div class="border border-gray-200 rounded-lg p-4 flex gap-4">
+                            <div class="w-20 h-20 bg-gray-200 rounded-lg shrink-0"></div>
+                            <div class="flex-1 space-y-3">
+                                <div class="h-5 bg-gray-200 rounded w-3/4"></div>
+                                <div class="flex gap-2">
+                                    <div class="h-4 bg-gray-200 rounded w-20"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-24"></div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column Skeleton -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+                    <div class="h-6 bg-gray-200 rounded w-40"></div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <div class="h-4 bg-gray-200 rounded w-20"></div>
+                            <div class="h-4 bg-gray-200 rounded w-24"></div>
+                        </div>
+                        <div class="h-12 bg-gray-200 rounded-lg w-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Error State -->
+    @if (error() && !isLoading()) {
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start gap-4">
+            <fa-icon [icon]="faExclamationTriangle" class="text-red-500 text-2xl"></fa-icon>
+            <div class="flex-1">
+                <h3 class="text-red-800 font-semibold mb-2">Error</h3>
+                <p class="text-red-700">{{ error() }}</p>
+                <button (click)="goBack()"
+                    class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    Volver a Órdenes
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Main Content -->
+    @if (order() && !isLoading()) {
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <!-- Breadcrumb & Title -->
+                <div>
+                    <nav class="text-sm text-gray-500 mb-2">
+                        <button (click)="goBack()" class="hover:text-purple-600 transition-colors">Órdenes</button>
+                        <span class="mx-2">/</span>
+                        <span class="text-gray-900 font-medium">Orden #{{ order()!.numeroOrden }}</span>
+                    </nav>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <div class="p-2 bg-purple-100 rounded-lg text-purple-600">
+                            <fa-icon [icon]="faReceipt" class="text-2xl"></fa-icon>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">Orden #{{ order()!.numeroOrden }}</h1>
+                            <p class="text-sm text-gray-500">{{ order()!.fecha | date:'dd MMMM yyyy, h:mm a' }}</p>
+                        </div>
+                        <span [class]="getStatusColor(order()!.estadoPago)"
+                            class="px-3 py-1 rounded-full text-sm font-semibold uppercase tracking-wide">
+                            {{ getStatusLabel(order()!.estadoPago) }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-2 flex-wrap">
+                    <button (click)="goBack()"
+                        class="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200">
+                        <fa-icon [icon]="faArrowLeft"></fa-icon>
+                        <span class="hidden md:inline">Volver</span>
+                    </button>
+                    @if (order()!.estadoPago !== 'pagado') {
+                    <button (click)="handleProcess()" [disabled]="isProcessing()"
+                        class="flex items-center gap-2 px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 disabled:opacity-50">
+                        <fa-icon [icon]="faCheck"></fa-icon>
+                        <span class="hidden md:inline">Procesar</span>
+                    </button>
+                    }
+                    <button (click)="handleDelete()" [disabled]="isProcessing()"
+                        class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                        <span class="hidden md:inline">Eliminar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left Column - Products -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Products List -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <fa-icon [icon]="faShoppingCart" class="text-purple-600 text-xl"></fa-icon>
+                        <h2 class="text-lg font-bold text-gray-900">Productos ({{ products().length }})</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        @for (product of products(); track product.id) {
+                        <div
+                            class="border border-gray-200 rounded-lg overflow-hidden hover:border-purple-300 transition-colors">
+                            <!-- Product Header (Always Visible) -->
+                            <div class="p-4 cursor-pointer" (click)="toggleProductDetails(product.id)">
+                                <div class="flex gap-4">
+                                    <!-- Product Image -->
+                                    <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                                        <img [src]="product.imagen || 'https://advanceit.co/logo.png'"
+                                            [alt]="product.nombre" class="w-full h-full object-cover"
+                                            onerror="this.src='https://advanceit.co/logo.png'">
+                                    </div>
+
+                                    <!-- Product Info -->
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-semibold text-gray-900 truncate">{{ product.nombre }}</h3>
+                                        <div class="flex flex-wrap gap-2 mt-1 text-sm text-gray-600">
+                                            <span class="flex items-center gap-1">
+                                                <fa-icon [icon]="faBox" class="text-xs text-gray-400"></fa-icon>
+                                                SKU: {{ product.SKU }}
+                                            </span>
+                                            @if (product.marca) {
+                                            <span class="flex items-center gap-1">
+                                                <fa-icon [icon]="faTag" class="text-xs text-gray-400"></fa-icon>
+                                                {{ product.marca }}
+                                            </span>
+                                            }
+                                        </div>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <span class="text-lg font-bold text-purple-600">
+                                                {{ product.precio ? formatPrice(product.precio) : 'N/A' }}
+                                            </span>
+                                            <span class="text-sm text-gray-600">
+                                                Cantidad: {{ product.cantidad_solicitada }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Expand Icon -->
+                                    <div class="shrink-0">
+                                        <fa-icon [icon]="faInfoCircle"
+                                            [class]="isProductExpanded(product.id) ? 'text-purple-600' : 'text-gray-400'"
+                                            class="text-xl transition-colors">
+                                        </fa-icon>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Expanded Details -->
+                            @if (isProductExpanded(product.id)) {
+                            <div class="px-4 pb-4 pt-2 border-t border-gray-100 bg-gray-50 space-y-3">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                    @if (product.categoria) {
+                                    <div>
+                                        <span class="font-semibold text-gray-700">Categoría:</span>
+                                        <span class="text-gray-600 ml-2">{{ product.categoria }}</span>
+                                    </div>
+                                    }
+                                    @if (product.subcategoria) {
+                                    <div>
+                                        <span class="font-semibold text-gray-700">Subcategoría:</span>
+                                        <span class="text-gray-600 ml-2">{{ product.subcategoria }}</span>
+                                    </div>
+                                    }
+                                    @if (product.warehouse) {
+                                    <div class="flex items-center gap-2">
+                                        <fa-icon [icon]="faWarehouse" class="text-gray-400"></fa-icon>
+                                        <span class="font-semibold text-gray-700">Almacén:</span>
+                                        <span class="text-gray-600">{{ product.warehouse }} ({{ product.warehouseId
+                                            }})</span>
+                                    </div>
+                                    }
+                                    @if (product.disponibilidad !== undefined && product.disponibilidad !== null) {
+                                    <div>
+                                        <span class="font-semibold text-gray-700">Disponibilidad:</span>
+                                        <span [class]="product.disponibilidad ? 'text-green-600' : 'text-red-600'"
+                                            class="ml-2 font-medium">
+                                            {{ product.disponibilidad ? 'Disponible' : 'Agotado' }}
+                                        </span>
+                                    </div>
+                                    }
+                                </div>
+                                @if (product.descripcion) {
+                                <div>
+                                    <p class="font-semibold text-gray-700 mb-1">Descripción:</p>
+                                    <p class="text-sm text-gray-600">{{ product.descripcion }}</p>
+                                </div>
+                                }
+                            </div>
+                            }
+                        </div>
+                        } @empty {
+                        <div class="text-center py-8 text-gray-500">
+                            <fa-icon [icon]="faBoxOpen" class="text-4xl mb-2"></fa-icon>
+                            <p>No hay productos en esta orden</p>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="space-y-6">
+
+                <!-- Order Summary Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h2 class="text-lg font-bold text-gray-900 mb-4">Resumen de la Orden</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span class="font-medium text-gray-900">{{ formatPrice(order()!.precioTotal) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 bg-purple-50 -mx-6 px-6 rounded-lg">
+                            <span class="text-lg font-bold text-gray-900">Total</span>
+                            <span class="text-xl font-bold text-purple-600">{{ formatPrice(order()!.precioTotal)
+                                }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Info Card -->
+                @if (order()!.quotationId || order()!.shippingNo || order()!.notas) {
+                <div class="bg-purple-50 rounded-xl border border-purple-200 p-6">
+                    <div class="flex items-start gap-3">
+                        <fa-icon [icon]="faInfoCircle" class="text-purple-600 text-xl mt-0.5"></fa-icon>
+                        <div class="text-sm text-purple-900 space-y-2">
+                            <p class="font-semibold mb-2">Información Adicional</p>
+                            @if (order()!.quotationId) {
+                            <p><span class="font-medium">Cotización ID:</span> {{ order()!.quotationId }}</p>
+                            }
+                            @if (order()!.shippingNo) {
+                            <p><span class="font-medium">Envío:</span> {{ order()!.shippingNo }}</p>
+                            }
+                            @if (order()!.notas) {
+                            <p><span class="font-medium">Notas:</span> {{ order()!.notas }}</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    }
+</div>

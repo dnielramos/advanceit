@@ -42,6 +42,13 @@ export const dashboardRoutes: Routes = [
           ),
       },
       {
+        path: 'ordenes/:id',
+        loadComponent: () =>
+          import('../pages/dashboard/orders/order-detail/order-detail.component').then(
+            (m) => m.OrderDetailComponent
+          ),
+      },
+      {
         path: 'inventory-uploader',
         loadComponent: () =>
           import('../components/dashboard/inventory-uploader/inventory-uploader.component').then(

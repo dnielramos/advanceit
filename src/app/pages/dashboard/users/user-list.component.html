@@ -1,178 +1,226 @@
-<div class="bg-slate-100 font-sans">
-  <div class="container min-w-full">
-    <div class="rounded-2xl shadow-xl p-6 flex flex-col h-[calc(100vh-4rem)] bg-slate-50">
-      <!-- HEADER CRUD ESTÁNDAR -->
-      <app-header-crud titulo="Usuarios" descripcion="Gestiona los usuarios del sistema"
-        textoBotonNuevo="Agregar Usuario" textoBotonActualizar="Actualizar" [filterByStatus]="true"
-        [filterStatusValues]="availableRoles" placeholderInput="Buscar por nombre o email..." [showViewToggle]="true"
-        [currentView]="state().viewMode" (crear)="openAddModal()" (actualizar)="loadUsers()"
-        (filterChange)="handleFilterChange($event)" (clearFilters)="handleClearFilters()"
-        (viewChange)="handleViewChange($event)">
-      </app-header-crud>
+<div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple flex flex-col h-full">
 
-      <!-- CONTENIDO PRINCIPAL -->
-      <main class="flex-grow overflow-y-auto pr-2 pt-6 scroll-purple">
+  <!-- Header -->
+  <app-header-crud titulo="Usuarios" descripcion="Gestiona los usuarios del sistema" textoBotonNuevo="Agregar Usuario"
+    textoBotonActualizar="Refrescar" [filterByStatus]="true" [filterStatusValues]="availableRoles"
+    placeholderInput="Buscar por nombre o email..." [showViewToggle]="true" [currentView]="state().viewMode"
+    (crear)="openAddModal()" (actualizar)="loadUsers()" (filterChange)="handleFilterChange($event)"
+    (clearFilters)="handleClearFilters()" (viewChange)="handleViewChange($event)">
+  </app-header-crud>
 
-        <!-- Grid View -->
-        @if (state().viewMode === 'grid') {
-        <!-- Loading State (Skeleton) -->
-        @if (state().loading) {
-        <app-skeleton-card [count]="8"></app-skeleton-card>
-        }
+  <!-- Main Content -->
+  <div class="flex-1 overflow-y-auto mt-6 pr-2">
 
-        <!-- Actual Content -->
-        @if (!state().loading && !state().error && filteredUsers().length > 0) {
-        <div
-          class="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 animate__animated animate__fadeInUp">
-          @for (user of filteredUsers(); track user.id) {
-          <div
-            class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-purple-200 transition-all duration-300 group">
-            <div class="flex items-center space-x-4">
-              <div class="relative">
+    <!-- Grid View -->
+    @if (state().viewMode === 'grid') {
+    <!-- Loading State -->
+    @if (state().loading) {
+    <app-skeleton-card [count]="8"></app-skeleton-card>
+    }
+
+    <!-- Actual Content -->
+    @if (!state().loading && !state().error && filteredUsers().length > 0) {
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate__animated animate__fadeInUp">
+      @for (user of filteredUsers(); track user.id) {
+      <div
+        class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col">
+
+        <!-- Card Header -->
+        <div class="p-5 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white">
+          <div class="flex justify-between items-start gap-3">
+            <div class="flex items-start gap-3 overflow-hidden">
+              <!-- Icon/Avatar Container -->
+              <div class="relative shrink-0">
                 <img [src]="user.picture || 'https://placehold.co/150x150/663399/FFFFFF?text=' + user.name.charAt(0)"
                   alt="Foto de {{ user.name }}"
-                  class="w-16 h-16 rounded-full object-cover border-2 border-purple-100 group-hover:border-purple-400 transition-colors" />
+                  class="w-12 h-12 rounded-lg object-cover border border-purple-100 group-hover:border-purple-400 transition-colors duration-300" />
+                <!-- Status Indicator -->
+                <!-- <div class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white bg-green-500"></div> -->
               </div>
 
-              <div class="flex-1 min-w-0">
-                <h3 class="text-lg font-bold text-gray-900 truncate group-hover:text-purple-700 transition-colors">
+              <div class="min-w-0">
+                <h2 class="text-base font-bold text-gray-900 truncate leading-tight mb-1" [title]="user.name">
                   {{ user.name }}
-                </h3>
-                <p class="text-sm text-gray-500 truncate mb-1">
-                  {{ user.email }}
-                </p>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize"
-                  [ngClass]="{
-                            'bg-purple-100 text-purple-800': user.type === 'admin',
-                            'bg-blue-100 text-blue-800': user.type === 'user',
-                            'bg-orange-100 text-orange-800': user.type === 'cashier',
-                            'bg-gray-100 text-gray-800': user.type === 'warehouse'
-                          }">
-                  {{ user.type }}
-                </span>
+                </h2>
+                <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                  <fa-icon [icon]="faUsers" class="text-gray-400"></fa-icon>
+                  <span class="truncate capitalize">{{ user.type }}</span>
+                </div>
               </div>
             </div>
 
-            <div
-              class="mt-5 pt-4 border-t border-gray-100 flex justify-end space-x-2 opacity-80 group-hover:opacity-100 transition-opacity">
+            <!-- Role Badge -->
+            <span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm"
+              [ngClass]="{
+                    'bg-purple-100 text-purple-800 border border-purple-200': user.type === 'admin',
+                    'bg-blue-100 text-blue-800 border border-blue-200': user.type === 'user',
+                    'bg-orange-100 text-orange-800 border border-orange-200': user.type === 'cashier',
+                    'bg-gray-100 text-gray-800 border border-gray-200': user.type === 'warehouse'
+                  }">
+              {{ user.type }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-5 space-y-4 flex-1">
+          <!-- Email -->
+          <div class="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100">
+            <div class="flex items-center gap-2 overflow-hidden">
+              <div class="p-1.5 bg-white rounded-lg text-purple-600 shrink-0">
+                <span class="text-xs font-bold">&#64;</span>
+              </div>
+              <span class="text-sm font-semibold text-gray-700 truncate" [title]="user.email">{{ user.email }}</span>
+            </div>
+          </div>
+
+          <!-- Info Grid -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <p class="text-xs text-gray-500 font-semibold mb-1">Ciudad</p>
+              <p class="text-sm font-bold text-gray-700 truncate">{{ user.city || 'N/A' }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <p class="text-xs text-gray-500 font-semibold mb-1">Teléfono</p>
+              <p class="text-sm font-bold text-gray-700 truncate">{{ user.telephone || 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Footer / Actions -->
+        <div class="p-4 bg-gray-50 border-t border-gray-100">
+          <div class="flex gap-2">
+            <button (click)="viewUser(user)"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100 hover:shadow-sm"
+              title="Ver detalles">
+              <fa-icon [icon]="faEye"></fa-icon>
+              <span>Ver</span>
+            </button>
+            <button (click)="editUser(user)"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white transition-all duration-200"
+              title="Editar usuario">
+              <fa-icon [icon]="faPen"></fa-icon>
+              <span>Editar</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      }
+    </div>
+    }
+    }
+
+    <!-- List View -->
+    @if (state().viewMode === 'list') {
+    <!-- Loading State -->
+    @if (state().loading) {
+    <app-skeleton-table [rowCount]="8" [columnCount]="4"></app-skeleton-table>
+    }
+
+    <!-- Actual Content -->
+    @if (!state().loading && !state().error && filteredUsers().length > 0) {
+    <div
+      class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm animate__animated animate__fadeIn">
+      <table class="w-full">
+        <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+          <tr>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Usuario</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Email</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Rol</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Ubicación</th>
+            <th class="px-6 py-4 text-right text-sm font-semibold">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          @for (user of filteredUsers(); track user.id) {
+          <tr [class]="$index % 2 === 0 ? 'bg-white' : 'bg-gray-50'" class="hover:bg-purple-50 transition-colors group">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <img [src]="user.picture || 'https://placehold.co/150x150/663399/FFFFFF?text=' + user.name.charAt(0)"
+                  class="h-10 w-10 rounded-lg object-cover border border-gray-200 group-hover:border-purple-300 transition-colors"
+                  alt="">
+                <div class="ml-4">
+                  <div class="text-sm font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{{
+                    user.name }}</div>
+                  <div class="text-xs text-gray-500">{{ user.company || 'Sin empresa' }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+              {{ user.email }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide"
+                [ngClass]="{
+                      'bg-purple-100 text-purple-800 border border-purple-200': user.type === 'admin',
+                      'bg-blue-100 text-blue-800 border border-blue-200': user.type === 'user',
+                      'bg-orange-100 text-orange-800 border border-orange-200': user.type === 'cashier',
+                      'bg-gray-100 text-gray-800 border border-gray-200': user.type === 'warehouse'
+                    }">
+                {{ user.type }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+              {{ user.city || 'N/A' }}, {{ user.country || 'N/A' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
               <button (click)="viewUser(user)"
-                class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Ver detalles">
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
+                title="Ver">
                 <fa-icon [icon]="faEye"></fa-icon>
               </button>
-              <button (click)="editUser(user)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                title="Editar usuario">
+              <button (click)="editUser(user)"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
+                title="Editar">
                 <fa-icon [icon]="faPen"></fa-icon>
               </button>
-            </div>
-          </div>
+            </td>
+          </tr>
           }
-        </div>
-        }
-        }
-
-        <!-- List View -->
-        @if (state().viewMode === 'list') {
-        <!-- Loading State (Skeleton) -->
-        @if (state().loading) {
-        <app-skeleton-table [rowCount]="8" [columnCount]="4"></app-skeleton-table>
-        }
-
-        <!-- Actual Content -->
-        @if (!state().loading && !state().error && filteredUsers().length > 0) {
-        <div
-          class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm animate__animated animate__fadeIn">
-          <table class="w-full">
-            <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
-              <tr>
-                <th class="px-6 py-4 text-left text-sm font-semibold">Usuario</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold">Email</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold">Rol</th>
-                <th class="px-6 py-4 text-right text-sm font-semibold">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-              @for (user of filteredUsers(); track user.id) {
-              <tr class="hover:bg-purple-50 transition-colors group">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <img
-                      [src]="user.picture || 'https://placehold.co/150x150/663399/FFFFFF?text=' + user.name.charAt(0)"
-                      class="h-10 w-10 rounded-full object-cover border border-gray-200" alt="">
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900 group-hover:text-purple-700 transition-colors">{{
-                        user.name }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ user.email }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize"
-                    [ngClass]="{
-                              'bg-purple-100 text-purple-800': user.type === 'admin',
-                              'bg-blue-100 text-blue-800': user.type === 'user',
-                              'bg-orange-100 text-orange-800': user.type === 'cashier',
-                              'bg-gray-100 text-gray-800': user.type === 'warehouse'
-                            }">
-                    {{ user.type }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                  <button (click)="viewUser(user)"
-                    class="text-purple-600 hover:text-purple-900 p-1 hover:bg-purple-100 rounded transition-colors">
-                    <fa-icon [icon]="faEye"></fa-icon>
-                  </button>
-                  <button (click)="editUser(user)"
-                    class="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-100 rounded transition-colors">
-                    <fa-icon [icon]="faPen"></fa-icon>
-                  </button>
-                </td>
-              </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        }
-        }
-
-        <!-- Error State -->
-        @if (state().error) {
-        <div class="flex flex-col items-center justify-center py-12 text-center animate__animated animate__fadeIn">
-          <div class="bg-red-50 p-4 rounded-full mb-4">
-            <fa-icon [icon]="faTimes" class="text-red-500 text-2xl"></fa-icon>
-          </div>
-          <h3 class="text-lg font-medium text-gray-900">Error al cargar usuarios</h3>
-          <p class="text-gray-500 mt-1 max-w-sm">{{ state().error }}</p>
-          <button (click)="loadUsers()" class="mt-4 text-purple-600 hover:text-purple-700 font-medium hover:underline">
-            Intentar nuevamente
-          </button>
-        </div>
-        }
-
-        <!-- Empty State -->
-        @if (!state().loading && !state().error && filteredUsers().length === 0) {
-        <div
-          class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg border border-gray-200 animate__animated animate__fadeIn">
-          <div class="bg-white p-4 rounded-full shadow-sm mb-4">
-            <fa-icon [icon]="faUserSlash" class="text-purple-400 text-4xl"></fa-icon>
-          </div>
-          <h2 class="text-xl font-semibold text-gray-800 mb-2">No se encontraron usuarios</h2>
-          <p class="text-gray-500 text-sm text-center max-w-md">
-            {{ state().searchTerm ? 'No hay resultados para tu búsqueda. Intenta con otros términos.' : 'Aún no hay
-            usuarios registrados en el sistema.' }}
-          </p>
-          @if (state().searchTerm) {
-          <button (click)="handleClearFilters()"
-            class="mt-6 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm">
-            Limpiar filtros
-          </button>
-          }
-        </div>
-        }
-
-      </main>
+        </tbody>
+      </table>
     </div>
+    }
+    }
+
+    <!-- Error State -->
+    @if (state().error) {
+    <div class="flex flex-col items-center justify-center py-12 text-center animate__animated animate__fadeIn">
+      <div class="bg-red-50 p-4 rounded-full mb-4">
+        <fa-icon [icon]="faTimes" class="text-red-500 text-2xl"></fa-icon>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900">Error al cargar usuarios</h3>
+      <p class="text-gray-500 mt-1 max-w-sm">{{ state().error }}</p>
+      <button (click)="loadUsers()" class="mt-4 text-purple-600 hover:text-purple-700 font-medium hover:underline">
+        Intentar nuevamente
+      </button>
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!state().loading && !state().error && filteredUsers().length === 0) {
+    <div
+      class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn">
+      <fa-icon [icon]="faUserSlash" class="text-purple-500 mb-4 text-5xl drop-shadow-sm"></fa-icon>
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">
+        No se encontraron usuarios
+      </h2>
+      <p class="text-gray-500 text-sm text-center max-w-md">
+        {{ state().searchTerm ? 'No hay resultados para tu búsqueda. Intenta con otros términos.' : 'Aún no hay usuarios
+        registrados en el sistema.' }}
+      </p>
+      @if (state().searchTerm) {
+      <button (click)="handleClearFilters()"
+        class="mt-6 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm">
+        Limpiar filtros
+      </button>
+      }
+    </div>
+    }
+
   </div>
 </div>
 

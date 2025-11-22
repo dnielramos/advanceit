@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
 import { UsersService } from './users.service';
@@ -79,16 +79,28 @@ export class AuthService {
       return of(false);
     }
 
+    const handleProfileResponse = (response: JwtPayload): boolean => {
+      this.currentUserRole.next(response.role);
+      return true;
+    };
+
     return this.http.get<JwtPayload>(this.validationUrl).pipe(
-      map((response) => {
-        // Al actualizar el rol, `isLoggedIn$` emitirá `true` automáticamente.
-        this.currentUserRole.next(response.role);
-        return true;
-      }),
-      catchError((error) => {
+      map(handleProfileResponse),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          return this.refreshToken().pipe(
+            switchMap(() => this.http.get<JwtPayload>(this.validationUrl)),
+            map(handleProfileResponse),
+            catchError((refreshError) => {
+              console.error('El refresh token también falló', refreshError);
+              this.logout();
+              return of(false);
+            })
+          );
+        }
+
         console.error('La validación del token falló', error);
         this.logout(); // Logout limpiará el rol, y `isLoggedIn$` emitirá `false`.
-        // this.router.navigate(['/in']);
         return of(false);
       })
     );

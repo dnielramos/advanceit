@@ -11,7 +11,7 @@ import { AuthService } from '../services/auth.service';
 
 // --- URLs que deben ser ignoradas por el interceptor ---
 // (Ajusta estas rutas a las de tu API)
-const BYPASS_URLS = ['/api/auth/login', '/api/auth/refresh'];
+const BYPASS_URLS = ['/auth/login', '/auth/refresh'];
 
 // --- Lógica para manejar el estado del refresh fuera de la función ---
 let isRefreshing = false;

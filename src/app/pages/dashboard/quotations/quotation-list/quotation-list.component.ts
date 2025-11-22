@@ -184,4 +184,10 @@ export class QuotationListComponent implements OnInit {
         return 'Desconocido';
     }
   }
+
+  calculateExpirationDate(creationDate: Date | string, days: number): Date {
+    const date = new Date(creationDate);
+    date.setDate(date.getDate() + days);
+    return date;
+  }
 }

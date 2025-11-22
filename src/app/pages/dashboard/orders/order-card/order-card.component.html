@@ -3,15 +3,29 @@
 
   <div class="flex-1">
     <p class="font-semibold text-purple-600">Orden {{ order.numeroOrden }}</p>
-    <p *ngIf="user" class="text-sm text-slate-500">{{ user.name }}</p>
-    <p class="text-xs text-slate-400 mt-1 font-medium">{{ order.productos.length }} Items</p>
+    <div *ngIf="user" class="flex items-center gap-2 mt-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+      </svg>
+      <p class="text-sm text-slate-700">{{ user.name }}</p>
+    </div>
+    <div class="flex items-center gap-2 mt-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-600" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+      </svg>
+      <p class="text-xs text-slate-600 font-medium">{{ order.productos.length }} Items</p>
+    </div>
+    <p class="text-xs text-slate-400 mt-1">{{ order.fecha | date: 'dd/MM/yyyy h:mm a' }}</p>
   </div>
 
   <div class="flex items-center gap-4 md:gap-6">
-    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" *ngIf="order.estadoPago !== 'pagado'" [ngClass]="estadoPagoClass">
+    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" *ngIf="order.estadoPago !== 'pagado'"
+      [ngClass]="estadoPagoClass">
       {{ order.estadoPago.replace('_', ' ') }}
     </span>
-    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" *ngIf="order.estadoPago == 'pagado'" [ngClass]="estadoPagoClass">
+    <span class="px-3 py-1 text-xs font-semibold rounded-full capitalize" *ngIf="order.estadoPago == 'pagado'"
+      [ngClass]="estadoPagoClass">
       {{ 'Procesado' }}
     </span>
     <p class="text-lg font-bold text-slate-800 w-28 text-right">${{ order.precioTotal | number:'1.2-2' }}</p>

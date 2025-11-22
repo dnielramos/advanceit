@@ -23,6 +23,8 @@ import { PaymentMethod, PaymentStatus } from '../../../models/payment.model';
 import { AuthService, Role } from '../../../services/auth.service';
 import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 import { ViewportService } from '../../../services/viewport.service';
+import { SkeletonCardComponent } from '../../../components/skeleton-card/skeleton-card.component';
+import { SkeletonTableComponent } from '../../../components/skeleton-table/skeleton-table.component';
 
 @Component({
   selector: 'app-orders',
@@ -33,7 +35,9 @@ import { ViewportService } from '../../../services/viewport.service';
     OrderCardComponent,
     ViewOrderModalComponent,
     CreateOrderModalComponent,
-    HeaderCrudComponent
+    HeaderCrudComponent,
+    SkeletonCardComponent,
+    SkeletonTableComponent
 ],
   templateUrl: './orders.component.html',
 })
@@ -96,6 +100,9 @@ export class OrdersComponent implements OnInit {
 
   role: Role | null = null;
   Role = Role; // Hacer que la enumeración Role esté disponible en la plantilla
+  
+  // Loading state
+  isLoading = signal(false);
 
   constructor(
     private ordersService: OrdersService,
@@ -122,13 +129,18 @@ export class OrdersComponent implements OnInit {
   }
 
   loadOrders(): void {
+    this.isLoading.set(true);
     this.ordersService.getOrders().subscribe({
       next: (data) => {
         this.allOrders = data;
         this.applyFilters();
         this.updateResumen();
+        this.isLoading.set(false);
       },
-      error: (err) => console.error('Error cargando órdenes:', err),
+      error: (err) => {
+        console.error('Error cargando órdenes:', err);
+        this.isLoading.set(false);
+      },
     });
   }
 

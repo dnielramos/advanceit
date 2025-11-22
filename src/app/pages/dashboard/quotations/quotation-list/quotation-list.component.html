@@ -4,7 +4,11 @@
 
   <!-- Vista Grid (Tarjetas) -->
   <div *ngIf="viewMode() === 'grid'" class="space-y-4">
-    <div *ngIf="quotations.length > 0"
+    <!-- Skeleton Loader -->
+    <app-skeleton-card *ngIf="isLoading" [count]="6"></app-skeleton-card>
+
+    <!-- Actual Content -->
+    <div *ngIf="!isLoading && quotations.length > 0"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
       <div *ngFor="let q of quotations"
         class="bg-white p-6 rounded-xl shadow-lg shadow-purple-50 transition-all duration-300 transform border-t-4 border-purple-500">
@@ -45,7 +49,7 @@
       </div>
     </div>
 
-    <div *ngIf="quotations.length === 0"
+    <div *ngIf="!isLoading && quotations.length === 0"
       class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn">
       <fa-icon [icon]="faBoxOpen" class="text-purple-500 mb-4 text-5xl drop-shadow-sm"></fa-icon>
       <h2 class="text-xl font-semibold text-gray-700 mb-2">
@@ -60,7 +64,11 @@
 
   <!-- Vista Lista (Tabla) -->
   <div *ngIf="viewMode() === 'list'" class="mt-4 overflow-x-auto">
-    <div class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden">
+    <!-- Skeleton Loader -->
+    <app-skeleton-table *ngIf="isLoading" [rowCount]="8" [columnCount]="6"></app-skeleton-table>
+
+    <!-- Actual Content -->
+    <div *ngIf="!isLoading" class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden">
       <table class="w-full">
         <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
           <tr>
@@ -73,8 +81,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          <tr *ngFor="let q of quotations; let odd = odd"
-            [class]="odd ? 'bg-white' : 'bg-gray-50'"
+          <tr *ngFor="let q of quotations; let odd = odd" [class]="odd ? 'bg-white' : 'bg-gray-50'"
             class="hover:bg-purple-50 transition-colors">
             <td class="px-6 py-4 text-sm font-medium text-gray-900">
               {{ q.company.razon_social }}

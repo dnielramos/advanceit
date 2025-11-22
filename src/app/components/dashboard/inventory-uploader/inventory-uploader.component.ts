@@ -10,6 +10,8 @@ import {
 } from '../../../services/company-inventories.service';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { SkeletonCardComponent } from '../../skeleton-card/skeleton-card.component';
+import { SkeletonTableComponent } from '../../skeleton-table/skeleton-table.component';
 import {
   faBuilding,
   faUpload,
@@ -38,7 +40,7 @@ interface CompanyInventory {
 @Component({
   selector: 'app-inventory-browser',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderCrudComponent, FontAwesomeModule],
+  imports: [CommonModule, FormsModule, HeaderCrudComponent, FontAwesomeModule, SkeletonCardComponent, SkeletonTableComponent],
   templateUrl: './inventory-uploader.component.html',
 })
 export class InventoryUploaderComponent implements OnInit {

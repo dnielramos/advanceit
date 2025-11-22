@@ -28,6 +28,8 @@ import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
 import { HeaderCrudComponent } from '../../../../shared/header-dashboard/heeader-crud.component';
+import { SkeletonCardComponent } from '../../../../components/skeleton-card/skeleton-card.component';
+import { SkeletonTableComponent } from '../../../../components/skeleton-table/skeleton-table.component';
 
 @Component({
   imports: [
@@ -37,6 +39,8 @@ import { HeaderCrudComponent } from '../../../../shared/header-dashboard/heeader
     CommonModule,
     FontAwesomeModule,
     AngularToastifyModule,
+    SkeletonCardComponent,
+    SkeletonTableComponent
   ],
   selector: 'app-quotation-list',
   templateUrl: './quotation-list.component.html',
@@ -49,13 +53,13 @@ export class QuotationListComponent implements OnInit {
     throw new Error('Method not implemented.');
   }
   @Input({ required: true }) quotations: PopulatedQuotation[] = [];
+  @Input() isLoading: boolean = false;
   // View mode signal
   viewMode = signal<'grid' | 'list'>('grid');
   // Allow parent to control view mode
   @Input() set externalView(mode: 'grid' | 'list' | undefined) {
     if (mode) this.viewMode.set(mode);
   }
-  isLoading = true;
   isModalOpen = false;
   currentModal: 'create' | 'edit' | 'details' | 'status' | null = null;
   selectedQuotationId: string | null = null;

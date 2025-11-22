@@ -47,6 +47,7 @@ export class QuotationComponent {
         this.viewMode.set('grid');
       }
     });
+    this.isLoading.set(true);
     this.loadQuotations();
   }
 
@@ -92,11 +93,18 @@ export class QuotationComponent {
   }
 
   loadQuotations() {
-    this.quotationService.findAllPopulated().subscribe((data) => {
-      console.log('Quotaciones cargadas:', data);
-      this.quotations.set(data);
-      this.originalQuotations.set(data);
-      this.isLoading.set(false);
+    this.isLoading.set(true);
+    this.quotationService.findAllPopulated().subscribe({
+      next: (data) => {
+        console.log('Quotaciones cargadas:', data);
+        this.quotations.set(data);
+        this.originalQuotations.set(data);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error al cargar cotizaciones:', err);
+        this.isLoading.set(false);
+      }
     });
   }
 

@@ -231,7 +231,7 @@ export class CreateRmaComponent implements OnInit {
         this.toast.set('Solicitud creada correctamente');
         setTimeout(() => {
           this.toast.set(null);
-          this.router.navigate(['/dashboard/rmas']);
+          this.router.navigate(['/dashboard/solicitudes']);
         }, 1200);
         this.created.emit();
       },
@@ -242,9 +242,8 @@ export class CreateRmaComponent implements OnInit {
     });
   }
 
-  // Navegar atrás
   goBack(): void {
-    this.router.navigate(['/dashboard/rmas']);
+    this.router.navigate(['/dashboard/solicitudes']);
   }
 
   // Contador seleccionados

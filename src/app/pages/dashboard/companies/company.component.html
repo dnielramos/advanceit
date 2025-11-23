@@ -25,7 +25,7 @@
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate__animated animate__fadeInUp">
             @for (c of paginated(); track c.id) {
             <div
-                class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col">
+                class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col cursor-pointer transform hover:-translate-y-1">
 
                 <!-- Card Header -->
                 <div class="p-5 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white">
@@ -51,10 +51,10 @@
 
                         <!-- Status Badge -->
                         <span
-                            class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm"
+                            class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm border"
                             [ngClass]="{
-                    'bg-green-100 text-green-800 border border-green-200': c.estado === 'ACTIVO',
-                    'bg-gray-100 text-gray-800 border border-gray-200': c.estado !== 'ACTIVO'
+                    'bg-green-100 text-green-800 border-green-200': c.estado === 'ACTIVO',
+                    'bg-gray-100 text-gray-800 border-gray-200': c.estado !== 'ACTIVO'
                   }">
                             {{ c.estado }}
                         </span>
@@ -64,18 +64,20 @@
                 <!-- Card Body -->
                 <div class="p-5 space-y-4 flex-1">
                     <!-- NIT -->
-                    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100">
+                    <div
+                        class="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100 group-hover:border-purple-200 transition-colors">
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-purple-600">NIT</span>
-                            <span class="text-sm font-semibold text-gray-700">{{ c.nit }}</span>
+                            <span class="text-xs font-bold text-purple-600 uppercase">NIT</span>
+                            <span class="text-sm font-semibold text-gray-700 font-mono">{{ c.nit }}</span>
                         </div>
                     </div>
 
                     <!-- Location -->
-                    <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                    <div
+                        class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all">
                         <div class="flex items-center gap-2 mb-1">
                             <fa-icon [icon]="faMapMarkerAlt" class="text-xs text-gray-400"></fa-icon>
-                            <p class="text-xs text-gray-500 font-semibold">Ubicación</p>
+                            <p class="text-xs text-gray-500 font-semibold uppercase">Ubicación</p>
                         </div>
                         <p class="text-sm font-bold text-gray-700 truncate">
                             {{ c.ciudad }}, {{ c.pais }}
@@ -84,26 +86,24 @@
                 </div>
 
                 <!-- Card Footer / Actions -->
-                <div class="p-4 bg-gray-50 border-t border-gray-100">
-                    <div class="flex gap-2">
-                        <button (click)="openDetail(c.id)"
-                            class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100 hover:shadow-sm"
-                            title="Ver detalles">
-                            <fa-icon [icon]="faEye"></fa-icon>
-                            <span>Ver</span>
-                        </button>
-                        <button (click)="openEdit(c)"
-                            class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white transition-all duration-200"
-                            title="Editar empresa">
-                            <fa-icon [icon]="faPen"></fa-icon>
-                            <span>Editar</span>
-                        </button>
-                        <button (click)="confirmDelete(c.id)"
-                            class="flex items-center justify-center p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
-                            title="Eliminar">
-                            <fa-icon [icon]="faTrash"></fa-icon>
-                        </button>
-                    </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100 flex gap-2">
+                    <button (click)="openDetail(c.id); $event.stopPropagation()"
+                        class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100 hover:shadow-sm"
+                        title="Ver detalles">
+                        <fa-icon [icon]="faEye"></fa-icon>
+                        <span>Ver</span>
+                    </button>
+                    <button (click)="openEdit(c); $event.stopPropagation()"
+                        class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white transition-all duration-200"
+                        title="Editar empresa">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                        <span>Editar</span>
+                    </button>
+                    <button (click)="confirmDelete(c.id); $event.stopPropagation()"
+                        class="flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        title="Eliminar">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </button>
                 </div>
 
             </div>
@@ -137,7 +137,7 @@
                 <tbody class="divide-y divide-gray-200 bg-white">
                     @for (c of paginated(); track c.id) {
                     <tr [class]="$index % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
-                        class="hover:bg-purple-50 transition-colors group">
+                        class="hover:bg-purple-50 transition-colors group cursor-pointer" (click)="openDetail(c.id)">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div
@@ -160,27 +160,27 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide"
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border"
                                 [ngClass]="{
-                      'bg-green-100 text-green-800 border border-green-200': c.estado === 'ACTIVO',
-                      'bg-gray-100 text-gray-800 border border-gray-200': c.estado !== 'ACTIVO'
+                      'bg-green-100 text-green-800 border-green-200': c.estado === 'ACTIVO',
+                      'bg-gray-100 text-gray-800 border-gray-200': c.estado !== 'ACTIVO'
                     }">
                                 {{ c.estado }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            <button (click)="openDetail(c.id)"
+                            <button (click)="openDetail(c.id); $event.stopPropagation()"
                                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
                                 title="Ver">
                                 <fa-icon [icon]="faEye"></fa-icon>
                             </button>
-                            <button (click)="openEdit(c)"
+                            <button (click)="openEdit(c); $event.stopPropagation()"
                                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
                                 title="Editar">
                                 <fa-icon [icon]="faPen"></fa-icon>
                             </button>
-                            <button (click)="confirmDelete(c.id)"
-                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-red-600 hover:bg-red-100 transition-colors"
+                            <button (click)="confirmDelete(c.id); $event.stopPropagation()"
+                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
                                 title="Eliminar">
                                 <fa-icon [icon]="faTrash"></fa-icon>
                             </button>
@@ -193,23 +193,31 @@
         }
         }
 
-        <!-- Error State (if needed, though not explicitly in TS) -->
         <!-- Empty State -->
         @if (!loading() && filtered().length === 0) {
         <div
-            class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn">
-            <fa-icon [icon]="faBuilding" class="text-purple-500 mb-4 text-5xl drop-shadow-sm"></fa-icon>
-            <h2 class="text-xl font-semibold text-gray-700 mb-2">
+            class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn border border-gray-200 border-dashed">
+            <div class="bg-white p-4 rounded-full shadow-sm mb-4">
+                <fa-icon [icon]="faBuilding" class="text-gray-400 text-3xl"></fa-icon>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">
                 No se encontraron empresas
             </h2>
-            <p class="text-gray-500 text-sm text-center max-w-md">
+            <p class="text-gray-500 text-sm text-center max-w-md mb-6">
                 {{ query() ? 'No hay resultados para tu búsqueda. Intenta con otros términos.' : 'Aún no hay empresas
                 registradas en el sistema.' }}
             </p>
             @if (query()) {
             <button (click)="handleClearFilters()"
-                class="mt-6 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm">
+                class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
+                <fa-icon [icon]="faXmark"></fa-icon>
                 Limpiar filtros
+            </button>
+            } @else {
+            <button (click)="openCreate()"
+                class="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
+                <fa-icon [icon]="faPlus"></fa-icon>
+                Registrar Empresa
             </button>
             }
         </div>
@@ -219,15 +227,16 @@
         @if (!loading() && filtered().length > 0) {
         <div
             class="mt-6 flex items-center justify-between text-sm text-gray-600 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-            <div class="font-medium">Página <span class="text-purple-700">{{ page() + 1 }}</span> de {{ totalPages() }}
+            <div class="font-medium">Página <span class="text-purple-700 font-bold">{{ page() + 1 }}</span> de {{
+                totalPages() }}
             </div>
             <div class="flex items-center gap-2">
                 <button (click)="prevPage()" [disabled]="page()===0"
-                    class="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    class="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium">
                     Anterior
                 </button>
                 <button (click)="nextPage()" [disabled]="page()+1>=totalPages()"
-                    class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm">
+                    class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm font-medium">
                     Siguiente
                 </button>
             </div>

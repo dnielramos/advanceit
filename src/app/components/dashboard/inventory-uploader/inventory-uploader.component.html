@@ -9,270 +9,261 @@
 
   <!-- Registrar inventario - Modal mejorado -->
   <div *ngIf="isCreateInventory()"
-    class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 flex items-center justify-center p-4"
+    class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate__animated animate__fadeIn"
     (click)="closeModalOnOverlayClick($event)">
     <section
-      class="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 animate__animated animate__fadeIn">
+      class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto animate__animated animate__zoomIn">
+
       <!-- Header del modal -->
-      <div class="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
-        <div class="flex items-center gap-3">
-          <div class="bg-purple-100 p-3 rounded-xl">
-            <fa-icon [icon]="faUpload" class="text-purple-600 text-lg"></fa-icon>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-900">Registrar nuevo inventario</h2>
-        </div>
+      <div class="flex items-center justify-between p-6 border-b border-gray-100">
+        <h2 class="text-xl font-bold text-gray-800">Registrar nuevo inventario</h2>
         <button (click)="onCloseCreateInventory()" [disabled]="isProcessingFile() || isSavingInventory()"
-          class="text-gray-500 hover:text-gray-700 transition-colors p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50">
-          <fa-icon [icon]="faTimes" class="text-xl"></fa-icon>
+          class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50">
+          <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
         </button>
       </div>
 
-      <!-- Sección de entrada de datos -->
-      <div class="space-y-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Empresa</label>
+      <!-- Contenido del modal -->
+      <div class="p-6 space-y-6">
+
+        <!-- Formulario -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Empresa</label>
             <input type="text" placeholder="Nombre de la empresa" [(ngModel)]="tempCompany"
               [disabled]="isProcessingFile() || isSavingInventory()"
-              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition" />
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-50 disabled:text-gray-500 transition-all outline-none" />
           </div>
 
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Archivo</label>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Archivo de Inventario</label>
             <div class="relative">
               <input type="file" accept=".xlsx,.xls,.csv" (change)="handleFile($event)"
                 [disabled]="isProcessingFile() || isSavingInventory()"
-                class="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed transition" />
-              <p class="text-xs text-gray-500 mt-2">Máx. 50 MB (Excel/CSV)</p>
+                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-60" />
             </div>
+            <p class="text-xs text-gray-400 mt-1">Formatos: .xlsx, .xls, .csv (Máx. 50MB)</p>
           </div>
 
-          <div class="flex flex-col justify-end gap-2">
+          <div class="flex items-end">
             <button (click)="saveInventory()"
               [disabled]="!tempCompany || !previewData().length || isProcessingFile() || isSavingInventory()"
-              class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 h-full">
-              <span *ngIf="!isSavingInventory()" class="flex items-center gap-2">
+              class="w-full bg-purple-600 text-white px-6 py-2.5 rounded-lg font-medium shadow-sm hover:bg-purple-700 focus:ring-4 focus:ring-purple-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+              <ng-container *ngIf="!isSavingInventory()">
                 <fa-icon [icon]="faFloppyDisk"></fa-icon>
-                Guardar
-              </span>
-              <span *ngIf="isSavingInventory()" class="flex items-center gap-2">
+                <span>Guardar Inventario</span>
+              </ng-container>
+              <ng-container *ngIf="isSavingInventory()">
                 <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
-                Guardando...
-              </span>
+                <span>Guardando...</span>
+              </ng-container>
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- Indicador de error -->
-      <div *ngIf="fileError()"
-        class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 animate__animated animate__shake">
-        <fa-icon [icon]="faCircleExclamation" class="text-red-600 mt-1 text-lg flex-shrink-0"></fa-icon>
-        <div>
-          <p class="text-red-800 font-semibold">Error</p>
-          <p class="text-red-700 text-sm">{{ fileError() }}</p>
+        <!-- Estados de carga y error -->
+        <div *ngIf="fileError()"
+          class="p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3 animate__animated animate__shakeX">
+          <fa-icon [icon]="faCircleExclamation" class="text-red-500 mt-0.5"></fa-icon>
+          <div>
+            <h4 class="text-sm font-semibold text-red-800">Error en el archivo</h4>
+            <p class="text-sm text-red-600 mt-1">{{ fileError() }}</p>
+          </div>
         </div>
-      </div>
 
-      <!-- Indicador de progreso de lectura de archivo -->
-      <div *ngIf="isProcessingFile()" class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-sm font-semibold text-blue-900 flex items-center gap-2">
-            <fa-icon [icon]="faHourglassHalf" class="animate-spin"></fa-icon>
-            Leyendo archivo: {{ fileSize() }}
-          </span>
-          <span class="text-sm font-semibold text-blue-700">{{ fileUploadProgress() | number:'1.0-0' }}%</span>
+        <div *ngIf="isProcessingFile()" class="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-blue-800 flex items-center gap-2">
+              <fa-icon [icon]="faHourglassHalf" class="animate-spin"></fa-icon>
+              Procesando archivo...
+            </span>
+            <span class="text-sm font-bold text-blue-600">{{ fileUploadProgress() | number:'1.0-0' }}%</span>
+          </div>
+          <div class="w-full bg-blue-200 rounded-full h-2">
+            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              [style.width.%]="fileUploadProgress()"></div>
+          </div>
+          <p class="text-xs text-blue-500 mt-2 text-right">{{ fileSize() }}</p>
         </div>
-        <div class="w-full h-3 bg-blue-200 rounded-full overflow-hidden">
-          <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
-            [style.width.%]="fileUploadProgress()"></div>
-        </div>
-      </div>
 
-      <!-- Indicador de progreso de guardado -->
-      <div *ngIf="isSavingInventory()" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-        <div class="flex items-center gap-2 mb-3">
-          <fa-icon [icon]="faSpinner" class="animate-spin text-green-600 text-lg"></fa-icon>
-          <span class="text-sm font-semibold text-green-900">Guardando inventario en el servidor...</span>
+        <div *ngIf="uploadStatus() === 'success' && !isProcessingFile() && !isSavingInventory()"
+          class="p-4 bg-green-50 border border-green-100 rounded-lg flex items-center gap-3 animate__animated animate__fadeIn">
+          <fa-icon [icon]="faCheckCircle" class="text-green-500 text-xl"></fa-icon>
+          <div>
+            <h4 class="text-sm font-semibold text-green-800">¡Archivo procesado correctamente!</h4>
+            <p class="text-sm text-green-600">Se han detectado {{ previewData().length }} registros.</p>
+          </div>
         </div>
-        <div class="w-full h-3 bg-green-200 rounded-full overflow-hidden">
-          <div class="h-full bg-gradient-to-r from-green-500 to-emerald-500 animate-pulse"></div>
+
+        <!-- Vista previa -->
+        <div *ngIf="previewData().length" class="border rounded-lg overflow-hidden">
+          <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <fa-icon [icon]="faEye" class="text-purple-500"></fa-icon>
+              Vista Previa
+            </h3>
+            <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">
+              Mostrando 5 de {{ previewData().length }} filas
+            </span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th *ngFor="let col of previewColumns()"
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                    {{ col }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let row of previewData().slice(0,5)" class="hover:bg-gray-50">
+                  <td *ngFor="let col of previewColumns()" class="px-4 py-2 text-gray-600 whitespace-nowrap">
+                    {{ row[col] }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      <!-- Indicador de éxito -->
-      <div *ngIf="uploadStatus() === 'success' && !isProcessingFile() && !isSavingInventory()"
-        class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3 animate__animated animate__bounceIn">
-        <fa-icon [icon]="faCheckCircle" class="text-emerald-600 text-xl"></fa-icon>
-        <p class="text-emerald-800 font-semibold">¡Inventario procesado correctamente!</p>
-      </div>
-
-      <!-- Vista previa -->
-      <div *ngIf="previewData().length" class="border-t pt-6">
-        <h3 class="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">
-          <fa-icon [icon]="faEye" class="text-purple-600"></fa-icon>
-          Vista previa
-          <span class="text-sm font-normal text-gray-500">({{ previewData().length }} filas)</span>
-        </h3>
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
-
-          <table class="min-w-full text-sm">
-            <thead class="bg-purple-100 text-purple-800">
-              <tr>
-                <th *ngFor="let col of previewColumns()" class="px-4 py-2 border">{{ col }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of previewData().slice(0,5)" class="hover:bg-purple-50">
-                <td *ngFor="let col of previewColumns()" class="px-4 py-2 border text-gray-700">
-                  {{ row[col] }}
-                </td>
-              </tr>
-          </table>
-        </div>
-        <p class="text-xs text-gray-500 mt-3">* Se muestran las primeras 5 filas. Se cargarán {{ previewData().length }}
-          en total.</p>
       </div>
     </section>
   </div>
 
   <!-- Lista de empresas -->
-  <section *ngIf="companies().length && !selectedCompany()"
-    class="bg-white mt-6 rounded-2xl p-6 border border-gray-200">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-      <i class="fa-solid fa-building text-purple-600 mr-3"></i>
-      Empresas registradas
-      <span *ngIf="isLoadingCompanies()" class="ml-3 text-sm text-gray-500 flex items-center gap-1">
-        <i class="fa-solid fa-spinner animate-spin"></i>
-        Cargando...
-      </span>
-    </h2>
+  <section *ngIf="companies().length && !selectedCompany()" class="mt-6">
 
-    <!-- Loaders while loading companies -->
+    <!-- Loaders -->
     <app-skeleton-card *ngIf="isLoadingCompanies()" [count]="6"></app-skeleton-card>
 
     <!-- Vista Grid -->
     <div *ngIf="viewMode() === 'grid' && !isLoadingCompanies()"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div *ngFor="let c of companies()" (click)="viewInventory(c)"
-        class="group border border-gray-200 rounded-xl p-5 bg-white hover:shadow-md hover:border-purple-300 cursor-pointer transition">
-        <div class="flex justify-between items-start">
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeIn">
 
+      <div *ngFor="let c of companies()"
+        class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col cursor-pointer"
+        (click)="viewInventory(c)">
 
-          <h3 class="text-lg font-semibold text-orange-600 group-hover:text-purple-700 flex items-center gap-2">
-            <img [src]="getCompanyLogo(c.company)" (error)="onLogoError($event, c.company)" alt="logo"
-              class="w-25 h-10 rounded-sm object-contain" />
-            {{ capitalizeCompany(c.company) }}
-          </h3>
-          <span class="text-sm text-gray-500">{{ c.inventory.length }} filas</span>
-        </div>
-        <p class="mt-2 text-sm text-gray-600 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="size-4">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
-          </svg>
-          <fa-icon [icon]="faCalendarDay" class="text-purple-600"></fa-icon>
-          {{ c.created_at ? (c.created_at | date:'medium') : 'Sin fecha' }}
-        </p>
-
-        <!-- Cabeceras del inventario -->
-        <div class="mt-3 flex flex-wrap gap-2">
-          <span *ngFor="let col of (c.columns || []).slice(0, 4)"
-            class="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full border border-purple-100">
-            {{ col }}
-          </span>
-          <span *ngIf="(c.columns || []).length > 4" class="text-xs text-gray-500">
-            + más
-          </span>
-        </div>
-
-        <div class="mt-4 flex items-center justify-between gap-2">
-          <button (click)="viewInventory(c); $event.stopPropagation()"
-            class="inline-flex items-center gap-2 text-purple-700 font-medium hover:text-purple-800 transition">
-            <fa-icon [icon]="faEye"></fa-icon>
-            Ver inventario
-          </button>
-          <div class="flex items-center gap-2">
-            <button (click)="confirmDeleteInventory(c.id, c.company); $event.stopPropagation()"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-              <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
-            </button>
-            <fa-icon [icon]="faChevronRight" class="text-gray-400 group-hover:text-purple-600 transition"></fa-icon>
+        <!-- Card Header -->
+        <div class="p-5 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white">
+          <div class="flex justify-between items-start gap-3">
+            <div class="flex items-start gap-3 overflow-hidden">
+              <div
+                class="p-2 bg-purple-100 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 shrink-0">
+                <img [src]="getCompanyLogo(c.company)" (error)="onLogoError($event, c.company)" alt="logo"
+                  class="w-8 h-8 object-contain" *ngIf="true" />
+              </div>
+              <div class="min-w-0">
+                <h2 class="text-base font-bold text-gray-900 truncate leading-tight mb-1">
+                  {{ capitalizeCompany(c.company) }}
+                </h2>
+                <p class="text-xs text-gray-500 flex items-center gap-1">
+                  <fa-icon [icon]="faCalendarDay" class="text-gray-400"></fa-icon>
+                  {{ c.created_at ? (c.created_at | date:'mediumDate') : 'Sin fecha' }}
+                </p>
+              </div>
+            </div>
+            <span
+              class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+              {{ c.inventory.length }} items
+            </span>
           </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-5 space-y-4 flex-1">
+          <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+            <p class="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Columnas Detectadas</p>
+            <div class="flex flex-wrap gap-1.5">
+              <span *ngFor="let col of (c.columns || []).slice(0, 4)"
+                class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-white text-gray-600 border border-gray-200 shadow-sm">
+                {{ col }}
+              </span>
+              <span *ngIf="(c.columns || []).length > 4" class="text-xs text-gray-400 self-center pl-1">
+                +{{ (c.columns || []).length - 4 }} más
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="p-4 bg-gray-50 border-t border-gray-100 flex gap-2">
+          <button (click)="viewInventory(c); $event.stopPropagation()"
+            class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100 hover:shadow-sm">
+            <fa-icon [icon]="faEye"></fa-icon>
+            <span>Ver Inventario</span>
+          </button>
+          <button (click)="confirmDeleteInventory(c.id, c.company); $event.stopPropagation()"
+            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+            title="Eliminar">
+            <fa-icon [icon]="faTrash"></fa-icon>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Vista Tabla -->
     <div *ngIf="viewMode() === 'list' && !isLoadingCompanies()"
-      class="overflow-x-auto border border-gray-200 rounded-lg">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+      class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm animate__animated animate__fadeIn">
+      <table class="w-full">
+        <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Empresa
-            </th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Productos
-            </th>
-            <th scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-              Fecha Creación
-            </th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Columnas
-            </th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Acciones
-            </th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Empresa</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Productos</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold hidden md:table-cell">Fecha Creación</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold">Columnas</th>
+            <th class="px-6 py-4 text-right text-sm font-semibold">Acciones</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let c of companies()" class="hover:bg-gray-50 transition-colors cursor-pointer"
-            (click)="viewInventory(c)">
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <tr *ngFor="let c of companies(); let odd = odd" [class]="odd ? 'bg-white' : 'bg-gray-50'"
+            class="hover:bg-purple-50 transition-colors cursor-pointer group" (click)="viewInventory(c)">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
-                <img [src]="getCompanyLogo(c.company)" (error)="onLogoError($event, c.company)" alt="logo"
-                  class="h-10 w-25 rounded object-contain bg-white border border-gray-200" />
+                <div
+                  class="h-10 w-10 flex-shrink-0 bg-white rounded-lg border border-gray-200 p-1 flex items-center justify-center">
+                  <img [src]="getCompanyLogo(c.company)" (error)="onLogoError($event, c.company)" alt="logo"
+                    class="max-h-full max-w-full object-contain" />
+                </div>
                 <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">{{ capitalizeCompany(c.company) }}</div>
+                  <div class="text-sm font-bold text-gray-900 group-hover:text-purple-700 transition-colors">
+                    {{ capitalizeCompany(c.company) }}
+                  </div>
                 </div>
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+            <td class="px-6 py-4 whitespace-nowrap">
               <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
                 {{ c.inventory.length }} items
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-              {{ c.created_at ? (c.created_at | date:'short') : 'Sin fecha' }}
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
+              {{ c.created_at ? (c.created_at | date:'mediumDate') : 'Sin fecha' }}
             </td>
             <td class="px-6 py-4 text-sm text-gray-500">
               <div class="flex flex-wrap gap-1">
-                <span *ngFor="let col of (c.columns || []).slice(0, 3)"
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                <span *ngFor="let col of (c.columns || []).slice(0, 2)"
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                   {{ col }}
                 </span>
-                <span *ngIf="(c.columns || []).length > 3" class="text-xs text-gray-400">
-                  +{{ (c.columns || []).length - 3 }}
+                <span *ngIf="(c.columns || []).length > 2" class="text-xs text-gray-400">
+                  +{{ (c.columns || []).length - 2 }}
                 </span>
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <div class="inline-flex items-center gap-2">
-                <button (click)="viewInventory(c); $event.stopPropagation()"
-                  class="text-purple-600 hover:text-purple-900 inline-flex items-center gap-1 px-3 py-1.5 hover:bg-purple-50 rounded-lg transition-colors">
-                  <fa-icon [icon]="faEye"></fa-icon>
-                  Ver
-                </button>
-                <button (click)="confirmDeleteInventory(c.id, c.company); $event.stopPropagation()"
-                  class="text-red-600 hover:text-red-900 inline-flex items-center gap-1 px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors">
-                  <fa-icon [icon]="faTrash"></fa-icon>
-                  Eliminar
-                </button>
-              </div>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+              <button (click)="viewInventory(c); $event.stopPropagation()"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
+                title="Ver">
+                <fa-icon [icon]="faEye"></fa-icon>
+              </button>
+              <button (click)="confirmDeleteInventory(c.id, c.company); $event.stopPropagation()"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
+                title="Eliminar">
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -285,179 +276,169 @@
 
     <!-- Mensaje sin datos -->
     <div *ngIf="!isLoadingCompanies() && !companies().length"
-      class="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-      <i class="fa-solid fa-inbox text-4xl text-gray-400 mb-3 inline-block"></i>
-      <p class="text-gray-600 font-medium mb-2">No hay inventarios registrados</p>
-      <p class="text-gray-500 text-sm mb-4">Comienza registrando un nuevo inventario</p>
+      class="flex flex-col items-center justify-center py-20 px-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+      <div class="bg-white p-4 rounded-full shadow-sm mb-4">
+        <fa-icon [icon]="faExclamationTriangle" class="text-gray-400 text-3xl"></fa-icon>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-1">No hay inventarios registrados</h3>
+      <p class="text-gray-500 text-sm mb-6 text-center max-w-sm">Comienza subiendo un archivo Excel o CSV para gestionar
+        tu primer inventario.</p>
       <button (click)="onCreateInventory()"
-        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-        <i class="fa-solid fa-plus mr-2"></i>
-        Registrar inventario
+        class="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm flex items-center gap-2">
+        <fa-icon [icon]="faUpload"></fa-icon>
+        Registrar Inventario
       </button>
     </div>
   </section>
 
   <!-- Detalle de inventario (expandido, no modal) -->
-  <section *ngIf="selectedCompany()" class="bg-white shadow-xl rounded-2xl mt-6 p-6 border border-gray-200">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-      <h3 class="text-2xl font-bold text-purple-700 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-          class="size-6">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
-        </svg>
+  <section *ngIf="selectedCompany()" class="mt-6 animate__animated animate__fadeIn">
 
-        <p class="flex items-center gap-2">
-          {{ capitalizeCompany(selectedCompany()?.company || '') }}
-          <span class="text-xs text-orange-600"> Mostrando {{ filteredInventory().length }} ítem(s)</span>
-        </p>
-      </h3>
+    <!-- Header del detalle -->
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-purple-100 rounded-lg text-purple-600">
+          <fa-icon [icon]="faBuilding" class="text-xl"></fa-icon>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            {{ capitalizeCompany(selectedCompany()?.company || '') }}
+          </h3>
+          <p class="text-sm text-gray-500">
+            Mostrando {{ filteredInventory().length }} ítem(s)
+          </p>
+        </div>
+      </div>
+
       <button (click)="closeInventory()"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-          class="w-4 h-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-        </svg>
-        Volver
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+        <fa-icon [icon]="faChevronRight" class="rotate-180"></fa-icon>
+        Volver al listado
       </button>
     </div>
 
     <!-- Vista Grid de productos -->
-    <div *ngIf="viewMode() === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngIf="viewMode() === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <div *ngFor="let row of filteredInventory(); let i = index" (click)="viewProductDetail(row, i)"
-        class="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+        class="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col">
 
-        <!-- Borde superior -->
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-indigo-600"></div>
-
-        <div class="p-6">
-          <!-- Icono y título -->
-          <div class="flex items-start gap-4 mb-4">
+        <!-- Header Card -->
+        <div class="p-4 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white">
+          <div class="flex items-start gap-3">
             <div
-              class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+              class="p-2 bg-purple-50 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+              <!-- Icono genérico de producto -->
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6 text-purple-600 group-hover:text-white transition-colors">
+                stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                  d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-12l9 5.25" />
               </svg>
             </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="text-lg font-bold text-gray-900 truncate group-hover:text-purple-600 transition-colors">
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm font-bold text-gray-900 truncate group-hover:text-purple-600 transition-colors"
+                [title]="row['Laptop Model '] || row['Laptop Model'] || 'Producto'">
                 {{ row['Laptop Model '] || row['Laptop Model'] || 'Producto' }}
               </h3>
-              <p class="text-sm text-gray-500 mt-1">
+              <p class="text-xs text-gray-500 truncate mt-0.5">
                 {{ row['Service Tag Laptop'] || 'N/A' }}
               </p>
             </div>
           </div>
+        </div>
 
-          <!-- Información visible -->
-          <div class="space-y-3 mb-4">
-            <div class="flex items-center gap-2 text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-4 h-4 text-purple-600">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-              <span class="text-gray-700 font-medium">{{ row['First Name'] || '' }} {{ row['Last Name '] || '' }}</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-4 h-4 text-purple-600">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-              <span class="text-gray-700">{{ row['City '] || 'N/A' }}</span>
-            </div>
+        <!-- Body Card -->
+        <div class="p-4 space-y-3 flex-1">
+          <div class="flex items-center gap-2 text-xs text-gray-600">
+            <fa-icon [icon]="faBuilding" class="text-gray-400 w-4"></fa-icon>
+            <span class="truncate font-medium">{{ row['First Name'] || '' }} {{ row['Last Name '] || '' }}</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-4 h-4 text-gray-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+            </svg>
+            <span class="truncate">{{ row['City '] || 'N/A' }}</span>
           </div>
 
-          <!-- Información que se desvanece -->
-          <div class="relative overflow-hidden max-h-24">
-            <div class="space-y-2 text-xs text-gray-600">
-              <ng-container *ngFor="let col of selectedCompany()?.columns?.slice(0, 4)">
-                <div
-                  *ngIf="!['Laptop Model', 'Laptop Model ', 'Service Tag Laptop', 'First Name', 'Last Name ', 'City '].includes(col)"
-                  class="flex justify-between">
-                  <span class="font-medium text-gray-500">{{ col }}:</span>
-                  <span class="truncate ml-2">{{ row[col] }}</span>
-                </div>
-              </ng-container>
-            </div>
-            <!-- Gradiente de desvanecimiento -->
-            <div
-              class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none">
-            </div>
+          <!-- Dynamic Fields Preview -->
+          <div class="mt-3 pt-3 border-t border-gray-50 space-y-1.5">
+            <ng-container *ngFor="let col of selectedCompany()?.columns?.slice(0, 3)">
+              <div
+                *ngIf="!['Laptop Model', 'Laptop Model ', 'Service Tag Laptop', 'First Name', 'Last Name ', 'City '].includes(col)"
+                class="flex justify-between text-xs">
+                <span class="text-gray-400 font-medium truncate w-1/3">{{ col }}:</span>
+                <span class="text-gray-700 truncate w-2/3 text-right">{{ row[col] }}</span>
+              </div>
+            </ng-container>
           </div>
+        </div>
 
-          <!-- Botón de acción -->
-          <div class="mt-4 pt-4 border-t border-gray-100">
-            <div class="flex items-center justify-between text-purple-600 group-hover:text-purple-700">
-              <span class="text-sm font-medium">Ver detalles completos</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="w-5 h-5 transform group-hover:translate-x-1 transition-transform">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </div>
-          </div>
+        <!-- Footer Card -->
+        <div class="p-3 bg-gray-50 border-t border-gray-100 text-center">
+          <span
+            class="text-xs font-medium text-purple-600 group-hover:text-purple-700 flex items-center justify-center gap-1">
+            Ver detalles <fa-icon [icon]="faChevronRight" class="text-[10px]"></fa-icon>
+          </span>
         </div>
       </div>
 
-      <div *ngIf="filteredInventory().length === 0" class="col-span-full text-center py-12 text-gray-500">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          class="w-16 h-16 mx-auto opacity-50 mb-4">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p class="text-lg font-medium">No se encontraron coincidencias.</p>
+      <!-- Empty State -->
+      <div *ngIf="filteredInventory().length === 0"
+        class="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
+        <div class="bg-gray-100 p-4 rounded-full mb-3">
+          <fa-icon [icon]="faExclamationTriangle" class="text-gray-400 text-2xl"></fa-icon>
+        </div>
+        <p class="text-lg font-medium text-gray-900">No se encontraron coincidencias</p>
+        <p class="text-sm">Intenta con otros términos de búsqueda.</p>
       </div>
     </div>
 
     <!-- Vista Tabla de productos -->
-    <div *ngIf="viewMode() === 'list'" class="overflow-x-auto border border-gray-200 rounded-lg">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th *ngFor="let col of selectedColumns()" scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {{ col }}
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let row of filteredInventory(); let i = index" (click)="viewProductDetail(row, i)"
-            class="hover:bg-purple-50 transition-colors cursor-pointer">
-            <td *ngFor="let col of selectedColumns()" class="px-6 py-4 text-sm text-gray-900">
-              <div class="flex items-center gap-2">
-                <svg *ngIf="col.toLowerCase().includes('service tag')" xmlns="http://www.w3.org/2000/svg" fill="none"
-                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-purple-600">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
-                </svg>
-                <span class="break-words">{{ row[col] }}</span>
-                <button (click)="openDellSupport()" *ngIf="col.toLowerCase().includes('service tag')"
-                  class="text-xs text-purple-600 hover:text-purple-800 underline whitespace-nowrap">
-                  Ver soporte
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div *ngIf="filteredInventory().length === 0" class="text-center py-8 text-gray-500">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          class="w-12 h-12 mx-auto opacity-50">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p class="mt-2">No se encontraron coincidencias.</p>
+    <div *ngIf="viewMode() === 'list'"
+      class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+            <tr>
+              <th *ngFor="let col of selectedColumns()" scope="col"
+                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
+                {{ col }}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let row of filteredInventory(); let i = index; let odd = odd"
+              [class]="odd ? 'bg-white' : 'bg-gray-50'" class="hover:bg-purple-50 transition-colors cursor-pointer"
+              (click)="viewProductDetail(row, i)">
+              <td *ngFor="let col of selectedColumns()" class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <span class="truncate max-w-xs" [title]="row[col]">{{ row[col] }}</span>
+                  <button (click)="openDellSupport(); $event.stopPropagation()"
+                    *ngIf="col.toLowerCase().includes('service tag')"
+                    class="text-xs text-purple-600 hover:text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-100 hover:border-purple-300 transition-colors ml-2">
+                    Soporte
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="filteredInventory().length === 0" class="text-center py-12 text-gray-500 bg-white">
+        <div class="bg-gray-50 p-4 rounded-full inline-block mb-3">
+          <fa-icon [icon]="faExclamationTriangle" class="text-gray-400 text-2xl"></fa-icon>
+        </div>
+        <p class="text-lg font-medium text-gray-900">No se encontraron coincidencias</p>
       </div>
     </div>
 
-    <p class="text-xs text-gray-500 mt-5 text-center sm:text-left">
+    <p class="text-xs text-gray-500 mt-4 text-center sm:text-left">
       Mostrando {{ filteredInventory().length }} ítem(s)
     </p>
   </section>
-
 
 </div>

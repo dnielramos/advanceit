@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../../components/dashboard/sidebar/sidebar.component';
 import { TopbarComponent } from '../../components/dashboard/topbar/topbar.component';
+import { AiChatSidebarComponent } from '../../components/dashboard/ai-chat-sidebar/ai-chat-sidebar.component';
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent, AiChatSidebarComponent],
   template: `
     <div class="bg-gray-100 h-screen lg:flex">
       <!-- SIDEBAR -->
@@ -53,6 +54,8 @@ import { TopbarComponent } from '../../components/dashboard/topbar/topbar.compon
           <router-outlet></router-outlet>
         </main>
       </div>
+      <!-- AI Chat Sidebar -->
+      <app-ai-chat-sidebar></app-ai-chat-sidebar>
     </div>
   `,
   styles: [],

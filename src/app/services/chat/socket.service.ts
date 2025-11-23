@@ -130,11 +130,12 @@ export class SocketService {
     });
   }
 
-  sendMessage(message: string, sessionId: string, userId?: string) {
+  sendMessage(message: string, sessionId: string, userId?: string, context?: string) {
     this.socket.emit('send_message', {
       message,
       sessionId,
-      userId
+      userId,
+      context
     });
   }
 

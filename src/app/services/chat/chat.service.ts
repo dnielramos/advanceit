@@ -163,7 +163,7 @@ export class ChatService {
     this.socketService.joinSession(this.userId, customerInfo);
   }
 
-  sendMessage(message: string) {
+  sendMessage(message: string, context?: string) {
     if (!this.currentSessionId) {
       // throw new Error('No hay sesión activa');
       this.startChat(); // Vuelve a emitir join_session
@@ -185,8 +185,8 @@ export class ChatService {
     const currentMessages = this.messagesSubject.value;
     this.messagesSubject.next([...currentMessages, userMessage]);
 
-    // Enviar al servidor
-    this.socketService.sendMessage(message, this.currentSessionId, this.userId);
+    // Enviar al servidor incluyendo contexto opcional
+    this.socketService.sendMessage(message, this.currentSessionId, this.userId, context);
   }
 
   loadHistory() {

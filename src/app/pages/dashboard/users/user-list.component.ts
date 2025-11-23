@@ -15,7 +15,8 @@ import {
   faSpinner,
   faTimes,
   faUsers,
-  faUserPlus
+  faUserPlus,
+  faPlus
 } from '@fortawesome/free-solid-svg-icons';
 import { UsersService } from '../../../services/users.service';
 import { UserViewModalComponent } from './user-view-modal/user-view-modal.component';
@@ -49,7 +50,6 @@ interface UserState {
     UserViewModalComponent,
     UserEditModalComponent,
     UserAddModalComponent,
-    UserAddModalComponent,
     HeaderCrudComponent,
     SkeletonCardComponent,
     SkeletonTableComponent
@@ -71,6 +71,7 @@ export class UserListComponent {
   faUsers = faUsers;
   faUserPlus = faUserPlus;
   faTimes = faTimes;
+  faPlus = faPlus;
 
   state = signal<UserState>({
     users: [],
@@ -111,7 +112,8 @@ export class UserListComponent {
       faUserSlash,
       faSpinner,
       faTimes,
-      faUserPlus
+      faUserPlus,
+      faPlus
     );
   }
 

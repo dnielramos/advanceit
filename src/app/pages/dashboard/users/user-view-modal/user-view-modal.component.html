@@ -1,74 +1,119 @@
-<div class="fixed inset-0 z-50 bg-gray-700 bg-opacity-60 flex items-center justify-center animate__animated animate__fadeIn">
+<div
+  class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate__animated animate__fadeIn"
+  (click)="close()">
   <div
-    class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg mx-4 transform transition-all animate__animated animate__zoomIn max-h-[90vh] overflow-y-auto">
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate__animated animate__zoomIn transform transition-all flex flex-col max-h-[90vh] relative"
+    (click)="$event.stopPropagation()">
 
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <h3 class="text-2xl font-bold text-purple-700">Perfil de Usuario</h3>
-      <button (click)="close()" aria-label="Close modal" class="text-gray-400 hover:text-gray-600 transition-colors">
-        <fa-icon [icon]="faTimes" size="lg"></fa-icon>
-      </button>
-    </div>
+    <!-- Floating Close Button (Always visible) -->
+    <button (click)="close()"
+      class="absolute top-4 right-4 z-50 text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
+      <fa-icon [icon]="faTimes" class="text-xl drop-shadow-md"></fa-icon>
+    </button>
 
-    <!-- User Content -->
-    <div *ngIf="user" class="text-gray-700">
+    <!-- Scrollable Area (Contains Banner + Content) -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar">
 
-      <!-- Profile Picture -->
-      <div class="flex flex-col items-center mb-6">
-        <img [src]="user.picture || 'https://via.placeholder.com/150'" alt="User Profile Picture"
-          class="w-24 h-24 rounded-full object-cover border-4 border-purple-500 shadow-md">
-        <h4 class="text-2xl font-semibold mt-4">{{ user.name }}</h4>
-        <p class="text-gray-500">{{ user.email }}</p>
+      <!-- Banner (Header) -->
+      <div class="relative bg-gradient-to-r from-purple-600 to-purple-700 p-6 pb-16 text-center">
+        <h3 class="text-white text-lg font-medium opacity-90 tracking-wide pt-2">Perfil de Usuario</h3>
       </div>
 
-      <!-- Details -->
-      <div class="space-y-3">
+      <!-- Content (Overlapping Banner) -->
+      <div class="px-8 pb-8 relative">
 
-        <div class="flex items-center" *ngIf="user.address">
-          <fa-icon [icon]="faMapMarkerAlt" class="text-purple-500 w-5"></fa-icon>
-          <span class="ml-2 font-medium">Dirección:</span>
-          <span class="ml-1">{{ user.address || 'N/A' }}</span>
+        <!-- Avatar -->
+        <div class="relative -mt-12 mb-6 flex justify-center z-10">
+          <div class="relative">
+            <img
+              [src]="user?.picture || 'https://placehold.co/150x150/663399/FFFFFF?text=' + (user?.name?.charAt(0) || 'U')"
+              alt="Profile Picture" class="w-24 h-24 rounded-2xl object-cover border-4 border-white bg-white shadow-xl">
+            <div
+              class="absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center shadow-md"
+              [ngClass]="{
+                   'bg-purple-500': user?.type === 'admin',
+                   'bg-blue-500': user?.type === 'user',
+                   'bg-orange-500': user?.type === 'cashier',
+                   'bg-gray-500': user?.type === 'warehouse'
+                 }">
+              <fa-icon [icon]="faUserTag" class="text-white text-[10px]"></fa-icon>
+            </div>
+          </div>
         </div>
 
-        <div class="flex items-center" *ngIf="user.city">
-          <fa-icon [icon]="faCity" class="text-purple-500 w-5"></fa-icon>
-          <span class="ml-2 font-medium">Ciudad:</span>
-          <span class="ml-1">{{ user.city || 'N/A' }}</span>
+        <!-- User Info -->
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 mb-1">{{ user?.name }}</h2>
+          <div class="flex items-center justify-center gap-2 text-gray-500 text-sm font-medium">
+            <fa-icon [icon]="faEnvelope" class="text-purple-400"></fa-icon>
+            <span>{{ user?.email }}</span>
+          </div>
         </div>
 
-        <div class="flex items-center" *ngIf="user.country">
-          <fa-icon [icon]="faGlobe" class="text-purple-500 w-5"></fa-icon>
-          <span class="ml-2 font-medium">País:</span>
-          <span class="ml-1">{{ user.country || 'N/A' }}</span>
-        </div>
+        <!-- Details Grid -->
+        <div class="space-y-6">
 
-        <div class="flex items-center" *ngIf="user.company">
-          <fa-icon [icon]="faBuilding" class="text-purple-500 w-5"></fa-icon>
-          <span class="ml-2 font-medium">Empresa:</span>
-          <span class="ml-1">{{ user.company || 'N/A' }}</span>
-        </div>
+          <!-- Role & Company Section -->
+          <div class="grid grid-cols-2 gap-4">
+            <div
+              class="bg-purple-50 p-4 rounded-xl border border-purple-100 flex flex-col items-center text-center hover:shadow-sm transition-shadow">
+              <div
+                class="w-10 h-10 rounded-full bg-white text-purple-600 flex items-center justify-center mb-2 shadow-sm">
+                <fa-icon [icon]="faBuilding"></fa-icon>
+              </div>
+              <p class="text-xs text-purple-600 font-bold uppercase tracking-wider mb-1">Empresa</p>
+              <p class="text-sm font-bold text-gray-800 line-clamp-2">{{ user?.company || 'N/A' }}</p>
+            </div>
 
-        <div class="flex items-center" *ngIf="user.telephone">
-          <fa-icon [icon]="faPhone" class="text-purple-500 w-5"></fa-icon>
-          <span class="ml-2 font-medium">Teléfono:</span>
-          <span class="ml-1">{{ user.telephone || 'N/A' }}</span>
-        </div>
+            <div
+              class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col items-center text-center hover:shadow-sm transition-shadow">
+              <div
+                class="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center mb-2 shadow-sm">
+                <fa-icon [icon]="faUserTag"></fa-icon>
+              </div>
+              <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mb-1">Rol</p>
+              <p class="text-sm font-bold text-gray-800 capitalize">{{ user?.type || 'N/A' }}</p>
+            </div>
+          </div>
 
-        <div class="flex items-center" *ngIf="user.type">
-          <fa-icon [icon]="faUserTag" class="text-purple-500 w-5"></fa-icon>
-          <span class="ml-2 font-medium">Rol:</span>
-          <span class="ml-1 text-purple-600 font-semibold">{{ user.type || 'N/A' }}</span>
-        </div>
+          <!-- Contact & Location Section -->
+          <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex items-center gap-4 hover:bg-white transition-colors">
+              <div
+                class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
+                <fa-icon [icon]="faPhone"></fa-icon>
+              </div>
+              <div>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Teléfono</p>
+                <p class="text-sm font-semibold text-gray-700">{{ user?.telephone || 'No registrado' }}</p>
+              </div>
+            </div>
 
+            <div class="p-4 flex items-center gap-4 hover:bg-white transition-colors">
+              <div
+                class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
+                <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+              </div>
+              <div>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Ubicación</p>
+                <p class="text-sm font-semibold text-gray-700">
+                  {{ user?.city ? user?.city + ', ' : '' }}{{ user?.country || 'No registrada' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
     <!-- Footer -->
-    <div class="mt-6 text-right">
+    <div class="p-4 bg-gray-50 border-t border-gray-100 text-center sticky bottom-0 z-20">
       <button (click)="close()"
-        class="bg-gray-300 text-gray-800 py-2 px-4 rounded-full hover:bg-gray-400 transition-colors">
-        Cerrar
+        class="text-gray-500 hover:text-purple-600 font-medium text-sm transition-colors flex items-center justify-center gap-2 w-full py-2">
+        <span>Cerrar ventana</span>
       </button>
     </div>
+
   </div>
 </div>

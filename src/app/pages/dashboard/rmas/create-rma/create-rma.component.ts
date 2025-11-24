@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPaperPlane, faSpinner, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faSpinner, faArrowLeft, faArrowRight, faHome, faBox, faCheck, faSearch, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { RmasService } from '../../../../services/rmas.service';
 import { CreateRmaDto } from '../../../../models/rma.model';
 import { CompaniesService, Company } from '../../../../services/companies.service';
@@ -28,6 +28,11 @@ export class CreateRmaComponent implements OnInit {
   faPaperPlane = faPaperPlane;
   faArrowLeft = faArrowLeft;
   faArrowRight = faArrowRight;
+  faHome = faHome;
+  faBox = faBox;
+  faCheck = faCheck;
+  faSearch = faSearch;
+  faInfoCircle = faInfoCircle;
 
   isLoading = signal(false);
   error = signal<string | null>(null);

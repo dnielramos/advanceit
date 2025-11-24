@@ -1,263 +1,383 @@
-<div class="min-h-[calc(100vh-80px)] bg-slate-50 p-4 md:p-6">
-  <div class="max-w-6xl mx-auto bg-white rounded-lg shadow border border-gray-200">
+<div class="min-h-[calc(100vh-80px)] bg-slate-50 p-4 md:p-6 font-sans">
+  <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+
     <!-- Header page -->
-    <div class="bg-white text-purple-600 p-6 rounded-t-lg">
+    <div class="text-purple-600 p-8 relative overflow-hidden">
+      <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+
       <!-- Breadcrumb / Back -->
-      <div class="flex items-center justify-between">
-        <nav class="text-sm text-slate-900/90">
-          <button type="button" (click)="goBack()" class="hover:underline">
-            ← Volver a Solicitudes
+      <div class="flex items-center justify-between relative z-10">
+        <nav class="text-sm text-purple-500">
+          <button type="button" (click)="goBack()"
+            class="hover:text-purple-700 hover:underline flex items-center transition-colors">
+            <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon> Volver a Solicitudes
           </button>
         </nav>
-        <div class="text-xs bg-white/15 px-3 py-1 rounded-full">
-          Seleccionados: <span class="font-semibold">{{ selectedCount() }}</span>
+        <div class="text-xs bg-purple-100/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-purple-100/10">
+          Seleccionados: <span class="font-bold text-purple-600">{{ selectedCount() }}</span>
         </div>
       </div>
-      <div class="mt-2">
-        <h1 class="text-2xl font-bold">Nueva Solicitud</h1>
-        <p class="text-sm text-orange-600 mt-1">
-          {{ requestType() === 'rma' ? 'Devolución (RMA)' : 'Traslado de Equipo' }}
+      <div class="mt-6 relative z-10">
+        <h1 class="text-2xl text-slate-900 font-extrabold tracking-tight">Nueva Solicitud</h1>
+        <p class="text-orange-500 mt-2 text-sm font-medium flex items-center">
+          <span class="bg-orange-600/20 px-2 py-0.5 rounded text-xs mr-2 uppercase tracking-wider">
+            {{ requestType() === 'rma' ? 'RMA' : 'TRASLADO' }}
+          </span>
+          {{ requestType() === 'rma' ? 'Gestión de Devoluciones' : 'Movimiento de Inventario' }}
         </p>
       </div>
     </div>
 
     <!-- Stepper Header -->
-    <div class="px-6 pt-6 pb-2">
-      <div class="flex items-center justify-between text-gray-500 mb-6">
+    <div class="px-8 pt-8 pb-4 bg-white">
+      <div class="flex items-center justify-between relative">
+        <!-- Line Background -->
+        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-slate-100 -z-0"></div>
+
         <!-- Step 1 -->
-        <div class="flex-1 flex flex-col items-center">
-          <div [ngClass]="{'bg-purple-600': currentStep >= 1, 'bg-gray-300': currentStep < 1}"
-            class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
-            1
+        <div class="flex-1 flex flex-col items-center relative z-10 group cursor-default">
+          <div
+            [ngClass]="{'bg-purple-600 ring-4 ring-purple-100': currentStep >= 1, 'bg-white border-2 border-slate-300 text-slate-400': currentStep < 1}"
+            class="w-12 h-12 flex items-center justify-center rounded-full text-white font-bold transition-all duration-500 shadow-sm group-hover:scale-105">
+            <fa-icon [icon]="faHome" class="text-lg"></fa-icon>
           </div>
-          <span class="text-sm mt-2 font-medium" [ngClass]="{'text-purple-600': currentStep >= 1}">Inicio</span>
+          <span class="text-xs mt-3 font-bold uppercase tracking-wider transition-colors duration-300"
+            [ngClass]="{'text-purple-700': currentStep >= 1, 'text-slate-400': currentStep < 1}">Inicio</span>
         </div>
-        <div class="flex-1 border-t-2 transition-colors duration-300"
-          [ngClass]="{'border-purple-600': currentStep >= 2, 'border-gray-300': currentStep < 2}"></div>
+
+        <!-- Connector 1-2 -->
+        <div class="flex-1 h-1 transition-all duration-700 delay-100 relative z-0"
+          [ngClass]="{'bg-purple-600': currentStep >= 2, 'bg-slate-100': currentStep < 2}"></div>
 
         <!-- Step 2 -->
-        <div class="flex-1 flex flex-col items-center">
-          <div [ngClass]="{'bg-purple-600': currentStep >= 2, 'bg-gray-300': currentStep < 2}"
-            class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
-            2
+        <div class="flex-1 flex flex-col items-center relative z-10 group cursor-default">
+          <div
+            [ngClass]="{'bg-purple-600 ring-4 ring-purple-100': currentStep >= 2, 'bg-white border-2 border-slate-300 text-slate-400': currentStep < 2}"
+            class="w-12 h-12 flex items-center justify-center rounded-full text-white font-bold transition-all duration-500 shadow-sm group-hover:scale-110">
+            <fa-icon [icon]="faBox" class="text-lg"></fa-icon>
           </div>
-          <span class="text-sm mt-2 font-medium" [ngClass]="{'text-purple-600': currentStep >= 2}">Productos</span>
+          <span class="text-xs mt-3 font-bold uppercase tracking-wider transition-colors duration-300"
+            [ngClass]="{'text-purple-700': currentStep >= 2, 'text-slate-400': currentStep < 2}">Productos</span>
         </div>
-        <div class="flex-1 border-t-2 transition-colors duration-300"
-          [ngClass]="{'border-purple-600': currentStep >= 3, 'border-gray-300': currentStep < 3}"></div>
+
+        <!-- Connector 2-3 -->
+        <div class="flex-1 h-1 transition-all duration-700 delay-100 relative z-0"
+          [ngClass]="{'bg-purple-600': currentStep >= 3, 'bg-slate-100': currentStep < 3}"></div>
 
         <!-- Step 3 -->
-        <div class="flex-1 flex flex-col items-center">
-          <div [ngClass]="{'bg-purple-600': currentStep >= 3, 'bg-gray-300': currentStep < 3}"
-            class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
-            3
+        <div class="flex-1 flex flex-col items-center relative z-10 group cursor-default">
+          <div
+            [ngClass]="{'bg-purple-600 ring-4 ring-purple-100': currentStep >= 3, 'bg-white border-2 border-slate-300 text-slate-400': currentStep < 3}"
+            class="w-12 h-12 flex items-center justify-center rounded-full text-white font-bold transition-all duration-500 shadow-sm group-hover:scale-110">
+            <fa-icon [icon]="faCheck" class="text-lg"></fa-icon>
           </div>
-          <span class="text-sm mt-2 font-medium" [ngClass]="{'text-purple-600': currentStep >= 3}">Confirmar</span>
+          <span class="text-xs mt-3 font-bold uppercase tracking-wider transition-colors duration-300"
+            [ngClass]="{'text-purple-700': currentStep >= 3, 'text-slate-400': currentStep < 3}">Confirmar</span>
         </div>
       </div>
     </div>
 
-    <div class="p-6">
+    <div class="p-8 min-h-[400px]">
       <!-- Toast -->
       @if (toast(); as toastMsg) {
       <div
-        class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-800 p-3 rounded animate__animated animate__fadeIn">
+        class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl shadow-sm flex items-center animate__animated animate__fadeInDown">
+        <fa-icon [icon]="faCheck" class="mr-3 text-green-600"></fa-icon>
         {{ toastMsg }}
       </div>
       }
 
       @if (error(); as errorMsg) {
       <div
-        class="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 rounded-lg mb-4 animate__animated animate__fadeIn"
+        class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl shadow-sm flex items-center animate__animated animate__shakeX"
         role="alert">
-        <span class="font-medium">Error:</span> {{ errorMsg }}
+        <fa-icon [icon]="faInfoCircle" class="mr-3 text-red-600"></fa-icon>
+        <div><span class="font-bold">Atención:</span> {{ errorMsg }}</div>
       </div>
       }
 
-      <form [formGroup]="createForm" (ngSubmit)="handleSubmit()" class="space-y-6">
+      <form [formGroup]="createForm" (ngSubmit)="handleSubmit()" class="space-y-8">
 
         <!-- STEP 1: Tipo y Empresa -->
-        <div *ngIf="currentStep === 1" class="space-y-6 animate__animated animate__fadeInRight">
+        <div *ngIf="currentStep === 1" class="space-y-8 animate__animated animate__fadeInRight">
           <!-- Tipo de Solicitud -->
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <label class="block text-sm font-medium text-gray-700 mb-3">
+          <div class="bg-white">
+            <label class="block text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">
               Tipo de Solicitud <span class="text-red-500">*</span>
             </label>
-            <div class="flex flex-wrap gap-6">
-              <label class="flex items-center cursor-pointer">
-                <input type="radio" formControlName="request_type" value="rma"
-                  class="w-4 h-4 text-purple-600 focus:ring-purple-500" />
-                <span class="ml-2 text-sm text-gray-700">Devolución (RMA)</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <label
+                class="relative flex flex-col p-6 bg-white border-2 rounded-xl cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 group shadow-sm hover:shadow-md"
+                [ngClass]="{'border-purple-600 bg-purple-50 ring-1 ring-purple-600': createForm.get('request_type')?.value === 'rma', 'border-slate-200': createForm.get('request_type')?.value !== 'rma'}">
+                <input type="radio" formControlName="request_type" value="rma" class="sr-only" />
+                <div class="flex items-center mb-2">
+                  <div
+                    class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                    <fa-icon [icon]="faBox"></fa-icon>
+                  </div>
+                  <span class="font-bold text-slate-800 text-lg">Devolución (RMA)</span>
+                </div>
+                <p class="text-sm text-slate-500 ml-13">Reportar fallas o solicitar garantías de equipos.</p>
+                <div class="absolute top-4 right-4 text-purple-600"
+                  *ngIf="createForm.get('request_type')?.value === 'rma'">
+                  <fa-icon [icon]="faCheck"></fa-icon>
+                </div>
               </label>
-              <label class="flex items-center cursor-pointer">
-                <input type="radio" formControlName="request_type" value="transfer"
-                  class="w-4 h-4 text-purple-600 focus:ring-purple-500" />
-                <span class="ml-2 text-sm text-gray-700">Traslado de Equipo</span>
+
+              <label
+                class="relative flex flex-col p-6 bg-white border-2 rounded-xl cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 group shadow-sm hover:shadow-md"
+                [ngClass]="{'border-purple-600 bg-purple-50 ring-1 ring-purple-600': createForm.get('request_type')?.value === 'transfer', 'border-slate-200': createForm.get('request_type')?.value !== 'transfer'}">
+                <input type="radio" formControlName="request_type" value="transfer" class="sr-only" />
+                <div class="flex items-center mb-2">
+                  <div
+                    class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                    <fa-icon [icon]="faPaperPlane"></fa-icon>
+                  </div>
+                  <span class="font-bold text-slate-800 text-lg">Traslado de Equipo</span>
+                </div>
+                <p class="text-sm text-slate-500 ml-13">Mover equipos entre usuarios o ubicaciones.</p>
+                <div class="absolute top-4 right-4 text-purple-600"
+                  *ngIf="createForm.get('request_type')?.value === 'transfer'">
+                  <fa-icon [icon]="faCheck"></fa-icon>
+                </div>
               </label>
             </div>
           </div>
 
           <!-- Empresa -->
-          <div>
-            <label for="company_id" class="block text-sm font-medium text-gray-700 mb-1">Empresa <span
-                class="text-red-500">*</span></label>
-            <select id="company_id" formControlName="company_id"
-              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm">
-              <option value="">Selecciona una empresa...</option>
-              @for (company of companies(); track company.id) {
-              <option [value]="company.id">{{ company.razon_social }} ({{ company.nit }})</option>
-              }
-            </select>
+          <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+            <label for="company_id" class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Empresa
+              <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <select id="company_id" formControlName="company_id"
+                class="block w-full pl-4 pr-10 py-3 text-base border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-lg shadow-sm transition-shadow">
+                <option value="">-- Selecciona una empresa --</option>
+                @for (company of companies(); track company.id) {
+                <option [value]="company.id">{{ company.razon_social }} (NIT: {{ company.nit }})</option>
+                }
+              </select>
+            </div>
+            <p class="text-xs text-slate-500 mt-2 flex items-center">
+              <fa-icon [icon]="faInfoCircle" class="mr-1"></fa-icon>
+              Selecciona la empresa propietaria de los equipos.
+            </p>
             <div
               *ngIf="createForm.get('company_id')?.invalid && (createForm.get('company_id')?.dirty || createForm.get('company_id')?.touched)"
-              class="text-red-500 text-sm mt-1">
-              Debes seleccionar una empresa.
+              class="text-red-500 text-sm mt-2 font-medium animate__animated animate__fadeIn">
+              Debes seleccionar una empresa para continuar.
             </div>
           </div>
         </div>
 
         <!-- STEP 2: Productos -->
         <div *ngIf="currentStep === 2"
-          class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate__animated animate__fadeInRight">
+          class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate__animated animate__fadeInRight">
           <!-- Inventario -->
-          <div class="border border-gray-200 rounded-lg p-4">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Inventario Disponible</h3>
-
-            @if (!isCompanySelected()) {
-            <div class="text-center py-8 text-gray-500">Selecciona una empresa para ver su inventario</div>
-            } @else if (isLoading()) {
-            <div class="flex justify-center items-center py-8">
-              <fa-icon [icon]="faSpinner" class="text-purple-600 text-2xl animate-spin"></fa-icon>
-              <span class="ml-3 text-gray-700">Cargando inventario...</span>
+          <div class="flex flex-col h-[500px] bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 flex items-center">
+                <fa-icon [icon]="faBox" class="mr-2 text-purple-500"></fa-icon> Inventario Disponible
+              </h3>
+              <span class="text-xs font-medium bg-slate-200 text-slate-600 px-2 py-1 rounded-full">{{ inventory().length
+                }} ítems</span>
             </div>
-            } @else if (!hasInventory()) {
-            <div class="text-center py-8 text-gray-500">No hay productos en el inventario de esta empresa</div>
-            } @else {
-            <div class="space-y-2 max-h-[28rem] overflow-y-auto">
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
+              @if (!isCompanySelected()) {
+              <div class="flex flex-col items-center justify-center h-full text-slate-400">
+                <fa-icon [icon]="faHome" class="text-4xl mb-3 opacity-20"></fa-icon>
+                <p>Selecciona una empresa primero</p>
+              </div>
+              } @else if (isLoading()) {
+              <div class="flex flex-col items-center justify-center h-full text-purple-600">
+                <fa-icon [icon]="faSpinner" class="text-3xl animate-spin mb-3"></fa-icon>
+                <p class="font-medium">Cargando inventario...</p>
+              </div>
+              } @else if (!hasInventory()) {
+              <div class="flex flex-col items-center justify-center h-full text-slate-400">
+                <fa-icon [icon]="faSearch" class="text-4xl mb-3 opacity-20"></fa-icon>
+                <p>No se encontraron productos</p>
+              </div>
+              } @else {
               @for (product of inventory(); track $index) {
               <div
-                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-gray-900">{{ product.name || product.product_name || 'Sin nombre'
-                    }}</p>
-                  <p class="text-xs text-gray-500">SKU: {{ product.sku || product.id || product._id || 'N/A' }}</p>
-                  @if (product.serial) { <p class="text-xs text-gray-500">Serial: {{ product.serial }}</p> }
-                  @if (product.current_user) { <p class="text-xs text-purple-600">Usuario: {{ product.current_user }}
-                  </p> }
-                  @if (product.location) { <p class="text-xs text-gray-500">Ubicación: {{ product.location }}</p> }
+                class="group bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all duration-200 cursor-pointer animate__animated animate__fadeInUp"
+                (click)="addProduct(product)">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="font-bold text-slate-800 text-sm mb-1 group-hover:text-purple-700 transition-colors">{{
+                      product.name || product.product_name || 'Sin nombre' }}</h4>
+                    <div class="flex flex-wrap gap-2 text-xs text-slate-500">
+                      <span class="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">SKU: {{ product.sku ||
+                        'N/A' }}</span>
+                      <span *ngIf="product.serial"
+                        class="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">SN: {{ product.serial
+                        }}</span>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-400 flex items-center gap-3">
+                      <span *ngIf="product.current_user" class="flex items-center"><span
+                          class="w-1.5 h-1.5 rounded-full bg-green-400 mr-1"></span> {{ product.current_user }}</span>
+                      <span *ngIf="product.location" class="flex items-center"><span
+                          class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1"></span> {{ product.location }}</span>
+                    </div>
+                  </div>
+                  <button type="button"
+                    class="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity bg-purple-50 p-2 rounded-full hover:bg-purple-100">
+                    <fa-icon [icon]="faArrowRight"></fa-icon>
+                  </button>
                 </div>
-                <button type="button" (click)="addProduct(product)"
-                  class="ml-2 p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">+
-                  Agregar</button>
               </div>
               }
+              }
             </div>
-            }
           </div>
 
           <!-- Seleccionados -->
-          <div class="border border-gray-200 rounded-lg p-4">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Productos Seleccionados</h3>
-            @if (selectedProducts().length === 0) {
-            <div class="text-center py-8 text-gray-500">No has seleccionado productos</div>
-            } @else {
-            <div class="space-y-2 max-h-[28rem] overflow-y-auto">
+          <div
+            class="flex flex-col h-[500px] bg-white border border-purple-100 rounded-xl shadow-md overflow-hidden ring-1 ring-purple-50">
+            <div class="p-4 border-b border-purple-100 bg-purple-50/50 flex justify-between items-center">
+              <h3 class="font-bold text-purple-900 flex items-center">
+                <fa-icon [icon]="faCheck" class="mr-2 text-purple-600"></fa-icon> Seleccionados
+              </h3>
+              <span class="text-xs font-bold bg-purple-200 text-purple-800 px-2 py-1 rounded-full">{{ selectedCount()
+                }}</span>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
+              @if (selectedProducts().length === 0) {
+              <div class="flex flex-col items-center justify-center h-full text-slate-400">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                  <fa-icon [icon]="faBox" class="text-2xl opacity-20"></fa-icon>
+                </div>
+                <p class="text-sm">Selecciona productos del inventario</p>
+              </div>
+              } @else {
               @for (product of selectedProducts(); track $index) {
-              <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+              <div
+                class="bg-purple-50/30 p-4 rounded-lg border border-purple-100 flex justify-between items-center animate__animated animate__fadeInLeft">
                 <div class="flex-1">
-                  <p class="text-sm font-medium text-gray-900">{{ product.name || product.product_name || 'Sin nombre'
-                    }}</p>
-                  <p class="text-xs text-gray-500">SKU: {{ product.sku || product.id || product._id || 'N/A' }}</p>
-                  <div class="flex items-center mt-2 space-x-2">
-                    <label class="text-xs text-gray-600">Cantidad:</label>
+                  <h4 class="font-bold text-slate-800 text-sm">{{ product.name || product.product_name || 'Sin nombre'
+                    }}</h4>
+                  <p class="text-xs text-slate-500 font-mono mt-0.5">{{ product.sku || 'N/A' }}</p>
+                  <div class="flex items-center mt-2">
+                    <label class="text-xs font-bold text-purple-700 mr-2">CANT:</label>
                     <input type="number" min="1" [value]="product.quantity"
                       (input)="updateProductQuantity(product.id || product._id || product.sku, +$any($event.target).value)"
-                      class="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:border-purple-500 focus:ring-purple-500" />
+                      class="w-16 px-2 py-1 text-xs border border-purple-200 rounded bg-white focus:border-purple-500 focus:ring-purple-500 font-bold text-center shadow-sm" />
                   </div>
                 </div>
                 <button type="button" (click)="removeProduct(product.id || product._id || product.sku)"
-                  class="ml-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Eliminar</button>
+                  class="ml-4 text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                  title="Eliminar">
+                  <span class="text-xl font-bold">×</span>
+                </button>
               </div>
               }
+              }
             </div>
-            }
+
+            <div class="p-4 bg-purple-50 border-t border-purple-100 text-center text-xs text-purple-600 font-medium">
+              Verifica las cantidades antes de continuar
+            </div>
           </div>
         </div>
 
         <!-- STEP 3: Confirmar -->
-        <div *ngIf="currentStep === 3" class="space-y-4 animate__animated animate__fadeInRight">
-          <div>
-            <label for="create_motivo" class="block text-sm font-medium text-gray-700 mb-1">Motivo <span
-                class="text-red-500">*</span></label>
-            <textarea id="create_motivo" formControlName="motivo" rows="3"
-              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-              [placeholder]="requestType() === 'rma' ? 'Describe el motivo de la devolución... (mínimo 10 caracteres)' : 'Describe el motivo del traslado... (mínimo 10 caracteres)'"></textarea>
-            <div
-              *ngIf="createForm.get('motivo')?.invalid && (createForm.get('motivo')?.dirty || createForm.get('motivo')?.touched)"
-              class="text-red-500 text-sm mt-1">
-              El motivo es requerido y debe tener al menos 10 caracteres.
-            </div>
-          </div>
+        <div *ngIf="currentStep === 3" class="space-y-6 animate__animated animate__fadeInRight">
 
-          @if (requestType() === 'transfer') {
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+              <span
+                class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3 text-sm">1</span>
+              Detalles de la Solicitud
+            </h3>
+
             <div>
-              <label for="new_user" class="block text-sm font-medium text-gray-700 mb-1">Nuevo Usuario <span
+              <label for="create_motivo" class="block text-sm font-bold text-slate-700 mb-2">Motivo / Descripción <span
                   class="text-red-500">*</span></label>
-              <input type="text" id="new_user" formControlName="new_user"
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                placeholder="Nombre del nuevo usuario" />
+              <textarea id="create_motivo" formControlName="motivo" rows="4"
+                class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm transition-shadow resize-none p-3"
+                [placeholder]="requestType() === 'rma' ? 'Describe detalladamente el motivo de la devolución (mínimo 10 caracteres)...' : 'Describe el motivo del traslado...'"></textarea>
               <div
-                *ngIf="createForm.get('new_user')?.invalid && (createForm.get('new_user')?.dirty || createForm.get('new_user')?.touched)"
-                class="text-red-500 text-sm mt-1">
-                Requerido para traslados.
+                *ngIf="createForm.get('motivo')?.invalid && (createForm.get('motivo')?.dirty || createForm.get('motivo')?.touched)"
+                class="text-red-500 text-xs mt-2 font-medium flex items-center">
+                <fa-icon [icon]="faInfoCircle" class="mr-1"></fa-icon> El motivo es requerido y debe tener al menos 10
+                caracteres.
               </div>
             </div>
-            <div>
-              <label for="new_location" class="block text-sm font-medium text-gray-700 mb-1">Nueva Ubicación <span
-                  class="text-red-500">*</span></label>
-              <input type="text" id="new_location" formControlName="new_location"
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                placeholder="Nueva ubicación del equipo" />
-              <div
-                *ngIf="createForm.get('new_location')?.invalid && (createForm.get('new_location')?.dirty || createForm.get('new_location')?.touched)"
-                class="text-red-500 text-sm mt-1">
-                Requerido para traslados.
+
+            @if (requestType() === 'transfer') {
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-blue-50/50 rounded-xl border border-blue-100">
+              <div>
+                <label for="new_user" class="block text-sm font-bold text-slate-700 mb-2">Nuevo Usuario <span
+                    class="text-red-500">*</span></label>
+                <input type="text" id="new_user" formControlName="new_user"
+                  class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  placeholder="Nombre completo" />
+                <div
+                  *ngIf="createForm.get('new_user')?.invalid && (createForm.get('new_user')?.dirty || createForm.get('new_user')?.touched)"
+                  class="text-red-500 text-xs mt-1">Requerido.</div>
+              </div>
+              <div>
+                <label for="new_location" class="block text-sm font-bold text-slate-700 mb-2">Nueva Ubicación <span
+                    class="text-red-500">*</span></label>
+                <input type="text" id="new_location" formControlName="new_location"
+                  class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  placeholder="Ciudad, Oficina, etc." />
+                <div
+                  *ngIf="createForm.get('new_location')?.invalid && (createForm.get('new_location')?.dirty || createForm.get('new_location')?.touched)"
+                  class="text-red-500 text-xs mt-1">Requerido.</div>
               </div>
             </div>
+            }
           </div>
-          }
 
-          <div class="bg-gray-50 p-4 rounded-lg mt-4">
-            <h4 class="font-semibold text-gray-800 mb-2">Resumen de la Solicitud</h4>
-            <ul class="text-sm text-gray-600 space-y-1">
-              <li><strong>Tipo:</strong> {{ requestType() === 'rma' ? 'Devolución (RMA)' : 'Traslado de Equipo' }}</li>
-              <li><strong>Empresa:</strong> {{ createForm.get('company_id')?.value }}</li>
-              <!-- Could map ID to name if needed, but ID is what we have easily access to in form -->
-              <li><strong>Productos:</strong> {{ selectedCount() }} ítems seleccionados</li>
-            </ul>
+          <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+              <span
+                class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3 text-sm">2</span>
+              Resumen Final
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
+                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Tipo</p>
+                <p class="font-bold text-purple-700 text-lg">{{ requestType() === 'rma' ? 'RMA' : 'Traslado' }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
+                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Empresa ID</p>
+                <p class="font-bold text-slate-700 text-lg truncate" title="{{ createForm.get('company_id')?.value }}">
+                  {{ createForm.get('company_id')?.value }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
+                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Total Ítems</p>
+                <p class="font-bold text-slate-700 text-lg">{{ selectedCount() }}</p>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Actions Footer -->
-        <div class="flex justify-between pt-4 border-t">
+        <div class="flex justify-between pt-6 border-t border-slate-100">
           <button *ngIf="currentStep > 1" (click)="prevStep()" type="button"
-            class="flex items-center px-4 py-2 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200">
-            <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon> Anterior
+            class="flex items-center px-6 py-3 text-slate-600 font-bold rounded-xl hover:bg-slate-100 transition-all duration-200 group">
+            <fa-icon [icon]="faArrowLeft" class="mr-2 group-hover:-translate-x-1 transition-transform"></fa-icon>
+            Anterior
           </button>
 
           <div class="flex-grow"></div>
 
           <button *ngIf="currentStep < 3" (click)="nextStep()" type="button" [disabled]="!isStepValid(currentStep)"
-            class="flex items-center px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-            Siguiente <fa-icon [icon]="faArrowRight" class="ml-2"></fa-icon>
+            class="flex items-center px-8 py-3 rounded-xl font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-lg hover:shadow-purple-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none group transform hover:-translate-y-0.5">
+            Siguiente <fa-icon [icon]="faArrowRight"
+              class="ml-2 group-hover:translate-x-1 transition-transform"></fa-icon>
           </button>
 
           <button *ngIf="currentStep === 3" type="submit" [disabled]="isLoading() || !createForm.valid"
-            class="inline-flex items-center space-x-2 bg-purple-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
+            class="flex items-center px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-purple-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transform hover:-translate-y-0.5">
             @if (isLoading()) { <fa-icon [icon]="faSpinner" class="animate-spin mr-2"></fa-icon> } @else { <fa-icon
               [icon]="faPaperPlane" class="mr-2"></fa-icon> }
-            <span>{{ isLoading() ? 'Creando...' : 'Crear Solicitud' }}</span>
+            <span>{{ isLoading() ? 'Procesando...' : 'Crear Solicitud' }}</span>
           </button>
         </div>
       </form>

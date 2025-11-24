@@ -103,18 +103,18 @@ export class OrdersComponent implements OnInit {
 
   role: Role | null = null;
   Role = Role; // Hacer que la enumeración Role esté disponible en la plantilla
-  
+
   // Loading state
   isLoading = signal(false);
 
-  
+
   // FontAwesome icons
   faEye = faEye;
   faEdit = faEdit;
   faTrash = faTrash;
   faCheck = faCheck;
   faBoxOpen = faBoxOpen;
-  
+
   constructor(
     private ordersService: OrdersService,
     private shippingService: ShippingsService,
@@ -322,6 +322,7 @@ export class OrdersComponent implements OnInit {
       .subscribe({
         next: () => {
           console.log('Estado de la orden actualizado a "pagado".');
+          alert('Estado de la orden actualizado a "pagado".');
           this.loadOrders(); // Recargar la lista de órdenes
         },
         error: (err) => {

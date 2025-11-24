@@ -11,7 +11,7 @@ export interface QuotationEmailData {
   razonSocial: string;
   nombreContacto: string;
   emailContacto: string;
-  fechaCotizacion: string;
+  fechaCotizacion?: string;
   diasValidez: number;
   esOrdenDeContado: boolean;
   condicionesPago: string;
@@ -31,7 +31,7 @@ export interface QuotationEmailData {
   baseParaIVA: number;
   valorIVA: number;
   granTotal: number;
-  anioActual: number;
+  anioActual?: number;
 }
 
 export interface QuotationEmailResponse {
@@ -44,7 +44,7 @@ export interface QuotationEmailResponse {
   providedIn: 'root',
 })
 export class QuotationEmailService {
-  private apiUrl = `${ENVIRONMENT.apiUrlRender}/quotation-mail/send`;
+  private apiUrl = `${ENVIRONMENT.apiUrlRender}/email/send-quotation-confirmation`;
 
   constructor(private http: HttpClient) {}
 

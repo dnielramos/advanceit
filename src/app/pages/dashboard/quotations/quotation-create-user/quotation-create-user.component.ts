@@ -36,7 +36,7 @@ import { CartService } from '../../../../services/cart.service';
 import { CreateFullQuotationDto } from '../../../../models/quotation.types';
 import { CreationMode } from '../../../../models/creation-mode';
 import { User } from '../../../../models/user';
-import { QuotationEmailService } from '../../../../services/quotation-email.service';
+import { QuotationEmailService, QuotationEmailData } from '../../../../services/quotation-email.service';
 
 // Registrar iconos
 library.add(
@@ -502,17 +502,17 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
           day: 'numeric'
         });
 
-        const emailData = {
+        const emailData: QuotationEmailData = {
           to: userEmail,
-          numeroCotizacion: response.id.toString(),
+          numeroCotizacion: (response as any)['numeroCotizacion'] || (response as any)['consecutive'] || response.id.toString(),
           nombreCliente: this.selectedUser?.name || '',
           razonSocial: this.selectedCompany?.razon_social || '',
           nombreContacto: this.selectedUser?.name || '',
           emailContacto: userEmail,
-          fechaCotizacion: fechaCotizacion,
+          // fechaCotizacion: fechaCotizacion, // Removed to match working payload
           diasValidez: formValue.validity_days || 30,
           esOrdenDeContado: this.esOrdenDeContado,
-          condicionesPago: formValue.term === '0' || formValue.term === 0 ? 'Contado' : `Crédito ${formValue.term} días`,
+          condicionesPago: formValue.term === '0' || formValue.term === 0 ? '0' : `${formValue.term}`, // Send just the number
           creditoCubreOrden: this.creditoCubreOrden,
           creditoDisponible: this.creditoDisponible,
           productos: formValue.details.map((d: any) => ({
@@ -529,7 +529,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
           baseParaIVA: this.baseParaIVA,
           valorIVA: this.valorIVA,
           granTotal: this.granTotal,
-          anioActual: fechaActual.getFullYear(),
+          // anioActual: fechaActual.getFullYear(), // Removed to match working payload
         };
 
         console.log('📧 Email data a enviar:', emailData);

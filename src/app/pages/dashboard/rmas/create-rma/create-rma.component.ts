@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faSpinner, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { RmasService } from '../../../../services/rmas.service';
 import { CreateRmaDto } from '../../../../models/rma.model';
 import { CompaniesService, Company } from '../../../../services/companies.service';
@@ -26,6 +26,8 @@ export class CreateRmaComponent implements OnInit {
 
   faSpinner = faSpinner;
   faPaperPlane = faPaperPlane;
+  faArrowLeft = faArrowLeft;
+  faArrowRight = faArrowRight;
 
   isLoading = signal(false);
   error = signal<string | null>(null);
@@ -38,6 +40,9 @@ export class CreateRmaComponent implements OnInit {
 
   isCompanySelected = computed(() => this.companySelected());
   hasInventory = computed(() => this.inventory().length > 0);
+
+  // --- Stepper State ---
+  currentStep = 1;
 
   createForm: FormGroup;
 
@@ -184,13 +189,42 @@ export class CreateRmaComponent implements OnInit {
     this.saveDraft();
   }
 
-  handleSubmit(): void {
-    if (!this.createForm.get('company_id')?.value) {
-      this.error.set('Debes seleccionar una empresa.');
-      return;
+  // --- Stepper Methods ---
+
+  nextStep(): void {
+    if (this.isStepValid(this.currentStep)) {
+      this.currentStep++;
+    } else {
+      this.createForm.markAllAsTouched();
     }
-    if (this.selectedProducts().length === 0) {
-      this.error.set('Debes seleccionar al menos un producto.');
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  isStepValid(step: number): boolean {
+    switch (step) {
+      case 1: // Tipo y Empresa
+        return (
+          this.createForm.get('request_type')?.valid &&
+          this.createForm.get('company_id')?.valid
+        ) ?? false;
+      case 2: // Productos
+        return this.selectedProducts().length > 0;
+      case 3: // Motivo y Detalles
+        return this.createForm.valid;
+      default:
+        return false;
+    }
+  }
+
+  handleSubmit(): void {
+    if (!this.createForm.valid || this.selectedProducts().length === 0) {
+      this.error.set('Por favor completa todos los campos requeridos.');
+      this.createForm.markAllAsTouched();
       return;
     }
 

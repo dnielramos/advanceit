@@ -16,6 +16,8 @@ import {
   faCreditCard,
   faBoxOpen,
   faUser,
+  faArrowLeft,
+  faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -70,6 +72,8 @@ export class CreateOrderModalComponent implements OnInit {
   faCreditCard = faCreditCard;
   faBoxOpen = faBoxOpen;
   faUser = faUser;
+  faArrowLeft = faArrowLeft;
+  faArrowRight = faArrowRight;
 
   // --- Estado de Carga y UI ---
   isLoading = true;
@@ -96,6 +100,9 @@ export class CreateOrderModalComponent implements OnInit {
   trackingNumber = '';
 
   userActive: any;
+
+  // --- Stepper State ---
+  currentStep = 1;
 
   constructor(
     private ordersService: OrdersService,
@@ -211,8 +218,12 @@ export class CreateOrderModalComponent implements OnInit {
     }
 
     //pobkar los datos de envio con los datos de la compañia
-    this.shippingAddress = this.company?.ciudad || 'Advance Technology Projects' + this.company?.pais || '';
-    this.carrier = 'BODEGA_ADVANCE'
+    if (!this.shippingAddress && this.company) {
+        this.shippingAddress = this.company?.ciudad || 'Advance Technology Projects' + this.company?.pais || '';
+    }
+    if (!this.carrier) {
+        this.carrier = 'BODEGA_ADVANCE';
+    }
 
     // --- Validación 3: Formulario de Envío ---
     this.formCheckValid =
@@ -236,10 +247,37 @@ export class CreateOrderModalComponent implements OnInit {
     this.validateOrder();
   }
 
+  // --- Stepper Methods ---
+
+  nextStep(): void {
+    if (this.isStepValid(this.currentStep)) {
+      this.currentStep++;
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  isStepValid(step: number): boolean {
+    switch (step) {
+      case 1: // Validación de Cliente y Crédito
+        return this.creditCheck.valid;
+      case 2: // Verificación de Inventario
+        return this.stockCheckValid;
+      case 3: // Información de Envío y Confirmación
+        return this.formCheckValid && this.isOrderValid;
+      default:
+        return false;
+    }
+  }
+
   submitOrder(): void {
     this.validateOrder(); // Re-validar por si acaso
     if (!this.isOrderValid || !this.order) {
-      alert('Por favor, corrige los errores antes de continuar.');
+      // alert('Por favor, corrige los errores antes de continuar.');
       return;
     }
 

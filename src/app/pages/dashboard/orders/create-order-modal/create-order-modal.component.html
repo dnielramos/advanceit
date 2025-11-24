@@ -14,15 +14,52 @@
       </button>
     </header>
 
-    <main class="p-6 space-y-6 overflow-y-auto">
-      <div *ngIf="isLoading" class="flex flex-col items-center justify-center text-center p-10">
+    <!-- Stepper Header -->
+    <div class="px-6 pt-6 pb-2">
+      <div class="flex items-center justify-between text-gray-500 mb-6">
+        <!-- Step 1 -->
+        <div class="flex-1 flex flex-col items-center">
+          <div [ngClass]="{'bg-purple-600': currentStep >= 1, 'bg-gray-300': currentStep < 1}"
+            class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
+            1
+          </div>
+          <span class="text-sm mt-2 font-medium" [ngClass]="{'text-purple-600': currentStep >= 1}">Cliente</span>
+        </div>
+        <div class="flex-1 border-t-2 transition-colors duration-300"
+          [ngClass]="{'border-purple-600': currentStep >= 2, 'border-gray-300': currentStep < 2}"></div>
+
+        <!-- Step 2 -->
+        <div class="flex-1 flex flex-col items-center">
+          <div [ngClass]="{'bg-purple-600': currentStep >= 2, 'bg-gray-300': currentStep < 2}"
+            class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
+            2
+          </div>
+          <span class="text-sm mt-2 font-medium" [ngClass]="{'text-purple-600': currentStep >= 2}">Productos</span>
+        </div>
+        <div class="flex-1 border-t-2 transition-colors duration-300"
+          [ngClass]="{'border-purple-600': currentStep >= 3, 'border-gray-300': currentStep < 3}"></div>
+
+        <!-- Step 3 -->
+        <div class="flex-1 flex flex-col items-center">
+          <div [ngClass]="{'bg-purple-600': currentStep >= 3, 'bg-gray-300': currentStep < 3}"
+            class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold transition-colors duration-300">
+            3
+          </div>
+          <span class="text-sm mt-2 font-medium" [ngClass]="{'text-purple-600': currentStep >= 3}">Envío</span>
+        </div>
+      </div>
+    </div>
+
+    <main class="px-6 pb-6 space-y-6 overflow-y-auto flex-1">
+      <div *ngIf="isLoading" class="flex flex-col items-center justify-center text-center p-10 h-full">
         <fa-icon [icon]="faSpinner" class="text-purple-500 w-10 h-10 fa-spin"></fa-icon>
         <p class="mt-4 text-slate-600 font-semibold">{{ loadingMessage }}</p>
       </div>
 
       <ng-container *ngIf="!isLoading">
+        <!-- Global Validation Errors -->
         <div *ngIf="validationErrors.length > 0 && !isOrderValid"
-          class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg">
+          class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg mb-4 animate__animated animate__fadeIn">
           <h3 class="font-bold flex items-center">
             <fa-icon [icon]="faExclamationTriangle" class="mr-2"></fa-icon>
             Acción Requerida
@@ -32,172 +69,189 @@
           </ul>
         </div>
 
-        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
-          <h3
-            class="text-md md:text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4 flex items-center">
-            <fa-icon [icon]="faCreditCard" class="mr-3 text-purple-500"></fa-icon>
-            Validación de Cliente
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div class="space-y-2">
-              <p class="text-slate-500">Cliente:</p>
-              <p class="font-semibold text-slate-900 flex items-center">
-                <fa-icon [icon]="faUser" class="mr-2 text-slate-400"></fa-icon>
-                {{ user?.name || 'No disponible' }}
-              </p>
-            </div>
-            <div class="space-y-2">
-              <p class="text-slate-500">Compañía:</p>
-              <p class="font-semibold text-slate-900">{{ company?.razon_social || 'No disponible' }}</p>
-            </div>
-            <div class="space-y-2">
-              <p class="text-slate-500">Crédito Disponible:</p>
-              <p class="font-semibold text-slate-900">{{ creditCheck.available | currency:'USD':'symbol':'1.0-0' }}</p>
-            </div>
-            <div class="space-y-2">
-              <p class="text-slate-500">Total de la Orden:</p>
-              <p class="font-semibold text-slate-900">{{ order?.precioTotal | currency:'USD':'symbol':'1.0-0' }}</p>
-            </div>
-          </div>
-          <div *ngIf="creditCheck.valid"
-            class="mt-4 p-3 bg-green-50 text-green-800 rounded-md border border-green-200 flex text-sm items-center font-semibold">
-            <fa-icon [icon]="faCheckCircle" class="mr-2"></fa-icon>
-            Crédito Aprobado. Saldo restante: {{ creditCheck.remaining | currency:'USD':'symbol':'1.0-0' }}
-          </div>
-          <div *ngIf="!creditCheck.valid"
-            class="mt-4 p-3 bg-red-50 text-red-800 rounded-md border border-red-200 flex text-sm items-center font-semibold">
-            <fa-icon [icon]="faExclamationTriangle" class="mr-2"></fa-icon>
-            Crédito Insuficiente. Se requiere un pago por adelantado.
-          </div>
-        </div>
-
-        <div class="bg-white p-4 md:p-5 rounded-lg shadow-sm border border-slate-200">
-          <h3
-            class="text-base md:text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4 flex items-center">
-            <fa-icon [icon]="faBoxOpen" class="mr-3 text-purple-500"></fa-icon>
-            Verificación de Inventario
-          </h3>
-
-          <!-- Tabla en escritorio -->
-          <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-sm text-left text-slate-600">
-              <thead class="text-xs text-slate-700 uppercase bg-slate-100">
-                <tr>
-                  <th scope="col" class="px-4 py-3">Producto</th>
-                  <th scope="col" class="px-4 py-3">SKU</th>
-                  <th scope="col" class="px-4 py-3 text-center">Solicitado</th>
-                  <th scope="col" class="px-4 py-3 text-center">Disponible</th>
-                  <th scope="col" class="px-4 py-3 text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of products" class="bg-white border-b hover:bg-slate-50">
-                  <td class="px-4 py-3 font-medium text-slate-900">{{ item.nombre }}</td>
-                  <td class="px-4 py-3 font-mono">{{ item.SKU }}</td>
-                  <td class="px-4 py-3 text-center font-bold">{{ item.cantidad_solicitada }}</td>
-                  <td class="px-4 py-3 text-center">{{ item.cantidad }}</td>
-                  <td class="px-4 py-3 text-center">
-                    <ng-container *ngIf="item.cantidad_solicitada <= (item.cantidad ?? 0); else noStock">
-                      <span
-                        class="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                        <fa-icon [icon]="faCheckCircle" class="mr-1"></fa-icon>
-                        Suficiente
-                      </span>
-                    </ng-container>
-                    <ng-template #noStock>
-                      <span
-                        class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                        <fa-icon [icon]="faExclamationTriangle" class="mr-1"></fa-icon>
-                        Insuficiente
-                      </span>
-                    </ng-template>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Vista responsive para móviles -->
-          <div class="md:hidden space-y-3">
-            <div *ngFor="let item of products" class="bg-slate-50 rounded-lg p-3 border border-slate-200">
-              <p class="text-sm font-semibold text-slate-800 break-words mb-1">{{ item.nombre }}</p>
-              <p class="text-xs text-slate-500 mb-2">SKU: <span class="font-mono">{{ item.SKU }}</span></p>
-
-              <div class="flex justify-end text-xs text-slate-600 mb-1">
-                <span>Solicitado:</span>
-                <span class="font-bold text-slate-800">{{ item.cantidad_solicitada }}</span>
+        <!-- STEP 1: Validación de Cliente -->
+        <div *ngIf="currentStep === 1" class="animate__animated animate__fadeInRight">
+          <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
+            <h3
+              class="text-md md:text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4 flex items-center">
+              <fa-icon [icon]="faCreditCard" class="mr-3 text-purple-500"></fa-icon>
+              Validación de Cliente
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div class="space-y-2">
+                <p class="text-slate-500">Cliente:</p>
+                <p class="font-semibold text-slate-900 flex items-center">
+                  <fa-icon [icon]="faUser" class="mr-2 text-slate-400"></fa-icon>
+                  {{ user?.name || 'No disponible' }}
+                </p>
               </div>
-
-              <div class="flex justify-end gap-2 text-xs text-slate-600 mb-2">
-                <span>Disponible:</span>
-                <span class="font-bold">{{ item.cantidad }}</span>
+              <div class="space-y-2">
+                <p class="text-slate-500">Compañía:</p>
+                <p class="font-semibold text-slate-900">{{ company?.razon_social || 'No disponible' }}</p>
               </div>
-
-              <div class="flex justify-end">
-                <ng-container *ngIf="item.cantidad_solicitada <= (item.cantidad ?? 0); else noStockMobile">
-                  <span
-                    class="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                    <fa-icon [icon]="faCheckCircle" class="mr-1"></fa-icon>
-                    Suficiente
-                  </span>
-                </ng-container>
-                <ng-template #noStockMobile>
-                  <span
-                    class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                    <fa-icon [icon]="faExclamationTriangle" class="mr-1"></fa-icon>
-                    Insuficiente
-                  </span>
-                </ng-template>
+              <div class="space-y-2">
+                <p class="text-slate-500">Crédito Disponible:</p>
+                <p class="font-semibold text-slate-900">{{ creditCheck.available | currency:'USD':'symbol':'1.0-0' }}
+                </p>
               </div>
+              <div class="space-y-2">
+                <p class="text-slate-500">Total de la Orden:</p>
+                <p class="font-semibold text-slate-900">{{ order?.precioTotal | currency:'USD':'symbol':'1.0-0' }}</p>
+              </div>
+            </div>
+            <div *ngIf="creditCheck.valid"
+              class="mt-4 p-3 bg-green-50 text-green-800 rounded-md border border-green-200 flex text-sm items-center font-semibold">
+              <fa-icon [icon]="faCheckCircle" class="mr-2"></fa-icon>
+              Crédito Aprobado. Saldo restante: {{ creditCheck.remaining | currency:'USD':'symbol':'1.0-0' }}
+            </div>
+            <div *ngIf="!creditCheck.valid"
+              class="mt-4 p-3 bg-red-50 text-red-800 rounded-md border border-red-200 flex text-sm items-center font-semibold">
+              <fa-icon [icon]="faExclamationTriangle" class="mr-2"></fa-icon>
+              Crédito Insuficiente. Se requiere un pago por adelantado.
             </div>
           </div>
         </div>
 
+        <!-- STEP 2: Verificación de Inventario -->
+        <div *ngIf="currentStep === 2" class="animate__animated animate__fadeInRight">
+          <div class="bg-white p-4 md:p-5 rounded-lg shadow-sm border border-slate-200">
+            <h3
+              class="text-base md:text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4 flex items-center">
+              <fa-icon [icon]="faBoxOpen" class="mr-3 text-purple-500"></fa-icon>
+              Verificación de Inventario
+            </h3>
 
-        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
-          <h3 class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4">
-            Información de Envío
-          </h3>
-          <form class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <div class="md:col-span-2">
-              <label for="shippingAddress" class="block text-sm font-semibold text-slate-700 mb-1">Dirección de Envío
-                <span class="text-red-500">*</span></label>
-              <input id="shippingAddress" type="text" [(ngModel)]="shippingAddress" (ngModelChange)="onFormChange()"
-                name="shippingAddress" placeholder="Ej: Calle 123 #45-67, Bogotá"
-                class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            <!-- Tabla en escritorio -->
+            <div class="hidden md:block overflow-x-auto">
+              <table class="w-full text-sm text-left text-slate-600">
+                <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                  <tr>
+                    <th scope="col" class="px-4 py-3">Producto</th>
+                    <th scope="col" class="px-4 py-3">SKU</th>
+                    <th scope="col" class="px-4 py-3 text-center">Solicitado</th>
+                    <th scope="col" class="px-4 py-3 text-center">Disponible</th>
+                    <th scope="col" class="px-4 py-3 text-center">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of products" class="bg-white border-b hover:bg-slate-50">
+                    <td class="px-4 py-3 font-medium text-slate-900">{{ item.nombre }}</td>
+                    <td class="px-4 py-3 font-mono">{{ item.SKU }}</td>
+                    <td class="px-4 py-3 text-center font-bold">{{ item.cantidad_solicitada }}</td>
+                    <td class="px-4 py-3 text-center">{{ item.cantidad }}</td>
+                    <td class="px-4 py-3 text-center">
+                      <ng-container *ngIf="item.cantidad_solicitada <= (item.cantidad ?? 0); else noStock">
+                        <span
+                          class="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                          <fa-icon [icon]="faCheckCircle" class="mr-1"></fa-icon>
+                          Suficiente
+                        </span>
+                      </ng-container>
+                      <ng-template #noStock>
+                        <span
+                          class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                          <fa-icon [icon]="faExclamationTriangle" class="mr-1"></fa-icon>
+                          Insuficiente
+                        </span>
+                      </ng-template>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div>
-              <label for="carrier" disabled="true"
-                class="block text-sm font-semibold text-slate-700 mb-1">Transportadora <span
-                  class="text-red-500">*</span></label>
-              <input id="carrier" disabled="true" type="text" [(ngModel)]="carrier" (ngModelChange)="onFormChange()"
-                name="carrier" placeholder="Ej: Servientrega"
-                class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
-              <p class="text-slate-500 text-[10px] mt-2 p-2">El mayorista enviará los productos a la bodega donde
-                gestionaran su historial.</p>
-            </div>
-            <!-- <div>
-                <label for="trackingNumber" class="block text-sm font-semibold text-slate-700 mb-1">Número de Guía <span class="text-red-500">*</span></label>
-                <input id="trackingNumber" type="text" [(ngModel)]="trackingNumber" (ngModelChange)="onFormChange()" name="trackingNumber" placeholder="Ej: 0123456789" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+
+            <!-- Vista responsive para móviles -->
+            <div class="md:hidden space-y-3">
+              <div *ngFor="let item of products" class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+                <p class="text-sm font-semibold text-slate-800 break-words mb-1">{{ item.nombre }}</p>
+                <p class="text-xs text-slate-500 mb-2">SKU: <span class="font-mono">{{ item.SKU }}</span></p>
+
+                <div class="flex justify-end text-xs text-slate-600 mb-1">
+                  <span>Solicitado:</span>
+                  <span class="font-bold text-slate-800">{{ item.cantidad_solicitada }}</span>
+                </div>
+
+                <div class="flex justify-end gap-2 text-xs text-slate-600 mb-2">
+                  <span>Disponible:</span>
+                  <span class="font-bold">{{ item.cantidad }}</span>
+                </div>
+
+                <div class="flex justify-end">
+                  <ng-container *ngIf="item.cantidad_solicitada <= (item.cantidad ?? 0); else noStockMobile">
+                    <span
+                      class="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                      <fa-icon [icon]="faCheckCircle" class="mr-1"></fa-icon>
+                      Suficiente
+                    </span>
+                  </ng-container>
+                  <ng-template #noStockMobile>
+                    <span
+                      class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                      <fa-icon [icon]="faExclamationTriangle" class="mr-1"></fa-icon>
+                      Insuficiente
+                    </span>
+                  </ng-template>
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Información de Envío -->
+        <div *ngIf="currentStep === 3" class="animate__animated animate__fadeInRight">
+          <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
+            <h3 class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-4">
+              Información de Envío
+            </h3>
+            <form class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               <div class="md:col-span-2">
-                <label for="deliveryTime" class="block text-sm font-semibold text-slate-700 mb-1">Tiempo de entrega estimado (días)</label>
-                <input id="deliveryTime" type="number" [(ngModel)]="estimatedDeliveryDays" (ngModelChange)="onFormChange()" name="deliveryTime" placeholder="Ej: 3" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
-              </div> -->
-          </form>
+                <label for="shippingAddress" class="block text-sm font-semibold text-slate-700 mb-1">Dirección de Envío
+                  <span class="text-red-500">*</span></label>
+                <input id="shippingAddress" type="text" [(ngModel)]="shippingAddress" (ngModelChange)="onFormChange()"
+                  name="shippingAddress" placeholder="Ej: Calle 123 #45-67, Bogotá"
+                  class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+              </div>
+              <div>
+                <label for="carrier" disabled="true"
+                  class="block text-sm font-semibold text-slate-700 mb-1">Transportadora <span
+                    class="text-red-500">*</span></label>
+                <input id="carrier" disabled="true" type="text" [(ngModel)]="carrier" (ngModelChange)="onFormChange()"
+                  name="carrier" placeholder="Ej: Servientrega"
+                  class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                <p class="text-slate-500 text-[10px] mt-2 p-2">El mayorista enviará los productos a la bodega donde
+                  gestionaran su historial.</p>
+              </div>
+            </form>
+          </div>
         </div>
       </ng-container>
     </main>
 
-    <footer
-      class="flex flex-col sm:flex-row items-center justify-between p-4 bg-white border-t border-slate-200 mt-auto">
-      <div class="text-xl font-bold text-slate-800 mb-4 sm:mb-0">
+    <footer class="flex items-center justify-between p-4 bg-white border-t border-slate-200 mt-auto">
+      <!-- Previous Button -->
+      <button *ngIf="currentStep > 1" (click)="prevStep()" type="button"
+        class="flex items-center px-4 py-2 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200">
+        <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon> Anterior
+      </button>
+
+      <div *ngIf="currentStep === 1" class="flex-grow"></div> <!-- Spacer for step 1 -->
+
+      <!-- Total Display (Only on Step 3 or always? Let's keep it always visible or just step 3? Original had it always. Let's keep it.) -->
+      <div class="text-lg font-bold text-slate-800 mx-4 hidden sm:block">
         Total: <span class="text-purple-600">{{ order?.precioTotal | currency:'USD':'symbol':'1.2-2' }}</span>
       </div>
-      <button (click)="submitOrder()" [disabled]="!isOrderValid || isSubmitting"
-        class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-lg shadow-md transition-all flex items-center justify-center disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none">
+
+      <!-- Next Button -->
+      <button *ngIf="currentStep < 3" (click)="nextStep()" type="button" [disabled]="!isStepValid(currentStep)"
+        class="flex items-center px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+        Siguiente <fa-icon [icon]="faArrowRight" class="ml-2"></fa-icon>
+      </button>
+
+      <!-- Submit Button -->
+      <button *ngIf="currentStep === 3" (click)="submitOrder()" [disabled]="!isOrderValid || isSubmitting"
+        class="flex items-center px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
         <fa-icon *ngIf="isSubmitting" [icon]="faSpinner" class="fa-spin mr-2"></fa-icon>
-        {{ isSubmitting ? 'Procesando...' : 'Confirmar y Procesar Orden' }}
+        {{ isSubmitting ? 'Procesando...' : 'Confirmar y Procesar' }}
       </button>
     </footer>
 

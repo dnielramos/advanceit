@@ -8,6 +8,8 @@ import { RmasService } from '../../../../services/rmas.service';
 import { CreateRmaDto } from '../../../../models/rma.model';
 import { CompaniesService, Company } from '../../../../services/companies.service';
 import { CompanyInventoriesService } from '../../../../services/company-inventories.service';
+import { AuthService, Role } from '../../../../services/auth.service';
+import { UsersService } from '../../../../services/users.service';
 
 @Component({
   selector: 'app-create-rma-page',
@@ -21,6 +23,8 @@ export class CreateRmaComponent implements OnInit {
   private readonly companiesService = inject(CompaniesService);
   private readonly inventoryService = inject(CompanyInventoriesService);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly usersService = inject(UsersService);
 
   @Output() created = new EventEmitter<void>();
 
@@ -62,11 +66,7 @@ export class CreateRmaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadCompanies();
-
-    // Restaurar borrador si existe
-    this.restoreDraft();
-
+    // Setup form listeners first
     this.createForm.get('request_type')?.valueChanges.subscribe((type) => {
       this.requestType.set(type);
       this.updateValidators();
@@ -86,6 +86,67 @@ export class CreateRmaComponent implements OnInit {
 
     // Persistir borrador en cambios
     this.createForm.valueChanges.subscribe(() => this.saveDraft());
+
+    // Initialize based on role
+    this.initializeBasedOnRole();
+  }
+
+  private initializeBasedOnRole(): void {
+    const userRole = this.authService.getCurrentUserRole();
+    const userId = this.authService.getUserId();
+
+    if (!userId) {
+      this.error.set('No se pudo obtener la información del usuario');
+      return;
+    }
+
+    // Load companies first
+    this.loadCompanies();
+
+    if (userRole === Role.Admin) {
+      // Admin: Clear company selection and don't auto-load inventory
+      // Set company_id to empty string explicitly
+      this.createForm.patchValue({ company_id: '' }, { emitEvent: false });
+      this.companySelected.set(false);
+      // Restore other draft fields (but skip company for admin)
+      setTimeout(() => this.restoreDraft(true), 500); // Pass true to skip company restoration
+    } else {
+      // Non-admin: Load user's company and auto-select
+      this.usersService.getUserById(userId).subscribe({
+        next: (user: any) => {
+          if (user.company) {
+            // Wait for companies to load
+            const checkCompaniesLoaded = setInterval(() => {
+              if (this.companies().length > 0) {
+                clearInterval(checkCompaniesLoaded);
+                // Find company by name or id
+                const userCompany = this.companies().find((c: any) => 
+                  c.razon_social?.toLowerCase() === user.company?.toLowerCase() ||
+                  c.id === user.company
+                );
+                if (userCompany) {
+                  // Set company in form without emitting to avoid draft save
+                  this.createForm.patchValue({ company_id: userCompany.id }, { emitEvent: false });
+                  this.companySelected.set(true);
+                  this.loadInventoryByCompany(userCompany.id);
+                } else {
+                  this.error.set('No se encontró la empresa asociada al usuario');
+                }
+                // Then restore draft if exists (won't override company)
+                this.restoreDraft(false);
+              }
+            }, 100);
+          } else {
+            // No company associated, restore draft
+            setTimeout(() => this.restoreDraft(false), 500);
+          }
+        },
+        error: (err) => {
+          this.error.set(`Error al cargar datos del usuario: ${err.message}`);
+          setTimeout(() => this.restoreDraft(false), 500);
+        }
+      });
+    }
   }
 
   updateValidators(): void {
@@ -304,29 +365,38 @@ export class CreateRmaComponent implements OnInit {
     } catch { /* noop */ }
   }
 
-  private restoreDraft(): void {
+  private restoreDraft(skipCompany: boolean = false): void {
     try {
       const raw = localStorage.getItem(this.draftKey);
       if (!raw) return;
       const data = JSON.parse(raw);
       if (data?.form) {
-        this.createForm.patchValue({
+        const patchData: any = {
           request_type: data.form.request_type || 'rma',
-          company_id: data.form.company_id || '',
           motivo: data.form.motivo || '',
           new_user: data.form.new_user || '',
           new_location: data.form.new_location || '',
-        }, { emitEvent: false });
+        };
+        
+        // Only restore company_id if not skipping (i.e., not admin)
+        if (!skipCompany) {
+          patchData.company_id = data.form.company_id || '';
+        }
+        
+        this.createForm.patchValue(patchData, { emitEvent: false });
         this.requestType.set(data.requestType || 'rma');
       }
       if (Array.isArray(data?.selectedProducts)) {
         this.selectedProducts.set(data.selectedProducts);
       }
-      // Disparar carga de inventario si hay empresa
-      const cid = this.createForm.get('company_id')?.value;
-      if (cid) {
-        this.companySelected.set(true);
-        this.loadInventoryByCompany(cid);
+      
+      // Only trigger inventory load if company was restored and we're not skipping
+      if (!skipCompany) {
+        const cid = this.createForm.get('company_id')?.value;
+        if (cid) {
+          this.companySelected.set(true);
+          this.loadInventoryByCompany(cid);
+        }
       }
     } catch { /* noop */ }
   }

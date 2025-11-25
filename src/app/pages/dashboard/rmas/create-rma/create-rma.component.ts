@@ -46,9 +46,30 @@ export class CreateRmaComponent implements OnInit {
   selectedProducts = signal<any[]>([]);
   requestType = signal<'rma' | 'transfer'>('rma');
   private companySelected = signal<boolean>(false);
+  searchTerm = signal<string>('');
 
   isCompanySelected = computed(() => this.companySelected());
   hasInventory = computed(() => this.inventory().length > 0);
+  
+  // Filtered inventory based on search term
+  filteredInventory = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    if (!term) return this.inventory();
+    
+    return this.inventory().filter((product: any) => {
+      const name = (product.name || product.product_name || '').toLowerCase();
+      const sku = (product.sku || product.id || product._id || '').toLowerCase();
+      const serial = (product.serial || '').toLowerCase();
+      const user = (product.current_user || '').toLowerCase();
+      const location = (product.location || '').toLowerCase();
+      
+      return name.includes(term) || 
+             sku.includes(term) || 
+             serial.includes(term) ||
+             user.includes(term) ||
+             location.includes(term);
+    });
+  });
 
   // --- Stepper State ---
   currentStep = 1;
@@ -349,6 +370,11 @@ export class CreateRmaComponent implements OnInit {
   // Contador seleccionados
   selectedCount(): number {
     return this.selectedProducts().length;
+  }
+  
+  // Clear search term
+  clearSearch(): void {
+    this.searchTerm.set('');
   }
 
   // Persistencia de borrador en localStorage

@@ -175,12 +175,27 @@
           class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate__animated animate__fadeInRight">
           <!-- Inventario -->
           <div class="flex flex-col h-[500px] bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-              <h3 class="font-bold text-slate-800 flex items-center">
-                <fa-icon [icon]="faBox" class="mr-2 text-purple-500"></fa-icon> Inventario Disponible
-              </h3>
-              <span class="text-xs font-medium bg-slate-200 text-slate-600 px-2 py-1 rounded-full">{{ inventory().length
-                }} ítems</span>
+            <div class="p-4 border-b border-slate-100 bg-slate-50">
+              <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold text-slate-800 flex items-center">
+                  <fa-icon [icon]="faBox" class="mr-2 text-purple-500"></fa-icon> Inventario Disponible
+                </h3>
+                <span class="text-xs font-medium bg-slate-200 text-slate-600 px-2 py-1 rounded-full">{{
+                  filteredInventory().length }} / {{ inventory().length }} ítems</span>
+              </div>
+
+              <!-- Search Input -->
+              <div class="relative">
+                <fa-icon [icon]="faSearch"
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></fa-icon>
+                <input type="text" [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)"
+                  placeholder="Buscar por nombre, SKU, serial, usuario..."
+                  class="w-full pl-10 pr-10 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-shadow bg-white" />
+                <button *ngIf="searchTerm()" (click)="clearSearch()" type="button"
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1">
+                  <span class="text-lg font-bold">×</span>
+                </button>
+              </div>
             </div>
 
             <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
@@ -199,8 +214,15 @@
                 <fa-icon [icon]="faSearch" class="text-4xl mb-3 opacity-20"></fa-icon>
                 <p>No se encontraron productos</p>
               </div>
+              } @else if (filteredInventory().length === 0) {
+              <div class="flex flex-col items-center justify-center h-full text-slate-400">
+                <fa-icon [icon]="faSearch" class="text-4xl mb-3 opacity-20"></fa-icon>
+                <p class="text-sm">No se encontraron resultados</p>
+                <button (click)="clearSearch()" type="button"
+                  class="mt-2 text-xs text-purple-600 hover:underline">Limpiar búsqueda</button>
+              </div>
               } @else {
-              @for (product of inventory(); track $index) {
+              @for (product of filteredInventory(); track $index) {
               <div
                 class="group bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all duration-200 cursor-pointer animate__animated animate__fadeInUp"
                 (click)="addProduct(product)">

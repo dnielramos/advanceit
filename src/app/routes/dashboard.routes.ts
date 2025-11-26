@@ -133,6 +133,13 @@ export const dashboardRoutes: Routes = [
             (m) => m.QuotationCreateUserComponent
           ),
       },
+      {
+        path: 'cotizaciones/:id',
+        loadComponent: () =>
+          import('../pages/dashboard/quotations/quotation-detail/quotation-detail.component').then(
+            (m) => m.QuotationDetailComponent
+          ),
+      },
 
 
       {

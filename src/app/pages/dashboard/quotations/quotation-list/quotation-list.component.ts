@@ -129,10 +129,8 @@ export class QuotationListComponent implements OnInit {
   }
 
   openDetailsModal(id: string): void {
-    this.currentModal = 'details';
-    this.modalTitle = 'Detalles de Cotización';
-    this.selectedQuotationId = id;
-    this.isModalOpen = true;
+    // Navigate to detail route instead of opening modal
+    this.router.navigate(['/dashboard/cotizaciones', id]);
   }
 
   closeModal(): void {

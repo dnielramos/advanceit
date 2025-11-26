@@ -1,80 +1,139 @@
-<div class="flex flex-col min-h-screen p-6 bg-gray-50 animate__animated animate__fadeIn">
+<div class="bg-slate-50 min-h-screen">
+  <div class="container mx-auto p-4 md:p-8 max-w-6xl animate__animated animate__fadeIn">
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="flex justify-center items-center py-20">
-    <fa-icon [icon]="faSpinner" size="3x" class="text-purple-500 animate-spin"></fa-icon>
-  </div>
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <fa-icon [icon]="faSpinner" size="3x" class="text-purple-500 animate-spin"></fa-icon>
+    </div>
 
-  <!-- Error State -->
-  <div *ngIf="!isLoading && error" class="flex flex-col items-center justify-center py-20">
-    <fa-icon [icon]="faExclamationCircle" size="3x" class="text-red-500 mb-4"></fa-icon>
-    <p class="text-red-500 text-center">{{ error }}</p>
-  </div>
+    <!-- Error State -->
+    <div *ngIf="!isLoading && error" class="flex flex-col items-center justify-center py-20">
+      <fa-icon [icon]="faExclamationCircle" size="3x" class="text-red-500 mb-4"></fa-icon>
+      <p class="text-red-500 text-center">{{ error }}</p>
+    </div>
 
-  <!-- Quotation Detail Content -->
-  <div *ngIf="!isLoading && quotation && !error" class="space-y-6 animate__animated animate__fadeInUp">
+    <!-- Quotation Detail Content -->
+    <div *ngIf="!isLoading && quotation && !error">
+      <h2 class="md:text-2xl text-md font-bold text-slate-800 mb-6 flex items-center gap-3">
+        Resumen de la Cotización
+      </h2>
+      <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+        <div class="p-6 md:p-10">
+          <!-- Header -->
+          <div
+            class="flex flex-col sm:flex-row justify-between items-center md:items-start pb-6 border-b border-slate-200">
+            <div class="flex flex-col md:flex-row items-center gap-4 mb-4 sm:mb-0">
+              <img src="assets/images/logo.png" alt="Logo Advance" class="h-14">
+              <div>
+                <h3 class="text-md md:text-2xl text-center font-extrabold text-slate-900">Advance Technology Projects
+                </h3>
+                <p class="text-sm text-slate-500">NIT - 900562155 | www.advanceit.co</p>
+              </div>
+            </div>
+            <div class="text-left sm:text-right">
+              <h3 class="text-2xl font-bold text-slate-800">COTIZACIÓN</h3>
+              <p class="text-sm text-slate-500 mt-1">Fecha: {{ quotation.creation_date | date:'d MMMM, y' }}</p>
+            </div>
+          </div>
 
-    <!-- Summary Card matching Step 3 style -->
-    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <!-- Client and Conditions -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+            <div>
+              <h4 class="font-semibold text-slate-500 uppercase tracking-wider text-xs mb-2">Cliente</h4>
+              <p class="font-bold text-slate-900 text-xl">{{ company?.razon_social }}</p>
+              <p class="text-slate-600 mt-1">Atención: {{ user?.name }}</p>
+              <p class="text-slate-600">{{ user?.email }}</p>
+            </div>
+            <div class="md:text-right">
+              <h4 class="font-semibold text-slate-500 uppercase tracking-wider text-xs mb-2">Condiciones</h4>
+              <p class="text-slate-700"><strong>Validez:</strong> {{ quotation.validity_days }} días</p>
+              <p class="text-slate-700"><strong>Pago:</strong> {{ esOrdenDeContado ? 'De Contado' :
+                company?.condiciones_pago + ' días de crédito' }}</p>
+            </div>
+          </div>
+        </div>
 
-      <!-- Company Logo and Info Header -->
-      <div class="flex items-center justify-center mb-4">
-        <img src="logo.png" alt="logo-advance" class="w-34 h-14 object-contain">
-      </div>
+        <!-- Products Table -->
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Producto</th>
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">Cant.</th>
+                <th class="px-6 py-4 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Precio Unit.
+                </th>
+                <th class="px-6 py-4 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr *ngFor="let detail of quotation.details">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p class="font-semibold text-slate-900">{{ detail.product_id }}</p>
+                  <p class="text-xs text-slate-500 max-w-xs truncate">Producto</p>
+                </td>
+                <td class="px-6 py-4 text-center text-slate-700">{{ detail.quantity }}</td>
+                <td class="px-6 py-4 text-right text-slate-700">{{ detail.unit_price | currency:'COP':'symbol':'1.0-0'
+                  }}</td>
+                <td class="px-6 py-4 text-right font-semibold text-slate-800">{{ (detail.quantity * detail.unit_price) |
+                  currency:'COP':'symbol':'1.0-0' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      <div class="flex flex-col items-center mb-6">
-        <p class="text-gray-700 font-semibold">Advance Technology Projects</p>
-        <p class="text-gray-700">NIT - 900562155</p>
-        <p class="text-gray-700 text-sm">www.advanceit.co</p>
-      </div>
+        <!-- Totals Section -->
+        <div class="bg-slate-50 p-6 md:p-10">
+          <div class="flex flex-col md:flex-row justify-between gap-8">
+            <!-- Left: Credit State -->
+            <div class="w-full md:w-1/2">
+              <h4 class="font-semibold text-slate-800 mb-3">Estado del Crédito</h4>
+              <div *ngIf="esOrdenDeContado" class="p-4 bg-blue-100 text-purple-800 rounded-lg border border-blue-200">
+                <p class="font-bold">Pago de Contado</p>
+                <p class="text-sm mt-1">Esta orden no requiere validación de crédito.</p>
+              </div>
+              <div *ngIf="!esOrdenDeContado && creditoCubreOrden"
+                class="p-4 bg-green-100 text-green-800 rounded-lg border border-green-200">
+                <p class="text-sm mt-1">El crédito disponible de <strong>{{ creditoDisponible |
+                    currency:'COP':'symbol':'1.0-0' }}</strong> es suficiente.</p>
+              </div>
+              <div *ngIf="!esOrdenDeContado && !creditoCubreOrden"
+                class="p-4 bg-red-100 text-red-800 rounded-lg border border-red-200">
+                <p class="font-bold">Crédito Insuficiente</p>
+                <p class="text-sm mt-1">El total excede el crédito de <strong>{{ creditoDisponible |
+                    currency:'COP':'symbol':'1.0-0' }}</strong>.</p>
+              </div>
+            </div>
 
-      <!-- Date and Status -->
-      <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-        <p class="text-gray-700">Hoy es {{ today }}</p>
-        <span [class]="getStatusColor(quotation.status)" class="px-3 py-1 rounded-full text-sm font-semibold">
-          {{ getStatusText(quotation.status) }}
-        </span>
-      </div>
+            <!-- Right: Totals Breakdown -->
+            <div class="w-full md:w-1/2 max-w-sm ml-auto space-y-2 text-slate-700">
+              <div class="flex justify-between"><span>Subtotal Productos:</span> <span>{{ subtotal |
+                  currency:'COP':'symbol':'1.0-0' }}</span></div>
+              <div class="flex justify-between text-red-600" *ngIf="totalDescuentos > 0"><span>Descuentos ({{
+                  totalDescuentos }}%):</span> <span>- {{ valorBaseDescuentos | currency:'COP':'symbol':'1.0-0'
+                  }}</span></div>
+              <div class="flex justify-between" *ngIf="valorLogistica > 0"><span>Valor Logística:</span> <span>+ {{
+                  valorLogistica | currency:'COP':'symbol':'1.0-0' }}</span></div>
+              <div class="border-t my-2 border-slate-200"></div>
+              <div class="flex justify-between font-semibold"><span>Base Gravable (IVA):</span> <span>{{ baseParaIVA |
+                  currency:'COP':'symbol':'1.0-0' }}</span></div>
+              <div class="flex justify-between"><span>IVA (19%):</span> <span>+ {{ valorIVA |
+                  currency:'COP':'symbol':'1.0-0' }}</span></div>
+              <div class="border-t-2 my-2 border-slate-300"></div>
+              <div class="flex justify-between items-center text-slate-900">
+                <span class="font-bold text-md md:text-xl">TOTAL:</span>
+                <span class="font-bold text-purple-600 text-2xl">{{ granTotal | currency:'COP':'symbol':'1.0-0'
+                  }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <!-- Quotation Data Section -->
-      <h4 class="font-bold text-gray-700 mb-3">Los datos de la Cotización:</h4>
-      <ul class="text-gray-600 space-y-2 mb-6">
-        <li><strong>ID:</strong> {{ quotation.id }}</li>
-        <li><strong>Razón Social:</strong> {{ company?.razon_social || 'N/A' }}</li>
-        <li><strong>Usuario:</strong> {{ user?.name || user?.email || 'N/A' }}</li>
-        <li><strong>Días de Validez:</strong> {{ quotation.validity_days }}</li>
-        <li><strong>Fecha de vencimiento:</strong> {{ quotation.expiration_date | date:'longDate' }}</li>
-        <li><strong>Término:</strong> {{ quotation.term }}</li>
-        <li><strong>Tipo de pago:</strong> {{ quotation.company_id ? 'Cupo crédito' : 'Contado/Transferencia' }}</li>
-      </ul>
-
-      <!-- Products Section -->
-      <h4 class="font-bold text-gray-700 mt-6 mb-3">Los productos de la cotización:</h4>
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm text-left text-gray-500">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-            <tr>
-              <th class="px-4 py-2">Producto ID</th>
-              <th class="px-4 py-2">Cantidad</th>
-              <th class="px-4 py-2">Precio Unitario</th>
-              <th class="px-4 py-2">Subtotal</th>
-              <th class="px-4 py-2">Impuestos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let detail of quotation.details" class="bg-white border-b">
-              <td class="px-4 py-2 text-ellipsis overflow-hidden whitespace-nowrap">{{ detail.product_id }}</td>
-              <td class="px-4 py-2">{{ detail.quantity }}</td>
-              <td class="px-4 py-2">${{ detail.unit_price | number:'1.2-2' }}</td>
-              <td class="px-4 py-2">${{ detail.subtotal | number:'1.2-2' }}</td>
-              <td class="px-4 py-2">${{ detail.taxes | number:'1.2-2' }}</td>
-            </tr>
-            <tr>
-              <td colspan="4" class="px-4 py-2 font-bold text-right">Total:</td>
-              <td class="px-4 py-2 font-bold text-purple-600 text-lg">${{ quotation.total | number:'1.2-2' }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Footer -->
+        <div class="border-t border-slate-200 bg-white px-6 md:px-10 py-5">
+          <p class="text-[10px] md:text-[12px] text-center text-slate-500">
+            Gracias por su interés. Si tiene alguna pregunta, no dude en contactarnos.
+          </p>
+        </div>
       </div>
     </div>
   </div>

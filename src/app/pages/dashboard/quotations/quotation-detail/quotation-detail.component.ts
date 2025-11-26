@@ -90,6 +90,9 @@ export class QuotationDetailComponent implements OnInit {
         this.user = result.users.find((u: any) => u.id === userId);
         console.log('Company loaded:', this.company);
         console.log('User loaded:', this.user);
+        
+        // Recalcular totales con los datos de la empresa
+        this.recalculateTotals();
         this.isLoading = false;
       },
       error: (err) => {
@@ -99,6 +102,18 @@ export class QuotationDetailComponent implements OnInit {
     });
   }
 
+  // Propiedades para cálculos detallados (igual que en quotation-create-user)
+  subtotal: number = 0;
+  totalDescuentos: number = 0;
+  valorBaseDescuentos: number = 0;
+  valorLogistica: number = 0;
+  baseParaIVA: number = 0;
+  valorIVA: number = 0;
+  granTotal: number = 0;
+  creditoDisponible: number = 0;
+  creditoCubreOrden: boolean = true;
+  esOrdenDeContado: boolean = true;
+
   // Calculate total from details
   get totalQuotation(): number {
     if (!this.quotation || !this.quotation.details) {
@@ -107,6 +122,56 @@ export class QuotationDetailComponent implements OnInit {
     return this.quotation.details.reduce((sum: number, detail: any) => {
       return sum + (detail.quantity * detail.unit_price);
     }, 0);
+  }
+
+  private recalculateTotals(): void {
+    if (!this.company || !this.quotation) return;
+
+    // 1. Parsear valores de la empresa (asegurando número)
+    const descuentoBase = parseFloat(this.company.descuento_base || '0');
+    const descuentoEspecial = parseFloat(this.company.descuento_especial || '0');
+    this.valorLogistica = parseFloat(this.company.valor_logistica || '0');
+    const saldoCredito = parseFloat(this.company.saldo_credito || '0');
+    const saldoGastado = parseFloat(this.company.saldo_gastado || '0');
+
+    // 2. Calcular subtotal de productos
+    this.subtotal = this.quotation.details.reduce(
+      (acc: number, detail: any) => acc + detail.quantity * detail.unit_price,
+      0
+    );
+
+    // 3. Aplicar descuentos
+    const descBaseValor = (this.subtotal * descuentoBase) / 100;
+    const descEspecialValor = (this.subtotal * descuentoEspecial) / 100;
+    this.valorBaseDescuentos = descBaseValor + descEspecialValor;
+    this.totalDescuentos = descuentoBase + descuentoEspecial;
+
+    // 4. Calcular base para el IVA
+    this.baseParaIVA = this.subtotal - this.valorBaseDescuentos + this.valorLogistica;
+    this.valorIVA = this.baseParaIVA * 0.19;
+
+    // 5. Calcular Gran Total
+    this.granTotal = this.baseParaIVA + this.valorIVA;
+
+    // 6. Validar Crédito
+    this.esOrdenDeContado =
+      parseInt(this.company.condiciones_pago?.toString() || '0') === 0 || saldoCredito === 0;
+    if (this.esOrdenDeContado) {
+      this.creditoDisponible = 0;
+      this.creditoCubreOrden = true;
+    } else {
+      this.creditoDisponible = saldoCredito - saldoGastado;
+      this.creditoCubreOrden = this.creditoDisponible >= this.granTotal;
+    }
+
+    console.log('📊 Cálculos detallados:', {
+      subtotal: this.subtotal,
+      descuentos: this.valorBaseDescuentos,
+      logistica: this.valorLogistica,
+      baseIVA: this.baseParaIVA,
+      iva: this.valorIVA,
+      total: this.granTotal
+    });
   }
 
   getStatusColor(status: any): string {

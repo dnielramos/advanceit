@@ -40,8 +40,11 @@
                 <label for="user_id" class="block text-sm font-semibold text-slate-700 mb-1">Usuario Asignado</label>
                 <select id="user_id" formControlName="user_id" class="mt-1 p-3 w-full rounded-lg border-slate-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 transition">
                   <option [ngValue]="null" disabled>-- Selecciona un usuario --</option>
-                  <option *ngFor="let user of users$ | async" [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
+                  <option *ngFor="let user of filteredUsers$ | async" [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
                 </select>
+                <div *ngIf="quotationForm.get('user_id')?.value && selectedCompany" class="text-green-600 text-xs mt-1">
+                  ✓ Usuario seleccionado automáticamente
+                </div>
               </div>
             </ng-container>
 
@@ -66,11 +69,14 @@
             <div>
               <label for="term" class="block text-sm font-semibold text-slate-700 mb-1">Condiciones de Pago</label>
               <input *ngIf="userRole === Role.User" type="text" formControlName="term" class="mt-1 p-3 w-full bg-slate-100 rounded-lg border-slate-300 cursor-not-allowed" [disabled]="true" [value]="selectedCompany?.condiciones_pago === '0' ? 'Contado' : selectedCompany?.condiciones_pago + ' días de crédito'">
-              <select *ngIf="userRole === Role.Admin" id="term" formControlName="term" class="mt-1 p-3 w-full rounded-lg border-slate-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 transition">
+              <select *ngIf="userRole === Role.Admin" id="term" formControlName="term" [disabled]="!!selectedCompany" class="mt-1 p-3 w-full rounded-lg border-slate-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 transition disabled:bg-slate-100 disabled:cursor-not-allowed">
                 <option value="0">Contado</option>
                 <option value="30">Crédito 30 días</option>
                 <option value="60">Crédito 60 días</option>
               </select>
+              <div *ngIf="userRole === Role.Admin && selectedCompany" class="text-blue-600 text-xs mt-1">
+                ✓ Términos establecidos automáticamente desde la empresa
+              </div>
             </div>
           </div>
         </div>

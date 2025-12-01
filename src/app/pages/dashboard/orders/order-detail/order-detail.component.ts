@@ -65,23 +65,35 @@ export class OrderDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    console.log('🔵 [OrderDetail] ngOnInit - ID de ruta:', id);
     if (id) {
       this.loadOrder(id);
     } else {
+      console.error('❌ [OrderDetail] No se encontró ID en la ruta');
       this.error.set('ID de orden no válido');
     }
   }
 
   loadOrder(id: string): void {
+    console.log('📦 [OrderDetail] loadOrder - Iniciando carga de orden:', id);
     this.isLoading.set(true);
     this.error.set(null);
 
     this.ordersService.getOrderById(id).subscribe({
       next: (orderData) => {
+        console.log('✅ [OrderDetail] Orden cargada exitosamente:', orderData);
+        console.log('   - numeroOrden:', orderData.numeroOrden);
+        console.log('   - estadoPago:', orderData.estadoPago);
+        console.log('   - precioTotal:', orderData.precioTotal);
+        console.log('   - cantidad de productos en orden:', orderData.productos?.length || 0);
+        console.log('   - ID para cargar productos:', id);
         this.order.set(orderData);
         this.loadProducts(id);
       },
       error: (err) => {
+        console.error('❌ [OrderDetail] Error al cargar orden:', err);
+        console.error('   - Message:', err.message);
+        console.error('   - Error completo:', err);
         this.error.set(`Error al cargar la orden: ${err.message}`);
         this.isLoading.set(false);
       },
@@ -89,14 +101,40 @@ export class OrderDetailComponent implements OnInit {
   }
 
   loadProducts(orderId: string): void {
+    console.log('🛒 [OrderDetail] loadProducts - Iniciando carga de productos para orden:', orderId);
     this.ordersService.getOrderProducts(orderId).subscribe({
       next: (productsData) => {
+        console.log('✅ [OrderDetail] Productos cargados exitosamente');
+        console.log('   - Cantidad de productos:', productsData.length);
+        console.log('   - Productos completos:', productsData);
+        
+        if (productsData.length === 0) {
+          console.warn('⚠️ [OrderDetail] La orden no tiene productos asociados');
+        } else {
+          console.log('   - Primer producto:', productsData[0]);
+          productsData.forEach((product, index) => {
+            console.log(`   📦 Producto ${index + 1}:`, {
+              id: product.id,
+              SKU: product.SKU,
+              nombre: product.nombre,
+              cantidad: product.cantidad,
+              precio: product.precio
+            });
+          });
+        }
+        
         this.products.set(productsData);
         this.isLoading.set(false);
+        console.log('   - Signal products actualizado, isLoading = false');
       },
       error: (err) => {
-        console.error('Error loading products:', err);
+        console.error('❌ [OrderDetail] Error al cargar productos:', err);
+        console.error('   - Message:', err.message);
+        console.error('   - Status:', err.status);
+        console.error('   - Error completo:', err);
+        console.warn('⚠️ [OrderDetail] Continuando con lista vacía de productos');
         // Continue even if products fail to load, just show empty list
+        this.products.set([]);
         this.isLoading.set(false);
       },
     });

@@ -51,15 +51,22 @@
         <div>
           <label for="user_id" class="block text-sm font-medium text-gray-700">ID de Usuario</label>
           <select id="user_id" formControlName="user_id"
-            class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+            [disabled]="isAdmin"
+            class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed">
             <option [ngValue]="''" disabled>-- Selecciona un usuario --</option>
-            <option *ngFor="let user of users$ | async" [ngValue]="user.id">
+            <option *ngFor="let user of filteredUsers$ | async" [ngValue]="user.id">
               {{ user.name }} ({{ user.email }})
             </option>
           </select>
           <div
             *ngIf="quotationForm.get('user_id')?.invalid && (quotationForm.get('user_id')?.dirty || quotationForm.get('user_id')?.touched)"
             class="text-red-500 text-sm mt-1">Necesitas elegir un usuario.</div>
+          <div *ngIf="isAdmin && quotationForm.get('user_id')?.value" class="text-blue-500 text-sm mt-1">
+            ✓ Usuario seleccionado automáticamente (campo bloqueado para admin)
+          </div>
+          <div *ngIf="!isAdmin && quotationForm.get('user_id')?.value && company" class="text-green-500 text-sm mt-1">
+            ✓ Usuario seleccionado automáticamente (puedes cambiarlo si es necesario)
+          </div>
         </div>
         <div>
           <label for="validity_days" class="block text-sm font-medium text-gray-700">Días de Validez</label>
@@ -75,8 +82,9 @@
         </div>
         <div>
           <label for="term" class="block text-sm font-medium text-gray-700">Término</label>
-          <select id="user_id" formControlName="term"
-            class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+          <select id="term" formControlName="term"
+            [disabled]="!!company"
+            class="p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed">
             <option [ngValue]="''" disabled>-- Cuanto plazo para el pago? --</option>
             <option [ngValue]="'30'">30 días</option>
             <option [ngValue]="'60'">60 días</option>
@@ -84,9 +92,7 @@
           <div
             *ngIf="quotationForm.get('term')?.invalid && (quotationForm.get('term')?.dirty || quotationForm.get('term')?.touched)"
             class="text-red-500 text-sm mt-1">Necesitas elegir cuanto plazo para el pago.</div>
-          <div
-            *ngIf="quotationForm.get('term')?.invalid && (quotationForm.get('term')?.dirty || quotationForm.get('term')?.touched)"
-            class="text-red-500 text-sm mt-1">Campo requerido.</div>
+          <div *ngIf="company" class="text-blue-500 text-sm mt-1">Término establecido automáticamente desde la empresa</div>
         </div>
       </div>
     </div>
@@ -115,16 +121,16 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Cantidad</label>
-              <input type="number" formControlName="quantity"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+              <input type="number" formControlName="quantity" readonly
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed">
               <div
                 *ngIf="details.at(i).get('quantity')?.invalid && (details.at(i).get('quantity')?.dirty || details.at(i).get('quantity')?.touched)"
                 class="text-red-500 text-sm mt-1">Campo requerido y > 0.</div>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Precio</label>
-              <input type="number" formControlName="unit_price"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+              <input type="number" formControlName="unit_price" readonly
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed">
               <div
                 *ngIf="details.at(i).get('unit_price')?.invalid && (details.at(i).get('unit_price')?.dirty || details.at(i).get('unit_price')?.touched)"
                 class="text-red-500 text-sm mt-1">Campo requerido y >= 0.</div>
@@ -148,7 +154,14 @@
 
     <div *ngIf="currentStep === 3" class="animate__animated animate__fadeInRight">
       <h3 class="text-xl font-semibold text-gray-800 mb-4">Revisar y Confirmar</h3>
-      <div class="space-y-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
+      
+      <!-- Indicador de carga del preview -->
+      <div *ngIf="isLoadingPreview" class="flex items-center justify-center p-6">
+        <fa-icon [icon]="['fas', 'spinner']" class="mr-2 animate-spin text-purple-600 text-3xl"></fa-icon>
+        <span class="text-gray-600">Calculando cotización...</span>
+      </div>
+
+      <div *ngIf="!isLoadingPreview && previewData" class="space-y-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
 
         <div class="flex items-center justify-center mb-2">
           <img src="logo.png" alt="logo-advance" class="w-34 h-14 object-contain">
@@ -163,38 +176,105 @@
         </div>
         <h4 class=" font-bold text-gray-700">Los datos de la Cotización:</h4>
         <ul class="text-gray-600 space-y-1">
-          <li><strong>Razon Social:</strong> {{ company?.razon_social }}</li>
-          <li><strong>Usuario:</strong> {{ user?.name }}</li>
-          <li><strong>Días de Validez:</strong> {{ quotationForm.value.validity_days }}</li>
-          <li><strong>Fecha de vencimiento:</strong> {{ quotationForm.value.expiration_date }}</li>
-          <li><strong>Término:</strong> {{ quotationForm.value.term }}</li>
-          <li><strong>Tipo de pago:</strong> {{ quotationForm.value.company_id ? 'Cupo credito' :
-            'Contado/Transferencia' }}</li>
+          <li><strong>Razon Social:</strong> {{ previewData.company.name }}</li>
+          <li><strong>Usuario:</strong> {{ previewData.user.name }}</li>
+          <li><strong>Días de Validez:</strong> {{ previewData.validity_days }}</li>
+          <li><strong>Fecha de vencimiento:</strong> {{ previewData.expiration_date | date:'dd/MM/yyyy' }}</li>
+          <li><strong>Término:</strong> {{ previewData.term }}</li>
+          <li><strong>Tipo de pago:</strong> {{ previewData.company.credit?.has_credit ? 'Cupo crédito' : 'Contado/Transferencia' }}</li>
         </ul>
+
+        <!-- Información de Crédito -->
+        <div *ngIf="previewData?.company?.credit?.has_credit" class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <h4 class="font-bold text-blue-900 mb-3">Información de Crédito:</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-blue-700">Crédito Total:</span>
+              <span class="font-semibold text-blue-900">${{ previewData?.company?.credit?.total_credit | number:'1.0-0' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-blue-700">Crédito Gastado:</span>
+              <span class="font-semibold text-orange-600">${{ previewData?.company?.credit?.spent_credit | number:'1.0-0' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-blue-700">Crédito Disponible:</span>
+              <span class="font-semibold text-green-600">${{ previewData?.company?.credit?.available_credit | number:'1.0-0' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-blue-700">Total de esta cotización:</span>
+              <span class="font-semibold text-purple-600">${{ previewData?.calculations?.total | number:'1.0-0' }}</span>
+            </div>
+          </div>
+          <div *ngIf="(previewData?.company?.credit?.available_credit || 0) < (previewData?.calculations?.total || 0)" 
+               class="mt-3 p-3 bg-red-100 border border-red-300 rounded-md">
+            <p class="text-red-700 text-sm font-semibold">⚠️ Advertencia: El total de la cotización excede el crédito disponible.</p>
+            <p class="text-red-600 text-xs mt-1">
+              Déficit: ${{ ((previewData?.calculations?.total || 0) - (previewData?.company?.credit?.available_credit || 0)) | number:'1.0-0' }}
+            </p>
+          </div>
+          <div *ngIf="(previewData?.company?.credit?.available_credit || 0) >= (previewData?.calculations?.total || 0)" 
+               class="mt-3 p-3 bg-green-100 border border-green-300 rounded-md">
+            <p class="text-green-700 text-sm font-semibold">✓ Crédito suficiente para esta cotización</p>
+            <p class="text-green-600 text-xs mt-1">
+              Crédito restante después de esta compra: ${{ ((previewData?.company?.credit?.available_credit || 0) - (previewData?.calculations?.total || 0)) | number:'1.0-0' }}
+            </p>
+          </div>
+        </div>
 
         <h4 class="font-bold text-gray-700 mt-4">Los productos de la cotización:</h4>
         <div class="overflow-x-auto">
           <table class="min-w-full text-sm text-left text-gray-500">
             <thead class="text-xs text-gray-700 uppercase bg-gray-100">
               <tr>
-                <th class="px-4 py-2">Producto ID</th>
+                <th class="px-4 py-2">Producto</th>
                 <th class="px-4 py-2">Cantidad</th>
                 <th class="px-4 py-2">Precio Unitario</th>
+                <th class="px-4 py-2">Subtotal</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let detail of details.controls" class="bg-white border-b">
-                <td class="px-4 py-2 text-ellipsis overflow-hidden whitespace-nowrap">{{ detail.value.product_name }}</td>
-                <td class="px-4 py-2">{{ detail.value.quantity }}</td>
-                <td class="px-4 py-2">${{ detail.value.unit_price | number:'1.2-2' }}</td>
-              </tr>
-              <tr>
-                <td colspan="2" class="px-4 py-2 font-bold">Total:</td>
-                <td class="px-4 py-2 font-bold text-purple-600 text-lg m-4 text-center text-lg">${{ totalQuotation | number:'1.2-2' }}</td>
+              <tr *ngFor="let product of previewData.products" class="bg-white border-b">
+                <td class="px-4 py-2">{{ product.name }}</td>
+                <td class="px-4 py-2">{{ product.quantity }}</td>
+                <td class="px-4 py-2">${{ product.unit_price | number:'1.0-0' }}</td>
+                <td class="px-4 py-2">${{ product.subtotal | number:'1.0-0' }}</td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <h4 class="font-bold text-gray-700 mt-6">Desglose de Cálculos:</h4>
+        <div class="bg-white p-4 rounded-md border border-gray-200 space-y-2">
+          <div class="flex justify-between items-center py-2 border-b">
+            <span class="text-gray-700">Subtotal Productos:</span>
+            <span class="font-semibold">${{ previewData.calculations.subtotal_productos | number:'1.0-0' }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b text-red-600">
+            <span>Descuento ({{ previewData.calculations.porcentaje_descuento }}%):</span>
+            <span class="font-semibold">-${{ previewData.calculations.valor_descuento | number:'1.0-0' }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b">
+            <span class="text-gray-700">Logística:</span>
+            <span class="font-semibold">+${{ previewData.calculations.valor_logistica | number:'1.0-0' }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b bg-gray-50">
+            <span class="text-gray-700 font-bold">Base Gravable:</span>
+            <span class="font-bold">${{ previewData.calculations.base_gravable | number:'1.0-0' }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b">
+            <span class="text-gray-700">IVA ({{ previewData.calculations.porcentaje_iva }}%):</span>
+            <span class="font-semibold">+${{ previewData.calculations.valor_iva | number:'1.0-0' }}</span>
+          </div>
+          <div class="flex justify-between items-center py-3 bg-purple-50 rounded-md px-2">
+            <span class="text-purple-900 font-bold text-lg">TOTAL:</span>
+            <span class="text-purple-600 font-bold text-xl">${{ previewData.calculations.total | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje si no hay preview -->
+      <div *ngIf="!isLoadingPreview && !previewData" class="p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+        <p class="text-yellow-800">No se pudo cargar el preview de la cotización. Por favor, regrese al paso anterior.</p>
       </div>
     </div>
   </form>

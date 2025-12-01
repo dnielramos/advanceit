@@ -10,6 +10,8 @@ import {
   UpdateQuotationDto,
   QuotationStatus,
   PopulatedQuotation,
+  PreviewQuotationDto,
+  PreviewQuotationResponse,
 } from '../models/quotation.types'; // Asegúrate de que este path sea correcto
 import { ENVIRONMENT } from '../../enviroments/enviroment';
 
@@ -22,7 +24,7 @@ import { ENVIRONMENT } from '../../enviroments/enviroment';
   providedIn: 'root',
 })
 export class QuotationService {
-  private apiUrl = `${ENVIRONMENT.apiUrlRender}/quotations`;
+  private apiUrl = `${ENVIRONMENT.apiUrl}/quotations`;
 
   constructor(private http: HttpClient, private cache: CacheService) {}
 
@@ -50,6 +52,28 @@ export class QuotationService {
     }
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
+  }
+
+  /**
+   * Obtiene un preview de la cotización con todos los cálculos del backend.
+   * No guarda en base de datos, solo calcula.
+   * @param data Los datos para calcular el preview.
+   * @returns Un Observable con el preview de la cotización.
+   */
+  preview(data: PreviewQuotationDto): Observable<PreviewQuotationResponse> {
+    console.log(' [QUOTATION SERVICE] Llamando a preview API');
+    console.log(' [QUOTATION SERVICE] URL:', `${this.apiUrl}/preview`);
+    console.log(' [QUOTATION SERVICE] Payload:', data);
+    
+    return this.http.post<PreviewQuotationResponse>(`${this.apiUrl}/preview`, data).pipe(
+      tap((response) => {
+        console.log(' [QUOTATION SERVICE] Preview response exitosa:', response);
+      }),
+      catchError((error) => {
+        console.error(' [QUOTATION SERVICE] Error en preview:', error);
+        return this.handleError(error);
+      })
+    );
   }
 
   /**

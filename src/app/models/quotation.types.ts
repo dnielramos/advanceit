@@ -14,6 +14,12 @@ interface QuotationCompany{
   id: string;
   razon_social: string;
   nit: string;
+  credit?: {
+    has_credit: boolean;
+    available_credit: number;
+    total_credit: number;
+    spent_credit: number;
+  };
 }
 
 export enum QuotationStatus {
@@ -35,6 +41,16 @@ export interface QuotationDetail {
   taxes: number;
 }
 
+export interface ProductPreview {
+  id: string;
+  name: string;
+  quantity: number;
+  unit_price: number;
+  discount: number;
+  subtotal: number;
+  taxes: number;
+}
+
 export interface Quotation {
   id: string;
   company_id: string;
@@ -48,6 +64,13 @@ export interface Quotation {
   edited_by?: string;
   status: QuotationStatus;
   total: number;
+  subtotal_productos?: number;
+  porcentaje_descuento?: number;
+  valor_descuento?: number;
+  valor_logistica?: number;
+  base_gravable?: number;
+  porcentaje_iva?: number;
+  valor_iva?: number;
 }
 
 interface PQuotation {
@@ -73,6 +96,13 @@ export interface CreateQuotationDto {
   creation_mode: string;
   created_by: string;
   total?: number;
+  subtotal_productos?: number;
+  porcentaje_descuento?: number;
+  valor_descuento?: number;
+  valor_logistica?: number;
+  base_gravable?: number;
+  porcentaje_iva?: number;
+  valor_iva?: number;
 }
 
 export interface UpdateQuotationDto {
@@ -113,4 +143,57 @@ export interface PopulatedQuotation {
   status: QuotationStatus;
   total: number;
   details: QuotationDetail[];
+  subtotal_productos?: number;
+  porcentaje_descuento?: number;
+  valor_descuento?: number;
+  valor_logistica?: number;
+  base_gravable?: number;
+  porcentaje_iva?: number;
+  valor_iva?: number;
+}
+
+export interface QuotationCalculations {
+  subtotal_productos: number;
+  porcentaje_descuento: number;
+  valor_descuento: number;
+  valor_logistica: number;
+  base_gravable: number;
+  porcentaje_iva: number;
+  valor_iva: number;
+  total: number;
+}
+
+export interface PreviewQuotationDto {
+  company_id: string;
+  user_id: string;
+  products: {
+    product_id: string;
+    quantity: number;
+    unit_price: number;
+  }[];
+  validity_days: number;
+  term: string;
+  creation_mode: string;
+  created_by: string;
+}
+
+export interface PreviewQuotationResponse {
+  company: {
+    id: string;
+    name: string;
+    credit?: {
+      has_credit: boolean;
+      available_credit: number;
+      total_credit: number;
+      spent_credit: number;
+    };
+  };
+  user: QuotationUser;
+  products: ProductPreview[];
+  expiration_date: string;
+  validity_days: number;
+  term: string;
+  creation_mode: string;
+  created_by: QuotationUser;
+  calculations: QuotationCalculations;
 }

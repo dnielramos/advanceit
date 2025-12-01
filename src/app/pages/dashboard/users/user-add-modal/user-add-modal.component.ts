@@ -1,15 +1,17 @@
-import { Component, signal, Output, EventEmitter, inject } from '@angular/core';
+import { Component, signal, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { 
   faUserPlus, faTimes, faUser, faEnvelope, faPhone, 
   faGlobe, faMapMarkerAlt, faCity, faBuilding, faShieldAlt,
-  faChevronDown, faSpinner, faPlus 
+  faChevronDown, faSpinner, faPlus, faSearch 
 } from '@fortawesome/free-solid-svg-icons';
 import { ToastService } from 'angular-toastify';
 import { UsersService } from '../../../../services/users.service';
+import { CompaniesService } from '../../../../services/companies.service';
 import { User } from '../../../../models/user';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-user-add-modal',
@@ -38,7 +40,7 @@ import { User } from '../../../../models/user';
     }
   `]
 })
-export class UserAddModalComponent {
+export class UserAddModalComponent implements OnInit {
   // Íconos de FontAwesome
   faUserPlus = faUserPlus;
   faTimes = faTimes;
@@ -53,6 +55,7 @@ export class UserAddModalComponent {
   faChevronDown = faChevronDown;
   faSpinner = faSpinner;
   faPlus = faPlus;
+  faSearch = faSearch;
 
   // Señales y eventos
   loading = signal(false);
@@ -61,12 +64,21 @@ export class UserAddModalComponent {
 
   // Formulario reactivo
   userForm: FormGroup;
+  
+  // Observable de empresas
+  companies$: Observable<any[]>;
+  allCompanies: any[] = []; // Todas las empresas cargadas
+  filteredCompanies: any[] = [];
+  companySearchTerm: string = '';
+  showDropdown: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private usersService: UsersService,
+    private companiesService: CompaniesService,
     private toastr: ToastService
   ) {
+    this.companies$ = this.companiesService.findAll();
     this.userForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
@@ -78,6 +90,49 @@ export class UserAddModalComponent {
       type: ['user', Validators.required],
       picture: ['https://placehold.co/150x150/663399/FFFFFF?text=U']
     });
+  }
+  
+  ngOnInit(): void {
+    console.log('🟢 [USER ADD MODAL] Inicializado');
+    // Cargar empresas y configurar filtro
+    this.companies$.subscribe(companies => {
+      this.allCompanies = companies; // Guardar todas las empresas
+      this.filteredCompanies = companies;
+      console.log('🏢 [COMPANIES] Empresas cargadas:', companies.length);
+    });
+  }
+  
+  filterCompanies(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.companySearchTerm = input.value.toLowerCase();
+    this.showDropdown = this.companySearchTerm.length > 0; // Mostrar dropdown solo si hay texto
+    
+    // Filtrar directamente del array en memoria
+    this.filteredCompanies = this.allCompanies.filter(c => 
+      c.razon_social?.toLowerCase().includes(this.companySearchTerm) ||
+      c.nit?.toString().includes(this.companySearchTerm)
+    );
+    console.log('🔍 [SEARCH] Empresas filtradas:', this.filteredCompanies.length);
+  }
+  
+  selectCompany(companyId: string, companyName: string): void {
+    console.log('✅ [SELECT] Empresa seleccionada:', companyId, companyName);
+    this.userForm.patchValue({ company: companyId });
+    this.companySearchTerm = companyName; // Mostrar el nombre en el input
+    this.showDropdown = false; // Ocultar dropdown al seleccionar
+    console.log('✅ [SELECT] companySearchTerm actualizado a:', this.companySearchTerm);
+    console.log('✅ [SELECT] Dropdown ocultado');
+  }
+  
+  getSelectedCompanyName(): string {
+    const companyId = this.userForm.get('company')?.value;
+    if (!companyId) return '';
+    
+    // Buscar directamente en el array de todas las empresas
+    const company = this.allCompanies.find(c => c.id === companyId);
+    const companyName = company?.razon_social || '';
+    console.log('📝 [GET NAME] ID:', companyId, '-> Nombre:', companyName);
+    return companyName;
   }
 
   onSubmit(): void {

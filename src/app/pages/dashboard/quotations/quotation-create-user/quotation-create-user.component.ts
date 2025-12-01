@@ -64,6 +64,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
   // Observables para datos
   users$!: Observable<User[]>;
   companies$!: Observable<Company[]>;
+  filteredUsers$!: Observable<User[]>;
 
   // Estado del componente
   quotationForm: FormGroup;
@@ -132,7 +133,9 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log('🟢 [INIT] QuotationCreateUserComponent inicializado');
     this.userRole = this.authService.getCurrentUserRole();
+    console.log('👤 [ROLE] Rol del usuario:', this.userRole);
     this.initializeUserDataAndSubscriptions();
   }
 
@@ -239,17 +242,60 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
     this.subscriptions.add(cartSub);
 
     if (this.userRole === Role.Admin) {
+      console.log('👑 [ADMIN] Configurando modo administrador');
       this.users$ = this.usersService.getUsers();
+      this.filteredUsers$ = this.users$;
       this.companies$ = this.companiesService.findAll();
 
       // Suscripción a cambios en la empresa (solo para admin)
       const companySub = this.quotationForm
         .get('company_id')!
         .valueChanges.subscribe((companyId) => {
+          console.log('🏢 [COMPANY CHANGE] Empresa seleccionada:', companyId);
           if (companyId) {
             this.companiesService.findById(companyId).pipe(take(1)).subscribe((company) => {
+              console.log('✅ [API RESPONSE] Empresa obtenida:', company);
               this.selectedCompany = company;
+              
+              // Filtrar y seleccionar automáticamente el primer usuario de la empresa
+              this.users$.pipe(take(1)).subscribe((allUsers) => {
+                console.log('👥 [USERS] Total usuarios disponibles:', allUsers.length);
+                const companyUsers = allUsers.filter((u: any) => u.company === companyId);
+                console.log('👥 [USERS] Usuarios filtrados para esta empresa:', companyUsers.length, companyUsers);
+                
+                // Actualizar usuarios filtrados
+                this.filteredUsers$ = new Observable((observer) => {
+                  observer.next(companyUsers);
+                  observer.complete();
+                });
+                console.log('✅ [USERS] filteredUsers$ actualizado');
+                
+                // Seleccionar automáticamente el primer usuario
+                if (companyUsers.length > 0) {
+                  console.log('🎯 [AUTO-SELECT] Seleccionando primer usuario:', companyUsers[0]);
+                  this.quotationForm.patchValue({
+                    user_id: companyUsers[0].id
+                  });
+                  this.selectedUser = companyUsers[0];
+                  console.log('✅ [AUTO-SELECT] Usuario establecido. user_id:', companyUsers[0].id);
+                } else {
+                  console.warn('⚠️ [AUTO-SELECT] No hay usuarios para esta empresa');
+                }
+              });
+              
+              // Establecer términos automáticamente desde la empresa
+              if (company.condiciones_pago) {
+                console.log('📋 [TERMS] Estableciendo términos:', company.condiciones_pago);
+                this.quotationForm.patchValue({
+                  term: company.condiciones_pago.toString()
+                });
+                console.log('✅ [TERMS] Términos establecidos en formulario');
+              } else {
+                console.warn('⚠️ [TERMS] Empresa no tiene condiciones_pago');
+              }
+              
               this.recalculateTotals(); // Recalcular al cambiar de empresa
+              console.log('🏁 [COMPANY CHANGE] Proceso completado');
             });
           }
         });
@@ -261,6 +307,7 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
         .valueChanges.subscribe((userId) => {
           if (userId) {
             this.usersService.getUserById(userId).pipe(take(1)).subscribe((user) => {
+              console.log('👤 [USER CHANGE] Usuario seleccionado:', user);
               this.selectedUser = user;
             });
           }

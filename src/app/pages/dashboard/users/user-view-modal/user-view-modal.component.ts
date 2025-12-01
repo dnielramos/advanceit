@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { User } from '../../../../models/user';
+import { User, UserPopulated } from '../../../../models/user';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faTimes, faUser, faEnvelope, faMapMarkerAlt, faCity,
@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './user-view-modal.component.html',
 })
 export class UserViewModalComponent {
-  @Input() user: User | null = null;
+  @Input() user: UserPopulated | null = null;
   @Output() closeModal = new EventEmitter<void>();
 
   // FontAwesome icons

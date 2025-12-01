@@ -140,13 +140,47 @@
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1">Empresa</label>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Empresa <span class="text-red-500">*</span></label>
               <div class="relative">
-                <fa-icon [icon]="faBuilding" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
-                <input formControlName="company" type="text" 
-                  class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
-                  placeholder="Empresa S.A.">
+                <fa-icon [icon]="faBuilding" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10"></fa-icon>
+                
+                <!-- Input de búsqueda -->
+                <input 
+                  type="text" 
+                  [(ngModel)]="companySearchTerm"
+                  [ngModelOptions]="{standalone: true}"
+                  (input)="filterCompanies($event)"
+                  (focus)="companySearchTerm = ''; showDropdown = false"
+                  class="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                  placeholder="Buscar empresa por nombre o NIT...">
+                
+                <fa-icon [icon]="faSearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"></fa-icon>
+                
+                <!-- Dropdown de resultados -->
+                <div *ngIf="showDropdown && filteredCompanies.length > 0" 
+                     class="absolute z-50 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button
+                    type="button"
+                    *ngFor="let company of filteredCompanies"
+                    (click)="selectCompany(company.id, company.razon_social)"
+                    class="w-full text-left px-4 py-3 hover:bg-purple-50 transition-colors border-b border-slate-100 last:border-0">
+                    <div class="font-semibold text-slate-800">{{ company.razon_social }}</div>
+                    <div class="text-xs text-slate-500">NIT: {{ company.nit }}</div>
+                  </button>
+                </div>
+                
+                <!-- Mensaje cuando no hay resultados -->
+                <div *ngIf="showDropdown && companySearchTerm && filteredCompanies.length === 0" 
+                     class="absolute z-50 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-center text-slate-500 text-sm">
+                  No se encontraron empresas con ese criterio
+                </div>
               </div>
+              @if (userForm.get('company')?.invalid && userForm.get('company')?.touched) {
+                <p class="mt-1 text-xs text-red-500">Debe seleccionar una empresa</p>
+              }
+              @if (userForm.get('company')?.value) {
+                <p class="mt-1 text-xs text-green-600">✓ Empresa seleccionada: {{ getSelectedCompanyName() }}</p>
+              }
             </div>
             
             <div>

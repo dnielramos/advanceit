@@ -89,12 +89,24 @@
               <p class="text-xs text-gray-500 font-semibold mb-1 uppercase tracking-wider">Teléfono</p>
               <p class="text-sm font-bold text-gray-700 truncate">{{ user.telephone || 'N/A' }}</p>
             </div>
+            <div
+              class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all col-span-2">
+              <p class="text-xs text-gray-500 font-semibold mb-1 uppercase tracking-wider">Estado</p>
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border"
+                [ngClass]="{
+                  'bg-emerald-100 text-emerald-800 border-emerald-200': user.status === 'ACTIVE' || !user.status,
+                  'bg-red-100 text-red-800 border-red-200': user.status === 'INACTIVE'
+                }">
+                {{ user.status === 'INACTIVE' ? 'INACTIVO' : 'ACTIVO' }}
+              </span>
+            </div>
           </div>
         </div>
 
         <!-- Card Footer / Actions -->
         <div class="p-4 bg-gray-50 border-t border-gray-100">
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
             <button (click)="viewUser(user); $event.stopPropagation()"
               class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100 hover:shadow-sm"
               title="Ver detalles">
@@ -106,6 +118,18 @@
               title="Editar usuario">
               <fa-icon [icon]="faPen"></fa-icon>
               <span>Editar</span>
+            </button>
+            <button *ngIf="user.status !== 'INACTIVE'" (click)="softDelete(user); $event.stopPropagation()"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-red-600 bg-red-50 hover:bg-red-600 hover:text-white transition-all duration-200"
+              title="Desactivar usuario">
+              <fa-icon [icon]="faUserSlash"></fa-icon>
+              <span>Desactivar</span>
+            </button>
+            <button *ngIf="user.status === 'INACTIVE'" (click)="reactivate(user); $event.stopPropagation()"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white transition-all duration-200"
+              title="Reactivar usuario">
+              <fa-icon [icon]="faUsers"></fa-icon>
+              <span>Reactivar</span>
             </button>
           </div>
         </div>
@@ -169,7 +193,17 @@
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-              {{ user.city || 'N/A' }}, {{ user.country || 'N/A' }}
+              <div class="flex flex-col gap-1">
+                <span>{{ user.city || 'N/A' }}, {{ user.country || 'N/A' }}</span>
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border self-start"
+                  [ngClass]="{
+                    'bg-emerald-100 text-emerald-800 border-emerald-200': user.status === 'ACTIVE' || !user.status,
+                    'bg-red-100 text-red-800 border-red-200': user.status === 'INACTIVE'
+                  }">
+                  {{ user.status === 'INACTIVE' ? 'INACTIVO' : 'ACTIVO' }}
+                </span>
+              </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
               <button (click)="viewUser(user); $event.stopPropagation()"
@@ -181,6 +215,16 @@
                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
                 title="Editar">
                 <fa-icon [icon]="faPen"></fa-icon>
+              </button>
+              <button *ngIf="user.status !== 'INACTIVE'" (click)="softDelete(user); $event.stopPropagation()"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-red-600 hover:bg-red-100 transition-colors"
+                title="Desactivar">
+                <fa-icon [icon]="faUserSlash"></fa-icon>
+              </button>
+              <button *ngIf="user.status === 'INACTIVE'" (click)="reactivate(user); $event.stopPropagation()"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors"
+                title="Reactivar">
+                <fa-icon [icon]="faUsers"></fa-icon>
               </button>
             </td>
           </tr>
@@ -240,7 +284,7 @@
 
 <!-- Modales -->
 @if (state().showViewModal) {
-<app-user-view-modal [user]="state().selectedUser" (closeModal)="closeModal()"></app-user-view-modal>
+<app-user-view-modal [user]="state().selectedUserPopulated" (closeModal)="closeModal()"></app-user-view-modal>
 } @if (state().showEditModal) {
 <app-user-edit-modal [user]="state().selectedUser" (closeModal)="closeModal(true)"></app-user-edit-modal>
 } @if (state().showAddModal) {

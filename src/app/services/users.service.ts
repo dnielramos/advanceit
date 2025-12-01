@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Role } from './auth.service';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
-import { User } from '../models/user';
+import { User, UserPopulated } from '../models/user';
 
 // DTOs (Data Transfer Objects) para tipar las peticiones
 export interface CreateUserDto {
@@ -41,7 +41,7 @@ export interface UpdatePasswordDto {
   providedIn: 'root'
 })
 export class UsersService {
-  private apiUrl = `${ENVIRONMENT.apiUrlRender}/users`;
+  private apiUrl = `${ENVIRONMENT.apiUrl}/users`;
 
   constructor(private http: HttpClient) { }
 
@@ -55,11 +55,12 @@ export class UsersService {
   }
 
   /**
-   * Obtiene la lista de todos los usuarios.
-   * @returns Un Observable con la lista de usuarios.
+   * Obtiene la lista de usuarios.
+   * Por defecto el backend devuelve solo usuarios activos, pero puede estar
+   * configurado para incluir inactivos según la implementación.
    */
-  getUsers(): Observable<any> {
-    return this.http.get(this.apiUrl);
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.apiUrl);
   }
 
   /**
@@ -76,6 +77,16 @@ export class UsersService {
    */
   getUserById(id: string): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Obtiene un usuario "populado" por su ID, incluyendo la información
+   * de la empresa (company: { id, name }).
+   * Este método se usa en vistas de detalle (perfil), sin afectar
+   * la lógica existente que espera solo el ID de company.
+   */
+  getUserByIdPopulated(id: string): Observable<UserPopulated> {
+    return this.http.get<UserPopulated>(`${this.apiUrl}/${id}`);
   }
 
   /**
@@ -96,6 +107,22 @@ export class UsersService {
    */
   updatePassword(id: string, newPassword: UpdatePasswordDto): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}/password`, newPassword);
+  }
+
+  /**
+   * Realiza un soft delete de un usuario (status = 'INACTIVE').
+   * @param id ID del usuario a desactivar.
+   */
+  softDeleteUser(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Reactiva un usuario previamente inactivo (status = 'ACTIVE').
+   * @param id ID del usuario a reactivar.
+   */
+  reactivateUser(id: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/reactivate`, {});
   }
 
   /**

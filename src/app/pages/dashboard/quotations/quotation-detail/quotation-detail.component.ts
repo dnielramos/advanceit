@@ -37,6 +37,8 @@ export class QuotationDetailComponent implements OnInit {
     day: 'numeric' 
   });
 
+  private shouldAutoPrint: boolean = false;
+
   constructor(
     private quotationService: QuotationService,
     private companiesService: CompaniesService,
@@ -48,6 +50,8 @@ export class QuotationDetailComponent implements OnInit {
   ngOnInit(): void {
     // Try to get ID from route params first, then fall back to @Input
     const routeId = this.route.snapshot.paramMap.get('id');
+    const printParam = this.route.snapshot.queryParamMap.get('print');
+    this.shouldAutoPrint = printParam === '1';
     const idToUse = routeId || this.quotationId;
     
     if (idToUse) {
@@ -94,6 +98,12 @@ export class QuotationDetailComponent implements OnInit {
         }
 
         this.isLoading = false;
+
+        if (this.shouldAutoPrint) {
+          setTimeout(() => {
+            window.print();
+          }, 500);
+        }
       },
       error: (err) => {
         this.error = 'No se pudo cargar la cotización. Inténtelo de nuevo más tarde.';
@@ -105,6 +115,10 @@ export class QuotationDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/dashboard/cotizaciones']);
+  }
+
+  manualPrint(): void {
+    window.print();
   }
 
   loadCompanyAndUser(companyId: string, userId: string): void {

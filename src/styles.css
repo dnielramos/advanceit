@@ -260,3 +260,30 @@ input[placeholder]::placeholder {
     display: none;
   }
 }
+
+/* Estilos globales para impresión: ocultar shell del dashboard y dejar solo el contenido */
+@media print {
+  /* Contenedores típicos de layout/dashboard */
+  .dashboard-layout,
+  .dashboard-shell,
+  .dashboard-topbar,
+  .dashboard-header,
+  .dashboard-sidebar,
+  .dashboard-footer,
+  .app-shell,
+  .app-header,
+  .app-footer {
+    display: none !important;
+  }
+
+  /* Forzar fondo blanco y sin sombras en todo */
+  body, html {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  * {
+    box-shadow: none !important;
+  }
+}

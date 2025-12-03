@@ -1,5 +1,73 @@
-<div class="bg-slate-50 min-h-screen">
-  <div class="container mx-auto p-4 md:p-8 max-w-6xl animate__animated animate__fadeIn">
+<style>
+  @media print {
+    /* Ocultar elementos globales de la app: home, menú, header, sidebar, footer, etc. */
+    .no-print,
+    nav,
+    header,
+    footer,
+    .sidebar,
+    .topbar,
+    .navbar,
+    .menu,
+    .menu-container {
+      display: none !important;
+    }
+
+    body, html {
+      background: #ffffff !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Contenedor principal de la hoja a imprimir */
+    .print-page {
+      box-shadow: none !important;
+      border: none !important;
+      background: #ffffff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .print-page-inner {
+      padding: 0 !important;
+      max-width: 100% !important;
+      border-radius: 0 !important;
+    }
+
+    /* Quitar fondos de color y sombras para un look corporativo limpio */
+    .bg-slate-50,
+    .bg-slate-100,
+    .bg-gray-50,
+    .bg-gray-100,
+    .bg-purple-50,
+    .bg-blue-100,
+    .bg-green-100,
+    .bg-red-100 {
+      background-color: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    .shadow,
+    .shadow-sm,
+    .shadow-md,
+    .shadow-lg,
+    .shadow-xl,
+    .shadow-2xl {
+      box-shadow: none !important;
+    }
+
+    /* Ajustar bordes para que se vea como documento */
+    .border,
+    .border-slate-200,
+    .border-gray-100,
+    .border-gray-200 {
+      border-color: #dddddd !important;
+    }
+  }
+</style>
+
+<div class="bg-slate-50 min-h-screen print-page">
+  <div class="container mx-auto p-4 md:p-8 max-w-6xl animate__animated animate__fadeIn print-page-inner">
 
     <!-- Loading State -->
     <div *ngIf="isLoading" class="flex justify-center items-center py-20">
@@ -14,17 +82,26 @@
 
     <!-- Quotation Detail Content -->
     <div *ngIf="!isLoading && quotation && !error">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6 no-print">
         <h2 class="md:text-2xl text-md font-bold text-slate-800 flex items-center gap-3">
           Resumen de la Cotización
         </h2>
-        <button
-          type="button"
-          (click)="goBack()"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-purple-400 hover:text-purple-700 transition-colors shadow-sm">
-          <span class="text-xs">⟵</span>
-          <span>Volver a cotizaciones</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-purple-400 hover:text-purple-700 transition-colors shadow-sm">
+            <span class="text-xs">⟵</span>
+            <span>Volver a cotizaciones</span>
+          </button>
+          <button
+            type="button"
+            (click)="manualPrint()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-200 bg-white text-sm font-medium text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-colors shadow-sm">
+            <span class="text-xs">PDF</span>
+            <span>Imprimir PDF</span>
+          </button>
+        </div>
       </div>
 
       <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">

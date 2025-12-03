@@ -18,6 +18,7 @@ import {
   faCalendarAlt,
   faBoxOpen,
   faBuilding,
+  faFilePdf,
 } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { QuotationFormComponent } from '../quotation-form/quotation-form.component';
@@ -79,6 +80,7 @@ export class QuotationListComponent implements OnInit {
   faCalendarAlt = faCalendarAlt;
   faBuilding = faBuilding;
   faBoxOpen = faBoxOpen;
+  faFilePdf = faFilePdf;
 
   constructor(
     private quotationService: QuotationService,
@@ -129,6 +131,12 @@ export class QuotationListComponent implements OnInit {
   openDetailsModal(id: string): void {
     // Navigate to detail route instead of opening modal
     this.router.navigate(['/dashboard/cotizaciones', id]);
+  }
+
+  printQuotation(id: string): void {
+    this.router.navigate(['/dashboard/cotizaciones', id], {
+      queryParams: { print: '1' },
+    });
   }
 
   closeModal(): void {

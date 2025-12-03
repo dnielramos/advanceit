@@ -81,7 +81,7 @@
         </div>
 
         <!-- Card Footer / Actions -->
-        <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center gap-2">
+        <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-end items-center gap-2">
           <button (click)="openDetailsModal(q.id)"
             class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100"
             title="Ver detalles">
@@ -92,20 +92,10 @@
           <div class="h-4 w-px bg-gray-300"></div>
 
           <div class="flex gap-1">
-            <button (click)="openEditModal(q.id)"
+            <button (click)="printQuotation(q.id)"
               class="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200"
-              title="Editar">
-              <fa-icon [icon]="faEdit"></fa-icon>
-            </button>
-            <button (click)="openStatusModal(q.id)"
-              class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200"
-              title="Cambiar estado">
-              <fa-icon [icon]="faCheckCircle"></fa-icon>
-            </button>
-            <button (click)="confirmDeletion(q.id)"
-              class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-              title="Eliminar">
-              <fa-icon [icon]="faTrashAlt"></fa-icon>
+              title="Imprimir PDF">
+              <fa-icon [icon]="faFilePdf"></fa-icon>
             </button>
           </div>
         </div>
@@ -173,20 +163,10 @@
                 title="Ver">
                 <fa-icon [icon]="faEye"></fa-icon>
               </button>
-              <button (click)="openEditModal(q.id)"
+              <button (click)="printQuotation(q.id)"
                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
-                title="Editar">
-                <fa-icon [icon]="faEdit"></fa-icon>
-              </button>
-              <button (click)="openStatusModal(q.id)"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
-                title="Cambiar estado">
-                <fa-icon [icon]="faCheckCircle"></fa-icon>
-              </button>
-              <button (click)="confirmDeletion(q.id)"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
-                title="Eliminar">
-                <fa-icon [icon]="faTrashAlt"></fa-icon>
+                title="Imprimir PDF">
+                <fa-icon [icon]="faFilePdf"></fa-icon>
               </button>
             </td>
           </tr>

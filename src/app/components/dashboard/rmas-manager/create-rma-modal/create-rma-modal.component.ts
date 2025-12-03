@@ -139,29 +139,23 @@ export class CreateRmaModalComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
     
-    // Buscar la empresa seleccionada para obtener su razón social
-    // Convertir companyId a número para comparación
-    const companyIdNum = typeof companyId === 'string' ? parseInt(companyId, 10) : companyId;
-    console.log('🔢 Company ID convertido a número:', companyIdNum);
+    // Buscar la empresa seleccionada por ID (comparando como string)
     console.log('🏢 Empresas disponibles:', this.companies().map(c => ({ id: c.id, tipo: typeof c.id, razon_social: c.razon_social })));
-    
-    // Buscar por ID (comparando ambos como números)
-    const selectedCompany = this.companies().find(c => Number(c.id) === Number(companyIdNum));
+    const selectedCompany = this.companies().find(c => String(c.id) === String(companyId));
     console.log('🏢 Empresa encontrada:', selectedCompany);
     
     if (!selectedCompany) {
       console.error('❌ Empresa no encontrada en la lista');
-      console.error('❌ Buscando ID:', companyIdNum, 'en empresas:', this.companies().map(c => c.id));
+      console.error('❌ Buscando ID:', companyId, 'en empresas:', this.companies().map(c => c.id));
       this.error.set('Empresa no encontrada');
       this.isLoading.set(false);
       return;
     }
     
-    // Buscar por razón social en minúsculas
-    const companyName = selectedCompany.razon_social.toLowerCase().trim();
-    console.log('🔍 Buscando inventario por company name:', companyName);
+    const companyIdentifier = selectedCompany.id ?? companyId;
+    console.log('🔍 Buscando inventario por company_id:', companyIdentifier);
     
-    this.inventoryService.getInventoryByCompany(companyName).subscribe({
+    this.inventoryService.getInventoryByCompany(String(companyIdentifier)).subscribe({
       next: (inventories) => {
         console.log('✅ Inventarios recibidos:', inventories);
         console.log('✅ Tipo de dato recibido:', typeof inventories, Array.isArray(inventories));

@@ -82,6 +82,10 @@ export class InventoryUploaderComponent implements OnInit {
   selectedInventory = computed(() => this.selectedCompany()?.inventory || []);
   selectedColumns = computed(() => this.selectedCompany()?.columns || []);
 
+  // Para añadir nuevos productos al inventario de la empresa seleccionada
+  isAddingItem = signal<boolean>(false);
+  newItem: any = {};
+
   // Para registrar inventario
   previewData = signal<any[]>([]);
   previewColumns = signal<string[]>([]);
@@ -349,10 +353,38 @@ export class InventoryUploaderComponent implements OnInit {
   // ======================================================
   viewInventory(company: CompanyInventory) {
     this.selectedCompany.set(company);
+    this.isAddingItem.set(false);
+
+    // Inicializar objeto base para nuevo ítem con todas las columnas de la empresa
+    const cols = company.columns && company.columns.length
+      ? company.columns
+      : (company.inventory?.[0] ? Object.keys(company.inventory[0]) : []);
+
+    const base: any = {};
+    (cols || []).forEach((col) => {
+      base[col] = '';
+    });
+    this.newItem = base;
   }
 
   closeInventory() {
     this.selectedCompany.set(null);
+  }
+
+  // ======================================================
+  // Añadir nuevo producto al inventario (solo consola por ahora)
+  // ======================================================
+  handleAddItem() {
+    const company = this.selectedCompany();
+    if (!company) return;
+
+    const payload = {
+      company: company.company,
+      columns: company.columns,
+      item: { ...this.newItem },
+    };
+
+    console.log('📦 Nuevo producto para inventario (payload):', payload);
   }
 
   // ======================================================

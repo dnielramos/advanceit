@@ -131,6 +131,111 @@
     </section>
   </div>
 
+  <!-- Detalle de inventario de una empresa -->
+  <section *ngIf="selectedCompany()" class="mt-6">
+
+    <!-- Header del detalle -->
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-purple-100 rounded-lg text-purple-600">
+          <fa-icon [icon]="faBuilding" class="text-xl"></fa-icon>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Inventario de {{ capitalizeCompany(selectedCompany()?.company || '') }}
+          </h3>
+          <p class="text-sm text-gray-500">
+            Mostrando {{ filteredInventory().length }} ítem(s)
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="button" (click)="isAddingItem.set(!isAddingItem())"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-purple-600 rounded-lg hover:bg-purple-700 transition-colors shadow-sm">
+          <fa-icon [icon]="faUpload"></fa-icon>
+          Añadir producto
+        </button>
+        <button type="button" (click)="closeInventory()"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+          <fa-icon [icon]="faChevronRight" class="rotate-180"></fa-icon>
+          Volver al listado
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario dinámico para añadir producto -->
+    <div *ngIf="isAddingItem()" class="mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+      <h4 class="text-md font-semibold text-gray-900 mb-3">Nuevo producto para {{ capitalizeCompany(selectedCompany()?.company || '') }}</h4>
+      <p class="text-xs text-gray-500 mb-4">Completa los campos según el formato del inventario de esta empresa.</p>
+
+      <form (ngSubmit)="handleAddItem()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div *ngFor="let col of selectedCompany()?.columns" class="flex flex-col">
+            <label class="text-xs font-medium text-gray-600 mb-1 truncate" [title]="col">{{ col }}</label>
+            <input type="text"
+              class="px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              [(ngModel)]="newItem[col]" [ngModelOptions]="{standalone: true}" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-4">
+          <button type="button" (click)="isAddingItem.set(false)"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-purple-600 rounded-lg hover:bg-purple-700 transition-colors">
+            Guardar (consola)
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tabla de productos del inventario -->
+    <div class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+            <tr>
+              <th *ngFor="let col of selectedColumns()" scope="col"
+                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
+                {{ col }}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let row of filteredInventory(); let i = index; let odd = odd"
+              [class]="odd ? 'bg-white' : 'bg-gray-50'" class="hover:bg-purple-50 transition-colors cursor-pointer"
+              (click)="viewProductDetail(row, i)">
+              <td *ngFor="let col of selectedColumns()" class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <span class="truncate max-w-xs" [title]="row[col]">{{ row[col] }}</span>
+                  <button (click)="openDellSupport(); $event.stopPropagation()"
+                    *ngIf="col.toLowerCase().includes('service tag')"
+                    class="text-xs text-purple-600 hover:text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-100 hover:border-purple-300 transition-colors ml-2">
+                    Soporte
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="filteredInventory().length === 0" class="text-center py-12 text-gray-500 bg-white">
+        <div class="bg-gray-50 p-4 rounded-full inline-block mb-3">
+          <fa-icon [icon]="faExclamationTriangle" class="text-gray-400 text-2xl"></fa-icon>
+        </div>
+        <p class="text-lg font-medium text-gray-900">No se encontraron coincidencias</p>
+      </div>
+    </div>
+
+    <p class="text-xs text-gray-500 mt-4 text-center sm:text-left">
+      Mostrando {{ filteredInventory().length }} ítem(s)
+    </p>
+  </section>
+
   <!-- Lista de empresas -->
   <section *ngIf="companies().length && !selectedCompany()" class="mt-6">
 
@@ -288,152 +393,6 @@
         <fa-icon [icon]="faUpload"></fa-icon>
         Registrar Inventario
       </button>
-    </div>
-  </section>
-
-  <!-- Detalle de inventario (expandido, no modal) -->
-  <section *ngIf="selectedCompany()" class="mt-6 animate__animated animate__fadeIn">
-
-    <!-- Header del detalle -->
-    <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-      <div class="flex items-center gap-3">
-        <div class="p-2 bg-purple-100 rounded-lg text-purple-600">
-          <fa-icon [icon]="faBuilding" class="text-xl"></fa-icon>
-        </div>
-        <div>
-          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-            {{ capitalizeCompany(selectedCompany()?.company || '') }}
-          </h3>
-          <p class="text-sm text-gray-500">
-            Mostrando {{ filteredInventory().length }} ítem(s)
-          </p>
-        </div>
-      </div>
-
-      <button (click)="closeInventory()"
-        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
-        <fa-icon [icon]="faChevronRight" class="rotate-180"></fa-icon>
-        Volver al listado
-      </button>
-    </div>
-
-    <!-- Vista Grid de productos -->
-    <div *ngIf="viewMode() === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <div *ngFor="let row of filteredInventory(); let i = index" (click)="viewProductDetail(row, i)"
-        class="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col">
-
-        <!-- Header Card -->
-        <div class="p-4 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white">
-          <div class="flex items-start gap-3">
-            <div
-              class="p-2 bg-purple-50 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-              <!-- Icono genérico de producto -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-12l9 5.25" />
-              </svg>
-            </div>
-            <div class="min-w-0 flex-1">
-              <h3 class="text-sm font-bold text-gray-900 truncate group-hover:text-purple-600 transition-colors"
-                [title]="row['Laptop Model '] || row['Laptop Model'] || 'Producto'">
-                {{ row['Laptop Model '] || row['Laptop Model'] || 'Producto' }}
-              </h3>
-              <p class="text-xs text-gray-500 truncate mt-0.5">
-                {{ row['Service Tag Laptop'] || 'N/A' }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Body Card -->
-        <div class="p-4 space-y-3 flex-1">
-          <div class="flex items-center gap-2 text-xs text-gray-600">
-            <fa-icon [icon]="faBuilding" class="text-gray-400 w-4"></fa-icon>
-            <span class="truncate font-medium">{{ row['First Name'] || '' }} {{ row['Last Name '] || '' }}</span>
-          </div>
-          <div class="flex items-center gap-2 text-xs text-gray-600">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-              stroke="currentColor" class="w-4 h-4 text-gray-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-            </svg>
-            <span class="truncate">{{ row['City '] || 'N/A' }}</span>
-          </div>
-
-          <!-- Dynamic Fields Preview -->
-          <div class="mt-3 pt-3 border-t border-gray-50 space-y-1.5">
-            <ng-container *ngFor="let col of selectedCompany()?.columns?.slice(0, 3)">
-              <div
-                *ngIf="!['Laptop Model', 'Laptop Model ', 'Service Tag Laptop', 'First Name', 'Last Name ', 'City '].includes(col)"
-                class="flex justify-between text-xs">
-                <span class="text-gray-400 font-medium truncate w-1/3">{{ col }}:</span>
-                <span class="text-gray-700 truncate w-2/3 text-right">{{ row[col] }}</span>
-              </div>
-            </ng-container>
-          </div>
-        </div>
-
-        <!-- Footer Card -->
-        <div class="p-3 bg-gray-50 border-t border-gray-100 text-center">
-          <span
-            class="text-xs font-medium text-purple-600 group-hover:text-purple-700 flex items-center justify-center gap-1">
-            Ver detalles <fa-icon [icon]="faChevronRight" class="text-[10px]"></fa-icon>
-          </span>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div *ngIf="filteredInventory().length === 0"
-        class="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
-        <div class="bg-gray-100 p-4 rounded-full mb-3">
-          <fa-icon [icon]="faExclamationTriangle" class="text-gray-400 text-2xl"></fa-icon>
-        </div>
-        <p class="text-lg font-medium text-gray-900">No se encontraron coincidencias</p>
-        <p class="text-sm">Intenta con otros términos de búsqueda.</p>
-      </div>
-    </div>
-
-    <!-- Vista Tabla de productos -->
-    <div *ngIf="viewMode() === 'list'"
-      class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
-            <tr>
-              <th *ngFor="let col of selectedColumns()" scope="col"
-                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
-                {{ col }}
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let row of filteredInventory(); let i = index; let odd = odd"
-              [class]="odd ? 'bg-white' : 'bg-gray-50'" class="hover:bg-purple-50 transition-colors cursor-pointer"
-              (click)="viewProductDetail(row, i)">
-              <td *ngFor="let col of selectedColumns()" class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                <div class="flex items-center gap-2">
-                  <span class="truncate max-w-xs" [title]="row[col]">{{ row[col] }}</span>
-                  <button (click)="openDellSupport(); $event.stopPropagation()"
-                    *ngIf="col.toLowerCase().includes('service tag')"
-                    class="text-xs text-purple-600 hover:text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-100 hover:border-purple-300 transition-colors ml-2">
-                    Soporte
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div *ngIf="filteredInventory().length === 0" class="text-center py-12 text-gray-500 bg-white">
-        <div class="bg-gray-50 p-4 rounded-full inline-block mb-3">
-          <fa-icon [icon]="faExclamationTriangle" class="text-gray-400 text-2xl"></fa-icon>
-        </div>
-        <p class="text-lg font-medium text-gray-900">No se encontraron coincidencias</p>
-      </div>
     </div>
 
     <p class="text-xs text-gray-500 mt-4 text-center sm:text-left">

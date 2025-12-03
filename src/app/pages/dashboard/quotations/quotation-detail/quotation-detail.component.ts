@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { QuotationService } from '../../../../services/quotation.service';
 import { PopulatedQuotation, Quotation, QuotationStatus } from '../../../../models/quotation.types';
 import { faSpinner, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
@@ -41,7 +41,8 @@ export class QuotationDetailComponent implements OnInit {
     private quotationService: QuotationService,
     private companiesService: CompaniesService,
     private usersService: UsersService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -61,16 +62,38 @@ export class QuotationDetailComponent implements OnInit {
       next: (data) => {
         console.log('Quotation data received:', data);
         this.quotation = data;
-        
-        // Load company and user data if we only have IDs
-        if (data.company_id && !data.company) {
-          this.loadCompanyAndUser(data.company_id, data.user_id);
+
+        // Asignar compañía y usuario directamente desde la respuesta
+        this.company = data.company;
+        this.user = data.user;
+
+        // Totales provenientes del backend
+        this.subtotal = parseFloat(data.subtotal_productos?.toString() || '0');
+        this.totalDescuentos = parseFloat(data.porcentaje_descuento?.toString() || '0');
+        this.valorBaseDescuentos = parseFloat(data.valor_descuento?.toString() || '0');
+        this.valorLogistica = parseFloat(
+          (data.valor_logistica ?? this.company?.valor_logistica)?.toString() || '0'
+        );
+        this.baseParaIVA = parseFloat(data.base_gravable?.toString() || '0');
+        this.valorIVA = parseFloat(data.valor_iva?.toString() || '0');
+        this.granTotal = parseFloat(data.total?.toString() || '0');
+
+        // Estado del crédito usando la información de la empresa
+        const saldoCredito = parseFloat(this.company?.saldo_credito?.toString() || '0');
+        const saldoGastado = parseFloat(this.company?.saldo_gastado?.toString() || '0');
+
+        this.esOrdenDeContado =
+          parseInt(this.company?.condiciones_pago?.toString() || '0') === 0 || saldoCredito === 0;
+
+        if (this.esOrdenDeContado) {
+          this.creditoDisponible = 0;
+          this.creditoCubreOrden = true;
         } else {
-          // Data already populated
-          this.company = data.company;
-          this.user = data.user;
-          this.isLoading = false;
+          this.creditoDisponible = saldoCredito - saldoGastado;
+          this.creditoCubreOrden = this.creditoDisponible >= this.granTotal;
         }
+
+        this.isLoading = false;
       },
       error: (err) => {
         this.error = 'No se pudo cargar la cotización. Inténtelo de nuevo más tarde.';
@@ -78,6 +101,10 @@ export class QuotationDetailComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/dashboard/cotizaciones']);
   }
 
   loadCompanyAndUser(companyId: string, userId: string): void {

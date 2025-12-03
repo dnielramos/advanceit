@@ -33,7 +33,7 @@ import {
 import { UsersService } from '../../../../services/users.service';
 import { AuthService, Role } from '../../../../services/auth.service';
 import { CartService } from '../../../../services/cart.service';
-import { CreateFullQuotationDto } from '../../../../models/quotation.types';
+import { CreateFullQuotationDto, PreviewQuotationDto, PreviewQuotationResponse } from '../../../../models/quotation.types';
 import { CreationMode } from '../../../../models/creation-mode';
 import { User } from '../../../../models/user';
 import { QuotationEmailService, QuotationEmailData } from '../../../../services/quotation-email.service';
@@ -243,8 +243,6 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
 
     if (this.userRole === Role.Admin) {
       console.log('👑 [ADMIN] Configurando modo administrador');
-      this.users$ = this.usersService.getUsers();
-      this.filteredUsers$ = this.users$;
       this.companies$ = this.companiesService.findAll();
 
       // Suscripción a cambios en la empresa (solo para admin)
@@ -257,19 +255,16 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
               console.log('✅ [API RESPONSE] Empresa obtenida:', company);
               this.selectedCompany = company;
               
-              // Filtrar y seleccionar automáticamente el primer usuario de la empresa
-              this.users$.pipe(take(1)).subscribe((allUsers) => {
-                console.log('👥 [USERS] Total usuarios disponibles:', allUsers.length);
-                const companyUsers = allUsers.filter((u: any) => u.company === companyId);
-                console.log('👥 [USERS] Usuarios filtrados para esta empresa:', companyUsers.length, companyUsers);
-                
-                // Actualizar usuarios filtrados
+              // Obtener usuarios de la empresa desde backend y seleccionar automáticamente el primero
+              this.usersService.getUsersByCompany(companyId).pipe(take(1)).subscribe((companyUsers) => {
+                console.log('👥 [USERS] Usuarios desde /users/company:', companyUsers.length, companyUsers);
+
+                // Actualizar observable filtrado para el select
                 this.filteredUsers$ = new Observable((observer) => {
                   observer.next(companyUsers);
                   observer.complete();
                 });
-                console.log('✅ [USERS] filteredUsers$ actualizado');
-                
+
                 // Seleccionar automáticamente el primer usuario
                 if (companyUsers.length > 0) {
                   console.log('🎯 [AUTO-SELECT] Seleccionando primer usuario:', companyUsers[0]);
@@ -466,15 +461,59 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.currentStep++;
-    console.log('✅ Avanzando al paso:', this.currentStep);
+    // Si vamos a pasar de productos (2) a resumen (3), llamar primero al preview del backend
+    if (this.currentStep === 2) {
+      const formValue = this.quotationForm.getRawValue();
+      const previewPayload: PreviewQuotationDto = {
+        company_id: formValue.company_id,
+        user_id: formValue.user_id,
+        products: formValue.details.map((d: any) => ({
+          product_id: d.product_id,
+          quantity: d.quantity,
+          unit_price: d.unit_price,
+        })),
+        validity_days: formValue.validity_days,
+        term: formValue.term,
+        creation_mode: formValue.creation_mode,
+        created_by: formValue.created_by,
+      };
 
-    // Forzar detección de cambios y recalcular totales
-    setTimeout(() => {
-      this.recalculateTotals();
-      this.cdr.markForCheck();
-      console.log('💰 Totales recalculados - Gran Total:', this.granTotal);
-    }, 0);
+      this.isLoading = true;
+      this.quotationService.preview(previewPayload).pipe(take(1)).subscribe({
+        next: (preview: PreviewQuotationResponse) => {
+          console.log('✅ [PREVIEW] Respuesta de backend:', preview);
+          // Actualizar totales desde backend usando calculations
+          if (preview && preview.calculations) {
+            this.subtotal = preview.calculations.subtotal_productos ?? this.subtotal;
+            this.totalDescuentos = preview.calculations.porcentaje_descuento ?? this.totalDescuentos;
+            this.valorBaseDescuentos = preview.calculations.valor_descuento ?? this.valorBaseDescuentos;
+            this.valorLogistica = preview.calculations.valor_logistica ?? this.valorLogistica;
+            this.baseParaIVA = preview.calculations.base_gravable ?? this.baseParaIVA;
+            this.valorIVA = preview.calculations.valor_iva ?? this.valorIVA;
+            this.granTotal = preview.calculations.total ?? this.granTotal;
+          }
+
+          this.isLoading = false;
+          this.currentStep++;
+          console.log('✅ Avanzando al paso:', this.currentStep);
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.isLoading = false;
+          this.toastService.error('No se pudo obtener el resumen desde el servidor.');
+        },
+      });
+    } else {
+      this.currentStep++;
+      console.log('✅ Avanzando al paso:', this.currentStep);
+
+      // Forzar detección de cambios y recalcular totales
+      setTimeout(() => {
+        this.recalculateTotals();
+        this.cdr.markForCheck();
+        console.log('💰 Totales recalculados - Gran Total:', this.granTotal);
+      }, 0);
+    }
   }
 
   prevStep(): void {
@@ -514,7 +553,6 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     const formValue = this.quotationForm.getRawValue();
 
-    // Puedes agregar más campos al payload si tu backend los necesita (total, iva, etc.)
     const payload: CreateFullQuotationDto = {
       quotation: {
         company_id: formValue.company_id,
@@ -523,7 +561,19 @@ export class QuotationCreateUserComponent implements OnInit, OnDestroy {
         term: formValue.term,
         creation_mode: formValue.creation_mode,
         created_by: formValue.created_by,
+        // ⚠️ Muy importante: estos valores vienen del PREVIEW del backend
+        // y deben enviarse completos para que el backend valide y
+        // actualice correctamente el crédito de la empresa.
         total: this.granTotal,
+        subtotal_productos: this.subtotal,
+        porcentaje_descuento: this.totalDescuentos,
+        valor_descuento: this.valorBaseDescuentos,
+        valor_logistica: this.valorLogistica,
+        base_gravable: this.baseParaIVA,
+        porcentaje_iva: this.valorIVA > 0 && this.baseParaIVA > 0
+          ? (this.valorIVA / this.baseParaIVA) * 100
+          : 19,
+        valor_iva: this.valorIVA,
       },
       details: formValue.details.map((d: any) => ({
         product_id: d.product_id,

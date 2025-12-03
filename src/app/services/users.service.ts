@@ -133,4 +133,12 @@ export class UsersService {
   getUserRole(id: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${id}/role`);
   }
+
+  /**
+   * Obtiene los usuarios asociados a una empresa específica.
+   * Endpoint esperado: GET /users/company/{companyId}
+   */
+  getUsersByCompany(companyId: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/company/${companyId}`);
+  }
 }

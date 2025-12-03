@@ -42,7 +42,7 @@
                   <option [ngValue]="null" disabled>-- Selecciona un usuario --</option>
                   <option *ngFor="let user of filteredUsers$ | async" [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
                 </select>
-                <div *ngIf="quotationForm.get('user_id')?.value && selectedCompany" class="text-green-600 text-xs mt-1">
+                <div *ngIf="quotationForm.get('user_id')?.value && selectedCompany" class="text-orange-600 text-xs mt-1">
                   ✓ Usuario seleccionado automáticamente
                 </div>
               </div>
@@ -74,7 +74,7 @@
                 <option value="30">Crédito 30 días</option>
                 <option value="60">Crédito 60 días</option>
               </select>
-              <div *ngIf="userRole === Role.Admin && selectedCompany" class="text-blue-600 text-xs mt-1">
+              <div *ngIf="userRole === Role.Admin && selectedCompany" class="text-purple-600 text-xs mt-1">
                 ✓ Términos establecidos automáticamente desde la empresa
               </div>
             </div>
@@ -105,11 +105,11 @@
             <div class="flex items-center gap-4 flex-wrap justify-center">
               <div>
                 <label class="block text-xs font-medium text-slate-600 text-center mb-1">Cantidad</label>
-                <input type="number" formControlName="quantity" class="w-24 text-center p-2 border-slate-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                <input type="number" formControlName="quantity" class="w-24 text-center p-2 border-slate-300 rounded-md shadow-sm bg-slate-100 cursor-not-allowed" [disabled]="true">
               </div>
               <div>
                 <label class="block text-xs font-medium text-slate-600 text-center mb-1">Precio Unit.</label>
-                <input type="number" formControlName="unit_price" class="w-36 text-right p-2 border-slate-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" [disabled]="true">
+                <input type="number" formControlName="unit_price" class="w-36 text-right p-2 border-slate-300 rounded-md shadow-sm bg-slate-100 cursor-not-allowed" [disabled]="true">
               </div>
               <div class="text-center">
                   <p class="text-xs font-medium text-slate-600">Subtotal</p>
@@ -118,8 +118,9 @@
                   </p>
               </div>
             </div>
-            <button (click)="removeDetail(i)" type="button" class="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" title="Eliminar producto">
-              <fa-icon [icon]="['fas', 'trash-alt']" size="lg"></fa-icon>
+            <!-- Eliminación de productos deshabilitada: debe gestionarse desde el carrito -->
+            <button type="button" class="p-3 text-slate-300 cursor-not-allowed" title="Gestione cambios desde el carrito" disabled>
+              <fa-icon [icon]="['fas', 'lock']" size="lg"></fa-icon>
             </button>
           </div>
         </div>

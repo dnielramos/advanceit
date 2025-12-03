@@ -24,7 +24,6 @@ import { QuotationFormComponent } from '../quotation-form/quotation-form.compone
 import { QuotationDetailComponent } from '../../quotations/quotation-detail/quotation-detail.component';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { QuotationCreateComponent } from '../quotation-create/quotation-create.component';
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
@@ -36,7 +35,6 @@ import { SkeletonTableComponent } from '../../../../components/skeleton-table/sk
   imports: [
     QuotationFormComponent,
     QuotationDetailComponent,
-    QuotationCreateComponent,
     CommonModule,
     FontAwesomeModule,
     AngularToastifyModule,

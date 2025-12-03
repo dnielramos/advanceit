@@ -1,7 +1,12 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AuthService, Role } from '../../../../services/auth.service';
+import { CreateOrderModalComponent } from '../create-order-modal/create-order-modal.component';
+import { CreateShippingDto, ShippingsService } from '../../../../services/shippings.service';
+import { PaymentsService } from '../../../../services/payments.service';
+import { PaymentMethod } from '../../../../models/payment.model';
 import {
   faArrowLeft,
   faReceipt,
@@ -20,6 +25,7 @@ import {
   faMapMarkerAlt,
   faTag,
   faWarehouse,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { OrdersService, Order, OrderProducts } from '../../../../services/orders.service';
 import { ToastService } from 'angular-toastify';
@@ -27,7 +33,7 @@ import { ToastService } from 'angular-toastify';
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, CreateOrderModalComponent],
   templateUrl: './order-detail.component.html',
 })
 export class OrderDetailComponent implements OnInit {
@@ -35,6 +41,9 @@ export class OrderDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly ordersService = inject(OrdersService);
   private readonly toast = inject(ToastService);
+  private readonly authService = inject(AuthService);
+  private readonly shippingService = inject(ShippingsService);
+  private readonly paymentsService = inject(PaymentsService);
 
   // Icons
   faArrowLeft = faArrowLeft;
@@ -49,6 +58,7 @@ export class OrderDetailComponent implements OnInit {
   faCheck = faCheck;
   faSpinner = faSpinner;
   faExclamationTriangle = faExclamationTriangle;
+  faTimes = faTimes;
   faBoxOpen = faBoxOpen;
   faInfoCircle = faInfoCircle;
   faMapMarkerAlt = faMapMarkerAlt;
@@ -60,8 +70,11 @@ export class OrderDetailComponent implements OnInit {
   products = signal<OrderProducts[]>([]);
   isLoading = signal(false);
   isProcessing = signal(false);
+  isProcessingModalOpen = signal(false);
   error = signal<string | null>(null);
   expandedProducts = signal<Set<string>>(new Set());
+
+  isAdmin = computed(() => this.authService.hasRole(Role.Admin));
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -154,42 +167,111 @@ export class OrderDetailComponent implements OnInit {
     return this.expandedProducts().has(productId);
   }
 
-  handleDelete(): void {
-    const currentOrder = this.order();
-    if (!currentOrder) return;
+  openProcessModal(): void {
+    this.isProcessingModalOpen.set(true);
+  }
 
-    if (!confirm(`¿Estás seguro de eliminar la orden #${currentOrder.numeroOrden}? Esta acción no se puede deshacer.`)) {
+  closeProcessModal(): void {
+    this.isProcessingModalOpen.set(false);
+  }
+
+  addDays(date: Date, days: number): Date {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
+  handleProcessOrder(shippingData: CreateShippingDto): void {
+    const currentOrder = this.order();
+    if (!currentOrder) {
+      console.error('No hay una orden seleccionada para procesar.');
       return;
     }
 
     this.isProcessing.set(true);
+    console.log('Datos de envío recibidos:', shippingData);
 
-    this.ordersService.deleteOrder(currentOrder.id).subscribe({
-      next: () => {
-        this.toast.success('Orden eliminada correctamente');
-        this.router.navigate(['/dashboard/orders']);
+    // 1. Crear el envío en el backend
+    this.shippingService.createShipping(shippingData).subscribe({
+      next: (newShipping) => {
+        console.log('Envío creado exitosamente:', newShipping);
+        this.toast.success('Envío creado exitosamente.');
+        this.proceedToPaymentAndStatus(currentOrder);
       },
       error: (err) => {
-        this.toast.error(`Error al eliminar: ${err.message}`);
+        console.error('Error creando el envío:', err);
+        this.toast.error('Hubo un error al crear el envío.');
         this.isProcessing.set(false);
+        this.closeProcessModal();
       },
     });
   }
 
-  handleProcess(): void {
+  private proceedToPaymentAndStatus(currentOrder: Order): void {
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      console.error('No se pudo obtener el ID del usuario.');
+      this.isProcessing.set(false);
+      this.closeProcessModal();
+      return;
+    }
+
+    // 2. Crear el pago
+    const payloadPayment = {
+      order_id: currentOrder.id,
+      monto: currentOrder.precioTotal,
+      fechaLimitePago: this.addDays(new Date(), 30).toString(), // hoy mas 30 dias
+      metodo: 'transferencia' as PaymentMethod,
+      createdBy: userId,
+    };
+
+    this.paymentsService.createPayment(payloadPayment).subscribe({
+      next: (newPayment) => {
+        console.log('Pago creado exitosamente:', newPayment);
+        this.toast.success('Pago registrado correctamente.');
+
+        // 3. Actualizar estado a "pagado"
+        this.ordersService.updateOrderStatus(currentOrder.id, 'pagado').subscribe({
+          next: () => {
+            this.toast.success('Orden procesada y marcada como PAGADO.');
+            this.loadOrder(currentOrder.id); // Recargar la orden
+            this.isProcessing.set(false);
+            this.closeProcessModal();
+          },
+          error: (err) => {
+            console.error('Error al actualizar el estado de la orden:', err);
+            this.toast.error('Error al actualizar estado de la orden.');
+            this.isProcessing.set(false);
+            this.closeProcessModal();
+          },
+        });
+      },
+      error: (err) => {
+        console.error('Error creando el pago:', err);
+        this.toast.error('Hubo un error al crear el registro de pago.');
+        this.isProcessing.set(false);
+        this.closeProcessModal();
+      },
+    });
+  }
+
+  handleReject(): void {
     const currentOrder = this.order();
     if (!currentOrder) return;
 
-    this.isProcessing.set(true);
+    if (!confirm(`¿Estás seguro de RECHAZAR la orden #${currentOrder.numeroOrden}?`)) {
+      return;
+    }
 
-    this.ordersService.updateOrderStatus(currentOrder.id, 'pagado').subscribe({
+    this.isProcessing.set(true);
+    this.ordersService.updateOrderStatus(currentOrder.id, 'no_pagado').subscribe({
       next: () => {
-        this.toast.success('Orden procesada correctamente');
+        this.toast.success('Orden rechazada correctamente.');
         this.loadOrder(currentOrder.id);
         this.isProcessing.set(false);
       },
       error: (err) => {
-        this.toast.error(`Error al procesar: ${err.message}`);
+        this.toast.error(`Error al rechazar: ${err.message}`);
         this.isProcessing.set(false);
       },
     });
@@ -216,7 +298,7 @@ export class OrderDetailComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     if (status === 'pagado') return 'Procesado';
-    if (status === 'no_pagado') return 'No Pagado';
+    if (status === 'no_pagado') return 'Rechazado';
     return status.charAt(0).toUpperCase() + status.slice(1);
   }
 

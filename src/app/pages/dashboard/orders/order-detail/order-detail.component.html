@@ -1,4 +1,11 @@
 <div class="min-h-screen bg-slate-50 p-4 sm:p-6 md:p-8">
+    <!-- Modal de procesamiento de orden -->
+    <div *ngIf="isProcessingModalOpen()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <app-create-order-modal [order]="order()" (close)="closeProcessModal()"
+            (processOrder)="handleProcessOrder($event)">
+        </app-create-order-modal>
+    </div>
+
     <!-- Loading State (Skeleton) -->
     @if (isLoading()) {
     <div class="max-w-7xl mx-auto space-y-6 animate-pulse">
@@ -114,18 +121,19 @@
                         <fa-icon [icon]="faArrowLeft"></fa-icon>
                         <span class="hidden md:inline">Volver</span>
                     </button>
-                    @if (order()!.estadoPago !== 'pagado') {
-                    <button (click)="handleProcess()" [disabled]="isProcessing()"
+                    @if (order()!.estadoPago !== 'pagado' && isAdmin()) {
+                    <button (click)="openProcessModal()" [disabled]="isProcessing()"
                         class="flex items-center gap-2 px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 disabled:opacity-50">
                         <fa-icon [icon]="faCheck"></fa-icon>
                         <span class="hidden md:inline">Procesar</span>
                     </button>
-                    }
-                    <button (click)="handleDelete()" [disabled]="isProcessing()"
-                        class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50">
-                        <fa-icon [icon]="faTrash"></fa-icon>
-                        <span class="hidden md:inline">Eliminar</span>
+                    
+                    <button (click)="handleReject()" [disabled]="isProcessing()"
+                        class="flex items-center gap-2 px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200 disabled:opacity-50">
+                        <fa-icon [icon]="faTimes"></fa-icon>
+                        <span class="hidden md:inline">Rechazar</span>
                     </button>
+                    }
                 </div>
             </div>
         </div>

@@ -9,7 +9,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   template: `
     <section class="bg-linear-to-b from-purple-300 to-purple-900"></section>
     <footer
-      class="relative bg-linear-to-b from-purple-300 to-purple-900 text-white"
+      class="relative bg-linear-to-b from-gray-500 to-black text-white"
     >
       <div class="relative pt-10 pb-8 max-w-6xl mx-auto">
         <hr class="my-8 border-gray-500" />
@@ -176,6 +176,8 @@ import { TranslatePipe } from '@ngx-translate/core';
             </p>
           </div>
         </div>
+
+        <!-- ubicaciones y terminos  -->
 
         <hr class="my-8 border-gray-500" />
         <div

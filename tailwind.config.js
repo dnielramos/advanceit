@@ -9,9 +9,15 @@ module.exports = {
           '0%': { transform: 'scale(1)', opacity: '1' },
           '100%': { transform: 'scale(3)', opacity: '0' },
         },
+        gradientMove: {
+          '0%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+          '100%': { 'background-position': '0% 50%' },
+        },
       },
       animation: {
         ripple: 'ripple 1s ease-out forwards',
+        gradientMove: 'gradientMove 6s ease infinite',
       },
       colors: {
         orange: {

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { SliderInicioComponent } from '../../components/inicio/slider-inicio/slider-inicio.component';
 import { SimpleCtaComponent } from "../../components/inicio/simple-cta/simple-cta.component";
+import { DellPartnerHeroComponent } from "../../components/inicio/dell-partner-hero/dell-partner-hero.component";
+import { DellExpertiseComponent } from "../../components/inicio/dell-expertise/dell-expertise.component";
 import { WhatMostComponent } from "../../components/inicio/what-most/what-most.component";
 import { TitleMapsComponent } from "../../components/inicio/title-maps/title-maps.component";
 import { CategoriesInicioComponent } from "../../components/inicio/categories-inicio/categories-inicio.component";
@@ -14,7 +16,7 @@ import { BrandSliderComponent } from "../../shared/brand-slider/brand-slider.com
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [CommonModule, FooterComponent, SliderInicioComponent, SimpleCtaComponent, WhatMostComponent, TitleMapsComponent, CategoriesInicioComponent, ImageDescriptionComponent, SocialImpactComponent, SimpleTitleSectionComponent, BrandSliderComponent],
+  imports: [CommonModule, FooterComponent, SliderInicioComponent, SimpleCtaComponent, DellPartnerHeroComponent, DellExpertiseComponent, WhatMostComponent, TitleMapsComponent, CategoriesInicioComponent, ImageDescriptionComponent, SocialImpactComponent, SimpleTitleSectionComponent, BrandSliderComponent],
   template: `
     <!-- Contenedor principal para separar el contenido del navbar si está fixed -->
     <div class="w-screen max-w-full overflow-hidden">
@@ -25,6 +27,9 @@ import { BrandSliderComponent } from "../../shared/brand-slider/brand-slider.com
       <app-simple-cta ></app-simple-cta>
       <!-- <app-optimization-insights></app-optimization-insights> -->
       <!-- <app-workforce-staffing></app-workforce-staffing> -->
+
+      <app-dell-partner-hero></app-dell-partner-hero>
+      <app-dell-expertise></app-dell-expertise>
 
       <!-- NUEVA SECCIÓN: "What's Most Important" -->
       <app-what-most

@@ -11,30 +11,54 @@
       {{'home.maps.description' | translate}}
     </p>
 
-    <!-- Contenedor de mapas (4 columnas en pantallas medianas) -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
+    <!-- Contenedor de mapas (grid responsivo) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 mb-12">
       <!-- Colombia -->
-      <div class="flex flex-col items-center">
+      <div class="flex flex-col items-center group">
         <img
           src="/assets/images/mapas/colombia.jpg"
-          alt="Colombia" class="h-32 w-auto mb-2 rounded-[50%] ring-4 ring-purple-500" />
-        <span class="text-gray-900 font-semibold ">{{'home.maps.colombia' | translate}}</span>
+          alt="Colombia" class="h-28 w-28 object-cover mb-2 rounded-full ring-4 ring-purple-500 group-hover:ring-orange-500 transition-all duration-300 group-hover:scale-105" />
+        <span class="text-gray-900 font-semibold group-hover:text-purple-700 transition-colors duration-300">{{'home.maps.colombia' | translate}}</span>
       </div>
 
-      <!-- Philippines -->
-      <div class="flex flex-col items-center">
+      <!-- USA -->
+      <div class="flex flex-col items-center group">
         <img
           src="/assets/images/mapas/usa.jpg"
-          alt="Philippines" class="h-32 w-auto mb-2 rounded-[50%] ring-4 ring-purple-500" />
-        <span class="text-gray-900 font-semibold">{{'home.maps.usa' | translate}}</span>
+          alt="USA" class="h-28 w-28 object-cover mb-2 rounded-full ring-4 ring-purple-500 group-hover:ring-orange-500 transition-all duration-300 group-hover:scale-105" />
+        <span class="text-gray-900 font-semibold group-hover:text-purple-700 transition-colors duration-300">{{'home.maps.usa' | translate}}</span>
       </div>
 
       <!-- Mexico -->
-      <div class="flex flex-col items-center">
+      <div class="flex flex-col items-center group">
         <img
           src="/assets/images/mapas/mexico.jpg"
-          alt="Mexico" class="h-32 w-auto mb-2 rounded-[50%] ring-4 ring-purple-500" />
-        <span class="text-gray-900 font-semibold">{{'home.maps.mexico' | translate}}</span>
+          alt="Mexico" class="h-28 w-28 object-cover mb-2 rounded-full ring-4 ring-purple-500 group-hover:ring-orange-500 transition-all duration-300 group-hover:scale-105" />
+        <span class="text-gray-900 font-semibold group-hover:text-purple-700 transition-colors duration-300">{{'home.maps.mexico' | translate}}</span>
+      </div>
+
+      <!-- Brasil -->
+      <div class="flex flex-col items-center group">
+        <img
+          src="/assets/images/mapas/brasil.jpg"
+          alt="Brasil" class="h-28 w-28 object-cover mb-2 rounded-full ring-4 ring-purple-500 group-hover:ring-orange-500 transition-all duration-300 group-hover:scale-105" />
+        <span class="text-gray-900 font-semibold group-hover:text-purple-700 transition-colors duration-300">{{'home.maps.brasil' | translate}}</span>
+      </div>
+
+      <!-- Ecuador -->
+      <div class="flex flex-col items-center group">
+        <img
+          src="/assets/images/mapas/ecuador.jpg"
+          alt="Ecuador" class="h-28 w-28 object-cover mb-2 rounded-full ring-4 ring-purple-500 group-hover:ring-orange-500 transition-all duration-300 group-hover:scale-105" />
+        <span class="text-gray-900 font-semibold group-hover:text-purple-700 transition-colors duration-300">{{'home.maps.ecuador' | translate}}</span>
+      </div>
+
+      <!-- Perú -->
+      <div class="flex flex-col items-center group">
+        <img
+          src="/assets/images/mapas/peru.jpg"
+          alt="Perú" class="h-28 w-28 object-cover mb-2 rounded-full ring-4 ring-purple-500 group-hover:ring-orange-500 transition-all duration-300 group-hover:scale-105" />
+        <span class="text-gray-900 font-semibold group-hover:text-purple-700 transition-colors duration-300">{{'home.maps.peru' | translate}}</span>
       </div>
     </div>
 

@@ -85,6 +85,9 @@
       "colombia": "Colombia",
       "usa": "Estados Unidos",
       "mexico": "México",
+      "brasil": "Brasil",
+      "ecuador": "Ecuador",
+      "peru": "Perú",
       "footerText": "Productos de Primer Nivel. Integración Perfecta. Soluciones Rentables."
     },
     "workforce": {
@@ -116,6 +119,41 @@
       "title": "Desde soluciones de hardware y software hasta configuraciones de red seguras y soporte de TI continuo, nos aseguramos de que su equipo nearshore esté completamente equipado para operar de manera eficiente y segura. ",
       "button": "Mostrar más..",
       "footer": "¡Convirtamos su oficina satélite en una potencia de productividad!"
+    },
+    "dellPartner": {
+      "title": "AdvanceIT - Orgullosos de ser Dell Technologies Solution Provider",
+      "p1": "Estamos comprometidos con la excelencia, y esto se demuestra a través de nuestras alianzas con marcas líderes en tecnología, incluyendo Dell.",
+      "p2": "Como Dell Technologies Solution Partner, nos hemos comprometido a cumplir con los exigentes estándares de Dell. Esto nos permite proporcionar la mejor y más efectiva solución Dell a nuestros clientes.",
+      "p3": "Como Dell Technologies Solution Provider, trabajamos con Dell y con usted para proporcionar una solución a sus necesidades, respaldada por la tecnología de hardware líder en la industria de Dell, servicios y soluciones de software.",
+      "badge": "Excelencia Certificada Dell",
+      "certified": "Certificado"
+    },
+    "dellExpertise": {
+      "title1": "Experiencia",
+      "title2": "que",
+      "title3": "transforma",
+      "title4": "su experiencia en TI",
+      "subtitle": "Soluciones Dell Certificadas",
+      "subtitleEnd": "con experiencia regional e implementación sin estrés en toda LATAM.",
+      "knowledgeTitle": "Conocimiento",
+      "knowledgeText": "Como Dell ofrece capacitación y consultoría, nuestros equipos se mantienen actualizados con las últimas actualizaciones, tecnología y más. No solo podemos asistirle en las etapas iniciales de su solución, sino que podemos continuar ese soporte con nuestra experiencia Out of the Box, un enfoque 100% libre de estrés para TI en LATAM.",
+      "knowledgeBadge": "Aprendizaje Continuo",
+      "benefitsTitle": "Beneficios de trabajar con un Dell Solution Provider",
+      "benefitsText": "Ser reconocido con el estatus de Gold Partner garantiza mayor experiencia, precisión y eficiencia, ya que los Dell Partners con Profesionales Certificados obtienen acceso a herramientas exclusivas de Dell, mejores prácticas y las últimas actualizaciones técnicas críticas para capacidades de implementación más ricas, además de conocimiento regional y local de LATAM.",
+      "benefitsBadge": "Ventaja Gold Partner",
+      "competenciesTitle": "Nuestras Competencias",
+      "competenciesIntro": "Estamos calificados por Dell para proporcionar soluciones en:",
+      "competencyStorage": "Almacenamiento",
+      "competencyServer": "Servidor",
+      "competencyCoreClient": "Core Client",
+      "competenciesText": "Ventas técnicas, servicios técnicos y marketing, estas competencias aseguran que AdvanceIT tenga el conocimiento y las habilidades apropiadas para satisfacer las necesidades de nuestros clientes. Múltiples departamentos en AdvanceIT deben realizar la capacitación de certificación y aprobar las pruebas relevantes.",
+      "competenciesBadge": "Certificación Multi-Departamento",
+      "ctaTitle": "¿Listo para su próxima solución Dell?",
+      "ctaText": "Combinamos la experiencia de Gold Partner con una implementación impecable para actualizar su infraestructura de TI sin fricción ni estrés.",
+      "ctaButton": "Comenzar",
+      "trustBadge1": "Gold Partner Certificado",
+      "trustBadge2": "Expertos Regionales LATAM",
+      "trustBadge3": "Garantía 100% Sin Estrés"
     }
   },
 

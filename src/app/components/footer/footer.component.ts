@@ -202,6 +202,20 @@ import { TranslatePipe } from '@ngx-translate/core';
               class="hover:underline"
               >{{ 'footer.locations.mexico' | translate }}</a
             >
+            <a
+              routerLink="/locations"
+              class="hover:underline"
+              >Perú</a
+            >
+            <a
+              routerLink="/locations"
+              class="hover:underline"
+              >Brasil</a>
+            <a
+              routerLink="/locations"
+              class="hover:underline"
+              >Ecuador</a>
+            
           </div>
 
           <div class="text-center md:text-right text-xs text-gray-400">

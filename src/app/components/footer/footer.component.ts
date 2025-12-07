@@ -7,12 +7,12 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-footer',
   imports: [FontAwesomeModule, RouterLink, TranslatePipe],
   template: `
-    <section class="bg-linear-to-b from-purple-300 to-purple-900"></section>
+    <section class="bg-advance-850"></section>
     <footer
-      class="relative text-white"
+      class="relative text-white bg-advance-900"
     >
 
-      <div class="relative bg-advance-900 pt-10 max-w-6xl mx-auto">
+      <div class="relative bg-advance-900 py-6  max-w-6xl mx-auto">
         <hr class="my-8 border-gray-500" />
         <div
           class="grid grid-cols-1 justify-items-center text-lg md:grid-cols-5 gap-8"
@@ -178,9 +178,6 @@ import { TranslatePipe } from '@ngx-translate/core';
           </div>
         </div>
 
-        <!-- ubicaciones y terminos  -->
-
-        <hr class="border-gray-500" />
 
       </div>
 

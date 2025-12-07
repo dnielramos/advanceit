@@ -469,7 +469,13 @@
       "Conference Room & AV Solutions",
       "Data Center & Server Room Solutions",
       "IT Relocation & Expansion"
-    ]
+    ],
+    "errors": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidPhone": "Please enter numbers only"
+    },
+    "sending": "Sending..."
   },
 
   "nosotrosPage": {

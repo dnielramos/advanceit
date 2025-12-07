@@ -48,34 +48,129 @@
       <!-- Formulario -->
       <form *ngIf="!formSubmitted" [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input formControlName="email" type="email" placeholder="{{ 'formSection.companyEmail' | translate }}"
-            class="input-field col-span-1 md:col-span-2" />
+          <!-- Email -->
+          <div class="col-span-1 md:col-span-2">
+            <input formControlName="email" type="email" placeholder="{{ 'formSection.companyEmail' | translate }}"
+              [class.border-red-500]="isFieldInvalid('email')"
+              [class.border-green-500]="form.get('email')?.valid && form.get('email')?.touched"
+              class="input-field w-full transition-all duration-300" />
+            <div *ngIf="isFieldInvalid('email')" class="mt-1 text-sm text-red-600 flex items-center gap-1 animate__animated animate__fadeIn animate__faster">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ getErrorMessage('email') }}</span>
+            </div>
+          </div>
 
-          <input formControlName="firstName" type="text" placeholder="{{ 'formSection.firstName' | translate }}"
-            class="input-field col-span-1" />
-          <input formControlName="lastName" type="text" placeholder="{{ 'formSection.lastName' | translate }}"
-            class="input-field col-span-1" />
+          <!-- First Name -->
+          <div class="col-span-1">
+            <input formControlName="firstName" type="text" placeholder="{{ 'formSection.firstName' | translate }}"
+              [class.border-red-500]="isFieldInvalid('firstName')"
+              [class.border-green-500]="form.get('firstName')?.valid && form.get('firstName')?.touched"
+              class="input-field w-full transition-all duration-300" />
+            <div *ngIf="isFieldInvalid('firstName')" class="mt-1 text-sm text-red-600 flex items-center gap-1 animate__animated animate__fadeIn animate__faster">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ getErrorMessage('firstName') }}</span>
+            </div>
+          </div>
 
-          <input formControlName="company" type="text" placeholder="{{ 'formSection.companyName' | translate }}"
-            class="input-field col-span-1" />
-          <input formControlName="phone" type="text" placeholder="{{ 'formSection.phoneNumber' | translate }}"
-            class="input-field col-span-1" />
+          <!-- Last Name -->
+          <div class="col-span-1">
+            <input formControlName="lastName" type="text" placeholder="{{ 'formSection.lastName' | translate }}"
+              [class.border-red-500]="isFieldInvalid('lastName')"
+              [class.border-green-500]="form.get('lastName')?.valid && form.get('lastName')?.touched"
+              class="input-field w-full transition-all duration-300" />
+            <div *ngIf="isFieldInvalid('lastName')" class="mt-1 text-sm text-red-600 flex items-center gap-1 animate__animated animate__fadeIn animate__faster">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ getErrorMessage('lastName') }}</span>
+            </div>
+          </div>
 
-          <select formControlName="solution" class="input-field col-span-1 md:col-span-2">
-            <option value="">{{ 'formSection.selectSolution' | translate }}</option>
-            <ng-container *ngFor="let sol of solutions">
-              <option [value]="sol">{{ sol }}</option>
-            </ng-container>
-          </select>
+          <!-- Company -->
+          <div class="col-span-1">
+            <input formControlName="company" type="text" placeholder="{{ 'formSection.companyName' | translate }}"
+              [class.border-red-500]="isFieldInvalid('company')"
+              [class.border-green-500]="form.get('company')?.valid && form.get('company')?.touched"
+              class="input-field w-full transition-all duration-300" />
+            <div *ngIf="isFieldInvalid('company')" class="mt-1 text-sm text-red-600 flex items-center gap-1 animate__animated animate__fadeIn animate__faster">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ getErrorMessage('company') }}</span>
+            </div>
+          </div>
 
-          <input formControlName="state" type="text" placeholder="{{ 'formSection.state' | translate }}"
-            class="input-field col-span-1" />
-          <input formControlName="source" type="text" placeholder="{{ 'formSection.howDidYouHear' | translate }}"
-            class="input-field col-span-1" />
+          <!-- Phone -->
+          <div class="col-span-1">
+            <input formControlName="phone" type="text" placeholder="{{ 'formSection.phoneNumber' | translate }}"
+              [class.border-red-500]="isFieldInvalid('phone')"
+              [class.border-green-500]="form.get('phone')?.valid && form.get('phone')?.touched"
+              class="input-field w-full transition-all duration-300" />
+            <div *ngIf="isFieldInvalid('phone')" class="mt-1 text-sm text-red-600 flex items-center gap-1 animate__animated animate__fadeIn animate__faster">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ getErrorMessage('phone') }}</span>
+            </div>
+          </div>
 
-          <textarea formControlName="comments" rows="4"
-            placeholder="{{ 'formSection.commentsPlaceholder' | translate }}"
-            class="input-field col-span-1 md:col-span-2"></textarea>
+          <!-- Solution -->
+          <div class="col-span-1 md:col-span-2">
+            <select formControlName="solution"
+              [class.border-red-500]="isFieldInvalid('solution')"
+              [class.border-green-500]="form.get('solution')?.valid && form.get('solution')?.touched"
+              class="input-field w-full transition-all duration-300">
+              <option value="">{{ 'formSection.selectSolution' | translate }}</option>
+              <ng-container *ngFor="let sol of solutions">
+                <option [value]="sol">{{ sol }}</option>
+              </ng-container>
+            </select>
+            <div *ngIf="isFieldInvalid('solution')" class="mt-1 text-sm text-red-600 flex items-center gap-1 animate__animated animate__fadeIn animate__faster">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ getErrorMessage('solution') }}</span>
+            </div>
+          </div>
+
+          <!-- State -->
+          <div class="col-span-1">
+            <input formControlName="state" type="text" placeholder="{{ 'formSection.state' | translate }}"
+              [class.border-red-500]="isFieldInvalid('state')"
+              [class.border-green-500]="form.get('state')?.valid && form.get('state')?.touched"
+              class="input-field w-full transition-all duration-300" />
+            <div *ngIf="isFieldInvalid('state')" class="mt-1 text-sm text-red-600 flex items-center gap-1 animate__animated animate__fadeIn animate__faster">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ getErrorMessage('state') }}</span>
+            </div>
+          </div>
+
+          <!-- Source -->
+          <div class="col-span-1">
+            <input formControlName="source" type="text" placeholder="{{ 'formSection.howDidYouHear' | translate }}"
+              [class.border-red-500]="isFieldInvalid('source')"
+              [class.border-green-500]="form.get('source')?.valid && form.get('source')?.touched"
+              class="input-field w-full transition-all duration-300" />
+            <div *ngIf="isFieldInvalid('source')" class="mt-1 text-sm text-red-600 flex items-center gap-1 animate__animated animate__fadeIn animate__faster">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ getErrorMessage('source') }}</span>
+            </div>
+          </div>
+
+          <!-- Comments -->
+          <div class="col-span-1 md:col-span-2">
+            <textarea formControlName="comments" rows="4"
+              placeholder="{{ 'formSection.commentsPlaceholder' | translate }}"
+              class="input-field w-full transition-all duration-300"></textarea>
+          </div>
         </div>
 
 
@@ -92,8 +187,13 @@
 
         <!-- Botón -->
         <button type="submit"
-          class="bg-purple-700 text-white font-bold px-6 py-3 rounded-md hover:bg-purple-800 w-full md:w-auto">
-          {{ 'formSection.letsTalkButton' | translate }}
+          [disabled]="isSubmitting"
+          class="bg-purple-700 text-white font-bold px-6 py-3 rounded-md hover:bg-purple-800 w-full md:w-auto transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          <svg *ngIf="isSubmitting" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>{{ isSubmitting ? ('formSection.sending' | translate) : ('formSection.letsTalkButton' | translate) }}</span>
         </button>
       </form>
 

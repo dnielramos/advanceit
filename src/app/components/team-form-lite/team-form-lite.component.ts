@@ -41,6 +41,7 @@ export class TeamFormLiteComponent implements OnInit, OnDestroy {
   @Input() title: string = 'formSection.title';
   @Input() orange = false;
   formSubmitted = false;
+  isSubmitting = false;
   faCheck = faCircleCheck; // FontAwesome icon for confirmation
 
   solutions: string[] = [];
@@ -98,17 +99,46 @@ export class TeamFormLiteComponent implements OnInit, OnDestroy {
       this.form.markAllAsTouched();
       return;
     }
-    this.formSubmitted = true;
+    
+    this.isSubmitting = true;
     this.form.disable(); // Disable the form to prevent further submissions
     const payload = this.form.value;
     console.log('Payload to send:', payload);
+    
     this.emailService.sendForm(payload).subscribe({
       next: (res) => {
         console.log('Server response:', res);
-        this.form.reset();
+        this.isSubmitting = false;
         this.formSubmitted = true;
+        this.form.reset();
       },
-      error: (err) => console.error('Server error:', err),
+      error: (err) => {
+        console.error('Server error:', err);
+        this.isSubmitting = false;
+        this.form.enable();
+      },
     });
+  }
+
+  // Helper methods for validation
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.form.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const field = this.form.get(fieldName);
+    if (!field) return '';
+
+    if (field.hasError('required')) {
+      return this.translateService.instant('formSection.errors.required');
+    }
+    if (field.hasError('email')) {
+      return this.translateService.instant('formSection.errors.invalidEmail');
+    }
+    if (field.hasError('pattern')) {
+      return this.translateService.instant('formSection.errors.invalidPhone');
+    }
+    return '';
   }
 }

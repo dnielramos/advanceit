@@ -468,7 +468,13 @@
       "Soluciones de Sala de Conferencias y AV",
       "Soluciones de Centro de Datos y Sala de Servidores",
       "Reubicación y Expansión de TI"
-    ]
+    ],
+    "errors": {
+      "required": "Este campo es obligatorio",
+      "invalidEmail": "Por favor ingrese un correo electrónico válido",
+      "invalidPhone": "Por favor ingrese solo números"
+    },
+    "sending": "Enviando..."
   },
 
   "nosotrosPage": {

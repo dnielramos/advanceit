@@ -34,151 +34,100 @@ import { BrandSliderComponent } from "../../shared/brand-slider/brand-slider.com
   template: `
     <!-- Contenedor principal -->
     <div class="w-screen max-w-full overflow-hidden">
-      <!-- SLIDER -->
-      <div class="animate__animated animate__fadeIn">
-        <app-slider-inicio></app-slider-inicio>
-      </div>
+      <!-- SLIDER - Carga inmediata -->
+      <app-slider-inicio></app-slider-inicio>
 
       <!-- Simple CTA -->
-      <div class="reveal-section">
-        <app-simple-cta></app-simple-cta>
-      </div>
+      <app-simple-cta></app-simple-cta>
 
       <!-- Dell Partner Hero -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-dell-partner-hero></app-dell-partner-hero>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-dell-partner-hero></app-dell-partner-hero>
       } @placeholder {
-        <div class="min-h-[400px] bg-gray-50"></div>
+        <div class="min-h-[400px] bg-gradient-to-br from-gray-900 to-gray-800 animate-pulse"></div>
       }
 
       <!-- Dell Expertise -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-dell-expertise></app-dell-expertise>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-dell-expertise></app-dell-expertise>
       } @placeholder {
-        <div class="min-h-[500px] bg-white"></div>
+        <div class="min-h-[500px] bg-white animate-pulse"></div>
       }
 
       <!-- What's Most Important -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-what-most
-            noteText="home.whatMostNoteText"
-            title="home.whatMostTitle" 
-            description="home.whatMostP1"      
-            footerText="home.whatMostFooterText"      
-            buttonText="home.whatMostButtonText">
-          </app-what-most>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-what-most
+          noteText="home.whatMostNoteText"
+          title="home.whatMostTitle" 
+          description="home.whatMostP1"      
+          footerText="home.whatMostFooterText"      
+          buttonText="home.whatMostButtonText">
+        </app-what-most>
       } @placeholder {
-        <div class="min-h-[300px] bg-white"></div>
+        <div class="min-h-[300px] bg-white animate-pulse"></div>
       }
       
       <!-- Simple CTA secundario -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-simple-cta title="home.simpleTitle"></app-simple-cta>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-simple-cta title="home.simpleTitle"></app-simple-cta>
       } @placeholder {
-        <div class="min-h-[200px] bg-gray-50"></div>
+        <div class="min-h-[100px] bg-white animate-pulse"></div>
       }
 
       <!-- Categories -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-categories-inicio></app-categories-inicio>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-categories-inicio></app-categories-inicio>
       } @placeholder {
-        <div class="min-h-[400px] bg-white"></div>
+        <div class="min-h-[400px] bg-white animate-pulse"></div>
       }
 
       <!-- Brand Slider -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-brand-slider></app-brand-slider>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-brand-slider></app-brand-slider>
       } @placeholder {
-        <div class="min-h-[150px] bg-gray-50"></div>
+        <div class="min-h-[150px] bg-gray-50 animate-pulse"></div>
       }
 
       <!-- Title Maps -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-title-maps></app-title-maps>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-title-maps></app-title-maps>
       } @placeholder {
-        <div class="min-h-[350px] bg-white"></div>
+        <div class="min-h-[350px] bg-white animate-pulse"></div>
       }
 
       <!-- Image Description -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-image-description></app-image-description>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-image-description></app-image-description>
       } @placeholder {
-        <div class="min-h-[400px] bg-gray-50"></div>
+        <div class="min-h-[400px] bg-gray-50 animate-pulse"></div>
       }
 
       <!-- Social Impact -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-social-impact></app-social-impact>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-social-impact></app-social-impact>
       } @placeholder {
-        <div class="min-h-[350px] bg-white"></div>
+        <div class="min-h-[350px] bg-white animate-pulse"></div>
       }
 
       <!-- Simple Title Section -->
-      @defer (on viewport) {
-        <div class="reveal-section">
-          <app-simple-title-section></app-simple-title-section>
-        </div>
+      @defer (on viewport; prefetch on idle) {
+        <app-simple-title-section></app-simple-title-section>
       } @placeholder {
-        <div class="min-h-[250px] bg-gray-50"></div>
+        <div class="min-h-[250px] bg-purple-50 animate-pulse"></div>
       }
     </div>
 
     <!-- Footer -->
-    @defer (on viewport) {
-      <div class="reveal-section">
-        <app-footer></app-footer>
-      </div>
+    @defer (on viewport; prefetch on idle) {
+      <app-footer></app-footer>
     } @placeholder {
-      <div class="min-h-[300px] bg-gray-900"></div>
+      <div class="min-h-[300px] bg-gray-900 animate-pulse"></div>
     }
   `,
   styles: [`
     :host {
       display: block;
     }
-
-    /* Animación de revelado suave y profesional */
-    .reveal-section {
-      opacity: 0;
-      transform: translateY(30px);
-      animation: revealSmooth 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
-
-    @keyframes revealSmooth {
-      0% {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Delays escalonados para efecto cascada suave */
-    .reveal-section:nth-child(1) { animation-delay: 0s; }
-    .reveal-section:nth-child(2) { animation-delay: 0.1s; }
-    .reveal-section:nth-child(3) { animation-delay: 0.15s; }
-    .reveal-section:nth-child(4) { animation-delay: 0.2s; }
-    .reveal-section:nth-child(5) { animation-delay: 0.25s; }
   `],
 })
 export class InicioComponent {

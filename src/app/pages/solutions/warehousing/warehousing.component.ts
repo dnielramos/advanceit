@@ -8,7 +8,6 @@ import { FooterComponent } from "../../../components/footer/footer.component";
   selector: 'app-warehousing',
   imports: [HeroHeaderComponent, FeatureSectionComponent, TopPositionsComponent, FooterComponent],
   templateUrl: './warehousing.component.html',
-  styleUrl: './warehousing.component.css'
 })
 export class WarehousingComponent {
 

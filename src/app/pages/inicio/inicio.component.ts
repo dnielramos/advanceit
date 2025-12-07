@@ -12,7 +12,6 @@ import { ImageDescriptionComponent } from "../../components/inicio/image-descrip
 import { SocialImpactComponent } from "../../components/inicio/social-impact/social-impact.component";
 import { SimpleTitleSectionComponent } from "../../components/inicio/simple-title-section/simple-title-section.component";
 import { BrandSliderComponent } from "../../shared/brand-slider/brand-slider.component";
-import { AnimateOnScrollDirective } from '../../shared/directives/animate-on-scroll.directive';
 
 @Component({
   selector: 'app-inicio',
@@ -30,43 +29,42 @@ import { AnimateOnScrollDirective } from '../../shared/directives/animate-on-scr
     ImageDescriptionComponent, 
     SocialImpactComponent, 
     SimpleTitleSectionComponent, 
-    BrandSliderComponent,
-    AnimateOnScrollDirective
+    BrandSliderComponent
   ],
   template: `
-    <!-- Contenedor principal para separar el contenido del navbar si está fixed -->
+    <!-- Contenedor principal -->
     <div class="w-screen max-w-full overflow-hidden">
-      <!-- SLIDER (fondo e imágenes) - Carga inmediata con animación de entrada -->
+      <!-- SLIDER -->
       <div class="animate__animated animate__fadeIn">
         <app-slider-inicio></app-slider-inicio>
       </div>
 
-      <!-- Simple CTA con animación en scroll -->
-      <div appAnimateOnScroll="animate__fadeInUp" animationDuration="0.8s">
+      <!-- Simple CTA -->
+      <div class="reveal-section">
         <app-simple-cta></app-simple-cta>
       </div>
 
-      <!-- Dell Partner Hero con lazy loading -->
+      <!-- Dell Partner Hero -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInLeft" animationDuration="0.9s">
+        <div class="reveal-section">
           <app-dell-partner-hero></app-dell-partner-hero>
         </div>
       } @placeholder {
-        <div class="min-h-[400px] bg-gradient-to-br from-white via-purple-50/30 to-purple-100/20 animate-pulse"></div>
+        <div class="min-h-[400px] bg-gray-50"></div>
       }
 
-      <!-- Dell Expertise con lazy loading -->
+      <!-- Dell Expertise -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInRight" animationDuration="0.9s">
+        <div class="reveal-section">
           <app-dell-expertise></app-dell-expertise>
         </div>
       } @placeholder {
-        <div class="min-h-[500px] bg-gradient-to-br from-white via-purple-50/30 to-purple-100/20 animate-pulse"></div>
+        <div class="min-h-[500px] bg-white"></div>
       }
 
-      <!-- What's Most Important con lazy loading -->
+      <!-- What's Most Important -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInUp" animationDuration="0.8s">
+        <div class="reveal-section">
           <app-what-most
             noteText="home.whatMostNoteText"
             title="home.whatMostTitle" 
@@ -76,86 +74,111 @@ import { AnimateOnScrollDirective } from '../../shared/directives/animate-on-scr
           </app-what-most>
         </div>
       } @placeholder {
-        <div class="min-h-[300px] bg-white animate-pulse"></div>
+        <div class="min-h-[300px] bg-white"></div>
       }
       
       <!-- Simple CTA secundario -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeIn" animationDuration="0.7s">
+        <div class="reveal-section">
           <app-simple-cta title="home.simpleTitle"></app-simple-cta>
         </div>
       } @placeholder {
-        <div class="min-h-[200px] bg-purple-50 animate-pulse"></div>
+        <div class="min-h-[200px] bg-gray-50"></div>
       }
 
-      <!-- Categories con lazy loading -->
+      <!-- Categories -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInUp" animationDuration="0.8s" animationDelay="0.1s">
+        <div class="reveal-section">
           <app-categories-inicio></app-categories-inicio>
         </div>
       } @placeholder {
-        <div class="min-h-[400px] bg-white animate-pulse"></div>
+        <div class="min-h-[400px] bg-white"></div>
       }
 
-      <!-- Brand Slider con lazy loading -->
+      <!-- Brand Slider -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeIn" animationDuration="0.6s">
+        <div class="reveal-section">
           <app-brand-slider></app-brand-slider>
         </div>
       } @placeholder {
-        <div class="min-h-[150px] bg-gray-50 animate-pulse"></div>
+        <div class="min-h-[150px] bg-gray-50"></div>
       }
 
-      <!-- Title Maps con lazy loading -->
+      <!-- Title Maps -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__zoomIn" animationDuration="0.8s">
+        <div class="reveal-section">
           <app-title-maps></app-title-maps>
         </div>
       } @placeholder {
-        <div class="min-h-[350px] bg-white animate-pulse"></div>
+        <div class="min-h-[350px] bg-white"></div>
       }
 
-      <!-- Image Description con lazy loading -->
+      <!-- Image Description -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInLeft" animationDuration="0.9s">
+        <div class="reveal-section">
           <app-image-description></app-image-description>
         </div>
       } @placeholder {
-        <div class="min-h-[400px] bg-gray-50 animate-pulse"></div>
+        <div class="min-h-[400px] bg-gray-50"></div>
       }
 
-      <!-- Social Impact con lazy loading -->
+      <!-- Social Impact -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInUp" animationDuration="0.8s">
+        <div class="reveal-section">
           <app-social-impact></app-social-impact>
         </div>
       } @placeholder {
-        <div class="min-h-[350px] bg-white animate-pulse"></div>
+        <div class="min-h-[350px] bg-white"></div>
       }
 
-      <!-- Simple Title Section con lazy loading -->
+      <!-- Simple Title Section -->
       @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInUp" animationDuration="0.8s">
+        <div class="reveal-section">
           <app-simple-title-section></app-simple-title-section>
         </div>
       } @placeholder {
-        <div class="min-h-[250px] bg-purple-50 animate-pulse"></div>
+        <div class="min-h-[250px] bg-gray-50"></div>
       }
     </div>
 
-    <!-- Footer con lazy loading -->
+    <!-- Footer -->
     @defer (on viewport) {
-      <div appAnimateOnScroll="animate__fadeIn" animationDuration="0.6s">
+      <div class="reveal-section">
         <app-footer></app-footer>
       </div>
     } @placeholder {
-      <div class="min-h-[300px] bg-gray-900 animate-pulse"></div>
+      <div class="min-h-[300px] bg-gray-900"></div>
     }
   `,
   styles: [`
     :host {
       display: block;
     }
+
+    /* Animación de revelado suave y profesional */
+    .reveal-section {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: revealSmooth 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    @keyframes revealSmooth {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Delays escalonados para efecto cascada suave */
+    .reveal-section:nth-child(1) { animation-delay: 0s; }
+    .reveal-section:nth-child(2) { animation-delay: 0.1s; }
+    .reveal-section:nth-child(3) { animation-delay: 0.15s; }
+    .reveal-section:nth-child(4) { animation-delay: 0.2s; }
+    .reveal-section:nth-child(5) { animation-delay: 0.25s; }
   `],
 })
 export class InicioComponent {

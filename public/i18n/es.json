@@ -121,11 +121,13 @@
       "footer": "¡Convirtamos su oficina satélite en una potencia de productividad!"
     },
     "dellPartner": {
-      "title": "AdvanceIT - Orgullosos de ser Dell Technologies Solution Provider",
-      "p1": "Estamos comprometidos con la excelencia, y esto se demuestra a través de nuestras alianzas con marcas líderes en tecnología, incluyendo Dell.",
-      "p2": "Como Dell Technologies Solution Partner, nos hemos comprometido a cumplir con los exigentes estándares de Dell. Esto nos permite proporcionar la mejor y más efectiva solución Dell a nuestros clientes.",
+      "title1": "AdvanceIT – Se enorgullece de ser un",
+      "title2": "proveedor de soluciones de",
+      "title3": "Dell Technologies",
+      "p1": "Estamos comprometidos con la excelencia y esto se demuestra a través de nuestras asociaciones con marcas tecnológicas líderes, incluida Dell.",
+      "p2": "Como socio de soluciones de Dell Technologies, nos comprometemos a cumplir con los exigentes estándares de Dell. Esto nos permite ofrecer la mejor y más eficaz solución Dell a nuestros clientes.",
       "p3": "Como Dell Technologies Solution Provider, trabajamos con Dell y con usted para proporcionar una solución a sus necesidades, respaldada por la tecnología de hardware líder en la industria de Dell, servicios y soluciones de software.",
-      "badge": "Excelencia Certificada Dell",
+      "badge": "Excelencia certificada Dell",
       "certified": "Certificado"
     },
     "dellExpertise": {

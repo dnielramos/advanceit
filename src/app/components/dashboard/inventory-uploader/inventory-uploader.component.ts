@@ -28,8 +28,7 @@ import {
   faCalendarDay,
   faTrash,
   faPen,
-  faExclamationTriangle,
-  faBox
+  faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import { ViewModeService } from '../../../services/view-mode.service';
 
@@ -69,7 +68,6 @@ export class InventoryUploaderComponent implements OnInit {
   faTrash = faTrash;
   faPen = faPen;
   faExclamationTriangle = faExclamationTriangle;
-  faBox = faBox;
 
   // Estado general
   companies = signal<CompanyInventory[]>([]);
@@ -424,6 +422,9 @@ export class InventoryUploaderComponent implements OnInit {
     console.log('📦 Nuevo producto para inventario (payload):', payload);
   }
 
+  // ======================================================
+  // Cambio de vista
+  // ======================================================
   // ======================================================
   // Cambio de vista
   // ======================================================

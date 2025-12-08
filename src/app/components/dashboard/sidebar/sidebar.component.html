@@ -6,11 +6,18 @@
     <img class="h-10" src="logo.png" alt="Logo" />
   </div>
 
-  <div class="px-4 py-2 flex items-center space-x-3">
-    <img src="{{ userActive.picture }}" alt="User Avatar" class="w-10 h-10 rounded-full" />
+  <div class="px-4 py-2 flex items-center space-x-3" *ngIf="userActive">
+    <img [src]="userActive.picture" alt="User Avatar" class="w-10 h-10 rounded-full" />
+    <div class="leading-tight pt-2 overflow-hidden" *ngIf="!isToggleSidebarDesktop">
+      <p class="font-semibold text-gray-700 text-sm truncate max-w-[120px]">{{ userActive.name }}</p>
+      <p class="text-xs text-purple-600 truncate max-w-[120px]" [title]="userActive.company?.name">{{ userActive.company?.name }}</p>
+    </div>
+  </div>
+  <div class="px-4 py-2 flex items-center space-x-3" *ngIf="!userActive">
+    <div class="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
     <div class="leading-tight pt-2" *ngIf="!isToggleSidebarDesktop">
-      <p class="font-semibold text-gray-700 text-sm">{{ userActive.name }}</p>
-      <p class="text-xs text-purple-600">{{ userActive.company }}</p>
+      <div class="h-4 w-20 bg-gray-200 rounded animate-pulse mb-1"></div>
+      <div class="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
     </div>
   </div>
 
@@ -26,7 +33,7 @@
         <span *ngIf="!isToggleSidebarDesktop" class="text-gray-800 font-semibold text-sm">{{ item.label }}</span>
       </a>
 
-      <div *ngIf="item.subItems" class="mt-2">
+      <div *ngIf="item.subItems && authService.hasRole(item.roles)" class="mt-2">
         <button (click)="toggleDropdown(item.key)"
           class="w-full flex items-center justify-between space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors duration-200"
           [ngClass]="{ 'bg-gray-100': openDropdowns[item.key] }">

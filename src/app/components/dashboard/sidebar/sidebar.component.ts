@@ -21,7 +21,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService, Role } from '../../../services/auth.service'; // Asegúrate que la ruta sea correcta
 import { Subscription } from 'rxjs';
-import { User } from '../../../models/user';
+import { User, UserPopulated } from '../../../models/user';
 import { UsersService } from '../../../services/users.service';
 
 // Interfaz para definir la estructura de cada item del menú
@@ -61,6 +61,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   faWandSparkles = faWandSparkles;
 
   private authSubscription!: Subscription;
+  private roleSubscription!: Subscription;
 
   // Inputs & Outputs
   @Input() isToggleSidebarDesktop: boolean = false;
@@ -68,34 +69,52 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   public openDropdowns: { [key: string]: boolean } = {};
   public menuItems: MenuItem[] = []; // Se inicializa vacío y se construye dinámicamente
+  public isLoading: boolean = true;
 
-  public userActive !: User;
+  public userActive: UserPopulated | null = null;
 
-  constructor(protected authService: AuthService, userService: UsersService) {
+  constructor(protected authService: AuthService, private userService: UsersService) {}
 
-    authService.isLoggedIn$.subscribe((isLoggedIn) => {
-      if (isLoggedIn) {
-        userService.getUserById(authService.getUserId()!).subscribe((user) => {
+  private loadUserData(): void {
+    const userId = this.authService.getUserId();
+    if (userId) {
+      this.userService.getUserByIdPopulated(userId).subscribe({
+        next: (user) => {
           this.userActive = user;
-
-          console.log(this.userActive, 'USER ACTIVE');
-        });
-      }
-    });
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading user:', err);
+          this.isLoading = false;
+        }
+      });
+    }
   }
 
   ngOnInit(): void {
     // Nos suscribimos al estado de login del servicio de autenticación
     this.authSubscription = this.authService.isLoggedIn$.subscribe(isLoggedIn => {
-      this.buildMenu(isLoggedIn);
+      if (isLoggedIn) {
+        this.buildMenu(isLoggedIn);
+        this.loadUserData();
+      }
     });
 
+    // También suscribirse al rol para reconstruir el menú cuando cambie
+    this.roleSubscription = this.authService.currentUserRole$.subscribe(role => {
+      if (role) {
+        this.buildMenu(true);
+      }
+    });
   }
 
   ngOnDestroy(): void {
-    // Limpiamos la suscripción para evitar fugas de memoria
+    // Limpiamos las suscripciones para evitar fugas de memoria
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
+    }
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
     }
   }
 

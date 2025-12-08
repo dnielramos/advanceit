@@ -30,7 +30,8 @@ export class AuthService {
   public currentUserRole$ = this.currentUserRole.asObservable();
   public isLoggedIn$: Observable<boolean>;
 
-  public activeUser$: Observable<string> = of('');
+  private activeUserSubject = new BehaviorSubject<string>('');
+  public activeUser$ = this.activeUserSubject.asObservable();
 
   // Inyección de dependencias moderna
   private http = inject(HttpClient);
@@ -55,7 +56,14 @@ export class AuthService {
     const token = this.getAccessToken();
     if (token) {
       // Al validar, se actualizará `currentUserRole`, y `isLoggedIn$` reaccionará automáticamente.
-      this.validateToken().subscribe();
+      this.validateToken().subscribe({
+        next: (isValid) => {
+          if (isValid) {
+            // Cargar datos del usuario cuando el token es válido
+            this.getUserId();
+          }
+        }
+      });
     } else {
       // Si no hay token al inicio, nos aseguramos de que el estado sea `null`.
       this.currentUserRole.next(null);
@@ -115,10 +123,11 @@ export class AuthService {
       const userId = decoded.sub || decoded.userId || null;
 
       if (userId) {
-        // Actualiza el observable activeUser$ con el email del usuario
-        this.activeUser$ = this.userService.getUserById(userId).pipe(
-          map(user => user.name)
-        );
+        // Actualiza el BehaviorSubject con el nombre del usuario
+        this.userService.getUserById(userId).subscribe({
+          next: (user) => this.activeUserSubject.next(user.name),
+          error: (err) => console.error('Error loading user name:', err)
+        });
       }
 
       return decoded.sub || decoded.userId || null;
@@ -140,6 +149,8 @@ export class AuthService {
     localStorage.setItem('access_token', tokens.access_token);
     localStorage.setItem('refresh_token', tokens.refresh_token);
     this.decodeAndStoreToken(tokens.access_token);
+    // Cargar el nombre del usuario después del login
+    this.getUserId();
   }
 
   // --- MODIFICADO: logout borra ambos tokens ---
@@ -147,6 +158,7 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     this.currentUserRole.next(null);
+    this.activeUserSubject.next(''); // Limpiar el nombre del usuario
     this.router.navigate(['/in']); // Redirige al login
   }
 

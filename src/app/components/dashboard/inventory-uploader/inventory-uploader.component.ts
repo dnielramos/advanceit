@@ -8,8 +8,6 @@ import {
   CompanyInventoriesService,
   InventoryPayload,
 } from '../../../services/company-inventories.service';
-import { CompaniesService, Company } from '../../../services/companies.service';
-import { AuthService } from '../../../services/auth.service';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SkeletonCardComponent } from '../../skeleton-card/skeleton-card.component';
@@ -35,7 +33,6 @@ import { ViewModeService } from '../../../services/view-mode.service';
 interface CompanyInventory {
   id?: string;
   company: string;
-  company_id?: string;
   inventory: any[];
   columns: string[];
   created_at?: string;
@@ -49,9 +46,7 @@ interface CompanyInventory {
 })
 export class InventoryUploaderComponent implements OnInit {
   private inventoriesService = inject(CompanyInventoriesService);
-  private companiesService = inject(CompaniesService);
   private router = inject(Router);
-  private authService = inject(AuthService);
 
   // Icons
   faBuilding = faBuilding;
@@ -71,7 +66,6 @@ export class InventoryUploaderComponent implements OnInit {
 
   // Estado general
   companies = signal<CompanyInventory[]>([]);
-  availableCompanies = signal<Company[]>([]); // Empresas cargadas para el selector
   selectedCompany = signal<CompanyInventory | null>(null);
   isCreateInventory = signal<boolean>(false);
 
@@ -157,28 +151,6 @@ export class InventoryUploaderComponent implements OnInit {
   }
 
   onCreateInventory() {
-    // Reset empresa temporal al abrir el modal
-    this.tempCompany = '';
-
-    // Cargar empresas disponibles (solo activas) la primera vez que se abre el modal
-    if (this.availableCompanies().length === 0) {
-      this.companiesService.findAll().subscribe({
-        next: (data) => {
-          const companies = data || [];
-          const active = companies.filter((c) => {
-            const status = (c.estado || '').toLowerCase();
-            return status === 'active' || status === 'activo' || status === 'activa';
-          });
-          // Si no se encuentran activas (por esquema distinto), usar todas para no bloquear UX
-          this.availableCompanies.set(active.length ? active : companies);
-        },
-        error: (err) => {
-          console.error('Error cargando empresas:', err);
-          this.availableCompanies.set([]);
-        },
-      });
-    }
-
     // Si estamos en detalle, cerrar primero para evitar superponer modales
     if (this.selectedCompany()) {
       this.closeInventory();
@@ -204,7 +176,6 @@ export class InventoryUploaderComponent implements OnInit {
           const mapped: CompanyInventory[] = (data || []).map((item) => ({
             id: item.id,
             company: item.company,
-            company_id: item.company_id ?? item.companyId ?? null,
             inventory: item.inventory ?? [],
             columns:
               item.columns ??
@@ -236,7 +207,6 @@ export class InventoryUploaderComponent implements OnInit {
         const mapped: CompanyInventory[] = (data || []).map((item) => ({
           id: item.id,
           company: item.company,
-          company_id: item.company_id ?? item.companyId ?? null,
           inventory: item.inventory ?? [],
           columns:
             item.columns ??
@@ -346,16 +316,11 @@ export class InventoryUploaderComponent implements OnInit {
 
     this.isSavingInventory.set(true);
     this.uploadStatus.set('saving');
-    const selectedCompany = this.availableCompanies().find(
-      (c) => String(c.id) === String(this.tempCompany)
-    );
-    const userId = this.authService.getUserId();
 
     const payload: InventoryPayload = {
-      company: selectedCompany?.razon_social,
-      company_id: selectedCompany?.id ?? this.tempCompany,
+      company: this.tempCompany,
       inventory: this.previewData(),
-      created_by: userId || 'system', // aquí podrías poner el usuario logueado
+      created_by: 'system', // aquí podrías poner el usuario logueado
     };
 
     this.inventoriesService.createInventory(payload).subscribe({

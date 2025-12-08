@@ -30,13 +30,9 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="space-y-2">
             <label class="block text-sm font-medium text-gray-700">Empresa</label>
-            <select [(ngModel)]="tempCompany" [disabled]="isProcessingFile() || isSavingInventory()"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-50 disabled:text-gray-500 transition-all outline-none bg-white">
-              <option value="" disabled selected>Selecciona una empresa</option>
-              <option *ngFor="let comp of availableCompanies()" [value]="comp.id">
-                {{ comp.razon_social }}
-              </option>
-            </select>
+            <input type="text" placeholder="Nombre de la empresa" [(ngModel)]="tempCompany"
+              [disabled]="isProcessingFile() || isSavingInventory()"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-50 disabled:text-gray-500 transition-all outline-none" />
           </div>
 
           <div class="space-y-2">

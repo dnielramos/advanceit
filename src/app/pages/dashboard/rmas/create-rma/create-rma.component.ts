@@ -207,17 +207,16 @@ export class CreateRmaComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    const selectedCompany = this.companies().find(
-      (c: any) => String(c.id) === String(companyId)
-    );
+    const companyIdNum = typeof companyId === 'string' ? parseInt(companyId, 10) : companyId;
+    const selectedCompany = this.companies().find((c: any) => Number(c.id) === Number(companyIdNum));
     if (!selectedCompany) {
       this.error.set('Empresa no encontrada');
       this.isLoading.set(false);
       return;
     }
 
-    const companyIdentifier = selectedCompany.id ?? companyId;
-    this.inventoryService.getInventoryByCompany(String(companyIdentifier)).subscribe({
+    const companyName = selectedCompany.razon_social.toString().toLowerCase().trim();
+    this.inventoryService.getInventoryByCompany(companyName).subscribe({
       next: (inventories) => {
         const allItems: any[] = [];
         if (Array.isArray(inventories)) {

@@ -13,7 +13,6 @@ import { FooterComponent } from '../../../components/footer/footer.component';
     FooterComponent,
   ],
   templateUrl: './identity-access.component.html',
-  styleUrl: './identity-access.component.css',
 })
 export class IdentityAccessComponent {
   topPositions: any;

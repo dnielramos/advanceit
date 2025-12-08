@@ -8,7 +8,6 @@ import { TopPositionsComponent } from "../../../components/top-positions/top-pos
   selector: 'app-procurement-logistics',
   imports: [FooterComponent, HeroHeaderComponent, FeatureSectionComponent, TopPositionsComponent],
   templateUrl: './procurement-logistics.component.html',
-  styleUrl: './procurement-logistics.component.css'
 })
 export class ProcurementLogisticsComponent {
 topPositions: any;

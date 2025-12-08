@@ -8,7 +8,6 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-helpdesk-support',
   imports: [FeatureSectionComponent, TeamFormLiteComponent, FooterComponent, TranslatePipe],
   templateUrl: './helpdesk-support.component.html',
-  styleUrl: './helpdesk-support.component.css',
 })
 export class HelpdeskSupportComponent {
 

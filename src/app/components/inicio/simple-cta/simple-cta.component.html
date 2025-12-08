@@ -1,22 +1,32 @@
-<div class="w-screen bg-white py-8 px-4 text-center">
-  <div class="max-w-4xl mx-auto">
-    <h2
-    *ngIf = "title"
-      class="text-2xl md:text-4xl lg:text-5xl font-bold text-purple-700 uppercase"
-    >
+<div class="w-screen py-10 px-4 text-center bg-cover bg-center bg-scroll md:bg-fixed bg-no-repeat relative"
+  style="background-image: url('parallax-bg.avif');">
+
+  <div class="bg-black/60 w-full h-full absolute top-0 left-0 z-0"></div>
+
+  <div class="max-w-4xl mx-auto relative z-10  rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] p-2 md:p-8">
+    <h2 *ngIf="title" class="text-3xl md:text-5xl lg:text-5xl font-bold text-white uppercase mb-4">
       {{title | translate}}
     </h2>
-    <p class="text-lg md:text-xl text-gray-700" *ngIf = "description">
-      At Advance Technology Projects, we’re passionate about making a real difference in the communities where we work. For over 14 years, our mission has been to improve people’s quality of life by bringing innovative, tech-driven solutions that not only transform the businesses of our clients but also make their day-to-day tasks easier and more efficient.
-    </p>
-    <p class="text-lg md:text-xl text-gray-700" *ngIf = "description">
-      We’re proud to have a team of dedicated people who share this vision and work every day to create value for our clients. From day one, we’ve believed that it’s our responsibility to contribute to the development of the societies where we operate.
-    </p>
-    <p class="text-lg md:text-xl text-gray-700" *ngIf = "description">
-      With a strong track record and leadership in digital transformation across LATAM, we’re uniquely positioned to tackle the challenges of today’s market, simplifying complex demands and driving real, lasting change.
-    </p>
+    <div class="space-y-6">
+      <p class="text-lg md:text-xl text-gray-700 leading-relaxed" *ngIf="description">
+        At Advance Technology Projects, we’re passionate about making a real difference in the communities where we
+        work. For over 14 years, our mission has been to improve people’s quality of life by bringing innovative,
+        tech-driven solutions that not only transform the businesses of our clients but also make their day-to-day tasks
+        easier and more efficient.
+      </p>
+      <p class="text-lg md:text-xl text-gray-700 leading-relaxed" *ngIf="description">
+        We’re proud to have a team of dedicated people who share this vision and work every day to create value for our
+        clients. From day one, we’ve believed that it’s our responsibility to contribute to the development of the
+        societies where we operate.
+      </p>
+      <p class="text-lg md:text-xl text-gray-700 leading-relaxed" *ngIf="description">
+        With a strong track record and leadership in digital transformation across LATAM, we’re uniquely positioned to
+        tackle the challenges of today’s market, simplifying complex demands and driving real, lasting change.
+      </p>
+    </div>
 
-
-    <app-button-simple-cta *ngIf = "buttonText" [buttonText]="buttonText.toUpperCase()" link="contacto"></app-button-simple-cta>
+    <div class="mt-8">
+      <app-button-simple-cta *ngIf="buttonText" buttonText="L" link="contacto"></app-button-simple-cta>
+    </div>
   </div>
 </div>

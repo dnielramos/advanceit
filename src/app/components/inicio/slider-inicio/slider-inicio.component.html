@@ -5,7 +5,7 @@
     class="absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-in-out"
     [ngStyle]="{ opacity: i === currentSlideIndex ? 1 : 0 }">
     <!-- Imagen de fondo con Parallax Fijo -->
-    <div class="w-full h-full bg-cover bg-center bg-fixed bg-no-repeat"
+    <div class="w-full h-full bg-cover bg-center bg-scroll md:bg-fixed bg-no-repeat"
       [style.background-image]="'url(' + slide.image + ')'">
     </div>
 

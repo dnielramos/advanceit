@@ -4,18 +4,23 @@
   <div *ngFor="let slide of slides; let i = index"
     class="absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-in-out"
     [ngStyle]="{ opacity: i === currentSlideIndex ? 1 : 0 }">
-    <!-- Imagen de fondo -->
-    <img [src]="slide.image" alt="Imagen de Slide" class="w-full h-full object-cover" />
+    <!-- Imagen de fondo con Parallax Fijo -->
+    <div class="w-full h-full bg-cover bg-center bg-fixed bg-no-repeat"
+      [style.background-image]="'url(' + slide.image + ')'">
+    </div>
+
     <!-- Texto superpuesto -->
     <div class="absolute top-1/8 lg:pl-20 lg:bottom-1/2 pt-12 min-w-screen text-white bg-opacity-40 max-w-5xl z-2">
-      <h2 class="text-4xl max-w-full h-20 text-center lg:text-start my-8 uppercase font-extrabold px-0 md:text-6xl lg:text-7xl mb-2">
+      <h2
+        class="text-4xl max-w-full h-20 text-center lg:text-start my-8 uppercase font-extrabold px-0 md:text-6xl lg:text-7xl mb-2">
         {{ slide.title | translate }}
       </h2>
       <p class="text-xl md:text-xl text-center lg:text-start">
         {{ slide.subtitle | translate }}
       </p>
 
-      <div class="lg:flex grid justify-center lg:justify-start gap-4 lg:gap-2 mt-12 lg:mt-8 animate__animated animate__fadeIn">
+      <div
+        class="lg:flex grid justify-center lg:justify-start gap-4 lg:gap-2 mt-12 lg:mt-8 animate__animated animate__fadeIn">
         <button class="p-2 lg:w-30 border-2 cursor-pointer border-purple-600 rounded-md" routerLink="/{{slide.link}}">
           {{ 'home.slider.learnMore' | translate }}
         </button>
@@ -26,11 +31,12 @@
     </div>
   </div>
 
-  <!-- Capa de opacidad -->
-  <div class="absolute top-0 left-0 text-amber-50 bg-black opacity-30 w-full h-full z-1"></div>
+  <!-- Overlay corporativo -->
+  <div class="absolute inset-0 bg-[#0f1a2b]/80 z-1"></div>
 
   <!-- Indicadores de posición (barras verticales) -->
-  <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-row space-x-3 z-10
+  <div
+    class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-row space-x-3 z-10
               md:bottom-auto md:left-6 md:top-1/2 md:transform md:-translate-y-1/2 md:flex-col md:space-y-3 md:space-x-0">
     <div *ngFor="let s of slides; let j = index" (click)="goToSlide(j)"
       class="cursor-pointer w-2 h-8 rounded-sm transition-colors duration-300" [ngClass]="{

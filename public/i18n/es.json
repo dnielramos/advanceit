@@ -121,11 +121,13 @@
       "footer": "¡Convirtamos su oficina satélite en una potencia de productividad!"
     },
     "dellPartner": {
-      "title": "AdvanceIT - Orgullosos de ser Dell Technologies Solution Provider",
-      "p1": "Estamos comprometidos con la excelencia, y esto se demuestra a través de nuestras alianzas con marcas líderes en tecnología, incluyendo Dell.",
-      "p2": "Como Dell Technologies Solution Partner, nos hemos comprometido a cumplir con los exigentes estándares de Dell. Esto nos permite proporcionar la mejor y más efectiva solución Dell a nuestros clientes.",
+      "title1": "AdvanceIT – Se enorgullece de ser un",
+      "title2": "proveedor de soluciones de",
+      "title3": "Dell Technologies",
+      "p1": "Estamos comprometidos con la excelencia y esto se demuestra a través de nuestras asociaciones con marcas tecnológicas líderes, incluida Dell.",
+      "p2": "Como socio de soluciones de Dell Technologies, nos comprometemos a cumplir con los exigentes estándares de Dell. Esto nos permite ofrecer la mejor y más eficaz solución Dell a nuestros clientes.",
       "p3": "Como Dell Technologies Solution Provider, trabajamos con Dell y con usted para proporcionar una solución a sus necesidades, respaldada por la tecnología de hardware líder en la industria de Dell, servicios y soluciones de software.",
-      "badge": "Excelencia Certificada Dell",
+      "badge": "Excelencia certificada Dell",
       "certified": "Certificado"
     },
     "dellExpertise": {
@@ -153,7 +155,10 @@
       "ctaButton": "Comenzar",
       "trustBadge1": "Gold Partner Certificado",
       "trustBadge2": "Expertos Regionales LATAM",
-      "trustBadge3": "Garantía 100% Sin Estrés"
+      "trustBadge3": "Garantía 100% Sin Estrés",
+      "solutionProviderTitle": "¿Qué significa ser un Dell Technologies Solution Provider?",
+      "solutionProviderText1": "Como Dell Technologies Solution Provider, trabajamos con Dell y con usted para proporcionar una solución a sus necesidades, respaldada por la tecnología de hardware líder en la industria de Dell, servicios y soluciones de software.",
+      "solutionProviderText2": "Como Dell ofrece capacitación y consultoría, nuestros equipos se mantienen actualizados con las últimas actualizaciones, tecnología y más. No solo podemos asistirle en las etapas iniciales de su solución, sino que podemos continuar ese soporte con nuestro enfoque libre de estrés para TI."
     }
   },
 
@@ -463,7 +468,13 @@
       "Soluciones de Sala de Conferencias y AV",
       "Soluciones de Centro de Datos y Sala de Servidores",
       "Reubicación y Expansión de TI"
-    ]
+    ],
+    "errors": {
+      "required": "Este campo es obligatorio",
+      "invalidEmail": "Por favor ingrese un correo electrónico válido",
+      "invalidPhone": "Por favor ingrese solo números"
+    },
+    "sending": "Enviando..."
   },
 
   "nosotrosPage": {

@@ -13,75 +13,114 @@ import { ImageDescriptionComponent } from "../../components/inicio/image-descrip
 import { SocialImpactComponent } from "../../components/inicio/social-impact/social-impact.component";
 import { SimpleTitleSectionComponent } from "../../components/inicio/simple-title-section/simple-title-section.component";
 import { BrandSliderComponent } from "../../shared/brand-slider/brand-slider.component";
-import { AnimateOnScrollDirective } from '../../shared/directives/animate-on-scroll.directive';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [CommonModule, FooterComponent, SliderInicioComponent, SimpleCtaComponent, WhatMostComponent, TitleMapsComponent, CategoriesInicioComponent, WorkforceStaffingComponent, ImageDescriptionComponent, SocialImpactComponent, SimpleTitleSectionComponent, BrandSliderComponent],
-template: `
-    <!-- Contenedor principal para separar el contenido del navbar si está fixed -->
+  imports: [
+    CommonModule, 
+    FooterComponent, 
+    SliderInicioComponent, 
+    SimpleCtaComponent, 
+    DellPartnerHeroComponent, 
+    DellExpertiseComponent, 
+    WhatMostComponent, 
+    TitleMapsComponent, 
+    CategoriesInicioComponent, 
+    ImageDescriptionComponent, 
+    SocialImpactComponent, 
+    SimpleTitleSectionComponent, 
+    BrandSliderComponent
+  ],
+  template: `
+    <!-- Contenedor principal -->
     <div class="w-screen max-w-full overflow-hidden">
-      <!-- SLIDER (fondo e imágenes) -->
+      <!-- SLIDER - Carga inmediata -->
       <app-slider-inicio></app-slider-inicio>
 
-      <!-- NUEVA SECCIÓN: "BECOME AN EARLY ADOPTER OF AI" -->
-      <app-simple-cta ></app-simple-cta>
+      <!-- Simple CTA -->
+      <app-simple-cta></app-simple-cta>
 
-      <app-brand-slider></app-brand-slider>
-
-      <!-- NUEVA SECCIÓN: "What's Most Important" -->
-      <app-what-most
-      noteText="home.whatMostNoteText"
-        title="home.whatMostTitle"
-        description = "home.whatMostP1"
-        footerText="home.whatMostFooterText"
-        buttonText="home.whatMostButtonText"
-      ></app-what-most>
-
-      <app-simple-cta title="home.simpleTitle"></app-simple-cta>
-
-      <app-categories-inicio></app-categories-inicio>
-
-      <app-title-maps></app-title-maps>
-
-      <app-workforce-staffing></app-workforce-staffing>
-
-      <!-- <app-optimization-insights></app-optimization-insights> -->
-
-      <!-- Image Description con lazy loading -->
-      @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInLeft" animationDuration="0.9s">
-          <app-image-description></app-image-description>
-        </div>
+      <!-- Dell Partner Hero -->
+      @defer (on viewport; prefetch on idle) {
+        <app-dell-partner-hero></app-dell-partner-hero>
       } @placeholder {
-        <div class="min-h-[400px] bg-gray-50 animate-pulse"></div>
+        <div class="min-h-[400px] bg-gradient-to-br from-gray-900 to-gray-800 animate-pulse"></div>
       }
 
-      <!-- Social Impact con lazy loading -->
-      @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInUp" animationDuration="0.8s">
-          <app-social-impact></app-social-impact>
-        </div>
+      <!-- Dell Expertise -->
+      @defer (on viewport; prefetch on idle) {
+        <app-dell-expertise></app-dell-expertise>
+      } @placeholder {
+        <div class="min-h-[500px] bg-white animate-pulse"></div>
+      }
+
+      <!-- What's Most Important -->
+      @defer (on viewport; prefetch on idle) {
+        <app-what-most
+          noteText="home.whatMostNoteText"
+          title="home.whatMostTitle" 
+          description="home.whatMostP1"      
+          footerText="home.whatMostFooterText"      
+          buttonText="home.whatMostButtonText">
+        </app-what-most>
+      } @placeholder {
+        <div class="min-h-[300px] bg-white animate-pulse"></div>
+      }
+      
+      <!-- Simple CTA secundario -->
+      @defer (on viewport; prefetch on idle) {
+        <app-simple-cta title="home.simpleTitle"></app-simple-cta>
+      } @placeholder {
+        <div class="min-h-[100px] bg-white animate-pulse"></div>
+      }
+
+      <!-- Categories -->
+      @defer (on viewport; prefetch on idle) {
+        <app-categories-inicio></app-categories-inicio>
+      } @placeholder {
+        <div class="min-h-[400px] bg-white animate-pulse"></div>
+      }
+
+      <!-- Brand Slider -->
+      @defer (on viewport; prefetch on idle) {
+        <app-brand-slider></app-brand-slider>
+      } @placeholder {
+        <div class="min-h-[150px] bg-gray-50 animate-pulse"></div>
+      }
+
+      <!-- Title Maps -->
+      @defer (on viewport; prefetch on idle) {
+        <app-title-maps></app-title-maps>
       } @placeholder {
         <div class="min-h-[350px] bg-white animate-pulse"></div>
       }
 
-      <!-- Simple Title Section con lazy loading -->
-      @defer (on viewport) {
-        <div appAnimateOnScroll="animate__fadeInUp" animationDuration="0.8s">
-          <app-simple-title-section></app-simple-title-section>
-        </div>
+      <!-- Image Description -->
+      @defer (on viewport; prefetch on idle) {
+        <app-image-description></app-image-description>
+      } @placeholder {
+        <div class="min-h-[400px] bg-gray-50 animate-pulse"></div>
+      }
+
+      <!-- Social Impact -->
+      @defer (on viewport; prefetch on idle) {
+        <app-social-impact></app-social-impact>
+      } @placeholder {
+        <div class="min-h-[350px] bg-white animate-pulse"></div>
+      }
+
+      <!-- Simple Title Section -->
+      @defer (on viewport; prefetch on idle) {
+        <app-simple-title-section></app-simple-title-section>
       } @placeholder {
         <div class="min-h-[250px] bg-purple-50 animate-pulse"></div>
       }
     </div>
 
-    <!-- Footer con lazy loading -->
-    @defer (on viewport) {
-      <div appAnimateOnScroll="animate__fadeIn" animationDuration="0.6s">
-        <app-footer></app-footer>
-      </div>
+    <!-- Footer -->
+    @defer (on viewport; prefetch on idle) {
+      <app-footer></app-footer>
     } @placeholder {
       <div class="min-h-[300px] bg-gray-900 animate-pulse"></div>
     }

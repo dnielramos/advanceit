@@ -7,11 +7,12 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-footer',
   imports: [FontAwesomeModule, RouterLink, TranslatePipe],
   template: `
-    <section class="bg-linear-to-b from-purple-300 to-purple-900"></section>
+    <section class="bg-advance-850"></section>
     <footer
-      class="relative bg-linear-to-b from-gray-500 to-black text-white"
+      class="relative text-white bg-advance-900"
     >
-      <div class="relative pt-10 pb-8 max-w-6xl mx-auto">
+
+      <div class="relative bg-advance-900 py-6  max-w-6xl mx-auto">
         <hr class="my-8 border-gray-500" />
         <div
           class="grid grid-cols-1 justify-items-center text-lg md:grid-cols-5 gap-8"
@@ -177,11 +178,11 @@ import { TranslatePipe } from '@ngx-translate/core';
           </div>
         </div>
 
-        <!-- ubicaciones y terminos  -->
 
-        <hr class="my-8 border-gray-500" />
-        <div
-          class="flex flex-col md:flex-row items-center justify-between text-sm text-gray-300"
+      </div>
+
+      <div
+          class="flex flex-col md:flex-row items-center p-4 bg-advance-950 justify-between text-sm text-gray-500"
         >
           <div
             class="flex flex-wrap items-center space-x-3 mb-4 md:mb-0 justify-center md:justify-start"
@@ -227,9 +228,9 @@ import { TranslatePipe } from '@ngx-translate/core';
               >{{ 'footer.termsAndPrivacy' | translate }}</a
             >
           </div>
-        </div>
       </div>
+
     </footer>
   `,
 })
-export class FooterComponent {}
+export class FooterComponent { }

@@ -331,7 +331,9 @@ export class OrderDetailComponent implements OnInit {
   goToQuotation(): void {
     const currentOrder = this.order();
     if (currentOrder?.quotationId) {
-      this.router.navigate(['/dashboard/cotizaciones', currentOrder.quotationId]);
+      this.router.navigate(['/dashboard/cotizaciones', currentOrder.quotationId], {
+        queryParams: { from: 'ordenes', orderId: currentOrder.id }
+      });
     }
   }
 }

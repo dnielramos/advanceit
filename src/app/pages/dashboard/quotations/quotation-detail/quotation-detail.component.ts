@@ -38,6 +38,8 @@ export class QuotationDetailComponent implements OnInit {
   });
 
   private shouldAutoPrint: boolean = false;
+  returnTo: string = 'cotizaciones';
+  private returnOrderId: string | null = null;
 
   constructor(
     private quotationService: QuotationService,
@@ -51,7 +53,11 @@ export class QuotationDetailComponent implements OnInit {
     // Try to get ID from route params first, then fall back to @Input
     const routeId = this.route.snapshot.paramMap.get('id');
     const printParam = this.route.snapshot.queryParamMap.get('print');
+    const fromParam = this.route.snapshot.queryParamMap.get('from');
+    const orderIdParam = this.route.snapshot.queryParamMap.get('orderId');
     this.shouldAutoPrint = printParam === '1';
+    this.returnTo = fromParam || 'cotizaciones';
+    this.returnOrderId = orderIdParam;
     const idToUse = routeId || this.quotationId;
     
     if (idToUse) {
@@ -114,7 +120,13 @@ export class QuotationDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard/cotizaciones']);
+    if (this.returnTo === 'ordenes' && this.returnOrderId) {
+      this.router.navigate(['/dashboard/ordenes', this.returnOrderId]);
+    } else if (this.returnTo === 'ordenes') {
+      this.router.navigate(['/dashboard/orders']);
+    } else {
+      this.router.navigate(['/dashboard/cotizaciones']);
+    }
   }
 
   manualPrint(): void {

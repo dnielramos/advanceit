@@ -8,6 +8,8 @@ import {
   CompanyInventoriesService,
   InventoryPayload,
 } from '../../../services/company-inventories.service';
+import { CompaniesService, Company } from '../../../services/companies.service';
+import { forkJoin } from 'rxjs';
 import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-crud.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SkeletonCardComponent } from '../../skeleton-card/skeleton-card.component';
@@ -31,10 +33,12 @@ import {
 import { ViewModeService } from '../../../services/view-mode.service';
 
 interface CompanyInventory {
-  id?: string;
-  company: string;
-  inventory: any[];
-  columns: string[];
+  id: string;
+  company_id: string;
+  company_name: string; // Nombre de la empresa
+  item_count: number;   // Cantidad de items (del listado)
+  inventory: any[];     // Items del inventario (se carga al ver detalle)
+  columns: string[];    // Columnas detectadas
   created_at?: string;
 }
 
@@ -46,7 +50,11 @@ interface CompanyInventory {
 })
 export class InventoryUploaderComponent implements OnInit {
   private inventoriesService = inject(CompanyInventoriesService);
+  private companiesService = inject(CompaniesService);
   private router = inject(Router);
+
+  // Mapa de empresas para lookup rápido
+  private companiesMap = new Map<string, Company>();
 
   // Icons
   faBuilding = faBuilding;
@@ -89,7 +97,8 @@ export class InventoryUploaderComponent implements OnInit {
   // Para registrar inventario
   previewData = signal<any[]>([]);
   previewColumns = signal<string[]>([]);
-  tempCompany = '';
+  selectedCompanyId = ''; // ID de la empresa seleccionada en el select
+  availableCompanies = signal<Company[]>([]); // Lista de empresas para el select
   tempFile: File | null = null;
 
   // Dentro de la clase InventoryUploaderComponent
@@ -131,7 +140,7 @@ export class InventoryUploaderComponent implements OnInit {
 
   onCloseCreateInventory() {
     this.isCreateInventory.set(false);
-    this.tempCompany = '';
+    this.selectedCompanyId = '';
     this.tempFile = null;
     this.previewData.set([]);
     this.previewColumns.set([]);
@@ -155,11 +164,28 @@ export class InventoryUploaderComponent implements OnInit {
     if (this.selectedCompany()) {
       this.closeInventory();
       // Abrir modal después de cerrar el detalle (dar tiempo para animación)
-      setTimeout(() => this.isCreateInventory.set(true), 300);
+      setTimeout(() => this.openCreateModal(), 300);
     } else {
-      // Si no hay detalle activo, abrir directamente
-      this.isCreateInventory.set(true);
+      this.openCreateModal();
     }
+  }
+
+  private openCreateModal() {
+    // Cargar lista de empresas disponibles para el select (solo activas)
+    this.companiesService.findAll().subscribe({
+      next: (companies) => {
+        // Filtrar solo empresas con estado ACTIVO
+        const activeCompanies = companies.filter(c => 
+          c.estado?.toUpperCase() === 'ACTIVO' || c.estado?.toUpperCase() === 'ACTIVE'
+        );
+        this.availableCompanies.set(activeCompanies);
+        this.isCreateInventory.set(true);
+      },
+      error: (err) => {
+        console.error('Error cargando empresas:', err);
+        this.fileError.set('Error al cargar las empresas disponibles');
+      }
+    });
   }
 
   handleFilterChange(event: { estado?: string; texto: string }) {
@@ -169,31 +195,21 @@ export class InventoryUploaderComponent implements OnInit {
     // Guardar el texto de búsqueda global
     this.searchText.set(event.texto);
 
-    // Si NO estás en detalle de inventario, filtra empresas
+    // Si NO estás en detalle de inventario, filtra empresas localmente
     if (!this.selectedCompany()) {
-      this.inventoriesService.getAllInventories().subscribe({
-        next: (data: any[]) => {
-          const mapped: CompanyInventory[] = (data || []).map((item) => ({
-            id: item.id,
-            company: item.company,
-            inventory: item.inventory ?? [],
-            columns:
-              item.columns ??
-              (item.inventory?.[0] ? Object.keys(item.inventory[0]) : []),
-            created_at: item.created_at ?? item.createdAt ?? null,
-          }));
-
-          this.companies.set(
-            mapped.filter(
-              (c) =>
-                (!event.estado || c.company === event.estado) &&
-                (!event.texto ||
-                  c.company.toLowerCase().includes(event.texto.toLowerCase()))
-            )
-          );
-        },
-        error: (err) => console.error('Error cargando inventarios', err),
-      });
+      const allCompanies = this.companies();
+      const filtered = allCompanies.filter(
+        (c) =>
+          (!event.estado || c.company_id === event.estado) &&
+          (!event.texto ||
+            c.company_name.toLowerCase().includes(event.texto.toLowerCase()))
+      );
+      this.companies.set(filtered);
+      
+      // Si no hay filtro, recargar todo
+      if (!event.texto && !event.estado) {
+        this.loadAllInventories();
+      }
     }
   }
 
@@ -202,17 +218,19 @@ export class InventoryUploaderComponent implements OnInit {
   // ======================================================
   loadAllInventories() {
     this.isLoadingCompanies.set(true);
+    
     this.inventoriesService.getAllInventories().subscribe({
-      next: (data: any[]) => {
-        const mapped: CompanyInventory[] = (data || []).map((item) => ({
+      next: (inventories) => {
+        const mapped: CompanyInventory[] = (inventories || []).map((item: any) => ({
           id: item.id,
-          company: item.company,
-          inventory: item.inventory ?? [],
-          columns:
-            item.columns ??
-            (item.inventory?.[0] ? Object.keys(item.inventory[0]) : []),
-          created_at: item.created_at ?? item.createdAt ?? null,
+          company_id: item.company_id,
+          company_name: item.company || 'Empresa desconocida', // El backend ya devuelve el nombre
+          item_count: item.item_count || 0,
+          inventory: [], // Se carga al ver el detalle
+          columns: item.detected_columns || [],
+          created_at: item.created_at ?? null,
         }));
+        
         // Ordenar por fecha desc
         this.companies.set(
           mapped.sort((a, b) => {
@@ -312,13 +330,13 @@ export class InventoryUploaderComponent implements OnInit {
   // Guardar inventario en backend
   // ======================================================
   saveInventory() {
-    if (!this.tempCompany || this.previewData().length === 0) return;
+    if (!this.selectedCompanyId || this.previewData().length === 0) return;
 
     this.isSavingInventory.set(true);
     this.uploadStatus.set('saving');
 
     const payload: InventoryPayload = {
-      company: this.tempCompany,
+      company_id: this.selectedCompanyId,
       inventory: this.previewData(),
       created_by: 'system', // aquí podrías poner el usuario logueado
     };
@@ -327,14 +345,10 @@ export class InventoryUploaderComponent implements OnInit {
       next: (response) => {
         console.log('Inventario creado con éxito:', response);
         this.uploadStatus.set('success');
-        this.isSavingInventory.set(false);
-
-        // Mostrar éxito por 2 segundos y luego limpiar
-        setTimeout(() => {
-          this.loadAllInventories(); // recargar lista
-          this.onCloseCreateInventory();
-          this.uploadStatus.set('idle');
-        }, 1500);
+        
+        // Cerrar modal, recargar lista y limpiar estado
+        this.onCloseCreateInventory();
+        this.loadAllInventories();
       },
       error: (error) => {
         console.error('Error al crear inventario:', error);
@@ -352,19 +366,35 @@ export class InventoryUploaderComponent implements OnInit {
   // Ver detalle de inventario
   // ======================================================
   viewInventory(company: CompanyInventory) {
-    this.selectedCompany.set(company);
     this.isAddingItem.set(false);
-
-    // Inicializar objeto base para nuevo ítem con todas las columnas de la empresa
-    const cols = company.columns && company.columns.length
-      ? company.columns
-      : (company.inventory?.[0] ? Object.keys(company.inventory[0]) : []);
-
-    const base: any = {};
-    (cols || []).forEach((col) => {
-      base[col] = '';
+    
+    // Cargar el detalle del inventario (con los items)
+    this.isLoadingCompanies.set(true);
+    this.inventoriesService.getInventoryById(company.id).subscribe({
+      next: (detail: any) => {
+        // Actualizar el inventario con los items cargados
+        const fullInventory: CompanyInventory = {
+          ...company,
+          inventory: detail.inventory || [],
+          columns: detail.detected_columns || company.columns || [],
+        };
+        
+        this.selectedCompany.set(fullInventory);
+        
+        // Inicializar objeto base para nuevo ítem
+        const cols = fullInventory.columns;
+        const base: any = {};
+        cols.forEach((col) => {
+          base[col] = '';
+        });
+        this.newItem = base;
+        this.isLoadingCompanies.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando detalle del inventario:', err);
+        this.isLoadingCompanies.set(false);
+      }
     });
-    this.newItem = base;
   }
 
   closeInventory() {
@@ -379,7 +409,8 @@ export class InventoryUploaderComponent implements OnInit {
     if (!company) return;
 
     const payload = {
-      company: company.company,
+      company_id: company.company_id,
+      company_name: company.company_name,
       columns: company.columns,
       item: { ...this.newItem },
     };
@@ -407,7 +438,8 @@ export class InventoryUploaderComponent implements OnInit {
     this.router.navigate(['/dashboard/inventory-uploader/product', index], {
       state: {
         product,
-        company: company.company,
+        company_id: company.company_id,
+        company_name: company.company_name,
         columns: company.columns,
       },
     });

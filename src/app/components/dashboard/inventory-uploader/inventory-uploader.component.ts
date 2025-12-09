@@ -402,20 +402,131 @@ export class InventoryUploaderComponent implements OnInit {
   }
 
   // ======================================================
-  // Añadir nuevo producto al inventario (solo consola por ahora)
+  // Añadir nuevo producto al inventario
   // ======================================================
+  isAddingItemLoading = signal<boolean>(false);
+  addItemError = signal<string>('');
+  addItemSuccess = signal<boolean>(false);
+  
+  // Modal de feedback
+  showFeedbackModal = signal<boolean>(false);
+  feedbackModalType = signal<'success' | 'error'>('success');
+  feedbackModalMessage = signal<string>('');
+  lastAddedItemIndex = signal<number>(-1);
+  lastAddedItem = signal<any>(null);
+
   handleAddItem() {
     const company = this.selectedCompany();
+    if (!company || !company.id) return;
+
+    // Validar que al menos un campo tenga valor
+    const hasValues = Object.values(this.newItem).some(v => v && String(v).trim());
+    if (!hasValues) {
+      this.showFeedbackModalError('Debes completar al menos un campo para registrar el producto.');
+      return;
+    }
+
+    this.isAddingItemLoading.set(true);
+    this.addItemError.set('');
+
+    // Guardar copia del item antes de enviarlo
+    const itemToAdd = { ...this.newItem };
+
+    // Usar el endpoint granular para agregar el item
+    this.inventoriesService.addItemsToInventory(company.id, [itemToAdd]).subscribe({
+      next: (response) => {
+        console.log('✅ Producto agregado:', response);
+        
+        // Actualizar el inventario local agregando el nuevo item
+        const currentInventory = company.inventory || [];
+        const newIndex = currentInventory.length; // El nuevo item estará al final
+        const updatedCompany = {
+          ...company,
+          inventory: [...currentInventory, itemToAdd],
+          item_count: (company.item_count || 0) + 1
+        };
+        this.selectedCompany.set(updatedCompany);
+
+        // Guardar referencia del item agregado
+        this.lastAddedItemIndex.set(newIndex);
+        this.lastAddedItem.set(itemToAdd);
+
+        // Limpiar formulario y cerrar
+        this.resetNewItemForm();
+        this.isAddingItem.set(false);
+        this.isAddingItemLoading.set(false);
+
+        // Mostrar modal de éxito
+        this.showFeedbackModalSuccess(
+          `¡Producto registrado exitosamente en el inventario de ${this.capitalizeCompany(company.company_name)}!`
+        );
+      },
+      error: (err) => {
+        console.error('❌ Error al agregar producto:', err);
+        this.isAddingItemLoading.set(false);
+        this.showFeedbackModalError(
+          err?.error?.message || 'Ocurrió un error al registrar el producto. Por favor, intenta nuevamente.'
+        );
+      }
+    });
+  }
+
+  showFeedbackModalSuccess(message: string) {
+    this.feedbackModalType.set('success');
+    this.feedbackModalMessage.set(message);
+    this.showFeedbackModal.set(true);
+  }
+
+  showFeedbackModalError(message: string) {
+    this.feedbackModalType.set('error');
+    this.feedbackModalMessage.set(message);
+    this.showFeedbackModal.set(true);
+  }
+
+  closeFeedbackModal() {
+    this.showFeedbackModal.set(false);
+  }
+
+  viewAddedProduct() {
+    const company = this.selectedCompany();
+    const index = this.lastAddedItemIndex();
+    const item = this.lastAddedItem();
+    
+    if (!company || index < 0 || !item) {
+      this.closeFeedbackModal();
+      return;
+    }
+
+    this.closeFeedbackModal();
+    
+    // Navegar al detalle del producto recién agregado
+    this.router.navigate(['/dashboard/inventory-uploader/product', index], {
+      state: {
+        product: item,
+        company_id: company.company_id,
+        company_name: company.company_name,
+        columns: company.columns,
+        inventory_id: company.id
+      }
+    });
+  }
+
+  resetNewItemForm() {
+    const company = this.selectedCompany();
     if (!company) return;
+    
+    const base: any = {};
+    (company.columns || []).forEach((col) => {
+      base[col] = '';
+    });
+    this.newItem = base;
+    this.addItemError.set('');
+  }
 
-    const payload = {
-      company_id: company.company_id,
-      company_name: company.company_name,
-      columns: company.columns,
-      item: { ...this.newItem },
-    };
-
-    console.log('📦 Nuevo producto para inventario (payload):', payload);
+  cancelAddItem() {
+    this.isAddingItem.set(false);
+    this.resetNewItemForm();
+    this.addItemSuccess.set(false);
   }
 
   // ======================================================

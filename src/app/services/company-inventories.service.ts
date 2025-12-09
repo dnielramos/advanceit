@@ -94,6 +94,52 @@ export class CompanyInventoriesService {
   }
 
   // ============================================
+  // Operaciones Granulares de Items
+  // ============================================
+
+  /**
+   * Agregar items a un inventario existente
+   * POST /company-inventories/:id/items
+   */
+  addItemsToInventory(inventoryId: string, items: any[], updatedBy: string = 'system'): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${inventoryId}/items`, { items, updated_by: updatedBy }).pipe(
+      tap(() => {
+        // Invalidar cache del inventario específico y listado
+        this.cache.invalidate(`${this.apiUrl}/${inventoryId}`);
+        this.cache.invalidate(`${this.apiUrl}::all`);
+      })
+    );
+  }
+
+  /**
+   * Actualizar un item específico por índice
+   * PATCH /company-inventories/:id/items/:itemIndex
+   */
+  updateItemByIndex(inventoryId: string, itemIndex: number, item: any, updatedBy: string = 'system'): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${inventoryId}/items/${itemIndex}`, { item, updated_by: updatedBy }).pipe(
+      tap(() => {
+        this.cache.invalidate(`${this.apiUrl}/${inventoryId}`);
+        this.cache.invalidate(`${this.apiUrl}::all`);
+      })
+    );
+  }
+
+  /**
+   * Eliminar un item específico por índice
+   * DELETE /company-inventories/:id/items/:itemIndex
+   */
+  deleteItemByIndex(inventoryId: string, itemIndex: number, updatedBy: string = 'system'): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${inventoryId}/items/${itemIndex}`, { 
+      body: { updated_by: updatedBy } 
+    }).pipe(
+      tap(() => {
+        this.cache.invalidate(`${this.apiUrl}/${inventoryId}`);
+        this.cache.invalidate(`${this.apiUrl}::all`);
+      })
+    );
+  }
+
+  // ============================================
   // Validación y manejo de archivos
   // ============================================
 

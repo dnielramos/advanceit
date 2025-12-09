@@ -115,6 +115,10 @@ export class ProductDetailComponent implements OnInit {
   private readonly STORAGE_KEY = 'product_detail_state';
 
   ngOnInit(): void {
+    // Scroll al inicio del contenedor principal al entrar al componente
+    // El scroll está en el <main> del dashboard layout, no en window
+    this.scrollToTop();
+    
     // Obtener datos de la navegación - usar history.state directamente
     // ya que getCurrentNavigation() puede ser null cuando el componente se inicializa
     let state = history.state;
@@ -191,7 +195,45 @@ export class ProductDetailComponent implements OnInit {
   goBack(): void {
     // Limpiar el estado guardado al volver
     sessionStorage.removeItem(this.STORAGE_KEY);
-    this.router.navigate(['/dashboard/inventory-uploader']);
+    
+    // Navegar de vuelta pasando el inventoryId para que se abra el inventario correcto
+    const inventoryId = this.inventoryId();
+    const companyId = this.companyId();
+    const companyName = this.companyName();
+    const columns = this.columns();
+    
+    if (inventoryId) {
+      // Navegar con estado para reabrir el inventario
+      this.router.navigate(['/dashboard/inventory-uploader'], {
+        state: {
+          returnToInventory: true,
+          inventory_id: inventoryId,
+          company_id: companyId,
+          company_name: companyName,
+          columns: columns,
+          scrollToIndex: this.productIndex()
+        }
+      });
+    } else {
+      this.router.navigate(['/dashboard/inventory-uploader']);
+    }
+  }
+
+  /**
+   * Hace scroll al inicio del contenedor principal del dashboard
+   */
+  private scrollToTop(): void {
+    // El scroll está en el <main> del dashboard layout, no en window
+    // Buscar el contenedor main con overflow-y-auto
+    setTimeout(() => {
+      const mainContainer = document.querySelector('main.overflow-y-auto');
+      if (mainContainer) {
+        mainContainer.scrollTo({ top: 0, behavior: 'instant' });
+      } else {
+        // Fallback a window si no encuentra el contenedor
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    }, 0);
   }
 
   openDellSupport(): void {

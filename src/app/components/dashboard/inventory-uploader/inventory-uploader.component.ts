@@ -128,9 +128,131 @@ export class InventoryUploaderComponent implements OnInit {
   });
 
   // Carga inicial
-  // Carga inicial
   ngOnInit(): void {
-    this.loadAllInventories();
+    // Verificar si venimos de vuelta del detalle de un producto
+    const state = history.state;
+    
+    if (state?.returnToInventory && state?.inventory_id) {
+      console.log('🔙 Regresando al inventario:', state);
+      this.loadAndOpenInventory(state.inventory_id, state.scrollToIndex);
+    } else {
+      this.loadAllInventories();
+    }
+  }
+  
+  /**
+   * Carga todos los inventarios y luego abre uno específico
+   */
+  private loadAndOpenInventory(inventoryId: string, scrollToIndex?: number): void {
+    this.isLoadingCompanies.set(true);
+    
+    this.inventoriesService.getAllInventories().subscribe({
+      next: (inventories) => {
+        const mapped: CompanyInventory[] = (inventories || []).map((item: any) => ({
+          id: item.id,
+          company_id: item.company_id,
+          company_name: item.company || 'Empresa desconocida',
+          item_count: item.item_count || 0,
+          inventory: [],
+          columns: item.detected_columns || [],
+          created_at: item.created_at ?? null,
+        }));
+        
+        this.companies.set(
+          mapped.sort((a, b) => {
+            const da = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const db = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return db - da;
+          })
+        );
+        
+        // Buscar el inventario específico y abrirlo
+        const targetInventory = mapped.find(c => c.id === inventoryId);
+        if (targetInventory) {
+          this.viewInventoryWithScroll(targetInventory, scrollToIndex);
+        } else {
+          this.isLoadingCompanies.set(false);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando inventarios', err);
+        this.isLoadingCompanies.set(false);
+      },
+    });
+  }
+  
+  /**
+   * Abre un inventario y hace scroll a un índice específico
+   */
+  private viewInventoryWithScroll(company: CompanyInventory, scrollToIndex?: number): void {
+    this.isAddingItem.set(false);
+    
+    this.inventoriesService.getInventoryById(company.id).subscribe({
+      next: (detail: any) => {
+        const fullInventory: CompanyInventory = {
+          id: company.id,
+          company_id: company.company_id,
+          company_name: company.company_name,
+          item_count: detail.item_count || company.item_count,
+          inventory: detail.inventory || [],
+          columns: detail.detected_columns || company.columns || [],
+          created_at: company.created_at
+        };
+        
+        this.selectedCompany.set(fullInventory);
+        
+        // Inicializar objeto base para nuevo ítem
+        const cols = fullInventory.columns;
+        const base: any = {};
+        cols.forEach((col) => {
+          base[col] = '';
+        });
+        this.newItem = base;
+        this.isLoadingCompanies.set(false);
+        
+        // Hacer scroll al elemento después de que se renderice
+        if (scrollToIndex !== undefined && scrollToIndex >= 0) {
+          setTimeout(() => {
+            this.scrollToProduct(scrollToIndex);
+          }, 100);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando detalle del inventario:', err);
+        this.isLoadingCompanies.set(false);
+      }
+    });
+  }
+  
+  /**
+   * Hace scroll a un producto específico en la lista
+   */
+  private scrollToProduct(index: number): void {
+    // Intentar encontrar el elemento por su posición
+    const gridView = document.querySelector('[class*="grid-cols"]');
+    const listView = document.querySelector('table tbody');
+    
+    if (this.viewMode() === 'grid' && gridView) {
+      const cards = gridView.querySelectorAll(':scope > div');
+      if (cards[index]) {
+        cards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Agregar highlight temporal
+        cards[index].classList.add('ring-2', 'ring-purple-500', 'ring-offset-2');
+        setTimeout(() => {
+          cards[index].classList.remove('ring-2', 'ring-purple-500', 'ring-offset-2');
+        }, 2000);
+      }
+    } else if (listView) {
+      const rows = listView.querySelectorAll('tr');
+      if (rows[index]) {
+        rows[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Agregar highlight temporal
+        rows[index].classList.add('bg-purple-100');
+        setTimeout(() => {
+          rows[index].classList.remove('bg-purple-100');
+        }, 2000);
+      }
+    }
   }
 
   openDellSupport() {

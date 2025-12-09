@@ -321,30 +321,46 @@
 
     <!-- Vista Lista/Tabla de productos -->
     <div *ngIf="viewMode() === 'list' && filteredInventory().length > 0" 
-      class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white animate__animated animate__fadeIn">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+      class="w-full border border-gray-200 rounded-lg shadow-sm bg-white animate__animated animate__fadeIn">
+      <div class="overflow-x-auto max-w-full">
+        <table class="w-full divide-y divide-gray-200 table-auto">
           <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">#</th>
+              <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider w-12">#</th>
               <th *ngFor="let col of selectedColumns()" scope="col"
-                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
-                {{ col }}
+                class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                <span class="truncate block max-w-[150px]" [title]="col">{{ col }}</span>
               </th>
+              <th class="px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider w-24">Acciones</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr *ngFor="let row of filteredInventory(); let i = index; let odd = odd"
-              [class]="odd ? 'bg-white' : 'bg-gray-50'" class="hover:bg-purple-50 transition-colors cursor-pointer"
+              [ngClass]="odd ? 'bg-white' : 'bg-gray-50'" 
+              class="hover:bg-purple-50 transition-colors cursor-pointer"
               (click)="viewProductDetail(row, i)">
-              <td class="px-4 py-3 text-sm text-gray-500 font-medium">{{ i + 1 }}</td>
-              <td *ngFor="let col of selectedColumns()" class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
-                <div class="flex items-center gap-2">
-                  <span class="truncate max-w-xs" [title]="row[col]">{{ row[col] }}</span>
+              <td class="px-3 py-3 text-sm text-gray-500 font-medium w-12">{{ i + 1 }}</td>
+              <td *ngFor="let col of selectedColumns()" class="px-3 py-3 text-sm text-gray-700">
+                <div class="flex items-center gap-1">
+                  <span class="truncate max-w-[120px] sm:max-w-[150px] md:max-w-[180px]" [title]="row[col]">{{ row[col] || '-' }}</span>
                   <button (click)="openDellSupport(); $event.stopPropagation()"
-                    *ngIf="col.toLowerCase().includes('service tag')"
-                    class="text-xs text-purple-600 hover:text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-100 hover:border-purple-300 transition-colors ml-2">
-                    Soporte
+                    *ngIf="col.toLowerCase().includes('service tag') && row[col]"
+                    class="text-[10px] text-purple-600 hover:text-purple-800 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-100 hover:border-purple-300 transition-colors flex-shrink-0">
+                    Dell
+                  </button>
+                </div>
+              </td>
+              <td class="px-3 py-3 text-sm w-24">
+                <div class="flex items-center justify-center gap-1">
+                  <button (click)="editProduct(row, i); $event.stopPropagation()"
+                    class="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                    title="Editar">
+                    <fa-icon [icon]="faPencil" class="text-xs"></fa-icon>
+                  </button>
+                  <button (click)="confirmDeleteProduct(i); $event.stopPropagation()"
+                    class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="Eliminar">
+                    <fa-icon [icon]="faTrash" class="text-xs"></fa-icon>
                   </button>
                 </div>
               </td>

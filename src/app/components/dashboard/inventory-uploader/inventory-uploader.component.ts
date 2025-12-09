@@ -468,6 +468,14 @@ export class InventoryUploaderComponent implements OnInit {
     }
   }
 
+  // Verificar si un item tiene service tag
+  hasServiceTag(row: any): boolean {
+    if (!row) return false;
+    return Object.keys(row).some(key => 
+      key.toLowerCase().includes('service tag') && row[key]
+    );
+  }
+
   // ======================================================
   // Eliminar inventario
   // ======================================================

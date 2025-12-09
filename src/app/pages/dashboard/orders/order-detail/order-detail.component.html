@@ -121,6 +121,16 @@
                         <fa-icon [icon]="faArrowLeft"></fa-icon>
                         <span class="hidden md:inline">Volver</span>
                     </button>
+                    
+                    <!-- Botón Ver Cotización -->
+                    @if (hasQuotation()) {
+                    <button (click)="goToQuotation()"
+                        class="flex items-center gap-2 px-4 py-2 text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-all duration-200">
+                        <fa-icon [icon]="faFileInvoiceDollar"></fa-icon>
+                        <span class="hidden md:inline">Ver Cotización</span>
+                    </button>
+                    }
+                    
                     @if (order()!.estadoPago !== 'pagado' && isAdmin()) {
                     <button (click)="openProcessModal()" [disabled]="isProcessing()"
                         class="flex items-center gap-2 px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 disabled:opacity-50">
@@ -296,4 +306,3 @@
         </div>
     </div>
     }
-</div>

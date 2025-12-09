@@ -25,7 +25,10 @@ import {
   faMapMarkerAlt,
   faTag,
   faWarehouse,
-  faTimes
+  faTimes,
+  faFileInvoiceDollar,
+  faExternalLinkAlt,
+  faPrint
 } from '@fortawesome/free-solid-svg-icons';
 import { OrdersService, Order, OrderProducts } from '../../../../services/orders.service';
 import { ToastService } from 'angular-toastify';
@@ -64,6 +67,9 @@ export class OrderDetailComponent implements OnInit {
   faMapMarkerAlt = faMapMarkerAlt;
   faTag = faTag;
   faWarehouse = faWarehouse;
+  faFileInvoiceDollar = faFileInvoiceDollar;
+  faExternalLinkAlt = faExternalLinkAlt;
+  faPrint = faPrint;
 
   // State
   order = signal<Order | null>(null);
@@ -305,5 +311,27 @@ export class OrderDetailComponent implements OnInit {
   formatPrice(price: number | string): string {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
     return numPrice.toLocaleString('es-CO', { style: 'currency', currency: 'COP' });
+  }
+
+  // ======================================================
+  // Cotización
+  // ======================================================
+  
+  /**
+   * Verifica si la orden tiene una cotización asociada
+   */
+  hasQuotation(): boolean {
+    const currentOrder = this.order();
+    return !!(currentOrder?.quotationId);
+  }
+
+  /**
+   * Navega a la página de detalle de la cotización
+   */
+  goToQuotation(): void {
+    const currentOrder = this.order();
+    if (currentOrder?.quotationId) {
+      this.router.navigate(['/dashboard/cotizaciones', currentOrder.quotationId]);
+    }
   }
 }

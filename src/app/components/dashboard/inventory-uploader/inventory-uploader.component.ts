@@ -28,7 +28,9 @@ import {
   faCalendarDay,
   faTrash,
   faPen,
-  faExclamationTriangle
+  faPencil,
+  faExclamationTriangle,
+  faTriangleExclamation
 } from '@fortawesome/free-solid-svg-icons';
 import { ViewModeService } from '../../../services/view-mode.service';
 
@@ -70,7 +72,9 @@ export class InventoryUploaderComponent implements OnInit {
   faCalendarDay = faCalendarDay;
   faTrash = faTrash;
   faPen = faPen;
+  faPencil = faPencil;
   faExclamationTriangle = faExclamationTriangle;
+  faTriangleExclamation = faTriangleExclamation;
 
   // Estado general
   companies = signal<CompanyInventory[]>([]);
@@ -368,16 +372,35 @@ export class InventoryUploaderComponent implements OnInit {
   viewInventory(company: CompanyInventory) {
     this.isAddingItem.set(false);
     
+    console.log('📂 viewInventory - company recibido:', {
+      id: company.id,
+      company_id: company.company_id,
+      company_name: company.company_name
+    });
+    
     // Cargar el detalle del inventario (con los items)
     this.isLoadingCompanies.set(true);
     this.inventoriesService.getInventoryById(company.id).subscribe({
       next: (detail: any) => {
+        console.log('📂 viewInventory - detalle recibido del backend:', detail);
+        
         // Actualizar el inventario con los items cargados
+        // IMPORTANTE: Preservar el ID del inventario
         const fullInventory: CompanyInventory = {
-          ...company,
+          id: company.id, // Asegurar que el ID se preserve
+          company_id: company.company_id,
+          company_name: company.company_name,
+          item_count: detail.item_count || company.item_count,
           inventory: detail.inventory || [],
           columns: detail.detected_columns || company.columns || [],
+          created_at: company.created_at
         };
+        
+        console.log('📂 viewInventory - fullInventory:', {
+          id: fullInventory.id,
+          company_id: fullInventory.company_id,
+          itemCount: fullInventory.inventory.length
+        });
         
         this.selectedCompany.set(fullInventory);
         
@@ -544,7 +567,17 @@ export class InventoryUploaderComponent implements OnInit {
   // ======================================================
   viewProductDetail(product: any, index: number) {
     const company = this.selectedCompany();
-    if (!company) return;
+    if (!company) {
+      console.error('❌ No hay empresa seleccionada');
+      return;
+    }
+
+    console.log('📦 Navegando a detalle de producto:', {
+      index,
+      inventory_id: company.id,
+      company_id: company.company_id,
+      company_name: company.company_name
+    });
 
     this.router.navigate(['/dashboard/inventory-uploader/product', index], {
       state: {
@@ -552,7 +585,97 @@ export class InventoryUploaderComponent implements OnInit {
         company_id: company.company_id,
         company_name: company.company_name,
         columns: company.columns,
+        inventory_id: company.id
       },
+    });
+  }
+
+  // ======================================================
+  // Editar producto (navega al detalle en modo edición)
+  // ======================================================
+  editProduct(product: any, index: number) {
+    const company = this.selectedCompany();
+    if (!company) {
+      console.error('❌ No hay empresa seleccionada para editar');
+      return;
+    }
+
+    console.log('✏️ Navegando a editar producto:', {
+      index,
+      inventory_id: company.id,
+      company_id: company.company_id,
+      company_name: company.company_name
+    });
+
+    this.router.navigate(['/dashboard/inventory-uploader/product', index], {
+      state: {
+        product,
+        company_id: company.company_id,
+        company_name: company.company_name,
+        columns: company.columns,
+        inventory_id: company.id,
+        editMode: true
+      },
+    });
+  }
+
+  // ======================================================
+  // Eliminar producto del inventario
+  // ======================================================
+  showDeleteProductModal = signal<boolean>(false);
+  productToDeleteIndex = signal<number>(-1);
+  isDeletingProduct = signal<boolean>(false);
+  deleteProductError = signal<string>('');
+
+  confirmDeleteProduct(index: number) {
+    this.productToDeleteIndex.set(index);
+    this.deleteProductError.set('');
+    this.showDeleteProductModal.set(true);
+  }
+
+  cancelDeleteProduct() {
+    this.showDeleteProductModal.set(false);
+    this.productToDeleteIndex.set(-1);
+    this.deleteProductError.set('');
+  }
+
+  executeDeleteProduct() {
+    const company = this.selectedCompany();
+    const index = this.productToDeleteIndex();
+    
+    if (!company || !company.id || index < 0) {
+      this.deleteProductError.set('No se puede eliminar: falta información del inventario.');
+      return;
+    }
+
+    this.isDeletingProduct.set(true);
+    this.deleteProductError.set('');
+
+    this.inventoriesService.deleteItemByIndex(company.id, index).subscribe({
+      next: (response) => {
+        console.log('✅ Producto eliminado:', response);
+        
+        // Actualizar inventario local
+        const currentInventory = company.inventory || [];
+        const updatedInventory = currentInventory.filter((_, i) => i !== index);
+        const updatedCompany = {
+          ...company,
+          inventory: updatedInventory,
+          item_count: Math.max(0, (company.item_count || 0) - 1)
+        };
+        this.selectedCompany.set(updatedCompany);
+
+        this.isDeletingProduct.set(false);
+        this.showDeleteProductModal.set(false);
+        
+        // Mostrar feedback de éxito
+        this.showFeedbackModalSuccess('Producto eliminado correctamente del inventario.');
+      },
+      error: (err) => {
+        console.error('❌ Error al eliminar producto:', err);
+        this.isDeletingProduct.set(false);
+        this.deleteProductError.set(err?.error?.message || 'Error al eliminar el producto. Intenta nuevamente.');
+      }
     });
   }
 

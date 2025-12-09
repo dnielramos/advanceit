@@ -8,19 +8,60 @@
           <fa-icon [icon]="faArrowLeft"></fa-icon>
           <span class="font-medium">Volver al inventario</span>
         </button>
-        <div class="flex items-center gap-2">
-          <img [src]="getCompanyLogo(companyName())" (error)="onLogoError($event, companyName())" alt="logo"
-            class="h-10 w-25 rounded object-contain bg-white border border-purple-200" />
-          <div class="text-sm text-purple-700 font-semibold">{{ capitalizeCompany(companyName()) }}</div>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <img [src]="getCompanyLogo(companyName())" (error)="onLogoError($event, companyName())" alt="logo"
+              class="h-10 w-25 rounded object-contain bg-white border border-purple-200" />
+            <div class="text-sm text-purple-700 font-semibold">{{ capitalizeCompany(companyName()) }}</div>
+          </div>
+          <!-- Botones de acción -->
+          <div class="flex items-center gap-2 border-l border-gray-200 pl-4">
+            <button *ngIf="!isEditMode()" (click)="enableEditMode()"
+              class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+              <fa-icon [icon]="faPencil"></fa-icon>
+              <span class="hidden sm:inline">Editar</span>
+            </button>
+            <button *ngIf="!isEditMode()" (click)="openDeleteModal()"
+              class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+              <fa-icon [icon]="faTrash"></fa-icon>
+              <span class="hidden sm:inline">Eliminar</span>
+            </button>
+          </div>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <div class="bg-purple-100 p-3 rounded-xl">
-          <fa-icon [icon]="faLaptop" class="text-purple-600 text-2xl"></fa-icon>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div [class]="isEditMode() ? 'bg-amber-100' : 'bg-purple-100'" class="p-3 rounded-xl transition-colors">
+            <fa-icon [icon]="isEditMode() ? faPencil : faLaptop" 
+              [class]="isEditMode() ? 'text-amber-600' : 'text-purple-600'" class="text-2xl"></fa-icon>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">
+              {{ isEditMode() ? 'Editar Producto' : 'Detalle del Producto' }}
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">
+              {{ isEditMode() ? 'Modifica los campos y guarda los cambios' : 'Información completa del equipo' }}
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Detalle del Producto</h1>
-          <p class="text-sm text-gray-500 mt-1">Información completa del equipo</p>
+        <!-- Botones de modo edición -->
+        <div *ngIf="isEditMode()" class="flex items-center gap-2">
+          <button (click)="cancelEditMode()" [disabled]="isSaving()"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50">
+            <fa-icon [icon]="faTimes"></fa-icon>
+            Cancelar
+          </button>
+          <button (click)="saveChanges()" [disabled]="isSaving()"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 min-w-[120px] justify-center">
+            <ng-container *ngIf="!isSaving()">
+              <fa-icon [icon]="faFloppyDisk"></fa-icon>
+              Guardar
+            </ng-container>
+            <ng-container *ngIf="isSaving()">
+              <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
+              Guardando...
+            </ng-container>
+          </button>
         </div>
       </div>
     </div>
@@ -140,12 +181,18 @@
     </div>
 
     <!-- Todos los campos -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6" 
+      [class.border-amber-200]="isEditMode()" [class.ring-2]="isEditMode()" [class.ring-amber-100]="isEditMode()">
       <h2 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-        <fa-icon [icon]="faBox" class="text-purple-600"></fa-icon>
-        Todos los Campos
+        <fa-icon [icon]="isEditMode() ? faPencil : faBox" [class]="isEditMode() ? 'text-amber-600' : 'text-purple-600'"></fa-icon>
+        {{ isEditMode() ? 'Editar Campos' : 'Todos los Campos' }}
+        <span *ngIf="isEditMode()" class="text-xs font-normal text-amber-600 bg-amber-50 px-2 py-1 rounded-full ml-2">
+          Modo edición activo
+        </span>
       </h2>
-      <div class="overflow-x-auto">
+      
+      <!-- Vista de solo lectura -->
+      <div *ngIf="!isEditMode()" class="overflow-x-auto">
         <table class="min-w-full">
           <thead>
             <tr class="bg-gradient-to-r from-purple-600 to-purple-700 border-b-2 border-purple-800">
@@ -172,6 +219,145 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Vista de edición -->
+      <div *ngIf="isEditMode()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngFor="let col of columns()" class="flex flex-col">
+            <label class="text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{{ col }}</label>
+            <input type="text"
+              [value]="getEditedValue(col)"
+              (input)="updateEditedField(col, $any($event.target).value)"
+              [disabled]="isSaving()"
+              class="px-4 py-2.5 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-50 disabled:text-gray-400 transition-all" />
+          </div>
+        </div>
+        
+        <!-- Botones de acción en modo edición (móvil) -->
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-100 md:hidden">
+          <button (click)="cancelEditMode()" [disabled]="isSaving()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50">
+            <fa-icon [icon]="faTimes"></fa-icon>
+            Cancelar
+          </button>
+          <button (click)="saveChanges()" [disabled]="isSaving()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50">
+            <ng-container *ngIf="!isSaving()">
+              <fa-icon [icon]="faFloppyDisk"></fa-icon>
+              Guardar
+            </ng-container>
+            <ng-container *ngIf="isSaving()">
+              <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
+              Guardando...
+            </ng-container>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Eliminación -->
+  <div *ngIf="showDeleteModal()"
+    class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate__animated animate__fadeIn">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__zoomIn">
+      
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-red-500 to-rose-600 p-6 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center">
+          <fa-icon [icon]="faTriangleExclamation" class="text-white text-4xl"></fa-icon>
+        </div>
+        <h3 class="text-xl font-bold text-white">¿Eliminar producto?</h3>
+      </div>
+      
+      <!-- Contenido -->
+      <div class="p-6">
+        <p class="text-gray-600 text-center mb-2">
+          Esta acción no se puede deshacer. El producto será eliminado permanentemente del inventario.
+        </p>
+        <div class="bg-gray-50 rounded-lg p-3 mt-4 border border-gray-100">
+          <p class="text-xs text-gray-500 text-center">
+            <span class="font-semibold text-gray-700">{{ capitalizeCompany(companyName()) }}</span> • 
+            Producto #{{ productIndex() + 1 }}
+          </p>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="deleteError()" 
+          class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+          <fa-icon [icon]="faCircleExclamation" class="text-red-500"></fa-icon>
+          <span class="text-sm text-red-700">{{ deleteError() }}</span>
+        </div>
+        
+        <!-- Botones -->
+        <div class="flex flex-col gap-3 mt-6">
+          <button (click)="confirmDelete()" [disabled]="isDeleting()"
+            class="w-full py-3 px-4 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+            <ng-container *ngIf="!isDeleting()">
+              <fa-icon [icon]="faTrash"></fa-icon>
+              Sí, eliminar producto
+            </ng-container>
+            <ng-container *ngIf="isDeleting()">
+              <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
+              Eliminando...
+            </ng-container>
+          </button>
+          <button (click)="closeDeleteModal()" [disabled]="isDeleting()"
+            class="w-full py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors disabled:opacity-50">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Feedback -->
+  <div *ngIf="showFeedbackModal()"
+    class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate__animated animate__fadeIn">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__zoomIn">
+      
+      <!-- Header -->
+      <div [class]="feedbackType() === 'success' 
+        ? 'bg-gradient-to-r from-gray-50 to-slate-50' 
+        : 'bg-gradient-to-r from-red-500 to-rose-600'"
+        class="p-6 text-center">
+        
+        <!-- Logo de empresa para éxito -->
+        <div *ngIf="feedbackType() === 'success'" 
+          class="w-16 h-16 mx-auto mb-4 bg-white rounded-xl p-2 border border-gray-200">
+          <img [src]="getCompanyLogo(companyName())" 
+               (error)="onLogoError($event, companyName())"
+               alt="logo" class="w-full h-full object-contain" />
+        </div>
+        
+        <!-- Icono de error -->
+        <div *ngIf="feedbackType() === 'error'" 
+          class="w-16 h-16 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center">
+          <fa-icon [icon]="faCircleExclamation" class="text-white text-4xl"></fa-icon>
+        </div>
+        
+        <h3 [class]="feedbackType() === 'success' ? 'text-gray-900' : 'text-white'" class="text-xl font-bold">
+          {{ feedbackType() === 'success' ? '¡Operación Exitosa!' : 'Error' }}
+        </h3>
+      </div>
+      
+      <!-- Contenido -->
+      <div class="p-6">
+        <p class="text-gray-600 text-center mb-6">{{ feedbackMessage() }}</p>
+        
+        <button (click)="closeFeedbackModal()"
+          class="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors">
+          {{ feedbackType() === 'success' ? 'Continuar' : 'Entendido' }}
+        </button>
+      </div>
+      
+      <!-- Footer con info -->
+      <div *ngIf="feedbackType() === 'success'" 
+        class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+        <div class="flex items-center justify-center gap-2 text-sm text-gray-500">
+          <fa-icon [icon]="faBuilding" class="text-purple-500"></fa-icon>
+          <span>{{ capitalizeCompany(companyName()) }}</span>
+        </div>
       </div>
     </div>
   </div>

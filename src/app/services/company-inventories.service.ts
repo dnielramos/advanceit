@@ -116,6 +116,11 @@ export class CompanyInventoriesService {
    * PATCH /company-inventories/:id/items/:itemIndex
    */
   updateItemByIndex(inventoryId: string, itemIndex: number, item: any, updatedBy: string = 'system'): Observable<any> {
+    console.log('✏️ Service updateItemByIndex:', {
+      url: `${this.apiUrl}/${inventoryId}/items/${itemIndex}`,
+      body: { item, updated_by: updatedBy }
+    });
+    
     return this.http.patch(`${this.apiUrl}/${inventoryId}/items/${itemIndex}`, { item, updated_by: updatedBy }).pipe(
       tap(() => {
         this.cache.invalidate(`${this.apiUrl}/${inventoryId}`);
@@ -127,10 +132,18 @@ export class CompanyInventoriesService {
   /**
    * Eliminar un item específico por índice
    * DELETE /company-inventories/:id/items/:itemIndex
+   * 
+   * Nota: Usamos request() en lugar de delete() para poder enviar body
    */
   deleteItemByIndex(inventoryId: string, itemIndex: number, updatedBy: string = 'system'): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${inventoryId}/items/${itemIndex}`, { 
-      body: { updated_by: updatedBy } 
+    console.log('🗑️ Service deleteItemByIndex:', {
+      url: `${this.apiUrl}/${inventoryId}/items/${itemIndex}`,
+      body: { updated_by: updatedBy }
+    });
+    
+    // Usar http.request para poder enviar body en DELETE
+    return this.http.request('DELETE', `${this.apiUrl}/${inventoryId}/items/${itemIndex}`, {
+      body: { updated_by: updatedBy }
     }).pipe(
       tap(() => {
         this.cache.invalidate(`${this.apiUrl}/${inventoryId}`);

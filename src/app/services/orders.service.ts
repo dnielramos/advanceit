@@ -6,6 +6,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { CacheService } from './cache.service';
 import { ProductoFinal } from '../models/Productos';
 import { CartItem } from './cart.service';
+import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 // // Interfaces para tipado fuerte
 // export interface Product {
@@ -39,7 +40,7 @@ export interface OrderProducts extends ProductoFinal {
 })
 export class OrdersService {
   // Es una buena práctica definir la URL base en los environments, pero esto funciona.
-  private readonly baseURL = 'https://advance-genai.onrender.com';
+  private readonly baseURL = ENVIRONMENT.apiUrl;
   // private baseURL = 'http://localhost:3002';
   private readonly apiUrl = `${this.baseURL}/orders`;
   private readonly productSearchUrl = `${this.baseURL}/advance-products/by-sku`; // Asumo que esta ruta existe

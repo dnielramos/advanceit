@@ -270,7 +270,7 @@ export class OrderDetailComponent implements OnInit {
     }
 
     this.isProcessing.set(true);
-    this.ordersService.updateOrderStatus(currentOrder.id, 'no_pagado').subscribe({
+    this.ordersService.updateOrderStatus(currentOrder.id, 'cancelado').subscribe({
       next: () => {
         this.toast.success('Orden rechazada correctamente.');
         this.loadOrder(currentOrder.id);

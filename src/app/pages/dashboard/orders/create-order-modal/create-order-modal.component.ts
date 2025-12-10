@@ -288,6 +288,7 @@ export class CreateOrderModalComponent implements OnInit {
       transportadora: this.carrier.trim(),
       fechaEstimada: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
       direccion_entrega: this.shippingAddress,
+      user_id: this.authService.getUserId() ?? undefined,
     };
 
     console.log('Procesando Orden:', shippingData);

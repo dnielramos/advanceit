@@ -6,10 +6,10 @@
     (clearFilters)="handleClearFilters()" (filterChange)="handleFilterChange($event)">
   </app-header-crud>
 
-  <main class="flex flex-col mt-6 lg:flex-row lg:gap-8 lg:h-[calc(100vh-180px)]">
+  <main class="flex p-2 flex-col lg:flex-row h-[calc(100vh-140px)] overflow-hidden mt-6">
 
     <!-- Lista de Pagos - Desktop: Scroll Interno, Mobile: Vista Normal -->
-    <div class="w-full scroll-purple lg:w-1/3 xl:w-1/4 animate__animated animate__fadeInLeft lg:overflow-y-auto lg:h-full">
+    <div class="w-full lg:w-1/3 xl:w-1/2 overflow-y-auto pr-3 lg:border-r lg:border-gray-200">
       @if (isLoading) {
       <div class="flex justify-center items-center h-64">
         <fa-icon [icon]="faCircleNotch" size="3x" class="text-purple-500 animate-spin"></fa-icon>
@@ -19,7 +19,7 @@
         <fa-icon [icon]="faExclamationTriangle"></fa-icon>
         <p class="font-bold">{{ error }}</p>
       </div>
-      }  @else if (!payments.length) {
+      } @else if (!payments.length) {
       <div class="text-center text-gray-400 p-8">
         <fa-icon [icon]="faEye" size="3x" class="mb-3"></fa-icon>
         <p class="font-semibold">Lo siento...</p>
@@ -50,10 +50,10 @@
     </div>
 
     <!-- Detalles del Pago - Desktop: Scroll Interno, Mobile: Modal -->
-    <div class="w-full lg:w-2/3 xl:w-3/4 mt-8 lg:mt-0 animate__animated animate__fadeInUp lg:overflow-y-auto lg:h-full">
+    <div class="w-full lg:w-2/3 xl:w-3/4 overflow-y-auto pl-3 hidden lg:block">
       @if (selectedPayment) {
       <!-- Vista Desktop -->
-      <div class="hidden lg:block bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
+      <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-4 border-b border-gray-200 mb-6">
           <div>
             <h2 class="text-2xl font-bold text-purple-700">Detalles del Pago</h2>
@@ -108,7 +108,9 @@
             class="btn-action bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-semibold transition-colors">
             Fijar Fecha de Pago
           </button>
-          <button  *ngIf="selectedPayment?.estado === 'pendiente' || selectedPayment?.estado === 'atrasado' || selectedPayment?.estado === 'no_pagado'"(click)="openActionModal('voucher')"
+          <button
+            *ngIf="selectedPayment?.estado === 'pendiente' || selectedPayment?.estado === 'atrasado' || selectedPayment?.estado === 'no_pagado'"
+            (click)="openActionModal('voucher')"
             class="btn-action bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
             <fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante
           </button>
@@ -121,7 +123,7 @@
       } @else {
       <!-- Placeholder cuando no hay selección -->
       <div
-        class="hidden lg:flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
+        class="flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
         <div class="text-center text-gray-500">
           <fa-icon [icon]="faFileInvoiceDollar" size="4x" class="mb-4"></fa-icon>
           <p class="text-xl font-semibold">Selecciona un pago</p>
@@ -199,13 +201,15 @@
           class="w-full bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-3 rounded-lg font-semibold transition-colors">
           Fijar Fecha de Pago
         </button>
-        <button  *ngIf="selectedPayment?.estado === 'pendiente' || selectedPayment?.estado === 'atrasado' || selectedPayment?.estado === 'no_pagado'" (click)="openActionModal('voucher')"
+        <button
+          *ngIf="selectedPayment?.estado === 'pendiente' || selectedPayment?.estado === 'atrasado' || selectedPayment?.estado === 'no_pagado'"
+          (click)="openActionModal('voucher')"
           class="w-full bg-green-100 text-green-700 hover:bg-green-200 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-colors">
           <fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante
         </button>
         <button *ngIf="selectedPayment?.estado === 'pagado'" (click)="showVoucherModal()"
-        class="w-full bg-purple-100 text-purple-600 hover:bg-purple-200 flex items-center  justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
-            <fa-icon [icon]="faEye"></fa-icon>Mirar Comprobante
+          class="w-full bg-purple-100 text-purple-600 hover:bg-purple-200 flex items-center  justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
+          <fa-icon [icon]="faEye"></fa-icon>Mirar Comprobante
         </button>
       </div>
     </div>
@@ -443,7 +447,7 @@ WHERE id = {{ selectedPayment?.id }};</pre>
 
 
 @if(voucherModal && selectedPayment) {
-  <div class="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4" (click)="closeVoucherModal()">
-    <app-payment-voucher [paymentId]="selectedPayment!.id"></app-payment-voucher>
-  </div>
+<div class="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4" (click)="closeVoucherModal()">
+  <app-payment-voucher [paymentId]="selectedPayment!.id"></app-payment-voucher>
+</div>
 }

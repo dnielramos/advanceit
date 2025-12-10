@@ -19,6 +19,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { finalize } from 'rxjs';
 import { ShippingsService } from '../../../services/shippings.service';
+import { AuthService } from '../../../services/auth.service';
 import {
   Shipping,
   ShippingStatus,
@@ -44,6 +45,7 @@ import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-cr
 })
 export class ShippingsManagerComponent implements OnInit {
   private shippingsService = inject(ShippingsService);
+  private authService = inject(AuthService);
 
   public allShippings: Shipping[] = [];
   public shippings: Shipping[] = [];
@@ -266,6 +268,7 @@ export class ShippingsManagerComponent implements OnInit {
     const finalPayload: any = {
       estado: this.updateStatusPayload.estado,
       description: this.updateStatusPayload.description,
+      user_id: this.authService.getUserId() ?? undefined,
     };
 
     // Si el estado es 'en_transito', agregamos los campos adicionales.

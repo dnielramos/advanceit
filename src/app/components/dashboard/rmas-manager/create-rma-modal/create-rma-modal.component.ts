@@ -158,10 +158,10 @@ export class CreateRmaModalComponent implements OnInit {
     }
     
     // Buscar por razón social en minúsculas
-    const companyName = selectedCompany.razon_social.toLowerCase().trim();
-    console.log('🔍 Buscando inventario por company name:', companyName);
+    // Usar ID de la empresa en lugar de nombre
+    console.log('🔍 Buscando inventario por company ID:', selectedCompany.id);
     
-    this.inventoryService.getInventoryByCompany(companyName).subscribe({
+    this.inventoryService.getInventoryByCompany(selectedCompany.id).subscribe({
       next: (inventories) => {
         console.log('✅ Inventarios recibidos:', inventories);
         console.log('✅ Tipo de dato recibido:', typeof inventories, Array.isArray(inventories));

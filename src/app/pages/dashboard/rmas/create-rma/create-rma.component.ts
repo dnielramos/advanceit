@@ -215,8 +215,8 @@ export class CreateRmaComponent implements OnInit {
       return;
     }
 
-    const companyName = selectedCompany.razon_social.toString().toLowerCase().trim();
-    this.inventoryService.getInventoryByCompany(companyName).subscribe({
+    // Usar ID de la empresa en lugar de nombre, ya que el backend espera el ID
+    this.inventoryService.getInventoryByCompany(selectedCompany.id).subscribe({
       next: (inventories) => {
         const allItems: any[] = [];
         if (Array.isArray(inventories)) {

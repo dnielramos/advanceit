@@ -40,7 +40,7 @@ export interface OrderProducts extends ProductoFinal {
 })
 export class OrdersService {
   // Es una buena práctica definir la URL base en los environments, pero esto funciona.
-  private readonly baseURL = ENVIRONMENT.apiUrl;
+  private readonly baseURL = ENVIRONMENT.apiUrlRender;
   // private baseURL = 'http://localhost:3002';
   private readonly apiUrl = `${this.baseURL}/orders`;
   private readonly productSearchUrl = `${this.baseURL}/advance-products/by-sku`; // Asumo que esta ruta existe

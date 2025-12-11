@@ -257,15 +257,21 @@
 
       <!-- Botones de acción -->
       <div class="pt-4 border-t border-gray-100 space-y-3">
+        <!-- Botón Ver Productos -->
+        <button (click)="openProductsPanel()"
+          class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white font-semibold py-3 px-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
+          <fa-icon [icon]="faBoxes"></fa-icon>
+          <span>Ver Productos</span>
+        </button>
         @if (selectedShipping.guia && selectedShipping.estado === 'en_transito') {
         <button (click)="setShippingToView(selectedShipping.id)"
-          class="w-full flex items-center justify-center gap-2 bg-purple-50 text-purple-600 font-semibold py-3 px-5 rounded-xl border border-purple-200">
+          class="w-full flex items-center justify-center gap-2 bg-purple-50 text-purple-600 font-semibold py-3 px-5 rounded-xl border border-purple-200 hover:bg-purple-100 transition-colors">
           <fa-icon [icon]="faTruck"></fa-icon>
           <span>Ver Comprobante</span>
         </button>
         }
         <button (click)="openUpdateStatusModal()"
-          class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold py-3 px-5 rounded-xl shadow-lg">
+          class="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-5 rounded-xl border border-gray-200 transition-colors">
           <fa-icon [icon]="faEdit"></fa-icon>
           <span>Actualizar Estado</span>
         </button>
@@ -508,6 +514,12 @@
 
       <!-- Botones de acción -->
       <div class="pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
+        <!-- Botón Ver Productos -->
+        <button (click)="openProductsPanel()"
+          class="flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white font-semibold py-3 px-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
+          <fa-icon [icon]="faBoxes"></fa-icon>
+          <span>Ver Productos</span>
+        </button>
         @if (shipping.guia && shipping.estado === 'en_transito') {
         <button (click)="setShippingToView(shipping.id)"
           class="flex items-center justify-center gap-2 bg-purple-50 text-purple-600 font-semibold py-3 px-5 rounded-xl border border-purple-200 hover:bg-purple-100 transition-all">
@@ -516,7 +528,7 @@
         </button>
         }
         <button (click)="openUpdateStatusModal()"
-          class="flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200">
+          class="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-5 rounded-xl border border-gray-200 transition-colors">
           <fa-icon [icon]="faEdit"></fa-icon>
           <span>Actualizar Estado</span>
         </button>
@@ -526,7 +538,6 @@
   }
 </ng-template>
 
-
 @if (isUpdateStatusModalOpen) {
 <app-update-status-modal [isOpen]="isUpdateStatusModalOpen" [isSubmitting]="isSubmitting"
   [availableStatuses]="availableStatuses" [updateStatusPayload]="updateStatusPayload"
@@ -535,10 +546,241 @@
 </app-update-status-modal>
 }
 
+@if (idShippingToView) {
+<app-shipping-viewer [shippingId]="idShippingToView" (close)="closeShippingViewer()"></app-shipping-viewer>
+}
 
-@if (idShippingToView){
+<!-- Panel de Productos - Desktop -->
+@if (showProductsPanel && selectedShipping) {
+<div class="fixed inset-0 z-[60] hidden lg:flex">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeProductsPanel()"></div>
+  
+  <!-- Panel lateral -->
+  <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl flex flex-col animate__animated animate__slideInRight animate__faster">
+    
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200 px-6 py-5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center">
+            <fa-icon [icon]="faBoxes" size="lg" class="text-violet-600"></fa-icon>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">Productos del Envío</h2>
+            <p class="text-sm text-gray-500">Orden {{ selectedShipping.order?.numeroOrden || 'N/A' }}</p>
+          </div>
+        </div>
+        <button (click)="closeProductsPanel()" 
+          class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Resumen -->
+      <div class="mt-4 flex items-center gap-4">
+        <div class="flex items-center gap-2 bg-violet-50 px-3 py-1.5 rounded-lg">
+          <fa-icon [icon]="faCubes" class="text-violet-600 text-sm"></fa-icon>
+          <span class="text-sm font-semibold text-violet-700">{{ orderProducts.length }} producto(s)</span>
+        </div>
+        <div class="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg">
+          <span class="text-sm text-gray-600">Total unidades: <span class="font-bold text-gray-800">{{ getTotalProductsCount() }}</span></span>
+        </div>
+      </div>
+    </div>
 
-<app-shipping-viewer [shippingId]="idShippingToView" (close)="closeShippingViewer()">
+    <!-- Contenido -->
+    <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
+      @if (isLoadingProducts) {
+      <div class="flex flex-col items-center justify-center h-64">
+        <fa-icon [icon]="faCircleNotch" size="2x" class="text-violet-500 animate-spin"></fa-icon>
+        <p class="mt-4 text-gray-500">Cargando productos...</p>
+      </div>
+      } @else if (productsError) {
+      <div class="bg-red-50 border border-red-200 text-red-700 p-5 rounded-xl">
+        <div class="flex items-center gap-3">
+          <fa-icon [icon]="faExclamationTriangle" class="text-red-500"></fa-icon>
+          <p class="font-medium">{{ productsError }}</p>
+        </div>
+      </div>
+      } @else if (orderProducts.length === 0) {
+      <div class="flex flex-col items-center justify-center h-64 text-center">
+        <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+          <fa-icon [icon]="faBoxes" size="lg" class="text-gray-400"></fa-icon>
+        </div>
+        <p class="font-semibold text-gray-700">No hay productos</p>
+        <p class="text-sm text-gray-500 mt-1">Esta orden no tiene productos asociados.</p>
+      </div>
+      } @else {
+      <div class="space-y-4">
+        @for (product of orderProducts; track product.id) {
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex gap-4 p-4">
+            <!-- Imagen -->
+            <div class="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+              @if (product.imagen) {
+              <img [src]="product.imagen" [alt]="product.nombre" class="w-full h-full object-contain" 
+                onerror="this.src='https://advanceit.co/logo.png'">
+              } @else {
+              <div class="w-full h-full flex items-center justify-center">
+                <fa-icon [icon]="faBoxes" class="text-gray-300 text-2xl"></fa-icon>
+              </div>
+              }
+            </div>
+            
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <h4 class="font-bold text-gray-900 text-sm line-clamp-2">{{ product.nombre }}</h4>
+                <span class="flex-shrink-0 bg-violet-100 text-violet-700 font-bold px-3 py-1.5 rounded-lg text-sm">
+                  x{{ product.cantidad_solicitada }}
+                </span>
+              </div>
+              
+              <div class="mt-2 flex flex-wrap gap-2">
+                @if (product.SKU) {
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-mono">SKU: {{ product.SKU }}</span>
+                }
+                @if (product.marca) {
+                <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded font-semibold">{{ product.marca }}</span>
+                }
+                @if (product.categoria) {
+                <span class="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded">{{ product.categoria }}</span>
+                }
+              </div>
 
-</app-shipping-viewer>
+              @if (product.warehouse) {
+              <div class="mt-2 flex items-center gap-2 text-xs text-gray-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
+                </svg>
+                <span><strong>Bodega:</strong> {{ product.warehouse }}</span>
+                @if (product.warehouseId) {
+                <span class="text-gray-400">({{ product.warehouseId }})</span>
+                }
+              </div>
+              }
+            </div>
+          </div>
+          
+          <!-- Descripción expandible -->
+          @if (product.descripcion) {
+          <div class="px-4 pb-4 pt-0">
+            <p class="text-xs text-gray-500 line-clamp-2">{{ product.descripcion }}</p>
+          </div>
+          }
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-white border-t border-gray-200 px-6 py-4">
+      <button (click)="closeProductsPanel()"
+        class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Panel de Productos - Mobile (Bottom Sheet) -->
+<div class="lg:hidden fixed inset-0 z-[60] flex items-end" (click)="closeProductsPanel()">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  
+  <!-- Bottom Sheet -->
+  <div class="relative w-full bg-white rounded-t-3xl max-h-[90vh] overflow-hidden animate__animated animate__slideInUp animate__faster"
+    (click)="$event.stopPropagation()">
+    
+    <!-- Handle -->
+    <div class="flex justify-center pt-3 pb-2">
+      <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="px-5 pb-4 border-b border-gray-100">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+            <fa-icon [icon]="faBoxes" class="text-violet-600"></fa-icon>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Productos</h2>
+            <p class="text-xs text-gray-500">{{ orderProducts.length }} producto(s) - {{ getTotalProductsCount() }} unidades</p>
+          </div>
+        </div>
+        <button (click)="closeProductsPanel()" 
+          class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="overflow-y-auto max-h-[65vh] p-4">
+      @if (isLoadingProducts) {
+      <div class="flex flex-col items-center justify-center h-40">
+        <fa-icon [icon]="faCircleNotch" size="2x" class="text-violet-500 animate-spin"></fa-icon>
+        <p class="mt-3 text-gray-500 text-sm">Cargando...</p>
+      </div>
+      } @else if (productsError) {
+      <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm">
+        {{ productsError }}
+      </div>
+      } @else if (orderProducts.length === 0) {
+      <div class="flex flex-col items-center justify-center h-40 text-center">
+        <fa-icon [icon]="faBoxes" class="text-gray-300 text-3xl mb-2"></fa-icon>
+        <p class="text-gray-500 text-sm">No hay productos</p>
+      </div>
+      } @else {
+      <div class="space-y-3">
+        @for (product of orderProducts; track product.id) {
+        <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+          <div class="flex gap-3">
+            <!-- Imagen pequeña -->
+            <div class="w-14 h-14 bg-white rounded-lg flex-shrink-0 overflow-hidden border border-gray-200">
+              @if (product.imagen) {
+              <img [src]="product.imagen" [alt]="product.nombre" class="w-full h-full object-contain"
+                onerror="this.src='https://advanceit.co/logo.png'">
+              } @else {
+              <div class="w-full h-full flex items-center justify-center">
+                <fa-icon [icon]="faBoxes" class="text-gray-300"></fa-icon>
+              </div>
+              }
+            </div>
+            
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <h4 class="font-semibold text-gray-900 text-sm line-clamp-2">{{ product.nombre }}</h4>
+                <span class="flex-shrink-0 bg-violet-100 text-violet-700 font-bold px-2 py-0.5 rounded text-xs">
+                  x{{ product.cantidad_solicitada }}
+                </span>
+              </div>
+              <div class="mt-1 flex flex-wrap gap-1">
+                @if (product.SKU) {
+                <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-mono">{{ product.SKU }}</span>
+                }
+                @if (product.marca) {
+                <span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-semibold">{{ product.marca }}</span>
+                }
+              </div>
+              @if (product.warehouse) {
+              <p class="text-[10px] text-gray-500 mt-1">📦 {{ product.warehouse }}</p>
+              }
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>
 }

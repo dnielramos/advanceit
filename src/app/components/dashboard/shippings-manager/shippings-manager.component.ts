@@ -21,10 +21,13 @@ import {
   faMapMarkerAlt,
   faHistory,
   faShieldAlt,
+  faBoxes,
+  faCubes,
 } from '@fortawesome/free-solid-svg-icons';
 import { finalize } from 'rxjs';
 import { ShippingsService } from '../../../services/shippings.service';
 import { AuthService } from '../../../services/auth.service';
+import { OrdersService, OrderProducts } from '../../../services/orders.service';
 import {
   Shipping,
   ShippingStatus,
@@ -51,6 +54,7 @@ import { HeaderCrudComponent } from '../../../shared/header-dashboard/heeader-cr
 export class ShippingsManagerComponent implements OnInit {
   private shippingsService = inject(ShippingsService);
   private authService = inject(AuthService);
+  private ordersService = inject(OrdersService);
 
   public allShippings: Shipping[] = [];
   public shippings: Shipping[] = [];
@@ -64,6 +68,13 @@ export class ShippingsManagerComponent implements OnInit {
   public isMobile = false;
   public isDetailsModalOpen = false;
   // --- FIN NUEVA LÓGICA ---
+
+  // --- LÓGICA PARA PRODUCTOS ---
+  public showProductsPanel = false;
+  public orderProducts: OrderProducts[] = [];
+  public isLoadingProducts = false;
+  public productsError: string | null = null;
+  // --- FIN LÓGICA PRODUCTOS ---
 
   public isUpdateStatusModalOpen = false;
   public isSubmitting = false;
@@ -93,7 +104,9 @@ export class ShippingsManagerComponent implements OnInit {
   faSpinner = faSpinner;
   faTruck = faTruck;
   faArrowLeft = faArrowLeft;
-  faTimes = faTimes; // Ícono de cierre
+  faTimes = faTimes;
+  faBoxes = faBoxes;
+  faCubes = faCubes;
 
   public readonly statusInfo: {
     [key in ShippingStatus]: {
@@ -362,6 +375,45 @@ export class ShippingsManagerComponent implements OnInit {
 
   public closeShippingViewer() {
     this.idShippingToView = '';
+  }
+
+  // --- MÉTODOS PARA PRODUCTOS ---
+  openProductsPanel(): void {
+    if (!this.selectedShipping?.order_id) {
+      alert('Este envío no tiene una orden asociada.');
+      return;
+    }
+    this.showProductsPanel = true;
+    this.loadOrderProducts();
+  }
+
+  closeProductsPanel(): void {
+    this.showProductsPanel = false;
+    this.orderProducts = [];
+    this.productsError = null;
+  }
+
+  loadOrderProducts(): void {
+    if (!this.selectedShipping?.order_id) return;
+    
+    this.isLoadingProducts = true;
+    this.productsError = null;
+    
+    this.ordersService.getOrderProducts(this.selectedShipping.order_id, true)
+      .pipe(finalize(() => this.isLoadingProducts = false))
+      .subscribe({
+        next: (products) => {
+          this.orderProducts = products;
+        },
+        error: (err) => {
+          console.error('Error loading products:', err);
+          this.productsError = 'No se pudieron cargar los productos.';
+        }
+      });
+  }
+
+  getTotalProductsCount(): number {
+    return this.orderProducts.reduce((sum, p) => sum + (p.cantidad_solicitada || 1), 0);
   }
 
 }

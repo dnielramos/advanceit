@@ -40,6 +40,7 @@ export class QuotationDetailComponent implements OnInit {
   private shouldAutoPrint: boolean = false;
   returnTo: string = 'cotizaciones';
   private returnOrderId: string | null = null;
+  private returnPaymentId: string | null = null;
 
   constructor(
     private quotationService: QuotationService,
@@ -53,11 +54,13 @@ export class QuotationDetailComponent implements OnInit {
     // Try to get ID from route params first, then fall back to @Input
     const routeId = this.route.snapshot.paramMap.get('id');
     const printParam = this.route.snapshot.queryParamMap.get('print');
-    const fromParam = this.route.snapshot.queryParamMap.get('from');
+    const fromParam = this.route.snapshot.queryParamMap.get('returnTo') || this.route.snapshot.queryParamMap.get('from');
     const orderIdParam = this.route.snapshot.queryParamMap.get('orderId');
+    const paymentIdParam = this.route.snapshot.queryParamMap.get('paymentId');
     this.shouldAutoPrint = printParam === '1';
     this.returnTo = fromParam || 'cotizaciones';
     this.returnOrderId = orderIdParam;
+    this.returnPaymentId = paymentIdParam;
     const idToUse = routeId || this.quotationId;
     
     if (idToUse) {
@@ -120,12 +123,26 @@ export class QuotationDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    if (this.returnTo === 'ordenes' && this.returnOrderId) {
+    if (this.returnTo === 'payments' && this.returnPaymentId) {
+      // Regresar a pagos con el pago seleccionado
+      this.router.navigate(['/dashboard/payments'], {
+        queryParams: { paymentId: this.returnPaymentId }
+      });
+    } else if (this.returnTo === 'ordenes' && this.returnOrderId) {
       this.router.navigate(['/dashboard/ordenes', this.returnOrderId]);
     } else if (this.returnTo === 'ordenes') {
       this.router.navigate(['/dashboard/orders']);
     } else {
       this.router.navigate(['/dashboard/cotizaciones']);
+    }
+  }
+
+  /** Obtiene el texto del botón de regresar */
+  getBackButtonText(): string {
+    switch (this.returnTo) {
+      case 'payments': return 'pagos';
+      case 'ordenes': return 'órdenes';
+      default: return 'cotizaciones';
     }
   }
 

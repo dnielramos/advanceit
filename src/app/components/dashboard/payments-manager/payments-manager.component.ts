@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 
 // FontAwesome
@@ -30,6 +31,7 @@ import {
   faDownload,
   faExchangeAlt,
   faTimesCircle,
+  faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Tus modelos y servicios
@@ -55,6 +57,8 @@ export class PaymentsManagerComponent implements OnInit {
 
   private paymentsService = inject(PaymentsService);
   private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   // Estado del componente
   public allPayments: Payment[] = [];
@@ -62,6 +66,9 @@ export class PaymentsManagerComponent implements OnInit {
   public selectedPayment: Payment | null = null;
   public isLoading = true;
   public error: string | null = null;
+  
+  // Para restaurar el pago seleccionado al regresar
+  private pendingPaymentId: string | null = null;
 
   // Control de visitados para badge "Nuevo"
   private visitedPaymentIds = new Set<string>();
@@ -104,6 +111,7 @@ export class PaymentsManagerComponent implements OnInit {
   faDownload = faDownload;
   faExchangeAlt = faExchangeAlt;
   faTimesCircle = faTimesCircle;
+  faExternalLinkAlt = faExternalLinkAlt;
 
   // --- Helpers para la UI ---
   public readonly statusInfo: StatusInfo = {
@@ -119,6 +127,18 @@ export class PaymentsManagerComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    // Verificar si hay un pago pendiente de seleccionar (regreso desde cotización)
+    this.route.queryParams.subscribe(params => {
+      if (params['paymentId']) {
+        this.pendingPaymentId = params['paymentId'];
+        // Limpiar el query param de la URL sin recargar
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
+        });
+      }
+    });
     this.loadPayments();
   }
 
@@ -137,7 +157,17 @@ export class PaymentsManagerComponent implements OnInit {
           );
           this.allPayments = sorted;
           this.payments = [...this.allPayments];
-          this.updateSelectedPayment();
+          
+          // Restaurar pago seleccionado si viene de navegación
+          if (this.pendingPaymentId) {
+            const payment = this.payments.find(p => p.id === this.pendingPaymentId);
+            if (payment) {
+              this.selectPayment(payment);
+            }
+            this.pendingPaymentId = null;
+          } else {
+            this.updateSelectedPayment();
+          }
         },
         error: (err) => this.error = 'No se pudieron cargar los pagos.',
       });
@@ -436,5 +466,30 @@ export class PaymentsManagerComponent implements OnInit {
    */
   getAuditUserName(user: AuditUser | string | undefined | null): string {
     return getAuditUserName(user);
+  }
+
+  /**
+   * Navega a la cotización asociada al pago seleccionado
+   */
+  navigateToQuotation(): void {
+    if (!this.selectedPayment?.order?.quotation_id) {
+      alert('Este pago no tiene una cotización asociada.');
+      return;
+    }
+
+    const quotationId = this.selectedPayment.order.quotation_id;
+    const paymentId = this.selectedPayment.id;
+
+    // Navegar a cotización pasando el paymentId para regresar
+    this.router.navigate(['/dashboard/cotizaciones', quotationId], {
+      queryParams: { returnTo: 'payments', paymentId: paymentId }
+    });
+  }
+
+  /**
+   * Verifica si el pago tiene cotización asociada
+   */
+  hasQuotation(): boolean {
+    return !!this.selectedPayment?.order?.quotation_id;
   }
 }

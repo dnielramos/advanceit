@@ -314,7 +314,7 @@ export class OrdersComponent implements OnInit {
       monto: this.orderToProcess.precioTotal,
       fechaLimitePago: this.addDays(new Date(), 30).toString(), // hoy mas 30 dias 1 mes
       metodo: 'transferencia' as PaymentMethod,
-      createdBy: userId,
+      user_id: userId,
     };
 
     this.ordersService

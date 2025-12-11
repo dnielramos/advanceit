@@ -20,7 +20,7 @@ export class PaymentsService {
   private readonly http = inject(HttpClient);
 
   // Es recomendable usar variables de entorno para esta URL.
-  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/payments`;
+  private readonly apiUrl = `${ENVIRONMENT.apiUrl}/payments`;
 
   /**
    * Crea un nuevo registro de pago.
@@ -113,15 +113,17 @@ export class PaymentsService {
    * Sube el archivo de comprobante para un pago específico.
    * @param id - ID del pago.
    * @param voucherFile - El archivo (File) del comprobante a subir.
+   * @param userId - ID del usuario que sube el comprobante (REQUERIDO).
    * @returns Un Observable con el pago actualizado (sin el buffer del comprobante).
    */
-  uploadVoucher(id: string, voucherFile: File): Observable<Payment> {
+  uploadVoucher(id: string, voucherFile: File, userId: string): Observable<Payment> {
     const url = `${this.apiUrl}/${id}/voucher`;
 
     // Para subir archivos, se debe usar FormData.
     const formData = new FormData();
     // 'comprobante' debe coincidir con el nombre del campo en el FileInterceptor del backend.
     formData.append('comprobante', voucherFile, voucherFile.name);
+    formData.append('user_id', userId); // 🆕 REQUERIDO
 
     return this.http.post<Payment>(url, formData).pipe(
       tap(() => console.log(`Comprobante subido para el pago ID: ${id}`)),

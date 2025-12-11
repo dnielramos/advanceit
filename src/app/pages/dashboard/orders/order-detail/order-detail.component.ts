@@ -228,7 +228,7 @@ export class OrderDetailComponent implements OnInit {
       monto: currentOrder.precioTotal,
       fechaLimitePago: this.addDays(new Date(), 30).toString(), // hoy mas 30 dias
       metodo: 'transferencia' as PaymentMethod,
-      createdBy: userId,
+      user_id: userId,
     };
 
     this.paymentsService.createPayment(payloadPayment).subscribe({

@@ -1,15 +1,38 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 // FontAwesome
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { IconDefinition, faCashRegister, faCheck, faCircleNotch, faClock, faCreditCard, faExclamationTriangle, faEye, faFileInvoiceDollar, faHandHoldingUsd, faPlus, faTimes, faUpload, faUniversity, faFileArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { 
+  IconDefinition, 
+  faCashRegister, 
+  faCheck, 
+  faCircleNotch, 
+  faClock, 
+  faCreditCard, 
+  faExclamationTriangle, 
+  faEye, 
+  faFileInvoiceDollar, 
+  faHandHoldingUsd, 
+  faPlus, 
+  faTimes, 
+  faUpload, 
+  faUniversity, 
+  faFileArrowUp,
+  faBuilding,
+  faUser,
+  faCalendarAlt,
+  faMoneyBillWave,
+  faEdit,
+  faShieldAlt,
+} from '@fortawesome/free-solid-svg-icons';
 
 // Tus modelos y servicios
 import { PaymentsService } from '../../../services/payments.service';
-import { Payment, PaymentStatus, PaymentMethod, CreatePaymentPayload } from '../../../models/payment.model';
+import { AuthService } from '../../../services/auth.service';
+import { Payment, PaymentStatus, PaymentMethod, CreatePaymentPayload, getAuditUserName, AuditUser } from '../../../models/payment.model';
 import { PaymentVoucherComponent } from "./payment-voucher/payment-voucher.component";
 import { HeaderCrudComponent } from "../../../shared/header-dashboard/heeader-crud.component";
 
@@ -28,12 +51,17 @@ type ActionType = 'status' | 'date' | 'voucher';
 export class PaymentsManagerComponent implements OnInit {
 
   private paymentsService = inject(PaymentsService);
+  private authService = inject(AuthService);
 
   // Estado del componente
+  public allPayments: Payment[] = [];
   public payments: Payment[] = [];
   public selectedPayment: Payment | null = null;
   public isLoading = true;
   public error: string | null = null;
+
+  // Control de visitados para badge "Nuevo"
+  private visitedPaymentIds = new Set<string>();
 
   // Estado para el modal de Creación
   public isCreateModalOpen = false;
@@ -91,7 +119,14 @@ export class PaymentsManagerComponent implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (data) => {
-          this.payments = data;
+          // Ordenar por fecha de creación (más recientes primero)
+          const sorted = data.sort(
+            (a, b) =>
+              new Date(b.created_at || b.fechaLimitePago || 0).getTime() -
+              new Date(a.created_at || a.fechaLimitePago || 0).getTime()
+          );
+          this.allPayments = sorted;
+          this.payments = [...this.allPayments];
           this.updateSelectedPayment();
         },
         error: (err) => this.error = 'No se pudieron cargar los pagos.',
@@ -101,30 +136,24 @@ export class PaymentsManagerComponent implements OnInit {
 
   // --- Lógica de Filtros ---
   handleFilterChange(filter: { texto: string; estado: string }): void {
+    const texto = filter.texto.toLowerCase().trim();
+    const estado = filter.estado;
 
-    this.isLoading = true;
-    this.error = null;
-    this.paymentsService.getAllPayments()
-      .pipe(finalize(() => this.isLoading = false))
-      .subscribe({
-        next: (data) => {
-          let filtered = data;
-
-          // Aplicar filtros
-          if (filter.texto) {
-            filtered = filtered.filter(payment => payment.order_id.includes(filter.texto) ||
-              payment.monto.toString().includes(filter.texto) ||
-              payment.estado.includes(filter.texto));
-          }
-          if (filter.estado) {
-            filtered = filtered.filter(payment => payment.estado === filter.estado);
-          }
-
-          this.payments = filtered;
-          this.updateSelectedPayment();
-        },
-        error: (err) => this.error = 'No se pudieron cargar los pagos.',
-      });
+    this.payments = this.allPayments.filter((payment) => {
+      const matchEstado = estado ? payment.estado === estado : true;
+      
+      // Búsqueda mejorada: incluye orden, empresa, cliente, monto
+      const matchTexto = texto
+        ? payment.order_id?.toLowerCase().includes(texto) ||
+          payment.order?.numeroOrden?.toLowerCase().includes(texto) ||
+          payment.order?.company?.razon_social?.toLowerCase().includes(texto) ||
+          payment.order?.company?.nit?.toLowerCase().includes(texto) ||
+          payment.order?.user?.name?.toLowerCase().includes(texto) ||
+          payment.monto.toString().includes(texto)
+        : true;
+        
+      return matchEstado && matchTexto;
+    });
   }
 
   handleClearFilters(): void {
@@ -134,6 +163,7 @@ export class PaymentsManagerComponent implements OnInit {
 
   selectPayment(payment: Payment): void {
     this.selectedPayment = payment;
+    this.visitedPaymentIds.add(payment.id);
     this.showDetailsMobile = true;
   }
 
@@ -189,7 +219,8 @@ export class PaymentsManagerComponent implements OnInit {
       return;
     }
 
-    this.paymentsService.updatePaymentStatus(this.selectedPayment.id, { estado: this.updateStatus })
+    const userId = this.authService.getUserId() || '';
+    this.paymentsService.updatePaymentStatus(this.selectedPayment.id, { estado: this.updateStatus, user_id: userId })
       .subscribe(() => {
         this.loadPayments();
         this.closeActionModal();
@@ -198,7 +229,8 @@ export class PaymentsManagerComponent implements OnInit {
 
   handleDateUpdate(): void {
     if (!this.selectedPayment) return;
-    this.paymentsService.updatePaymentDate(this.selectedPayment.id, { fechaPago: this.updateDate })
+    const userId = this.authService.getUserId() || '';
+    this.paymentsService.updatePaymentDate(this.selectedPayment.id, { fechaPago: this.updateDate, user_id: userId })
       .subscribe(() => {
         this.loadPayments();
         this.closeActionModal();
@@ -225,8 +257,9 @@ export class PaymentsManagerComponent implements OnInit {
   handleVoucherUpload(): void {
     if (!this.selectedPayment || !this.selectedFile || !this.voucherBase64) return;
 
+    const userId = this.authService.getUserId() || '';
     this.isUploading = true;
-    this.paymentsService.uploadVoucher(this.selectedPayment.id, this.selectedFile)
+    this.paymentsService.uploadVoucher(this.selectedPayment.id, this.selectedFile, userId)
       .pipe(finalize(() => this.isUploading = false))
       .subscribe({
         next: () => {
@@ -235,10 +268,10 @@ export class PaymentsManagerComponent implements OnInit {
 
           // Actualizar estado a pagado y fecha si no lo están
           if (this.selectedPayment?.estado !== 'pagado') {
-            this.paymentsService.updatePaymentStatus(this.selectedPayment!.id, { estado: 'pagado' })
+            this.paymentsService.updatePaymentStatus(this.selectedPayment!.id, { estado: 'pagado', user_id: userId })
               .subscribe(() => {
                 const today = new Date().toISOString().split('T')[0];
-                this.paymentsService.updatePaymentDate(this.selectedPayment!.id, { fechaPago: today })
+                this.paymentsService.updatePaymentDate(this.selectedPayment!.id, { fechaPago: today, user_id: userId })
                   .subscribe(() => {
                     this.loadPayments();
                     this.closeActionModal();
@@ -288,6 +321,7 @@ export class PaymentsManagerComponent implements OnInit {
       monto: 0,
       fechaLimitePago: new Date().toISOString().split('T')[0],
       metodo: 'transferencia',
+      user_id: this.authService.getUserId() || '',
     };
   }
 
@@ -295,5 +329,31 @@ export class PaymentsManagerComponent implements OnInit {
     if (this.selectedPayment) {
       this.selectedPayment = this.payments.find(p => p.id === this.selectedPayment?.id) || null;
     }
+  }
+
+  /**
+   * Verifica si un pago es "nuevo" (creado hace menos de 1 hora y no visitado)
+   */
+  isNewPayment(payment: Payment): boolean {
+    if (!payment.created_at) {
+      return false;
+    }
+    const createdAt = new Date(payment.created_at).getTime();
+    if (isNaN(createdAt)) {
+      return false;
+    }
+    const oneHourInMs = 60 * 60 * 1000;
+    const diffMs = Date.now() - createdAt;
+    if (diffMs > oneHourInMs) {
+      return false;
+    }
+    return !this.visitedPaymentIds.has(payment.id);
+  }
+
+  /**
+   * Obtiene el nombre del usuario de auditoría (created_by, updated_by)
+   */
+  getAuditUserName(user: AuditUser | string | undefined | null): string {
+    return getAuditUserName(user);
   }
 }

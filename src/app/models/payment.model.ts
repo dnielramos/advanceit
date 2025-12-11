@@ -11,18 +11,58 @@ export type PaymentStatus = 'pendiente' | 'pagado' | 'no_pagado' | 'atrasado';
 export type PaymentMethod = 'transferencia' | 'tarjeta' | 'credito';
 
 /**
- * Representa la entidad principal de un pago.
- * Omitimos 'comprobante' ya que rara vez se transfiere este Buffer en las respuestas GET.
+ * Información del usuario en un pago.
+ */
+export interface PaymentUserInfo {
+  id: string;
+  name: string;
+  email?: string;
+}
+
+/**
+ * Información de la empresa en un pago.
+ */
+export interface PaymentCompanyInfo {
+  id: number;
+  razon_social: string;
+  nit: string;
+}
+
+/**
+ * Información de la orden asociada al pago.
+ */
+export interface PaymentOrderInfo {
+  id: string;
+  numeroOrden: string;
+  quotation_id?: string;
+  company?: PaymentCompanyInfo;
+  user?: PaymentUserInfo;
+}
+
+/**
+ * Información de auditoría (created_by, updated_by).
+ */
+export interface AuditUser {
+  id: string;
+  name: string;
+}
+
+/**
+ * Representa la entidad principal de un pago con la nueva estructura del backend.
  */
 export interface Payment {
   id: string; // UUID
   order_id: string;
+  order?: PaymentOrderInfo; // 🆕 Datos poblados de la orden
   monto: number;
-  fechaLimitePago: string; // formato YYYY-MM-DD
+  fechaLimitePago: string; // formato YYYY-MM-DD o ISO
   metodo: PaymentMethod;
   estado: PaymentStatus;
-  createdBy?: string;
-  fechaPago?: string; // formato YYYY-MM-DD
+  created_by?: AuditUser | string; // 🆕 Usuario que creó el pago
+  updated_by?: AuditUser | string | null; // 🆕 Usuario que actualizó el pago
+  created_at?: string; // 🆕 Fecha de creación ISO
+  updated_at?: string; // 🆕 Fecha de actualización ISO
+  fechaPago?: string | null; // formato YYYY-MM-DD o ISO
   comprobante?: string; // Base64 del comprobante
 }
 
@@ -32,7 +72,13 @@ export interface Payment {
  * Datos necesarios para crear un nuevo pago.
  * Corresponde al `CreatePaymentDto` del backend.
  */
-export type CreatePaymentPayload = Omit<Payment, 'id' | 'estado' | 'fechaPago'>;
+export interface CreatePaymentPayload {
+  order_id: string;
+  monto: number;
+  fechaLimitePago: string;
+  metodo: PaymentMethod;
+  user_id: string; // 🆕 REQUERIDO: ID del usuario que crea
+}
 
 /**
  * Datos para actualizar el estado de un pago.
@@ -40,6 +86,7 @@ export type CreatePaymentPayload = Omit<Payment, 'id' | 'estado' | 'fechaPago'>;
  */
 export interface UpdateStatusPayload {
   estado: PaymentStatus;
+  user_id: string; // 🆕 REQUERIDO: ID del usuario que actualiza
 }
 
 /**
@@ -48,4 +95,16 @@ export interface UpdateStatusPayload {
  */
 export interface UpdateDatePayload {
   fechaPago: string; // YYYY-MM-DD
+  user_id: string; // 🆕 REQUERIDO: ID del usuario que actualiza
+}
+
+// --- Helpers ---
+
+/**
+ * Helper para obtener el nombre del usuario de auditoría.
+ */
+export function getAuditUserName(user: AuditUser | string | undefined | null): string {
+  if (!user) return 'Desconocido';
+  if (typeof user === 'string') return user;
+  return user.name;
 }

@@ -1,133 +1,344 @@
-<div class="bg-gray-50 min-h-screen font-sans text-gray-800 p-4 sm:p-6 lg:p-8">
+<div class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-sans text-gray-800 p-4 sm:p-6 lg:p-8">
 
-  <app-header-crud titulo="Pagos" descripcion="Gestion de pagos Advance." textoBotonActualizar="Refrescar"
-    placeholderInput="Buscar por Orden, Monto o Estado..." [filterByStatus]="true"
+  <app-header-crud titulo="Gestión de Pagos" descripcion="Administra y rastrea todos los pagos de órdenes en tiempo real." textoBotonActualizar="Refrescar"
+    placeholderInput="Buscar por orden, empresa, cliente, monto..." [filterByStatus]="true"
     [filterStatusValues]="['pendiente', 'pagado', 'no_pagado', 'atrasado']" (actualizar)="loadPayments()"
     (clearFilters)="handleClearFilters()" (filterChange)="handleFilterChange($event)">
   </app-header-crud>
 
-  <main class="flex p-2 flex-col lg:flex-row h-[calc(100vh-140px)] overflow-hidden mt-6">
+  <main class="flex p-2 flex-col lg:flex-row h-[calc(100vh-160px)] overflow-hidden mt-6 gap-4">
 
-    <!-- Lista de Pagos - Desktop: Scroll Interno, Mobile: Vista Normal -->
-    <div class="w-full lg:w-1/3 xl:w-1/2 overflow-y-auto pr-3 lg:border-r lg:border-gray-200">
+    <!-- Lista de Pagos -->
+    <div class="w-full lg:w-2/5 xl:w-1/3 overflow-y-auto pr-0 lg:pr-4">
       @if (isLoading) {
-      <div class="flex justify-center items-center h-64">
-        <fa-icon [icon]="faCircleNotch" size="3x" class="text-purple-500 animate-spin"></fa-icon>
+      <div class="flex flex-col items-center justify-center h-64 bg-white rounded-2xl shadow-sm">
+        <fa-icon [icon]="faCircleNotch" size="3x" class="text-emerald-500 animate-spin"></fa-icon>
+        <p class="mt-4 text-gray-500 font-medium">Cargando pagos...</p>
       </div>
       } @else if (error) {
-      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center gap-3">
-        <fa-icon [icon]="faExclamationTriangle"></fa-icon>
-        <p class="font-bold">{{ error }}</p>
+      <div class="bg-red-50 border border-red-200 text-red-700 p-5 rounded-2xl shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-red-100 rounded-full">
+            <fa-icon [icon]="faExclamationTriangle" class="text-red-500"></fa-icon>
+          </div>
+          <div>
+            <p class="font-bold">Error al cargar</p>
+            <p class="text-sm text-red-600">{{ error }}</p>
+          </div>
+        </div>
       </div>
       } @else if (!payments.length) {
-      <div class="text-center text-gray-400 p-8">
-        <fa-icon [icon]="faEye" size="3x" class="mb-3"></fa-icon>
-        <p class="font-semibold">Lo siento...</p>
-        <p class="text-sm">No encontré pagos con ese filtro.</p>
+      <div class="flex flex-col items-center justify-center h-64 bg-white rounded-2xl shadow-sm text-center p-8">
+        <div class="p-4 bg-gray-100 rounded-full mb-4">
+          <fa-icon [icon]="faFileInvoiceDollar" size="2x" class="text-gray-400"></fa-icon>
+        </div>
+        <p class="font-semibold text-gray-700">No hay pagos</p>
+        <p class="text-sm text-gray-500 mt-1">Intenta con otros filtros o recarga la lista.</p>
       </div>
       } @else {
-      <div class="space-y-3 pb-4">
+      <div class="space-y-3">
         @for (payment of payments; track payment.id) {
-        <div (click)="selectPayment(payment)"
-          [ngClass]="{'bg-purple-50 border-purple-500 shadow-lg': selectedPayment?.id === payment.id, 'bg-white border-gray-200 hover:border-purple-400 hover:shadow-md': selectedPayment?.id !== payment.id}"
-          class="p-4 border rounded-lg cursor-pointer transition-all duration-300">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-sm text-gray-500">Orden: {{ payment.order_id }}</p>
-              <p class="font-bold text-lg text-gray-800">{{ payment.monto | currency:'USD':'symbol':'1.2-2' }}</p>
+        <div (click)="selectPayment(payment)" [ngClass]="{
+            'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-400 shadow-lg ring-2 ring-emerald-200':
+              selectedPayment?.id === payment.id,
+            'bg-white border-gray-100 hover:border-emerald-300 hover:shadow-md':
+              selectedPayment?.id !== payment.id
+          }" class="p-4 border rounded-xl cursor-pointer transition-all duration-300 group">
+          
+          <!-- Header de la tarjeta -->
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-md">
+                  {{ payment.order?.numeroOrden || 'Sin orden' }}
+                </span>
+                @if (isNewPayment(payment)) {
+                <span class="text-[10px] font-extrabold uppercase tracking-wide text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                  Nuevo
+                </span>
+                }
+              </div>
+              <p class="font-semibold text-gray-800 truncate">
+                {{ payment.order?.company?.razon_social || 'Empresa no asignada' }}
+              </p>
+              <p class="text-xs text-gray-500 mt-0.5 truncate">
+                NIT: {{ payment.order?.company?.nit || 'N/A' }}
+              </p>
+              @if (payment.created_at) {
+              <p class="text-[11px] text-gray-400 mt-0.5">
+                Creado: {{ payment.created_at | date: 'short' }}
+              </p>
+              }
             </div>
-            <span [ngClass]="statusInfo[payment.estado].color"
-              class="flex items-center gap-2 text-xs font-semibold bg-gray-100 px-2 py-1 rounded-full">
-              <fa-icon [icon]="statusInfo[payment.estado].icon"></fa-icon>
+            <span [ngClass]="{
+              'bg-orange-100 text-orange-700 border-orange-200': payment.estado === 'pendiente',
+              'bg-green-100 text-green-700 border-green-200': payment.estado === 'pagado',
+              'bg-red-100 text-red-700 border-red-200': payment.estado === 'no_pagado',
+              'bg-yellow-100 text-yellow-700 border-yellow-200': payment.estado === 'atrasado'
+            }" class="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border whitespace-nowrap">
+              <fa-icon [icon]="statusInfo[payment.estado].icon" class="text-[10px]"></fa-icon>
               {{ statusInfo[payment.estado].label }}
             </span>
           </div>
-          <p class="text-xs text-gray-400 mt-2">Vence: {{ payment.fechaLimitePago | date }}</p>
+
+          <!-- Monto prominente -->
+          <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-3 mb-3">
+            <p class="text-xs text-gray-500 mb-1">Monto a Pagar</p>
+            <p class="font-bold text-xl text-gray-900">{{ payment.monto | currency:'COP':'symbol':'1.0-0' }}</p>
+          </div>
+
+          <!-- Info secundaria -->
+          <div class="flex items-center gap-4 text-xs text-gray-500">
+            <div class="flex items-center gap-1.5">
+              <fa-icon [icon]="methodInfo[payment.metodo].icon" class="text-gray-400"></fa-icon>
+              <span>{{ methodInfo[payment.metodo].label }}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <fa-icon [icon]="faClock" class="text-gray-400"></fa-icon>
+              <span>Vence: {{ payment.fechaLimitePago | date: 'shortDate' }}</span>
+            </div>
+          </div>
+
+          <!-- Footer con cliente -->
+          @if (payment.order?.user?.name) {
+          <div class="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+            <div class="w-6 h-6 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+              {{ payment.order?.user?.name?.charAt(0)?.toUpperCase() }}
+            </div>
+            <span class="text-xs text-gray-600 truncate">{{ payment.order?.user?.name }}</span>
+          </div>
+          }
         </div>
         }
       </div>
       }
     </div>
 
-    <!-- Detalles del Pago - Desktop: Scroll Interno, Mobile: Modal -->
-    <div class="w-full lg:w-2/3 xl:w-3/4 overflow-y-auto pl-3 hidden lg:block">
+    <!-- Panel de detalles -->
+    <div class="w-full lg:w-3/5 xl:w-2/3 overflow-y-auto hidden lg:block">
       @if (selectedPayment) {
-      <!-- Vista Desktop -->
-      <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
-        <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-4 border-b border-gray-200 mb-6">
-          <div>
-            <h2 class="text-2xl font-bold text-purple-700">Detalles del Pago</h2>
-            <p class="text-sm text-gray-500">Orden: {{ selectedPayment.order_id }}</p>
-          </div>
-          <div class="mt-4 sm:mt-0 text-right">
-            <p class="text-sm text-gray-600">Monto a Pagar</p>
-            <p class="font-semibold text-2xl">{{ selectedPayment.monto | currency:'USD':'symbol':'1.2-2' }}</p>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
+
+        <!-- Header con fondo claro -->
+        <div class="bg-white px-6 pt-5 pb-4 border-b border-gray-100">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
+                  {{ selectedPayment.order?.numeroOrden || 'Sin número' }}
+                </span>
+                <span [ngClass]="{
+                  'bg-orange-100 text-orange-800 border border-orange-200': selectedPayment.estado === 'pendiente',
+                  'bg-green-100 text-green-800 border border-green-200': selectedPayment.estado === 'pagado',
+                  'bg-red-100 text-red-800 border border-red-200': selectedPayment.estado === 'no_pagado',
+                  'bg-yellow-100 text-yellow-800 border border-yellow-200': selectedPayment.estado === 'atrasado'
+                }" class="flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full">
+                  <fa-icon [icon]="statusInfo[selectedPayment.estado].icon" class="text-[10px]"></fa-icon>
+                  {{ statusInfo[selectedPayment.estado].label }}
+                </span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Detalle del Pago</h2>
+            </div>
+            <div class="text-left sm:text-right">
+              @if (selectedPayment.created_at) {
+              <p class="text-xs text-gray-500">Creado</p>
+              <p class="font-medium text-gray-800 text-sm">{{ selectedPayment.created_at | date: 'medium' }}</p>
+              }
+            </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div class="flex items-center gap-3">
-            <fa-icon [icon]="statusInfo[selectedPayment.estado].icon" size="lg"
-              [ngClass]="statusInfo[selectedPayment.estado].color"></fa-icon>
-            <div>
-              <span class="text-sm text-gray-500">Estado</span>
-              <p class="font-semibold">{{ statusInfo[selectedPayment.estado].label }}</p>
+        <div class="p-6">
+          <!-- Monto prominente -->
+          <div class="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-100">
+            <p class="text-sm text-emerald-600 mb-2">Monto Total a Pagar</p>
+            <p class="text-4xl font-bold text-gray-900">{{ selectedPayment.monto | currency:'COP':'symbol':'1.0-0' }}</p>
+          </div>
+
+          <!-- Sección: Información de la Orden -->
+          <div class="mb-8">
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </span>
+              Información de la Orden
+            </h3>
+            <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p class="text-xs text-gray-500 mb-1">Número de Orden</p>
+                  <p class="font-bold text-emerald-600 text-lg">{{ selectedPayment.order?.numeroOrden || 'N/A' }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500 mb-1">ID Interno</p>
+                  <p class="font-mono text-xs text-gray-600 break-all">{{ selectedPayment.order_id }}</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="flex items-center gap-3">
-            <fa-icon [icon]="methodInfo[selectedPayment.metodo].icon" size="lg" class="text-gray-500"></fa-icon>
-            <div>
-              <span class="text-sm text-gray-500">Método</span>
-              <p class="font-semibold">{{ methodInfo[selectedPayment.metodo].label }}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <fa-icon [icon]="faClock" size="lg" class="text-gray-500"></fa-icon>
-            <div>
-              <span class="text-sm text-gray-500">Fecha Límite</span>
-              <p class="font-semibold">{{ selectedPayment.fechaLimitePago | date:'longDate' }}</p>
-            </div>
-          </div>
-          @if(selectedPayment.fechaPago) {
-          <div class="flex items-center gap-3">
-            <fa-icon [icon]="faCheck" size="lg" class="text-green-500"></fa-icon>
-            <div>
-              <span class="text-sm text-gray-500">Fecha de Pago</span>
-              <p class="font-semibold">{{ selectedPayment.fechaPago | date:'longDate' }}</p>
+
+          <!-- Sección: Empresa -->
+          @if (selectedPayment.order?.company) {
+          <div class="mb-8">
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+              </span>
+              Empresa
+            </h3>
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
+              <div class="flex items-start gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  {{ selectedPayment.order?.company?.razon_social?.charAt(0)?.toUpperCase() || 'E' }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-gray-900 text-lg truncate">{{ selectedPayment.order?.company?.razon_social }}</p>
+                  <p class="text-sm text-gray-600 mt-1">
+                    <span class="font-medium">NIT:</span> {{ selectedPayment.order?.company?.nit }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           }
-        </div>
 
-        <div class="mt-8 pt-6 border-t border-gray-200 flex flex-wrap gap-4">
-          <button (click)="openActionModal('status')"
-            class="btn-action bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-lg font-semibold transition-colors">
-            Cambiar Estado
-          </button>
-          <button (click)="openActionModal('date')"
-            class="btn-action bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-semibold transition-colors">
-            Fijar Fecha de Pago
-          </button>
-          <button
-            *ngIf="selectedPayment?.estado === 'pendiente' || selectedPayment?.estado === 'atrasado' || selectedPayment?.estado === 'no_pagado'"
-            (click)="openActionModal('voucher')"
-            class="btn-action bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
-            <fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante
-          </button>
-          <button *ngIf="selectedPayment?.estado === 'pagado'" (click)="showVoucherModal()"
-            class="btn-action bg-green-100 text-purple-600 hover:bg-green-200 flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
-            <fa-icon [icon]="faEye"></fa-icon>Mirar Comprobante
-          </button>
+          <!-- Sección: Cliente/Usuario -->
+          @if (selectedPayment.order?.user) {
+          <div class="mb-8">
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </span>
+              Cliente
+            </h3>
+            <div class="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-xl p-5 border border-teal-100">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  {{ selectedPayment.order?.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-gray-900">{{ selectedPayment.order?.user?.name }}</p>
+                  @if (selectedPayment.order?.user?.email) {
+                  <p class="text-sm text-gray-600 truncate">{{ selectedPayment.order?.user?.email }}</p>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+
+          <!-- Sección: Detalles del Pago -->
+          <div class="mb-8">
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                <fa-icon [icon]="faCashRegister" class="text-amber-600 text-sm"></fa-icon>
+              </span>
+              Detalles del Pago
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-1">Método de Pago</p>
+                <div class="flex items-center gap-2">
+                  <fa-icon [icon]="methodInfo[selectedPayment.metodo].icon" class="text-gray-600"></fa-icon>
+                  <p class="font-semibold text-gray-800">{{ methodInfo[selectedPayment.metodo].label }}</p>
+                </div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-1">Estado</p>
+                <div class="flex items-center gap-2">
+                  <fa-icon [icon]="statusInfo[selectedPayment.estado].icon" [ngClass]="statusInfo[selectedPayment.estado].color"></fa-icon>
+                  <p class="font-semibold text-gray-800">{{ statusInfo[selectedPayment.estado].label }}</p>
+                </div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-1">Fecha Límite de Pago</p>
+                <p class="font-semibold text-gray-800">{{ selectedPayment.fechaLimitePago | date: 'longDate' }}</p>
+              </div>
+              @if (selectedPayment.fechaPago) {
+              <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+                <p class="text-xs text-green-600 mb-1">Fecha de Pago Real</p>
+                <p class="font-bold text-green-700">{{ selectedPayment.fechaPago | date: 'longDate' }}</p>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Sección: Información de Auditoría -->
+          @if (selectedPayment.created_by || selectedPayment.updated_by) {
+          <div class="mb-6">
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+              </span>
+              Auditoría
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              @if (selectedPayment.created_by) {
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-1">Creado por</p>
+                <p class="font-medium text-gray-800">{{ getAuditUserName(selectedPayment.created_by) }}</p>
+                @if (selectedPayment.created_at) {
+                <p class="text-xs text-gray-500 mt-1">{{ selectedPayment.created_at | date: 'medium' }}</p>
+                }
+              </div>
+              }
+              @if (selectedPayment.updated_by) {
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-1">Última actualización por</p>
+                <p class="font-medium text-gray-800">{{ getAuditUserName(selectedPayment.updated_by) }}</p>
+                @if (selectedPayment.updated_at) {
+                <p class="text-xs text-gray-500 mt-1">{{ selectedPayment.updated_at | date: 'medium' }}</p>
+                }
+              </div>
+              }
+            </div>
+          </div>
+          }
+
+          <!-- Botones de acción -->
+          <div class="pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
+            <button (click)="openActionModal('status')"
+              class="flex items-center justify-center gap-2 bg-blue-50 text-blue-600 font-semibold py-3 px-5 rounded-xl border border-blue-200 hover:bg-blue-100 transition-all">
+              Cambiar Estado
+            </button>
+            <button (click)="openActionModal('date')"
+              class="flex items-center justify-center gap-2 bg-amber-50 text-amber-600 font-semibold py-3 px-5 rounded-xl border border-amber-200 hover:bg-amber-100 transition-all">
+              Fijar Fecha de Pago
+            </button>
+            @if (selectedPayment.estado === 'pendiente' || selectedPayment.estado === 'atrasado' || selectedPayment.estado === 'no_pagado') {
+            <button (click)="openActionModal('voucher')"
+              class="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-200">
+              <fa-icon [icon]="faFileArrowUp"></fa-icon>
+              <span>Subir Comprobante</span>
+            </button>
+            }
+            @if (selectedPayment.estado === 'pagado') {
+            <button (click)="showVoucherModal()"
+              class="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-200">
+              <fa-icon [icon]="faEye"></fa-icon>
+              <span>Ver Comprobante</span>
+            </button>
+            }
+          </div>
         </div>
       </div>
       } @else {
       <!-- Placeholder cuando no hay selección -->
-      <div
-        class="flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
-        <div class="text-center text-gray-500">
-          <fa-icon [icon]="faFileInvoiceDollar" size="4x" class="mb-4"></fa-icon>
-          <p class="text-xl font-semibold">Selecciona un pago</p>
-          <p>Elige un pago de la lista para ver sus detalles y acciones.</p>
+      <div class="flex items-center justify-center h-full bg-white/80 backdrop-blur-sm border-2 border-dashed border-gray-200 rounded-2xl">
+        <div class="text-center p-8">
+          <div class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mb-6">
+            <fa-icon [icon]="faFileInvoiceDollar" size="2x" class="text-emerald-400"></fa-icon>
+          </div>
+          <p class="text-xl font-bold text-gray-700">Selecciona un pago</p>
+          <p class="text-gray-500 mt-2 max-w-xs mx-auto">Haz clic en cualquier pago de la lista para ver sus detalles completos</p>
         </div>
       </div>
       }
@@ -137,80 +348,116 @@
 
 <!-- Modal de Detalles para Mobile -->
 @if (showDetailsMobile && selectedPayment) {
-<div class="lg:hidden fixed inset-0 bg-black/60 z-50 flex items-end" (click)="closeDetailsMobile()">
-  <div class="bg-white rounded-t-3xl w-full max-h-[85vh] overflow-y-auto animate__animated animate__slideInUp"
+<div class="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end" (click)="closeDetailsMobile()">
+  <div class="bg-white rounded-t-3xl w-full max-h-[85vh] overflow-y-auto animate__animated animate__slideInUp animate__faster"
     (click)="$event.stopPropagation()">
     <!-- Header del Modal -->
-    <div class="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center rounded-t-3xl">
-      <h2 class="text-xl font-bold text-purple-700">Detalles del Pago</h2>
+    <div class="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center rounded-t-3xl z-50">
+      <h2 class="text-xl font-bold text-emerald-700">Detalles del Pago</h2>
       <button (click)="closeDetailsMobile()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
     </div>
 
     <!-- Contenido del Modal -->
-    <div class="p-6">
-      <div class="mb-6">
-        <p class="text-sm text-gray-500">Orden: {{ selectedPayment.order_id }}</p>
-        <p class="font-semibold text-3xl text-violet-700 mt-2">{{ selectedPayment.monto |
-          currency:'USD':'symbol':'1.2-2' }}</p>
+    <div class="p-4">
+      <!-- Estado prominente -->
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-3 py-1 rounded-lg">
+          {{ selectedPayment.order?.numeroOrden || 'Sin orden' }}
+        </span>
+        <span [ngClass]="{
+          'bg-orange-100 text-orange-700': selectedPayment.estado === 'pendiente',
+          'bg-green-100 text-green-700': selectedPayment.estado === 'pagado',
+          'bg-red-100 text-red-700': selectedPayment.estado === 'no_pagado',
+          'bg-yellow-100 text-yellow-700': selectedPayment.estado === 'atrasado'
+        }" class="flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-lg">
+          <fa-icon [icon]="statusInfo[selectedPayment.estado].icon" class="text-[10px]"></fa-icon>
+          {{ statusInfo[selectedPayment.estado].label }}
+        </span>
       </div>
 
-      <div class="space-y-4 mb-8">
-        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-          <fa-icon [icon]="statusInfo[selectedPayment.estado].icon" size="lg"
-            [ngClass]="statusInfo[selectedPayment.estado].color"></fa-icon>
-          <div>
-            <span class="text-sm text-gray-500">Estado</span>
-            <p class="font-semibold">{{ statusInfo[selectedPayment.estado].label }}</p>
+      <!-- Monto prominente -->
+      <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 mb-4 border border-emerald-100">
+        <p class="text-xs text-emerald-600 mb-1">Monto Total a Pagar</p>
+        <p class="font-bold text-2xl text-gray-900">{{ selectedPayment.monto | currency:'COP':'symbol':'1.0-0' }}</p>
+      </div>
+
+      <!-- Empresa -->
+      @if (selectedPayment.order?.company) {
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-4 border border-blue-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow">
+            {{ selectedPayment.order?.company?.razon_social?.charAt(0)?.toUpperCase() || 'E' }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-gray-900 text-sm truncate">{{ selectedPayment.order?.company?.razon_social }}</p>
+            <p class="text-xs text-gray-600">NIT: {{ selectedPayment.order?.company?.nit }}</p>
           </div>
         </div>
+      </div>
+      }
 
-        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-          <fa-icon [icon]="methodInfo[selectedPayment.metodo].icon" size="lg" class="text-gray-500"></fa-icon>
-          <div>
-            <span class="text-sm text-gray-500">Método</span>
-            <p class="font-semibold">{{ methodInfo[selectedPayment.metodo].label }}</p>
+      <!-- Cliente -->
+      @if (selectedPayment.order?.user) {
+      <div class="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-xl p-4 mb-4 border border-teal-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold shadow">
+            {{ selectedPayment.order?.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-gray-900 text-sm">{{ selectedPayment.order?.user?.name }}</p>
+            @if (selectedPayment.order?.user?.email) {
+            <p class="text-xs text-gray-600 truncate">{{ selectedPayment.order?.user?.email }}</p>
+            }
           </div>
         </div>
+      </div>
+      }
 
-        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-          <fa-icon [icon]="faClock" size="lg" class="text-gray-500"></fa-icon>
-          <div>
-            <span class="text-sm text-gray-500">Fecha Límite</span>
-            <p class="font-semibold">{{ selectedPayment.fechaLimitePago | date:'longDate' }}</p>
+      <!-- Detalles del pago -->
+      <div class="space-y-3 mb-6">
+        <div class="bg-gray-50 rounded-xl p-3">
+          <p class="text-xs text-gray-500 mb-1">Método de Pago</p>
+          <div class="flex items-center gap-2">
+            <fa-icon [icon]="methodInfo[selectedPayment.metodo].icon" class="text-gray-600"></fa-icon>
+            <p class="font-semibold text-gray-800 text-sm">{{ methodInfo[selectedPayment.metodo].label }}</p>
           </div>
         </div>
-
-        @if(selectedPayment.fechaPago) {
-        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-          <fa-icon [icon]="faCheck" size="lg" class="text-green-500"></fa-icon>
-          <div>
-            <span class="text-sm text-gray-500">Fecha de Pago</span>
-            <p class="font-semibold">{{ selectedPayment.fechaPago | date:'longDate' }}</p>
-          </div>
+        <div class="bg-gray-50 rounded-xl p-3">
+          <p class="text-xs text-gray-500 mb-1">Fecha Límite</p>
+          <p class="font-semibold text-gray-800 text-sm">{{ selectedPayment.fechaLimitePago | date: 'longDate' }}</p>
+        </div>
+        @if (selectedPayment.fechaPago) {
+        <div class="bg-green-50 rounded-xl p-3 border border-green-200">
+          <p class="text-xs text-green-600 mb-1">Fecha de Pago Real</p>
+          <p class="font-bold text-green-700 text-sm">{{ selectedPayment.fechaPago | date: 'longDate' }}</p>
         </div>
         }
       </div>
 
-      <!-- Acciones -->
-      <div class="space-y-3">
+      <!-- Botones de acción -->
+      <div class="pt-4 border-t border-gray-100 space-y-3">
         <button (click)="openActionModal('status')"
-          class="w-full bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-3 rounded-lg font-semibold transition-colors">
+          class="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-3 rounded-xl font-semibold transition-colors border border-blue-200">
           Cambiar Estado
         </button>
         <button (click)="openActionModal('date')"
-          class="w-full bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-3 rounded-lg font-semibold transition-colors">
+          class="w-full bg-amber-50 text-amber-600 hover:bg-amber-100 px-4 py-3 rounded-xl font-semibold transition-colors border border-amber-200">
           Fijar Fecha de Pago
         </button>
-        <button
-          *ngIf="selectedPayment?.estado === 'pendiente' || selectedPayment?.estado === 'atrasado' || selectedPayment?.estado === 'no_pagado'"
-          (click)="openActionModal('voucher')"
-          class="w-full bg-green-100 text-green-700 hover:bg-green-200 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-colors">
-          <fa-icon [icon]="faFileArrowUp"></fa-icon>Subir Comprobante
+        @if (selectedPayment.estado === 'pendiente' || selectedPayment.estado === 'atrasado' || selectedPayment.estado === 'no_pagado') {
+        <button (click)="openActionModal('voucher')"
+          class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold py-3 px-5 rounded-xl shadow-lg">
+          <fa-icon [icon]="faFileArrowUp"></fa-icon>
+          <span>Subir Comprobante</span>
         </button>
-        <button *ngIf="selectedPayment?.estado === 'pagado'" (click)="showVoucherModal()"
-          class="w-full bg-purple-100 text-purple-600 hover:bg-purple-200 flex items-center  justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors">
-          <fa-icon [icon]="faEye"></fa-icon>Mirar Comprobante
+        }
+        @if (selectedPayment.estado === 'pagado') {
+        <button (click)="showVoucherModal()"
+          class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold py-3 px-5 rounded-xl shadow-lg">
+          <fa-icon [icon]="faEye"></fa-icon>
+          <span>Ver Comprobante</span>
         </button>
+        }
       </div>
     </div>
   </div>

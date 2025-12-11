@@ -41,7 +41,7 @@ export interface UpdatePasswordDto {
   providedIn: 'root'
 })
 export class UsersService {
-  private apiUrl = `${ENVIRONMENT.apiUrl}/users`;
+  private apiUrl = `${ENVIRONMENT.apiUrlRender}/users`;
 
   constructor(private http: HttpClient) { }
 

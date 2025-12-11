@@ -15,7 +15,12 @@ import {
   faTruck,
   faWarehouse,
   faArrowLeft,
-  faTimes, // Importar ícono para cerrar el modal
+  faTimes,
+  faBuilding,
+  faUser,
+  faMapMarkerAlt,
+  faHistory,
+  faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { finalize } from 'rxjs';
 import { ShippingsService } from '../../../services/shippings.service';
@@ -137,10 +142,11 @@ export class ShippingsManagerComponent implements OnInit {
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (data) => {
+          // Ordenar por fecha de creación (más recientes primero)
           const sorted = data.sort(
             (a, b) =>
-              new Date(b.fechaEstimada || 0).getTime() -
-              new Date(a.fechaEstimada || 0).getTime()
+              new Date(b.created_at || b.fechaEstimada || 0).getTime() -
+              new Date(a.created_at || a.fechaEstimada || 0).getTime()
           );
           this.allShippings = sorted;
           this.shippings = [...this.allShippings];
@@ -169,17 +175,25 @@ export class ShippingsManagerComponent implements OnInit {
   }
 
   applyFilters(): void {
-    const texto = this.filters.texto.toLowerCase();
+    const texto = this.filters.texto.toLowerCase().trim();
     const estado = this.filters.estado;
 
     this.shippings = this.allShippings.filter((shipping) => {
       const matchEstado = estado ? shipping.estado === estado : true;
-      // MEJORA: Buscar también por guía y transportadora
+      
+      // Búsqueda mejorada: incluye orden, empresa, cliente, guía, transportadora
       const matchTexto = texto
-        ? shipping.order_id.toLowerCase().includes(texto) ||
+        ? shipping.order_id?.toLowerCase().includes(texto) ||
+          shipping.order?.numeroOrden?.toLowerCase().includes(texto) ||
+          shipping.order?.company?.razon_social?.toLowerCase().includes(texto) ||
+          shipping.order?.company?.nit?.toLowerCase().includes(texto) ||
+          shipping.order?.user?.name?.toLowerCase().includes(texto) ||
+          shipping.order?.user?.email?.toLowerCase().includes(texto) ||
           shipping.guia?.toLowerCase().includes(texto) ||
-          shipping.transportadora?.toLowerCase().includes(texto)
+          shipping.transportadora?.toLowerCase().includes(texto) ||
+          shipping.direccion_entrega?.toLowerCase().includes(texto)
         : true;
+        
       return matchEstado && matchTexto;
     });
   }

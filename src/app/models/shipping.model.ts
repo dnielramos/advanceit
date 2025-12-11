@@ -10,12 +10,50 @@ export type ShippingStatus =
   | 'fallido';
 
 /**
+ * Representa una empresa asociada a una orden.
+ */
+export interface ShippingCompany {
+  id: number;
+  razon_social: string;
+  nit: string;
+}
+
+/**
+ * Representa un usuario asociado a una orden o acción.
+ */
+export interface ShippingUser {
+  id: string;
+  name: string;
+  email?: string;
+}
+
+/**
+ * Representa la información de quién creó o actualizó un registro.
+ */
+export interface AuditUser {
+  id: string;
+  name: string;
+}
+
+/**
+ * Representa la orden asociada al envío.
+ */
+export interface ShippingOrder {
+  id: string;
+  numeroOrden: string;
+  quotation_id?: string;
+  company?: ShippingCompany;
+  user?: ShippingUser;
+}
+
+/**
  * Representa un evento en el historial de un envío.
  */
 export interface HistoryEvent {
   timestamp: string;
   status: ShippingStatus;
   description: string;
+  updated_by?: AuditUser;
 }
 
 /**
@@ -24,6 +62,8 @@ export interface HistoryEvent {
 export interface Shipping {
   id: string; // UUID
   order_id: string;
+  order?: ShippingOrder;
+  direccion_entrega?: string;
   transportadora?: string;
   guia?: string;
   estado: ShippingStatus;
@@ -31,6 +71,10 @@ export interface Shipping {
   notas?: string;
   fechaEstimada?: string; // YYYY-MM-DD
   fechaEntregaReal?: string; // YYYY-MM-DD
+  created_by?: AuditUser;
+  updated_by?: AuditUser;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // --- DTOs (Data Transfer Objects) para las peticiones ---

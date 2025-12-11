@@ -1,69 +1,116 @@
-<div class="bg-gray-50 min-h-screen font-sans text-gray-800 p-4 sm:p- lg:p-8">
+<div class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-sans text-gray-800 p-4 sm:p-6 lg:p-8">
 
-  <app-header-crud titulo="Envíos" descripcion="Gestiona y actualiza los envíos." textoBotonActualizar="Refrescar"
-    placeholderInput="Buscar por Orden, Guía o Transportadora..." [filterByStatus]="true"
+  <app-header-crud titulo="Gestión de Envíos" descripcion="Administra y rastrea todos los envíos en tiempo real." textoBotonActualizar="Refrescar"
+    placeholderInput="Buscar por orden, empresa, guía..." [filterByStatus]="true"
     [filterStatusValues]="['preparando', 'en_transito', 'entregado', 'fallido']" (actualizar)="loadShippings()"
     (clearFilters)="handleClearFilters()" (filterChange)="handleFilterChange($event)">
   </app-header-crud>
 
-  <main class="flex p-2 flex-col lg:flex-row h-[calc(100vh-140px)] overflow-hidden mt-6">
-    <div class="w-full lg:w-1/3 xl:w-1/2 overflow-y-auto pr-3 lg:border-r lg:border-gray-200">
+  <main class="flex p-2 flex-col lg:flex-row h-[calc(100vh-160px)] overflow-hidden mt-6 gap-4">
+    <!-- Lista de envíos -->
+    <div class="w-full lg:w-2/5 xl:w-1/3 overflow-y-auto pr-0 lg:pr-4">
       @if (isLoading) {
-      <div class="flex items-center justify-center h-64">
+      <div class="flex flex-col items-center justify-center h-64 bg-white rounded-2xl shadow-sm">
         <fa-icon [icon]="faCircleNotch" size="3x" class="text-violet-500 animate-spin"></fa-icon>
+        <p class="mt-4 text-gray-500 font-medium">Cargando envíos...</p>
       </div>
       } @else if (error) {
-      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
+      <div class="bg-red-50 border border-red-200 text-red-700 p-5 rounded-2xl shadow-sm">
         <div class="flex items-center gap-3">
-          <fa-icon [icon]="faExclamationTriangle"></fa-icon>
-          <p class="font-bold">{{ error }}</p>
+          <div class="p-2 bg-red-100 rounded-full">
+            <fa-icon [icon]="faExclamationTriangle" class="text-red-500"></fa-icon>
+          </div>
+          <div>
+            <p class="font-bold">Error al cargar</p>
+            <p class="text-sm text-red-600">{{ error }}</p>
+          </div>
         </div>
       </div>
       } @else if (!shippings.length) {
-      <div class="text-center text-gray-400 p-8">
-        <fa-icon [icon]="faEye" size="3x" class="mb-3"></fa-icon>
-        <p class="font-semibold">No se encontraron envíos</p>
-        <p class="text-sm">Intenta con otros filtros o recarga la lista.</p>
+      <div class="flex flex-col items-center justify-center h-64 bg-white rounded-2xl shadow-sm text-center p-8">
+        <div class="p-4 bg-gray-100 rounded-full mb-4">
+          <fa-icon [icon]="faTruck" size="2x" class="text-gray-400"></fa-icon>
+        </div>
+        <p class="font-semibold text-gray-700">No hay envíos</p>
+        <p class="text-sm text-gray-500 mt-1">Intenta con otros filtros o recarga la lista.</p>
       </div>
       } @else {
       <div class="space-y-3">
         @for (shipping of shippings; track shipping.id) {
         <div (click)="selectShipping(shipping)" [ngClass]="{
-            'bg-violet-50 border-violet-500 shadow-md scale-[1.02]':
+            'bg-gradient-to-r from-violet-50 to-purple-50 border-violet-400 shadow-lg ring-2 ring-violet-200':
               selectedShipping?.id === shipping.id,
-            'bg-white border-gray-200 hover:border-violet-400 hover:shadow-sm':
+            'bg-white border-gray-100 hover:border-violet-300 hover:shadow-md':
               selectedShipping?.id !== shipping.id
-          }" class="p-4 border rounded-lg cursor-pointer transition-all duration-300">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-sm text-gray-500">Orden: {{ shipping.order_id }}</p>
-              <p class="font-bold text-gray-800">
-                {{ shipping.transportadora }}
+          }" class="p-4 border rounded-xl cursor-pointer transition-all duration-300 group">
+          
+          <!-- Header de la tarjeta -->
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-bold text-violet-600 bg-violet-100 px-2 py-0.5 rounded-md">
+                  {{ shipping.order?.numeroOrden || 'Sin orden' }}
+                </span>
+              </div>
+              <p class="font-semibold text-gray-800 truncate">
+                {{ shipping.order?.company?.razon_social || 'Empresa no asignada' }}
+              </p>
+              <p class="text-xs text-gray-500 mt-0.5 truncate">
+                NIT: {{ shipping.order?.company?.nit || 'N/A' }}
               </p>
             </div>
-            <span [ngClass]="getStatusInfo(shipping.estado).color"
-              class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap">
-              <fa-icon [icon]="getStatusInfo(shipping.estado).icon"></fa-icon>
+            <span [ngClass]="{
+              'bg-yellow-100 text-yellow-700 border-yellow-200': shipping.estado === 'preparando',
+              'bg-blue-100 text-blue-700 border-blue-200': shipping.estado === 'en_transito',
+              'bg-green-100 text-green-700 border-green-200': shipping.estado === 'entregado',
+              'bg-red-100 text-red-700 border-red-200': shipping.estado === 'fallido'
+            }" class="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border whitespace-nowrap">
+              <fa-icon [icon]="getStatusInfo(shipping.estado).icon" class="text-[10px]"></fa-icon>
               {{ getStatusInfo(shipping.estado).label }}
             </span>
           </div>
-          <p class="text-xs text-gray-400 mt-2">Guía: {{ shipping.guia }}</p>
+
+          <!-- Info secundaria -->
+          <div class="flex items-center gap-4 text-xs text-gray-500">
+            <div class="flex items-center gap-1.5">
+              <fa-icon [icon]="faTruck" class="text-gray-400"></fa-icon>
+              <span>{{ shipping.transportadora || 'Sin transportadora' }}</span>
+            </div>
+            @if (shipping.guia) {
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-400">|</span>
+              <span class="font-mono">{{ shipping.guia }}</span>
+            </div>
+            }
+          </div>
+
+          <!-- Footer con cliente -->
+          @if (shipping.order?.user?.name) {
+          <div class="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+            <div class="w-6 h-6 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+              {{ shipping.order?.user?.name?.charAt(0)?.toUpperCase() }}
+            </div>
+            <span class="text-xs text-gray-600 truncate">{{ shipping.order?.user?.name }}</span>
+          </div>
+          }
         </div>
         }
       </div>
       }
     </div>
 
-    <div class="w-full lg:w-2/3 xl:w-3/4 overflow-y-auto pl-3 hidden lg:block">
+    <!-- Panel de detalles -->
+    <div class="w-full lg:w-3/5 xl:w-2/3 overflow-y-auto hidden lg:block">
       @if (selectedShipping && !isMobile) {
       <ng-container *ngTemplateOutlet="shippingDetails; context: { shipping: selectedShipping }"></ng-container>
       } @else {
-      <div
-        class="flex items-center justify-center h-full bg-white/60 border-2 border-dashed border-gray-300 rounded-lg">
-        <div class="text-center text-gray-500">
-          <fa-icon [icon]="faEye" size="4x" class="mb-4"></fa-icon>
-          <p class="text-xl font-semibold">Selecciona un envío</p>
-          <p>Elige un envío de la lista para ver sus detalles aquí.</p>
+      <div class="flex items-center justify-center h-full bg-white/80 backdrop-blur-sm border-2 border-dashed border-gray-200 rounded-2xl">
+        <div class="text-center p-8">
+          <div class="w-20 h-20 mx-auto bg-gradient-to-br from-violet-100 to-purple-100 rounded-full flex items-center justify-center mb-6">
+            <fa-icon [icon]="faTruck" size="2x" class="text-violet-400"></fa-icon>
+          </div>
+          <p class="text-xl font-bold text-gray-700">Selecciona un envío</p>
+          <p class="text-gray-500 mt-2 max-w-xs mx-auto">Haz clic en cualquier envío de la lista para ver sus detalles completos</p>
         </div>
       </div>
       }
@@ -87,64 +134,127 @@
     <!-- Contenido del Modal (sin el header duplicado) -->
     <div class="p-4">
       @if (selectedShipping) {
-      <!-- Info resumida para móvil -->
-      <div class="mb-4">
-        <p class="text-sm text-gray-500">Guía: {{ selectedShipping.guia }}</p>
-        <div class="flex justify-between items-center mt-2">
-          <p class="text-xs text-gray-600">Fecha estimada: <span class="font-semibold">{{ selectedShipping.fechaEstimada
-              | date: 'mediumDate' }}</span></p>
-        </div>
+      <!-- Estado prominente -->
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-bold text-violet-600 bg-violet-100 px-3 py-1 rounded-lg">
+          {{ selectedShipping.order?.numeroOrden || 'Sin orden' }}
+        </span>
+        <span [ngClass]="{
+          'bg-yellow-100 text-yellow-700': selectedShipping.estado === 'preparando',
+          'bg-blue-100 text-blue-700': selectedShipping.estado === 'en_transito',
+          'bg-green-100 text-green-700': selectedShipping.estado === 'entregado',
+          'bg-red-100 text-red-700': selectedShipping.estado === 'fallido'
+        }" class="flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-lg">
+          <fa-icon [icon]="getStatusInfo(selectedShipping.estado).icon" class="text-[10px]"></fa-icon>
+          {{ getStatusInfo(selectedShipping.estado).label }}
+        </span>
       </div>
 
-      <!-- Información clave -->
-      <div class="grid grid-cols-1 gap-4 mb-6">
-        <div class="text-sm">
-          <span class="font-semibold text-gray-700">ID Orden:</span>
-          <span class="ml-1 text-gray-900">{{ selectedShipping.order_id }}</span>
+      <!-- Empresa -->
+      @if (selectedShipping.order?.company) {
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-4 border border-blue-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow">
+            {{ selectedShipping.order?.company?.razon_social?.charAt(0)?.toUpperCase() || 'E' }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-gray-900 text-sm truncate">{{ selectedShipping.order?.company?.razon_social }}</p>
+            <p class="text-xs text-gray-600">NIT: {{ selectedShipping.order?.company?.nit }}</p>
+          </div>
         </div>
-        <div class="text-sm">
-          <span class="font-semibold text-gray-700">Transportadora:</span>
-          <span class="ml-1 text-gray-900">{{ selectedShipping.transportadora }}</span>
+      </div>
+      }
+
+      <!-- Cliente -->
+      @if (selectedShipping.order?.user) {
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border border-green-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold shadow">
+            {{ selectedShipping.order?.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-gray-900 text-sm">{{ selectedShipping.order?.user?.name }}</p>
+            @if (selectedShipping.order?.user?.email) {
+            <p class="text-xs text-gray-600 truncate">{{ selectedShipping.order?.user?.email }}</p>
+            }
+          </div>
         </div>
-        <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-          <fa-icon [icon]="getStatusInfo(selectedShipping.estado).icon" size="lg"
-            [ngClass]="getStatusInfo(selectedShipping.estado).color"></fa-icon>
-          <span class="font-semibold text-lg text-gray-800">{{ getStatusInfo(selectedShipping.estado).label }}</span>
+      </div>
+      }
+
+      <!-- Detalles del envío -->
+      <div class="space-y-3 mb-6">
+        <div class="bg-gray-50 rounded-xl p-3">
+          <p class="text-xs text-gray-500 mb-1">Transportadora</p>
+          <p class="font-semibold text-gray-800 text-sm">{{ selectedShipping.transportadora || 'No asignada' }}</p>
         </div>
+        @if (selectedShipping.guia) {
+        <div class="bg-gray-50 rounded-xl p-3">
+          <p class="text-xs text-gray-500 mb-1">Número de Guía</p>
+          <p class="font-mono font-semibold text-gray-800 text-sm">{{ selectedShipping.guia }}</p>
+        </div>
+        }
+        @if (selectedShipping.direccion_entrega) {
+        <div class="bg-gray-50 rounded-xl p-3">
+          <p class="text-xs text-gray-500 mb-1">Dirección de Entrega</p>
+          <p class="font-semibold text-gray-800 text-sm">{{ selectedShipping.direccion_entrega }}</p>
+        </div>
+        }
+        @if (selectedShipping.fechaEstimada) {
+        <div class="bg-gray-50 rounded-xl p-3">
+          <p class="text-xs text-gray-500 mb-1">Fecha Estimada</p>
+          <p class="font-semibold text-gray-800 text-sm">{{ selectedShipping.fechaEstimada | date: 'longDate' }}</p>
+        </div>
+        }
         @if (selectedShipping.fechaEntregaReal) {
-        <div class="text-sm">
-          <span class="font-semibold text-gray-700">Entregado el:</span>
-          <span class="ml-1 text-gray-900">{{ selectedShipping.fechaEntregaReal | date: 'longDate' }}</span>
+        <div class="bg-green-50 rounded-xl p-3 border border-green-200">
+          <p class="text-xs text-green-600 mb-1">Fecha de Entrega Real</p>
+          <p class="font-bold text-green-700 text-sm">{{ selectedShipping.fechaEntregaReal | date: 'longDate' }}</p>
         </div>
         }
       </div>
 
-      <!-- Historial -->
-      <h3 class="text-lg font-bold text-gray-800 mb-4">Historial</h3>
-      <div class="relative pl-6 border-l-2 border-violet-100 space-y-5">
-        @for (event of selectedShipping.historial; track event.timestamp) {
-        <div class="relative">
-          <div class="absolute -left-[30px] top-1 h-3 w-3 rounded-full"
-            [ngClass]="getStatusInfo(event.status).color.replace('text-', 'bg-')"></div>
-          <p class="text-xs text-gray-500">{{ event.timestamp | date: 'medium' }}</p>
-          <p class="font-medium text-gray-800 mt-0.5" [ngClass]="getStatusInfo(event.status).color">
-            {{ getStatusInfo(event.status).label }}
-          </p>
-          <p class="text-gray-700 text-sm mt-1">{{ event.description }}</p>
+      <!-- Historial con Timeline -->
+      <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Historial</h3>
+      <div class="relative mb-6">
+        <div class="absolute left-3 top-0 bottom-0 w-0.5 bg-gradient-to-b from-violet-300 to-gray-200"></div>
+        <div class="space-y-3">
+          @for (event of selectedShipping.historial; track event.timestamp) {
+          <div class="relative pl-8">
+            <div class="absolute left-0 w-6 h-6 rounded-full flex items-center justify-center shadow" [ngClass]="{
+              'bg-yellow-400': event.status === 'preparando',
+              'bg-blue-500': event.status === 'en_transito',
+              'bg-green-500': event.status === 'entregado',
+              'bg-red-500': event.status === 'fallido'
+            }">
+              <fa-icon [icon]="getStatusInfo(event.status).icon" class="text-white text-[8px]"></fa-icon>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="font-bold text-gray-800 text-sm">{{ getStatusInfo(event.status).label }}</span>
+                <span class="text-[10px] text-gray-500">{{ event.timestamp | date: 'short' }}</span>
+              </div>
+              <p class="text-xs text-gray-600">{{ event.description }}</p>
+              @if (event.updated_by?.name) {
+              <p class="text-[10px] text-gray-400 mt-2">Por: {{ event.updated_by?.name }}</p>
+              }
+            </div>
+          </div>
+          }
         </div>
-        }
       </div>
 
       <!-- Botones de acción -->
-      <div class="mt-8 pt-6 border-t border-gray-100 space-y-3">
+      <div class="pt-4 border-t border-gray-100 space-y-3">
+        @if (selectedShipping.guia && selectedShipping.estado === 'en_transito') {
         <button (click)="setShippingToView(selectedShipping.id)"
-          *ngIf="selectedShipping.guia && selectedShipping.estado === 'en_transito'"
-          class="w-full font-bold text-sm text-purple-600 py-2">
-          <fa-icon [icon]="faTruck" class="text-purple-500 mr-1"></fa-icon>
-          Ver Guia
+          class="w-full flex items-center justify-center gap-2 bg-purple-50 text-purple-600 font-semibold py-3 px-5 rounded-xl border border-purple-200">
+          <fa-icon [icon]="faTruck"></fa-icon>
+          <span>Ver Comprobante</span>
         </button>
+        }
         <button (click)="openUpdateStatusModal()"
-          class="w-full flex items-center gap-2 bg-violet-600 text-white font-semibold py-3 px-5 rounded-lg shadow hover:bg-violet-700 justify-center">
+          class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold py-3 px-5 rounded-xl shadow-lg">
           <fa-icon [icon]="faEdit"></fa-icon>
           <span>Actualizar Estado</span>
         </button>
@@ -158,81 +268,248 @@
 
 <ng-template #shippingDetails let-shipping="shipping">
   @if (shipping) {
-  <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 transition-all duration-300">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
 
-    <!-- Encabezado sticky - Solo visible en desktop -->
-    <div class="sticky top-0 z-40 bg-white py-3 pb-4 mb-6 border-b border-gray-100">
+    <!-- Header con estado prominente -->
+    <div class="bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 class="text-xl sm:text-2xl font-bold text-violet-700">Detalles del Envío</h2>
-          <p class="text-sm text-gray-500 mt-1">Guía: {{ shipping.guia }}</p>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-bold text-white/80 bg-white/20 px-3 py-1 rounded-full">
+              {{ shipping.order?.numeroOrden || 'Sin número' }}
+            </span>
+            <span [ngClass]="{
+              'bg-yellow-400 text-yellow-900': shipping.estado === 'preparando',
+              'bg-blue-400 text-blue-900': shipping.estado === 'en_transito',
+              'bg-green-400 text-green-900': shipping.estado === 'entregado',
+              'bg-red-400 text-red-900': shipping.estado === 'fallido'
+            }" class="flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full">
+              <fa-icon [icon]="getStatusInfo(shipping.estado).icon" class="text-[10px]"></fa-icon>
+              {{ getStatusInfo(shipping.estado).label }}
+            </span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white">Detalle del Envío</h2>
+          @if (shipping.guia) {
+          <p class="text-sm text-white/70 mt-1 font-mono">Guía: {{ shipping.guia }}</p>
+          }
         </div>
-        <div class="text-left sm:text-right w-full sm:w-auto">
-          <p class="text-xs text-gray-600">Fecha entrega estimada</p>
-          <p class="font-semibold text-lg text-gray-800">
-            {{ shipping.fechaEstimada | date: 'longDate' }}
-          </p>
-          @if (shipping?.estado === 'entregado') {
-          <p class="text-xs text-gray-600 mt-1">Fecha entrega real</p>
-          <p class="font-semibold text-lg text-gray-800">
-            {{ shipping.fechaEntregaReal | date: 'longDate' }}
-          </p>
+        <div class="text-left sm:text-right">
+          @if (shipping.created_at) {
+          <p class="text-xs text-white/60">Creado</p>
+          <p class="font-medium text-white text-sm">{{ shipping.created_at | date: 'medium' }}</p>
           }
         </div>
       </div>
     </div>
 
-    <!-- Información clave en grid mejorado -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-      <div class="text-sm">
-        <span class="font-semibold text-gray-700">ID Orden:</span>
-        <span class="ml-1 text-gray-900">{{ shipping.order_id }}</span>
+    <div class="p-6">
+      <!-- Sección: Información de la Orden -->
+      <div class="mb-8">
+        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center">
+            <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </span>
+          Información de la Orden
+        </h3>
+        <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-gray-500 mb-1">Número de Orden</p>
+              <p class="font-bold text-violet-600 text-lg">{{ shipping.order?.numeroOrden || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 mb-1">ID Interno</p>
+              <p class="font-mono text-xs text-gray-600 break-all">{{ shipping.order_id }}</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="text-sm">
-        <span class="font-semibold text-gray-700">Transportadora:</span>
-        <span class="ml-1 text-gray-900">{{ shipping.transportadora }}</span>
-      </div>
-      <div class="col-span-1 sm:col-span-2 flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-        <fa-icon [icon]="getStatusInfo(shipping.estado).icon" size="lg"
-          [ngClass]="getStatusInfo(shipping.estado).color"></fa-icon>
-        <span class="font-semibold text-lg text-gray-800">{{ getStatusInfo(shipping.estado).label }}</span>
-      </div>
-      @if (shipping.fechaEntregaReal) {
-      <div class="col-span-1 sm:col-span-2 text-sm">
-        <span class="font-semibold text-gray-700">Entregado el:</span>
-        <span class="ml-1 text-gray-900">{{ shipping.fechaEntregaReal | date: 'longDate' }}</span>
+
+      <!-- Sección: Empresa -->
+      @if (shipping.order?.company) {
+      <div class="mb-8">
+        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+          </span>
+          Empresa
+        </h3>
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+              {{ shipping.order?.company?.razon_social?.charAt(0)?.toUpperCase() || 'E' }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-gray-900 text-lg truncate">{{ shipping.order?.company?.razon_social }}</p>
+              <p class="text-sm text-gray-600 mt-1">
+                <span class="font-medium">NIT:</span> {{ shipping.order?.company?.nit }}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
       }
-    </div>
 
-    <!-- Historial con mejor espaciado -->
-    <h3 class="text-lg font-bold text-gray-800 mb-4">Historial</h3>
-    <div class="relative pl-6 border-l-2 border-violet-100 space-y-5">
-      @for (event of shipping.historial; track event.timestamp) {
-      <div class="relative">
-        <div class="absolute -left-[30px] top-1 h-3 w-3 rounded-full"
-          [ngClass]="getStatusInfo(event.status).color.replace('text-', 'bg-')"></div>
-        <p class="text-xs text-gray-500">{{ event.timestamp | date: 'medium' }}</p>
-        <p class="font-medium text-gray-800 mt-0.5" [ngClass]="getStatusInfo(event.status).color">
-          {{ getStatusInfo(event.status).label }}
-        </p>
-        <p class="text-gray-700 text-sm mt-1">{{ event.description }}</p>
+      <!-- Sección: Cliente/Usuario -->
+      @if (shipping.order?.user) {
+      <div class="mb-8">
+        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+          </span>
+          Cliente
+        </h3>
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+              {{ shipping.order?.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-gray-900">{{ shipping.order?.user?.name }}</p>
+              @if (shipping.order?.user?.email) {
+              <p class="text-sm text-gray-600 truncate">{{ shipping.order?.user?.email }}</p>
+              }
+            </div>
+          </div>
+        </div>
       </div>
       }
-    </div>
 
-    <!-- Botón mejorado -->
-    <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-      <button (click)="setShippingToView(shipping.id)" *ngIf="shipping.guia && shipping.estado === 'en_transito'"
-        class="font-bold text-sm text-purple-600 mr-4">
-        <fa-icon [icon]="faTruck" class="text-purple-500 mr-1"></fa-icon>
-        Ver Guia
-      </button>
-      <button (click)="openUpdateStatusModal()"
-        class="flex items-center gap-2 bg-violet-600 text-white font-semibold py-3 px-5 rounded-lg shadow hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 min-w-[180px] justify-center">
-        <fa-icon [icon]="faEdit"></fa-icon>
-        <span>Actualizar Estado</span>
-      </button>
+      <!-- Sección: Detalles de Envío -->
+      <div class="mb-8">
+        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+            <fa-icon [icon]="faTruck" class="text-purple-600 text-sm"></fa-icon>
+          </span>
+          Detalles de Envío
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-500 mb-1">Transportadora</p>
+            <p class="font-semibold text-gray-800">{{ shipping.transportadora || 'No asignada' }}</p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-500 mb-1">Número de Guía</p>
+            <p class="font-mono font-semibold text-gray-800">{{ shipping.guia || 'Sin guía' }}</p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4 sm:col-span-2">
+            <p class="text-xs text-gray-500 mb-1">Dirección de Entrega</p>
+            <p class="font-semibold text-gray-800">{{ shipping.direccion_entrega || 'No especificada' }}</p>
+          </div>
+          @if (shipping.fechaEstimada) {
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-500 mb-1">Fecha Estimada</p>
+            <p class="font-semibold text-gray-800">{{ shipping.fechaEstimada | date: 'longDate' }}</p>
+          </div>
+          }
+          @if (shipping.fechaEntregaReal) {
+          <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+            <p class="text-xs text-green-600 mb-1">Fecha de Entrega Real</p>
+            <p class="font-bold text-green-700">{{ shipping.fechaEntregaReal | date: 'longDate' }}</p>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Sección: Historial con Timeline mejorado -->
+      <div class="mb-8">
+        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </span>
+          Historial de Seguimiento
+        </h3>
+        <div class="relative">
+          <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-violet-300 via-purple-300 to-gray-200"></div>
+          <div class="space-y-4">
+            @for (event of shipping.historial; track event.timestamp; let i = $index; let first = $first) {
+            <div class="relative pl-10">
+              <div class="absolute left-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md" [ngClass]="{
+                'bg-yellow-400': event.status === 'preparando',
+                'bg-blue-500': event.status === 'en_transito',
+                'bg-green-500': event.status === 'entregado',
+                'bg-red-500': event.status === 'fallido'
+              }">
+                <fa-icon [icon]="getStatusInfo(event.status).icon" class="text-white text-xs"></fa-icon>
+              </div>
+              <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                  <span class="font-bold text-gray-800">{{ getStatusInfo(event.status).label }}</span>
+                  <span class="text-xs text-gray-500">{{ event.timestamp | date: 'medium' }}</span>
+                </div>
+                <p class="text-sm text-gray-600">{{ event.description }}</p>
+                @if (event.updated_by?.name) {
+                <div class="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+                  <div class="w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-[10px] font-bold">
+                    {{ event.updated_by?.name?.charAt(0)?.toUpperCase() }}
+                  </div>
+                  <span class="text-xs text-gray-500">Por: <span class="font-medium text-gray-700">{{ event.updated_by?.name }}</span></span>
+                </div>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Información de Auditoría -->
+      @if (shipping.created_by || shipping.updated_by) {
+      <div class="mb-6">
+        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </span>
+          Auditoría
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          @if (shipping.created_by) {
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-500 mb-1">Creado por</p>
+            <p class="font-medium text-gray-800">{{ shipping.created_by?.name }}</p>
+            @if (shipping.created_at) {
+            <p class="text-xs text-gray-500 mt-1">{{ shipping.created_at | date: 'medium' }}</p>
+            }
+          </div>
+          }
+          @if (shipping.updated_by) {
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-500 mb-1">Última actualización por</p>
+            <p class="font-medium text-gray-800">{{ shipping.updated_by?.name }}</p>
+            @if (shipping.updated_at) {
+            <p class="text-xs text-gray-500 mt-1">{{ shipping.updated_at | date: 'medium' }}</p>
+            }
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- Botones de acción -->
+      <div class="pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
+        @if (shipping.guia && shipping.estado === 'en_transito') {
+        <button (click)="setShippingToView(shipping.id)"
+          class="flex items-center justify-center gap-2 bg-purple-50 text-purple-600 font-semibold py-3 px-5 rounded-xl border border-purple-200 hover:bg-purple-100 transition-all">
+          <fa-icon [icon]="faTruck"></fa-icon>
+          <span>Ver Comprobante</span>
+        </button>
+        }
+        <button (click)="openUpdateStatusModal()"
+          class="flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200">
+          <fa-icon [icon]="faEdit"></fa-icon>
+          <span>Actualizar Estado</span>
+        </button>
+      </div>
     </div>
   </div>
   }

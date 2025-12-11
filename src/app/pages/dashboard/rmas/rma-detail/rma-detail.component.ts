@@ -19,15 +19,17 @@ import {
   faTimes,
   faInfoCircle,
   faClipboardList,
+  faTruck,
 } from '@fortawesome/free-solid-svg-icons';
 import { RmasService } from '../../../../services/rmas.service';
 import { Rma, UpdateRmaDataDto } from '../../../../models/rma.model';
 import { ToastService } from 'angular-toastify';
+import { CreateRmaShippingModalComponent } from '../../../../components/dashboard/rmas-manager/create-rma-shipping-modal/create-rma-shipping-modal.component';
 
 @Component({
   selector: 'app-rma-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, CreateRmaShippingModalComponent],
   templateUrl: './rma-detail.component.html',
 })
 export class RmaDetailComponent implements OnInit {
@@ -53,6 +55,7 @@ export class RmaDetailComponent implements OnInit {
   faTimes = faTimes;
   faInfoCircle = faInfoCircle;
   faClipboardList = faClipboardList;
+  faTruck = faTruck;
 
   // State
   rma = signal<Rma | null>(null);
@@ -60,6 +63,7 @@ export class RmaDetailComponent implements OnInit {
   isSaving = signal(false);
   error = signal<string | null>(null);
   activeTab = signal<'details' | 'items' | 'history'>('details');
+  isShippingModalOpen = signal(false);
 
   // Forms
   updateDataForm!: FormGroup;
@@ -285,5 +289,13 @@ export class RmaDetailComponent implements OnInit {
     const code = this.getStateCode(input);
     const entry = Object.entries(this.stateMapEsToEn).find(([, v]) => v === code);
     return entry ? entry[0] : input;
+  }
+
+  openShippingModal(): void {
+    this.isShippingModalOpen.set(true);
+  }
+
+  closeShippingModal(): void {
+    this.isShippingModalOpen.set(false);
   }
 }

@@ -81,6 +81,8 @@ export class ShippingsManagerComponent implements OnInit {
     estado: '',
   };
 
+  private visitedShippingIds = new Set<string>();
+
   // Íconos
   faPlus = faPlus;
   faCircleNotch = faCircleNotch;
@@ -201,6 +203,7 @@ export class ShippingsManagerComponent implements OnInit {
   // --- MÉTODO `selectShipping` ACTUALIZADO ---
   selectShipping(shipping: Shipping): void {
     this.selectedShipping = shipping;
+    this.visitedShippingIds.add(shipping.id);
     if (this.isMobile) {
       this.isDetailsModalOpen = true; // Abrir modal en móvil
     }
@@ -330,6 +333,22 @@ export class ShippingsManagerComponent implements OnInit {
       fechaEstimada: today,
       direccionEntrega: '',
     };
+  }
+
+  isNewShipping(shipping: Shipping): boolean {
+    if (!shipping.created_at) {
+      return false;
+    }
+    const createdAt = new Date(shipping.created_at).getTime();
+    if (isNaN(createdAt)) {
+      return false;
+    }
+    const oneHourInMs = 60 * 60 * 1000;
+    const diffMs = Date.now() - createdAt;
+    if (diffMs > oneHourInMs) {
+      return false;
+    }
+    return !this.visitedShippingIds.has(shipping.id);
   }
 
   getStatusInfo(status: ShippingStatus) {

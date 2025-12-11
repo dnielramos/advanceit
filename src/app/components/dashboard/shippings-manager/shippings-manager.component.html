@@ -51,6 +51,12 @@
                 <span class="text-xs font-bold text-violet-600 bg-violet-100 px-2 py-0.5 rounded-md">
                   {{ shipping.order?.numeroOrden || 'Sin orden' }}
                 </span>
+                @if (isNewShipping(shipping)) {
+                <span
+                  class="text-[10px] font-extrabold uppercase tracking-wide text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  Nuevo
+                </span>
+                }
               </div>
               <p class="font-semibold text-gray-800 truncate">
                 {{ shipping.order?.company?.razon_social || 'Empresa no asignada' }}
@@ -58,6 +64,11 @@
               <p class="text-xs text-gray-500 mt-0.5 truncate">
                 NIT: {{ shipping.order?.company?.nit || 'N/A' }}
               </p>
+              @if (shipping.created_at) {
+              <p class="text-[11px] text-gray-400 mt-0.5">
+                Creado: {{ shipping.created_at | date: 'short' }}
+              </p>
+              }
             </div>
             <span [ngClass]="{
               'bg-yellow-100 text-yellow-700 border-yellow-200': shipping.estado === 'preparando',

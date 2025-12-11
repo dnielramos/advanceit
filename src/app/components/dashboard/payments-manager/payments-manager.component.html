@@ -691,10 +691,200 @@ WHERE id = {{ selectedPayment?.id }};</pre>
 </div>
 }
 
+<!-- Panel Lateral de Comprobante - Desktop -->
+@if (voucherModal && selectedPayment) {
+<div class="fixed inset-0 z-[60] hidden lg:flex">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeVoucherModal()"></div>
+  
+  <!-- Panel lateral -->
+  <div class="absolute right-0 top-0 h-full w-full max-w-3xl bg-white shadow-2xl flex animate__animated animate__slideInRight animate__faster">
+    
+    <!-- Panel de acciones (izquierda) -->
+    <div class="w-72 bg-gradient-to-b from-violet-600 to-purple-700 p-6 flex flex-col text-white">
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
+          <fa-icon [icon]="faFileInvoiceDollar" size="2x" class="text-white"></fa-icon>
+        </div>
+        <h2 class="text-2xl font-bold">Comprobante</h2>
+        <p class="text-violet-200 text-sm mt-1">Orden {{ selectedPayment.order?.numeroOrden || 'N/A' }}</p>
+      </div>
 
+      <!-- Info del pago -->
+      <div class="space-y-4 mb-8">
+        <div class="bg-white/10 rounded-xl p-4">
+          <p class="text-violet-200 text-xs uppercase tracking-wider mb-1">Monto Pagado</p>
+          <p class="font-bold text-xl">{{ selectedPayment.monto | currency:'COP':'symbol':'1.0-0' }}</p>
+        </div>
+        <div class="bg-white/10 rounded-xl p-4">
+          <p class="text-violet-200 text-xs uppercase tracking-wider mb-1">Empresa</p>
+          <p class="font-semibold text-sm truncate">{{ selectedPayment.order?.company?.razon_social || 'N/A' }}</p>
+        </div>
+        @if (selectedPayment.fechaPago) {
+        <div class="bg-white/10 rounded-xl p-4">
+          <p class="text-violet-200 text-xs uppercase tracking-wider mb-1">Fecha de Pago</p>
+          <p class="font-semibold text-sm">{{ selectedPayment.fechaPago | date: 'longDate' }}</p>
+        </div>
+        }
+      </div>
 
-@if(voucherModal && selectedPayment) {
-<div class="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4" (click)="closeVoucherModal()">
-  <app-payment-voucher [paymentId]="selectedPayment!.id"></app-payment-voucher>
+      <!-- Acciones -->
+      <div class="flex-1 flex flex-col justify-end space-y-3">
+        @if (!isChangingVoucher) {
+        <button (click)="downloadVoucher()"
+          class="w-full flex items-center justify-center gap-3 bg-white text-violet-700 font-semibold py-3.5 px-5 rounded-xl shadow-lg hover:shadow-xl hover:bg-violet-50 transition-all duration-200">
+          <fa-icon [icon]="faDownload"></fa-icon>
+          <span>Descargar</span>
+        </button>
+        <button (click)="startChangeVoucher()"
+          class="w-full flex items-center justify-center gap-3 bg-white/20 hover:bg-white/30 text-white font-semibold py-3.5 px-5 rounded-xl border border-white/30 transition-all duration-200">
+          <fa-icon [icon]="faExchangeAlt"></fa-icon>
+          <span>Cambiar Comprobante</span>
+        </button>
+        } @else {
+        <!-- Modo cambio de comprobante -->
+        <div class="bg-white/10 rounded-xl p-4 mb-2">
+          <p class="text-violet-200 text-xs uppercase tracking-wider mb-3">Nuevo Comprobante</p>
+          <label for="changeVoucherFile"
+            class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-white/40 rounded-xl cursor-pointer hover:border-white/60 transition-colors">
+            @if (selectedFile) {
+            <p class="text-sm font-medium truncate px-2">{{ selectedFile.name }}</p>
+            <p class="text-xs text-violet-200 mt-1">{{ (selectedFile.size / 1024).toFixed(1) }} KB</p>
+            } @else {
+            <fa-icon [icon]="faFileArrowUp" size="lg" class="mb-2"></fa-icon>
+            <p class="text-sm">Seleccionar archivo</p>
+            }
+          </label>
+          <input id="changeVoucherFile" type="file" class="hidden" accept="image/*,application/pdf"
+            (change)="onChangeVoucherFileSelected($event)">
+        </div>
+        <button (click)="uploadNewVoucher()" [disabled]="!selectedFile || isUploading"
+          class="w-full flex items-center justify-center gap-3 bg-white text-violet-700 font-semibold py-3.5 px-5 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+          @if (isUploading) {
+          <fa-icon [icon]="faCircleNotch" class="animate-spin"></fa-icon>
+          <span>Subiendo...</span>
+          } @else {
+          <fa-icon [icon]="faCheck"></fa-icon>
+          <span>Guardar Cambios</span>
+          }
+        </button>
+        <button (click)="cancelChangeVoucher()"
+          class="w-full flex items-center justify-center gap-3 bg-white/20 hover:bg-white/30 text-white font-semibold py-3.5 px-5 rounded-xl border border-white/30 transition-all duration-200">
+          <fa-icon [icon]="faTimesCircle"></fa-icon>
+          <span>Cancelar</span>
+        </button>
+        }
+
+        <div class="pt-4 border-t border-white/20">
+          <button (click)="closeVoucherModal()"
+            class="w-full text-violet-200 hover:text-white py-2 text-sm font-medium transition-colors">
+            Cerrar panel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visor del comprobante (derecha) -->
+    <div class="flex-1 bg-gray-50 p-6 overflow-hidden flex flex-col">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-gray-800">Vista previa</h3>
+        <button (click)="closeVoucherModal()" 
+          class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="flex-1 overflow-hidden rounded-xl">
+        <app-payment-voucher #voucherComponent [paymentId]="selectedPayment.id"></app-payment-voucher>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Comprobante - Mobile (Bottom Sheet) -->
+<div class="lg:hidden fixed inset-0 z-[60] flex items-end" (click)="closeVoucherModal()">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  
+  <!-- Bottom Sheet -->
+  <div class="relative w-full bg-white rounded-t-3xl max-h-[90vh] overflow-hidden animate__animated animate__slideInUp animate__faster"
+    (click)="$event.stopPropagation()">
+    
+    <!-- Handle -->
+    <div class="flex justify-center pt-3 pb-2">
+      <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="px-5 pb-4 border-b border-gray-100">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">Comprobante de Pago</h2>
+          <p class="text-sm text-gray-500">Orden {{ selectedPayment.order?.numeroOrden || 'N/A' }}</p>
+        </div>
+        <button (click)="closeVoucherModal()" 
+          class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Visor -->
+    <div class="h-[45vh] bg-gray-100 overflow-hidden">
+      <app-payment-voucher [paymentId]="selectedPayment.id"></app-payment-voucher>
+    </div>
+
+    <!-- Acciones Mobile -->
+    <div class="p-5 bg-white border-t border-gray-100 space-y-3">
+      @if (!isChangingVoucher) {
+      <div class="flex gap-3">
+        <button (click)="downloadVoucher()"
+          class="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold py-3.5 px-5 rounded-xl shadow-lg">
+          <fa-icon [icon]="faDownload"></fa-icon>
+          <span>Descargar</span>
+        </button>
+        <button (click)="startChangeVoucher()"
+          class="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 font-semibold py-3.5 px-5 rounded-xl border border-gray-200">
+          <fa-icon [icon]="faExchangeAlt"></fa-icon>
+          <span>Cambiar</span>
+        </button>
+      </div>
+      } @else {
+      <!-- Modo cambio mobile -->
+      <label for="changeVoucherFileMobile"
+        class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-violet-300 rounded-xl cursor-pointer bg-violet-50">
+        @if (selectedFile) {
+        <p class="text-sm font-medium text-violet-700 truncate px-4">{{ selectedFile.name }}</p>
+        <p class="text-xs text-violet-500 mt-1">{{ (selectedFile.size / 1024).toFixed(1) }} KB</p>
+        } @else {
+        <fa-icon [icon]="faFileArrowUp" class="text-violet-400 mb-1"></fa-icon>
+        <p class="text-sm text-violet-600">Seleccionar nuevo archivo</p>
+        }
+      </label>
+      <input id="changeVoucherFileMobile" type="file" class="hidden" accept="image/*,application/pdf"
+        (change)="onChangeVoucherFileSelected($event)">
+      
+      <div class="flex gap-3">
+        <button (click)="cancelChangeVoucher()"
+          class="flex-1 py-3 px-5 bg-gray-100 text-gray-700 font-semibold rounded-xl">
+          Cancelar
+        </button>
+        <button (click)="uploadNewVoucher()" [disabled]="!selectedFile || isUploading"
+          class="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold py-3 px-5 rounded-xl disabled:opacity-50">
+          @if (isUploading) {
+          <fa-icon [icon]="faCircleNotch" class="animate-spin"></fa-icon>
+          } @else {
+          <fa-icon [icon]="faCheck"></fa-icon>
+          }
+          <span>{{ isUploading ? 'Subiendo...' : 'Guardar' }}</span>
+        </button>
+      </div>
+      }
+    </div>
+  </div>
 </div>
 }

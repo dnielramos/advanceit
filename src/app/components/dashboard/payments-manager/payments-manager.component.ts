@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, HostListener } from '@angular/core';
+import { Component, OnInit, inject, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -27,6 +27,9 @@ import {
   faMoneyBillWave,
   faEdit,
   faShieldAlt,
+  faDownload,
+  faExchangeAlt,
+  faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Tus modelos y servicios
@@ -80,9 +83,13 @@ export class PaymentsManagerComponent implements OnInit {
   public showBase64Modal = false;
 
   public voucherModal = false;
+  public isChangingVoucher = false; // Para cambiar comprobante desde el panel
 
   // Estado para vista mobile
   public showDetailsMobile = false;
+
+  // Referencia al componente voucher para acceder a sus métodos
+  @ViewChild('voucherComponent') voucherComponent?: PaymentVoucherComponent;
 
   // --- Iconos de FontAwesome ---
   faPlus = faPlus;
@@ -94,6 +101,9 @@ export class PaymentsManagerComponent implements OnInit {
   faClock = faClock;
   faCheck = faCheck;
   faFileInvoiceDollar = faFileInvoiceDollar;
+  faDownload = faDownload;
+  faExchangeAlt = faExchangeAlt;
+  faTimesCircle = faTimesCircle;
 
   // --- Helpers para la UI ---
   public readonly statusInfo: StatusInfo = {
@@ -296,10 +306,81 @@ export class PaymentsManagerComponent implements OnInit {
 
   showVoucherModal(): void {
     this.voucherModal = true;
+    this.isChangingVoucher = false;
+    this.selectedFile = null;
   }
 
   closeVoucherModal(): void {
     this.voucherModal = false;
+    this.isChangingVoucher = false;
+    this.selectedFile = null;
+  }
+
+  /** Descarga el comprobante actual */
+  downloadVoucher(): void {
+    if (!this.voucherComponent?.comprobanteBase64) return;
+    
+    const base64 = this.voucherComponent.comprobanteBase64;
+    const link = document.createElement('a');
+    link.href = base64;
+    
+    // Determinar extensión
+    const isPdf = base64.startsWith('data:application/pdf');
+    const extension = isPdf ? 'pdf' : 'png';
+    const orderNum = this.selectedPayment?.order?.numeroOrden || this.selectedPayment?.id || 'comprobante';
+    link.download = `comprobante_${orderNum}.${extension}`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /** Activa el modo de cambio de comprobante */
+  startChangeVoucher(): void {
+    this.isChangingVoucher = true;
+    this.selectedFile = null;
+  }
+
+  /** Cancela el cambio de comprobante */
+  cancelChangeVoucher(): void {
+    this.isChangingVoucher = false;
+    this.selectedFile = null;
+  }
+
+  /** Sube el nuevo comprobante desde el panel lateral */
+  uploadNewVoucher(): void {
+    if (!this.selectedPayment || !this.selectedFile) return;
+
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      alert('Error: No se pudo identificar al usuario.');
+      return;
+    }
+
+    this.isUploading = true;
+    this.paymentsService.uploadVoucher(this.selectedPayment.id, this.selectedFile, userId)
+      .pipe(finalize(() => this.isUploading = false))
+      .subscribe({
+        next: (updatedPayment) => {
+          this.selectedPayment = updatedPayment;
+          this.isChangingVoucher = false;
+          this.selectedFile = null;
+          this.loadPayments();
+          // Refrescar el componente voucher
+          setTimeout(() => this.voucherComponent?.refresh(), 100);
+        },
+        error: (err) => {
+          alert('Error al subir el nuevo comprobante.');
+        },
+      });
+  }
+
+  /** Selecciona archivo para cambiar el comprobante */
+  onChangeVoucherFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+    }
   }
 
   closeBase64Modal(): void {

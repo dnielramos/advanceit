@@ -281,33 +281,33 @@
   @if (shipping) {
   <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
 
-    <!-- Header con estado prominente -->
-    <div class="bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-5">
+    <!-- Header con estado prominente, ahora en fondo claro -->
+    <div class="bg-white px-6 pt-5 pb-4 border-b border-gray-100">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div class="flex items-center gap-3 mb-2">
-            <span class="text-xs font-bold text-white/80 bg-white/20 px-3 py-1 rounded-full">
+            <span class="text-xs font-bold text-violet-700 bg-violet-50 px-3 py-1 rounded-full">
               {{ shipping.order?.numeroOrden || 'Sin número' }}
             </span>
             <span [ngClass]="{
-              'bg-yellow-400 text-yellow-900': shipping.estado === 'preparando',
-              'bg-blue-400 text-blue-900': shipping.estado === 'en_transito',
-              'bg-green-400 text-green-900': shipping.estado === 'entregado',
-              'bg-red-400 text-red-900': shipping.estado === 'fallido'
+              'bg-yellow-100 text-yellow-800 border border-yellow-200': shipping.estado === 'preparando',
+              'bg-blue-100 text-blue-800 border border-blue-200': shipping.estado === 'en_transito',
+              'bg-green-100 text-green-800 border border-green-200': shipping.estado === 'entregado',
+              'bg-red-100 text-red-800 border border-red-200': shipping.estado === 'fallido'
             }" class="flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full">
               <fa-icon [icon]="getStatusInfo(shipping.estado).icon" class="text-[10px]"></fa-icon>
               {{ getStatusInfo(shipping.estado).label }}
             </span>
           </div>
-          <h2 class="text-xl sm:text-2xl font-bold text-white">Detalle del Envío</h2>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Detalle del Envío</h2>
           @if (shipping.guia) {
-          <p class="text-sm text-white/70 mt-1 font-mono">Guía: {{ shipping.guia }}</p>
+          <p class="text-sm text-gray-500 mt-1 font-mono">Guía: {{ shipping.guia }}</p>
           }
         </div>
         <div class="text-left sm:text-right">
           @if (shipping.created_at) {
-          <p class="text-xs text-white/60">Creado</p>
-          <p class="font-medium text-white text-sm">{{ shipping.created_at | date: 'medium' }}</p>
+          <p class="text-xs text-gray-500">Creado</p>
+          <p class="font-medium text-gray-800 text-sm">{{ shipping.created_at | date: 'medium' }}</p>
           }
         </div>
       </div>

@@ -387,22 +387,58 @@ export class PaymentsManagerComponent implements OnInit {
       return;
     }
 
+    const paymentId = this.selectedPayment.id;
     this.isUploading = true;
-    this.paymentsService.uploadVoucher(this.selectedPayment.id, this.selectedFile, userId)
+    
+    this.paymentsService.uploadVoucher(paymentId, this.selectedFile, userId)
       .pipe(finalize(() => this.isUploading = false))
       .subscribe({
         next: (updatedPayment) => {
+          // Actualizar el pago seleccionado con los nuevos datos
           this.selectedPayment = updatedPayment;
+          
+          // Limpiar estado de cambio de comprobante
           this.isChangingVoucher = false;
           this.selectedFile = null;
-          this.loadPayments();
-          // Refrescar el componente voucher
-          setTimeout(() => this.voucherComponent?.refresh(), 100);
+          
+          // Refrescar el componente voucher PRIMERO para mostrar el nuevo comprobante
+          this.voucherComponent?.refresh();
+          
+          // Actualizar la lista de pagos en segundo plano sin afectar el modal
+          this.refreshPaymentsListSilently(paymentId);
         },
         error: (err) => {
           alert('Error al subir el nuevo comprobante.');
         },
       });
+  }
+
+  /**
+   * Actualiza la lista de pagos en segundo plano sin cerrar modales ni perder el estado actual.
+   * Mantiene el pago seleccionado y el modal de comprobante abierto.
+   */
+  private refreshPaymentsListSilently(selectedPaymentId: string): void {
+    this.paymentsService.getAllPayments().subscribe({
+      next: (data) => {
+        // Ordenar por fecha de creación (más recientes primero)
+        const sorted = data.sort(
+          (a, b) =>
+            new Date(b.created_at || b.fechaLimitePago || 0).getTime() -
+            new Date(a.created_at || a.fechaLimitePago || 0).getTime()
+        );
+        this.allPayments = sorted;
+        this.payments = [...this.allPayments];
+        
+        // Actualizar el pago seleccionado con los datos más recientes de la lista
+        const updatedPayment = this.payments.find(p => p.id === selectedPaymentId);
+        if (updatedPayment) {
+          this.selectedPayment = updatedPayment;
+        }
+      },
+      error: () => {
+        // Silenciar errores de actualización en segundo plano
+      },
+    });
   }
 
   /** Selecciona archivo para cambiar el comprobante */

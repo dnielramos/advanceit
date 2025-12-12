@@ -280,7 +280,11 @@
 
 
     @if (isShippingModalOpen()) {
-    <app-create-rma-shipping-modal (close)="closeShippingModal()" (created)="loadRma(rma()!.id)">
+    <app-create-rma-shipping-modal 
+        [rmaId]="rma()!.id" 
+        [rmaNumber]="rma()!.rma_number"
+        (close)="closeShippingModal()" 
+        (created)="loadRma(rma()!.id)">
     </app-create-rma-shipping-modal>
     }
     }

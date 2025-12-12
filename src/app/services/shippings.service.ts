@@ -14,7 +14,8 @@ import {
 import { ENVIRONMENT } from '../../enviroments/enviroment';
 
 export interface CreateShippingDto {
-  order_id: string;
+  order_id?: string;  // Requerido para envíos normales
+  rma_id?: string;    // Requerido para envíos RMA
   transportadora?: string;
   guia?: string;
   fechaEstimada?: string; // YYYY-MM-DD

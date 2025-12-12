@@ -47,6 +47,16 @@ export interface ShippingOrder {
 }
 
 /**
+ * Representa la información de RMA asociada al envío.
+ */
+export interface ShippingRma {
+  id: string;
+  rma_number: string;
+  motivo: string;
+  estado: string;
+}
+
+/**
  * Representa un evento en el historial de un envío.
  */
 export interface HistoryEvent {
@@ -61,8 +71,10 @@ export interface HistoryEvent {
  */
 export interface Shipping {
   id: string; // UUID
-  order_id: string;
+  order_id?: string;  // Solo presente en envíos normales
+  rma_id?: string;    // Solo presente en envíos RMA
   order?: ShippingOrder;
+  rma?: ShippingRma;  // Objeto poblado si es envío RMA
   direccion_entrega?: string;
   transportadora?: string;
   guia?: string;

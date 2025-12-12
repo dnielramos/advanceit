@@ -1,0 +1,323 @@
+# Guía de Integración: Envíos Normales y Envíos RMA
+
+> **Versión:** 1.0  
+> **Fecha:** Diciembre 2024  
+> **Módulo:** Shippings
+
+---
+
+## Resumen de Cambios
+
+El módulo de envíos ahora soporta dos tipos de asociación:
+
+| Tipo de Envío | Campo Requerido | Campo Nulo |
+|---------------|-----------------|------------|
+| **Envío Normal** | `order_id` | `rma_id = null` |
+| **Envío por RMA** | `rma_id` | `order_id = null` |
+
+**Regla importante:** Solo uno de los dos campos puede tener valor. Nunca ambos al mismo tiempo, nunca ambos nulos.
+
+---
+
+## Endpoint de Creación
+
+### `POST /shippings`
+
+#### Campos del Request Body
+
+| Campo | Tipo | Envío Normal | Envío RMA | Descripción |
+|-------|------|--------------|-----------|-------------|
+| `order_id` | `string` (UUID) | **Requerido** | No enviar | ID de la orden asociada |
+| `rma_id` | `string` (UUID) | No enviar | **Requerido** | ID del RMA asociado |
+| `direccion_entrega` | `string` | **Requerido** | **Requerido** | Dirección de entrega |
+| `transportadora` | `string` | **Requerido** | **Requerido** | Nombre de la transportadora |
+| `guia` | `string` | Opcional | Opcional | Número de guía |
+| `fechaEstimada` | `string` (YYYY-MM-DD) | **Requerido** | **Requerido** | Fecha estimada de entrega |
+| `notas` | `string` | Opcional | Opcional | Notas adicionales |
+| `user_id` | `string` (UUID) | **Requerido** | **Requerido** | ID del usuario que crea el envío |
+
+---
+
+## Ejemplos de Request
+
+### Crear Envío Normal (asociado a Order)
+
+```json
+POST /shippings
+Content-Type: application/json
+
+{
+  "order_id": "550e8400-e29b-41d4-a716-446655440000",
+  "direccion_entrega": "Calle 123 #45-67, Bogotá",
+  "transportadora": "Servientrega",
+  "guia": "1234567890",
+  "fechaEstimada": "2024-12-20",
+  "notas": "Entregar en horario de oficina",
+  "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}
+```
+
+### Crear Envío por RMA (asociado a RMA)
+
+```json
+POST /shippings
+Content-Type: application/json
+
+{
+  "rma_id": "660e8400-e29b-41d4-a716-446655440001",
+  "direccion_entrega": "Bodega principal - Zona Industrial",
+  "transportadora": "Coordinadora",
+  "guia": "9876543210",
+  "fechaEstimada": "2024-12-22",
+  "notas": "Devolución por garantía",
+  "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}
+```
+
+---
+
+## Respuesta del Servidor
+
+### Estructura del Objeto Shipping
+
+```typescript
+interface Shipping {
+  id: string;
+  order_id?: string;           // Solo presente en envíos normales
+  rma_id?: string;             // Solo presente en envíos RMA
+  order?: ShippingOrderInfo;   // Objeto poblado si es envío normal
+  rma?: ShippingRmaInfo;       // Objeto poblado si es envío RMA
+  direccion_entrega?: string;
+  transportadora?: string;
+  guia?: string;
+  estado: 'preparando' | 'en_transito' | 'entregado' | 'fallido';
+  historial?: HistoryEvent[];
+  notas?: string;
+  fechaEstimada?: string;
+  fechaEntregaReal?: string;
+  created_by: string | ShippingUserInfo;
+  updated_by: string | ShippingUserInfo;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### Objeto Order (solo en envíos normales)
+
+```typescript
+interface ShippingOrderInfo {
+  id: string;
+  numeroOrden: string;
+  quotation_id: string;
+  company: {
+    id: number;
+    razon_social: string;
+    nit: string;
+  };
+  user: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+}
+```
+
+### Objeto RMA (solo en envíos RMA)
+
+```typescript
+interface ShippingRmaInfo {
+  id: string;
+  rma_number: string;
+  motivo: string;
+  estado: string;
+}
+```
+
+---
+
+## Ejemplo de Respuesta
+
+### Envío Normal Creado
+
+```json
+{
+  "id": "770e8400-e29b-41d4-a716-446655440002",
+  "order_id": "550e8400-e29b-41d4-a716-446655440000",
+  "rma_id": null,
+  "direccion_entrega": "Calle 123 #45-67, Bogotá",
+  "transportadora": "Servientrega",
+  "guia": "1234567890",
+  "estado": "preparando",
+  "fechaEstimada": "2024-12-20",
+  "notas": "Entregar en horario de oficina",
+  "historial": [
+    {
+      "timestamp": "2024-12-12T07:58:00.000Z",
+      "status": "preparando",
+      "description": "Los Administradores han validado los productos y procesado la orden.",
+      "updated_by": { "id": "...", "name": "Admin User" }
+    }
+  ],
+  "created_by": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "updated_by": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "created_at": "2024-12-12T07:58:00.000Z",
+  "updated_at": "2024-12-12T07:58:00.000Z"
+}
+```
+
+### Envío RMA (al consultar con GET)
+
+```json
+{
+  "id": "880e8400-e29b-41d4-a716-446655440003",
+  "order_id": null,
+  "rma_id": "660e8400-e29b-41d4-a716-446655440001",
+  "rma": {
+    "id": "660e8400-e29b-41d4-a716-446655440001",
+    "rma_number": "RMA-ABC123-XYZ",
+    "motivo": "Producto defectuoso",
+    "estado": "approved"
+  },
+  "direccion_entrega": "Bodega principal - Zona Industrial",
+  "transportadora": "Coordinadora",
+  "guia": "9876543210",
+  "estado": "preparando",
+  "fechaEstimada": "2024-12-22",
+  "notas": "Devolución por garantía",
+  "historial": [...],
+  "created_by": {...},
+  "updated_by": {...},
+  "created_at": "2024-12-12T08:00:00.000Z",
+  "updated_at": "2024-12-12T08:00:00.000Z"
+}
+```
+
+---
+
+## Errores Comunes
+
+### Error: Datos de envío inválidos
+
+```json
+{
+  "statusCode": 400,
+  "message": "Datos de envío inválidos.",
+  "error": "Bad Request"
+}
+```
+
+**Causas posibles:**
+- No se envió ni `order_id` ni `rma_id`
+- Se enviaron ambos `order_id` y `rma_id`
+- Faltan campos requeridos: `transportadora`, `fechaEstimada`, `direccion_entrega`
+
+---
+
+## Endpoints Existentes (Sin Cambios)
+
+Los siguientes endpoints funcionan igual para ambos tipos de envío:
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/shippings` | Obtener todos los envíos |
+| `GET` | `/shippings/:id` | Obtener envío por ID |
+| `PATCH` | `/shippings/:id` | Actualizar envío (estado, guía, etc.) |
+| `PATCH` | `/shippings/:id/history` | Agregar eventos al historial |
+
+---
+
+## Lógica de Frontend Recomendada
+
+### Determinar Tipo de Envío
+
+```typescript
+function getTipoEnvio(shipping: Shipping): 'normal' | 'rma' {
+  if (shipping.order_id && !shipping.rma_id) return 'normal';
+  if (shipping.rma_id && !shipping.order_id) return 'rma';
+  throw new Error('Estado inválido de envío');
+}
+```
+
+### Mostrar Información Asociada
+
+```typescript
+function getInfoAsociada(shipping: Shipping) {
+  if (shipping.order) {
+    return {
+      tipo: 'Orden',
+      numero: shipping.order.numeroOrden,
+      empresa: shipping.order.company.razon_social,
+      cliente: shipping.order.user.name
+    };
+  }
+  
+  if (shipping.rma) {
+    return {
+      tipo: 'RMA',
+      numero: shipping.rma.rma_number,
+      motivo: shipping.rma.motivo,
+      estadoRma: shipping.rma.estado
+    };
+  }
+  
+  return null;
+}
+```
+
+### Formulario de Creación
+
+```typescript
+interface CreateShippingForm {
+  // Selector de tipo
+  tipoEnvio: 'normal' | 'rma';
+  
+  // Campos condicionales
+  order_id?: string;  // Solo si tipoEnvio === 'normal'
+  rma_id?: string;    // Solo si tipoEnvio === 'rma'
+  
+  // Campos siempre requeridos
+  direccion_entrega: string;
+  transportadora: string;
+  fechaEstimada: string;
+  
+  // Campos opcionales
+  guia?: string;
+  notas?: string;
+}
+
+function buildPayload(form: CreateShippingForm, userId: string) {
+  const payload: any = {
+    direccion_entrega: form.direccion_entrega,
+    transportadora: form.transportadora,
+    fechaEstimada: form.fechaEstimada,
+    guia: form.guia,
+    notas: form.notas,
+    user_id: userId
+  };
+  
+  if (form.tipoEnvio === 'normal') {
+    payload.order_id = form.order_id;
+  } else {
+    payload.rma_id = form.rma_id;
+  }
+  
+  return payload;
+}
+```
+
+---
+
+## Tabla Resumen de Cambios
+
+| Aspecto | Antes | Ahora |
+|---------|-------|-------|
+| `order_id` | Obligatorio | Opcional (requerido si no hay `rma_id`) |
+| `rma_id` | No existía | Opcional (requerido si no hay `order_id`) |
+| Objeto `rma` en respuesta | No existía | Presente si el envío está asociado a RMA |
+| Validación | Solo validaba `order_id` | Valida que exista exactamente uno de los dos |
+
+---
+
+## Contacto
+
+Para dudas sobre esta integración, contactar al equipo de backend.

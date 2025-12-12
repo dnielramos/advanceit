@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -19,6 +19,9 @@ export class CreateRmaShippingModalComponent {
   private readonly authService = inject(AuthService);
   private readonly toast = inject(ToastService);
 
+  @Input({ required: true }) rmaId!: string;
+  @Input() rmaNumber?: string;
+
   @Output() close = new EventEmitter<void>();
   @Output() created = new EventEmitter<void>();
 
@@ -37,11 +40,10 @@ export class CreateRmaShippingModalComponent {
 
   constructor() {
     this.createForm = this.fb.group({
-      order_id: [{ value: 'ADVANCE_RMA_SHIPPING', disabled: true }, [Validators.required]],
       direccion_entrega: ['', [Validators.required, Validators.minLength(5)]],
       transportadora: ['', [Validators.required]],
       guia: [''],
-      fechaEstimada: [''],
+      fechaEstimada: ['', [Validators.required]],
       notas: [''],
     });
   }
@@ -53,14 +55,14 @@ export class CreateRmaShippingModalComponent {
     }
 
     this.isLoading.set(true);
-    const formValue = this.createForm.getRawValue(); // getRawValue to include disabled fields
+    const formValue = this.createForm.value;
 
     const dto: CreateShippingDto = {
-      order_id: formValue.order_id,
+      rma_id: this.rmaId,
       direccion_entrega: formValue.direccion_entrega,
       transportadora: formValue.transportadora,
       guia: formValue.guia || undefined,
-      fechaEstimada: formValue.fechaEstimada || undefined,
+      fechaEstimada: formValue.fechaEstimada,
       notas: formValue.notas || undefined,
       user_id: this.authService.getUserId() || '',
     };

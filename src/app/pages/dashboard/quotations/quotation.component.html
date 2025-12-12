@@ -1,15 +1,15 @@
-<div class="bg-gray-100">
-  <header class="px-6 py-4">
+<div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple flex flex-col min-h-full">
+  <app-header-crud titulo="Cotizaciones" descripcion="Gestiona todas tus cotizaciones desde este panel."
+    textoBotonNuevo="Cotizar" (crear)="openCreateQuotation()" (openCreate)="openCreateQuotation()"
+    (filterChange)="filterQuotations($event)" [filterByStatus]="true"
+    [filterStatusValues]="['sent', 'approved', 'rejected', 'expired']"
+    (clearFilters)="filterQuotations({ texto: '', estado: '' })" (actualizar)="loadQuotations()"
+    [showViewToggle]="true" [currentView]="viewMode()" (viewChange)="onViewChange($event)">
+  </app-header-crud>
 
-    <app-header-crud titulo="Cotizaciones" descripcion="Gestiona todas tus cotizaciones desde este panel."
-      textoBotonNuevo="Cotizar" (crear)="openCreateQuotation()" (openCreate)="openCreateQuotation()"
-      (filterChange)="filterQuotations($event)" [filterByStatus]="true"
-      [filterStatusValues]="['sent', 'approved', 'rejected', 'expired']"
-      (clearFilters)="filterQuotations({ texto: '', estado: '' })" (actualizar)="loadQuotations()"
-      [showViewToggle]="true" [currentView]="viewMode()" (viewChange)="onViewChange($event)"></app-header-crud>
-  </header>
-
-  <app-quotation-list [quotations]="quotations()" [isLoading]="isLoading()" [externalView]="viewMode()"
-    (openDetails)="openDetailsModal($event)" (openEdit)="openEditModal($event)"
-    (refreshList)="loadQuotations()"></app-quotation-list>
+  <section class="mt-6">
+    <app-quotation-list [quotations]="quotations()" [isLoading]="isLoading()" [externalView]="viewMode()"
+      (openDetails)="openDetailsModal($event)" (openEdit)="openEditModal($event)"
+      (refreshList)="loadQuotations()"></app-quotation-list>
+  </section>
 </div>

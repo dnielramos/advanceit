@@ -1,6 +1,6 @@
 <lib-toastify-toast-container *ngIf="toastQuotation"></lib-toastify-toast-container>
 
-<div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple">
+<div class="scroll-purple">
 
   <!-- Vista Grid (Tarjetas) -->
   <div *ngIf="viewMode() === 'grid'" class="space-y-4">
@@ -116,7 +116,7 @@
   </div>
 
   <!-- Vista Lista (Tabla) -->
-  <div *ngIf="viewMode() === 'list'" class="mt-4 overflow-x-auto">
+  <div *ngIf="viewMode() === 'list'" class="overflow-x-auto">
     <!-- Skeleton Loader -->
     <app-skeleton-table *ngIf="isLoading" [rowCount]="8" [columnCount]="7"></app-skeleton-table>
 

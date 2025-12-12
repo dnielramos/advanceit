@@ -1,6 +1,6 @@
 // src/app/components/inventory-browser/inventory-browser.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
@@ -75,6 +75,9 @@ export class InventoryUploaderComponent implements OnInit {
   faPencil = faPencil;
   faExclamationTriangle = faExclamationTriangle;
   faTriangleExclamation = faTriangleExclamation;
+
+  // Referencia al contenedor de scroll de la tabla
+  @ViewChild('inventoryTableScroll') inventoryTableScroll!: ElementRef<HTMLDivElement>;
 
   // Estado general
   companies = signal<CompanyInventory[]>([]);
@@ -864,5 +867,18 @@ export class InventoryUploaderComponent implements OnInit {
     if (!name) return '';
     const lower = name.toLowerCase();
     return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }
+
+  // Métodos para navegación horizontal de la tabla
+  scrollTableLeft(): void {
+    if (this.inventoryTableScroll?.nativeElement) {
+      this.inventoryTableScroll.nativeElement.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  }
+
+  scrollTableRight(): void {
+    if (this.inventoryTableScroll?.nativeElement) {
+      this.inventoryTableScroll.nativeElement.scrollBy({ left: 300, behavior: 'smooth' });
+    }
   }
 }

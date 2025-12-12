@@ -9,6 +9,7 @@ import {
   faStore,
   faHeart,
   faFilter,
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Subscription } from 'rxjs';
@@ -65,6 +66,7 @@ export class AdvanceProductsComponent implements OnInit, OnDestroy {
   faShoppingCart = faShoppingCart;
   faTag = faTag;
   faStore = faStore;
+  faTimes = faTimes;
   faHeart = faHeart;
   faFilter = faFilter;
 

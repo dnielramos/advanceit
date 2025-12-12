@@ -13,7 +13,7 @@ import { AiChatSidebarComponent } from '../../components/dashboard/ai-chat-sideb
   standalone: true,
   imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent, AiChatSidebarComponent],
   template: `
-    <div class="bg-gray-100 h-screen lg:flex">
+    <div class="bg-slate-50 h-screen lg:flex">
       <!-- SIDEBAR -->
       <aside
         class="fixed inset-y-0 left-0 z-25 lg:z-10 w-48 bg-white shadow-lg transform transition-transform duration-300

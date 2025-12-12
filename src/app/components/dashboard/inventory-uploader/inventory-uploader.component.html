@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white p-6 max-w-7xl mx-auto">
+<div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple flex flex-col min-h-full">
   <!-- Título principal -->
   <app-header-crud titulo="Inventarios" descripcion="Gestiona y actualiza los inventarios."
     textoBotonActualizar="Refrescar" placeholderInput="Buscar por nombre..." [filterByStatus]="false"
@@ -379,9 +379,6 @@
       <p class="text-sm text-gray-500 mt-1">Este inventario aún no tiene productos registrados</p>
     </div>
 
-    <p class="text-xs text-gray-500 mt-4 text-center sm:text-left">
-      Mostrando {{ filteredInventory().length }} producto(s)
-    </p>
   </section>
 
   <!-- Lista de empresas -->
@@ -543,9 +540,6 @@
       </button>
     </div>
 
-    <p class="text-xs text-gray-500 mt-4 text-center sm:text-left">
-      Mostrando {{ filteredInventory().length }} ítem(s)
-    </p>
   </section>
 
   <!-- Modal de Feedback (Éxito/Error) -->

@@ -1,142 +1,118 @@
-<div class="min-h-screen bg-gray-50">
-  <div class="sticky top-0 z-20 bg-white/80 backdrop-blur-sm shadow-md">
-    <div class="container mx-auto max-w-7xl px-4 py-4">
-      <div class="relative mb-4">
-        <input type="text" [(ngModel)]="searchTerm" (input)="filterProducts()"
-          placeholder="Busca por nombre, marca, SKU..."
-          class="w-full rounded-full border border-gray-300 px-6 py-4 pl-12 text-lg shadow-sm outline-none transition-shadow focus:border-purple-500 focus:ring-2 focus:ring-purple-200" />
-        <fa-icon [icon]="faSearch" class="absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-400"></fa-icon>
+<div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple flex flex-col">
+  <lib-toastify-toast-container></lib-toastify-toast-container>
+
+  <!-- Header consistente con otros módulos -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5">
+    <!-- Título y descripción -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Inventario de Productos</h1>
+        <p class="text-sm text-gray-500 mt-1">Explora y gestiona el catálogo de productos disponibles</p>
       </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-semibold text-gray-600">
+          <span class="text-purple-600">{{ filteredProducts().length }}</span> producto(s)
+        </span>
+      </div>
+    </div>
 
-      <div class="flex flex-col flex-wrap items-center justify-between gap-4 md:flex-row">
-        <div class="font-semibold text-gray-600">
-          <span class="text-purple-600">{{ filteredProducts().length }}</span>
-          producto(s) encontrado(s)
-        </div>
+    <!-- Barra de búsqueda -->
+    <div class="relative mb-4">
+      <input type="text" [(ngModel)]="searchTerm" (input)="filterProducts()"
+        placeholder="Busca por nombre, marca, SKU..."
+        class="w-full rounded-xl border border-gray-200 px-5 py-3 pl-12 text-sm shadow-sm outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-100" />
+      <fa-icon [icon]="faSearch" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
+    </div>
 
-        <div class="flex flex-wrap justify-center gap-3">
-          <div class="relative inline-block">
-            <button (click)="toggleCategoryFilter()"
-              class="flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 shadow-sm transition-all hover:bg-gray-50">
-              <fa-icon [icon]="faFilter" class="mr-2 text-purple-500"></fa-icon>
-              <span>Categorías</span>
-              <span *ngIf="selectedCategories.length > 0"
-                class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white">{{
-                selectedCategories.length }}</span>
-            </button>
-            <div *ngIf="showCategoryFilter()" @fadeIn
-              class="absolute right-0 z-10 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-xl">
-              <div class="max-h-60 overflow-y-auto p-3">
-                <div *ngFor="let cat of uniqueCategories()">
-                  <label class="flex cursor-pointer items-center rounded p-2 hover:bg-purple-50">
-                    <input type="checkbox" [checked]="selectedCategories.includes(cat)" (change)="toggleCategory(cat)"
-                      class="h-4 w-4 accent-purple-500" />
-                    <span class="ml-3 text-gray-700">{{ cat }}</span>
-                  </label>
-                </div>
-              </div>
-              <div *ngIf="selectedCategories.length > 0" class="flex justify-end border-t border-gray-200 p-2">
-                <button (click)="clearCategoryFilters()" class="text-sm text-purple-600 hover:underline">
-                  Limpiar filtros
-                </button>
-              </div>
+    <!-- Filtros -->
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Filtro Categorías -->
+      <div class="relative inline-block">
+        <button (click)="toggleCategoryFilter()"
+          class="flex items-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm shadow-sm transition-all hover:bg-gray-50 hover:border-gray-300">
+          <fa-icon [icon]="faFilter" class="mr-2 text-purple-500"></fa-icon>
+          <span class="text-gray-700">Categorías</span>
+          <span *ngIf="selectedCategories.length > 0"
+            class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white">{{
+            selectedCategories.length }}</span>
+        </button>
+        <div *ngIf="showCategoryFilter()" @fadeIn
+          class="absolute left-0 z-10 mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-xl">
+          <div class="max-h-60 overflow-y-auto p-3">
+            <div *ngFor="let cat of uniqueCategories()">
+              <label class="flex cursor-pointer items-center rounded-lg p-2 hover:bg-purple-50 transition-colors">
+                <input type="checkbox" [checked]="selectedCategories.includes(cat)" (change)="toggleCategory(cat)"
+                  class="h-4 w-4 accent-purple-500 rounded" />
+                <span class="ml-3 text-sm text-gray-700">{{ cat }}</span>
+              </label>
             </div>
           </div>
-
-          <div class="relative inline-block">
-            <button (click)="toggleBrandFilter()"
-              class="flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 shadow-sm transition-all hover:bg-gray-50">
-              <fa-icon [icon]="faStore" class="mr-2 text-purple-500"></fa-icon>
-              <span>Marcas</span>
-              <span *ngIf="selectedBrands.length > 0"
-                class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white">{{
-                selectedBrands.length }}</span>
+          <div *ngIf="selectedCategories.length > 0" class="flex justify-end border-t border-gray-100 p-2">
+            <button (click)="clearCategoryFilters()" class="text-sm text-purple-600 hover:underline">
+              Limpiar
             </button>
-            <div *ngIf="showBrandFilter()" @fadeIn
-              class="absolute right-0 z-10 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-xl">
-              <div class="max-h-60 overflow-y-auto p-3">
-                <div *ngFor="let brand of uniqueBrands()">
-                  <label class="flex cursor-pointer items-center rounded p-2 hover:bg-purple-50">
-                    <input type="checkbox" [checked]="selectedBrands.includes(brand)" (change)="toggleBrand(brand)"
-                      class="h-4 w-4 accent-purple-500" />
-                    <span class="ml-3 text-gray-700">{{ brand }}</span>
-                  </label>
-                </div>
-              </div>
-              <div *ngIf="selectedBrands.length > 0" class="flex justify-end border-t border-gray-200 p-2">
-                <button (click)="clearBrandFilters()" class="text-sm text-purple-600 hover:underline">
-                  Limpiar filtros
-                </button>
-              </div>
-            </div>
           </div>
-
-          <button *ngIf="searchTerm || selectedCategories.length > 0 || selectedBrands.length > 0" @fadeIn
-            (click)="resetFilters()"
-            class="flex items-center rounded-lg bg-red-100 px-4 py-2 text-sm text-red-700 shadow-sm transition-all hover:bg-red-200">
-            Limpiar Todo
-          </button>
         </div>
       </div>
+
+      <!-- Filtro Marcas -->
+      <div class="relative inline-block">
+        <button (click)="toggleBrandFilter()"
+          class="flex items-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm shadow-sm transition-all hover:bg-gray-50 hover:border-gray-300">
+          <fa-icon [icon]="faStore" class="mr-2 text-purple-500"></fa-icon>
+          <span class="text-gray-700">Marcas</span>
+          <span *ngIf="selectedBrands.length > 0"
+            class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white">{{
+            selectedBrands.length }}</span>
+        </button>
+        <div *ngIf="showBrandFilter()" @fadeIn
+          class="absolute left-0 z-10 mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-xl">
+          <div class="max-h-60 overflow-y-auto p-3">
+            <div *ngFor="let brand of uniqueBrands()">
+              <label class="flex cursor-pointer items-center rounded-lg p-2 hover:bg-purple-50 transition-colors">
+                <input type="checkbox" [checked]="selectedBrands.includes(brand)" (change)="toggleBrand(brand)"
+                  class="h-4 w-4 accent-purple-500 rounded" />
+                <span class="ml-3 text-sm text-gray-700">{{ brand }}</span>
+              </label>
+            </div>
+          </div>
+          <div *ngIf="selectedBrands.length > 0" class="flex justify-end border-t border-gray-100 p-2">
+            <button (click)="clearBrandFilters()" class="text-sm text-purple-600 hover:underline">
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón Limpiar Todo -->
+      <button *ngIf="searchTerm || selectedCategories.length > 0 || selectedBrands.length > 0" @fadeIn
+        (click)="resetFilters()"
+        class="flex items-center rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-600 border border-red-200 transition-all hover:bg-red-100">
+        <fa-icon [icon]="faTimes" class="mr-2"></fa-icon>
+        Limpiar Todo
+      </button>
     </div>
   </div>
 
-  <lib-toastify-toast-container></lib-toastify-toast-container>
-
-  <div class="container mx-auto max-w-7xl">
+  <!-- Contenido con scroll infinito -->
+  <div class="flex-1 overflow-y-auto mt-6">
     <div *ngIf="filteredProducts().length > 0 && searchTerm.length > 0; else noProducts"
-      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate__animated animate__fadeInUp">
       <app-product-advance *ngFor="let p of filteredProducts(); tracky: trackBySku" @fadeIn @fadeOut
         [producto]="p" (agregarAlCarrito)="addToCart($event)"></app-product-advance>
-
     </div>
-
-
 
     <ng-template #noProducts>
       <app-grid-products-store (añadirAlCarrito)="addToCart($event)"></app-grid-products-store>
     </ng-template>
-
-    <!-- <ng-template #noProducts>
-      <div class="flex flex-col items-center py-20 text-center">
-        <div *ngIf="allProducts.length === 0; else noResults" class="loader"></div>
-        <p *ngIf="allProducts.length === 0" class="mt-4 text-gray-600">
-          Buscando los mejores productos para ti...
-        </p>
-
-        <ng-template #noResults>
-          <fa-icon
-            [icon]="faSearch"
-            class="mb-4 text-6xl text-gray-300"
-          ></fa-icon>
-          <h3 class="text-xl font-semibold text-gray-700">
-            No se encontraron productos
-          </h3>
-          <p class="text-gray-500">
-            Intenta ajustar tu búsqueda o limpiar los filtros.
-          </p>
-          <button
-            (click)="resetFilters()"
-            class="mt-6 rounded-lg bg-purple-500 px-6 py-3 text-white transition-colors hover:bg-purple-600"
-          >
-            Ver todos los productos
-          </button>
-        </ng-template>
-      </div>
-    </ng-template> -->
   </div>
 
-  <!-- t+item de carrito -->
+  <!-- Botón de carrito flotante -->
   <div *ngIf="cartItemCount() > 0 && islogged()"
-    class="fixed flex justify-center bottom-2 rounded-tl-xl rounded-bl-xl hover:cursor-pointer right-0 md:left-auto bg-purple-500 text-white animate__animated animate__fadeInRight shadow-lg w-18 h-15 z-10">
-    <a (click)="goToCart()" class="relative flex items-center justify-center w-full h-full">
-      <span
-        class="p-2 absolute top-2 right-2 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-        {{ cartItemCount() }}
-      </span>
-      <fa-icon [icon]="faShoppingCart" class="text-xl md:text-2xl "></fa-icon>
+    class="fixed flex justify-center bottom-4 right-4 rounded-2xl hover:cursor-pointer bg-gradient-to-r from-purple-500 to-purple-600 text-white animate__animated animate__fadeInRight shadow-lg hover:shadow-xl transition-all z-10">
+    <a (click)="goToCart()" class="relative flex items-center justify-center px-4 py-3 gap-2">
+      <fa-icon [icon]="faShoppingCart" class="text-xl"></fa-icon>
+      <span class="font-semibold">{{ cartItemCount() }}</span>
     </a>
   </div>
-
 </div>

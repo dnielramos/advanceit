@@ -76,6 +76,10 @@ export class ShippingsManagerComponent implements OnInit {
   public productsError: string | null = null;
   // --- FIN LÓGICA PRODUCTOS ---
 
+  // --- LÓGICA PARA PANEL DE GUÍA ---
+  public showGuidePanel = false;
+  // --- FIN LÓGICA GUÍA ---
+
   public isUpdateStatusModalOpen = false;
   public isSubmitting = false;
   public updateStatusPayload: any = this.getInitialUpdateStatusPayload();
@@ -376,6 +380,20 @@ export class ShippingsManagerComponent implements OnInit {
   public closeShippingViewer() {
     this.idShippingToView = '';
   }
+
+  // --- MÉTODOS PARA PANEL DE GUÍA ---
+  openGuidePanel(): void {
+    if (!this.selectedShipping?.guia) {
+      alert('Este envío no tiene guía asociada.');
+      return;
+    }
+    this.showGuidePanel = true;
+  }
+
+  closeGuidePanel(): void {
+    this.showGuidePanel = false;
+  }
+  // --- FIN MÉTODOS GUÍA ---
 
   // --- MÉTODOS PARA PRODUCTOS ---
   openProductsPanel(): void {

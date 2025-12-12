@@ -1,49 +1,51 @@
-<!--
-  Contenedor Principal (Modal Overlay):
-  - 'fixed inset-0 z-50': Posición fija, cubre toda la pantalla (viewport) y se sitúa encima de todo (z-index 50).
-  - 'flex items-center justify-center': Centra vertical y horizontalmente el contenido.
-  - 'bg-gray-900/80 backdrop-blur-sm': Fondo oscuro (negro al 80%) y un efecto "vidrio esmerilado" (blur).
-  - 'p-4 sm:p-6': Padding para que el contenido no toque los bordes en móviles.
-  - 'animate-fade-in': (CSS opcional abajo) Una animación suave de entrada.
-  - (click)="onClose()": Evento de clic en el fondo para cerrar el modal.
--->
+<!-- Modo embebido: solo muestra el contenido sin overlay -->
+@if (embedded) {
+  <div class="w-full h-full flex items-center justify-center p-4">
+    <!-- 1. Estado de Carga -->
+    @if (loading) {
+      <div class="flex flex-col items-center gap-4">
+        <svg class="w-10 h-10 text-violet-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+          </path>
+        </svg>
+        <span class="text-sm font-medium text-gray-600">Cargando comprobante...</span>
+      </div>
+    }
+    <!-- 2. Estado de Error -->
+    @else if (error) {
+      <div class="flex flex-col items-center gap-3 text-center p-6">
+        <svg class="w-12 h-12 text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        </svg>
+        <h3 class="text-base font-semibold text-gray-800">Ocurrió un error</h3>
+        <p class="text-sm text-gray-500">{{ error }}</p>
+      </div>
+    }
+    <!-- 3. Estado de Éxito (LA IMAGEN) -->
+    @else if (documentUrl) {
+      <img [src]="documentUrl"
+           alt="Comprobante de envío"
+           class="max-w-full max-h-full object-contain rounded-lg" />
+    }
+  </div>
+} @else {
+<!-- Modo modal: overlay completo -->
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm p-4 sm:p-6"
      (click)="onClose()">
 
-  <!--
-    Botón de Cerrar (Fijo):
-    - 'fixed top-4 right-4 z-[51]': Posición fija en la esquina superior derecha,
-      con un z-index más alto que el contenido para estar siempre visible.
-    - Estilo: Blanco, redondo, con sombra y un efecto 'hover' en púrpura.
-    - 'transition-all': Para animaciones suaves de hover.
-  -->
   <button (click)="onClose()"
-          class="fixed top-4 right-4 z-[51]
-                 p-1.5 text-white
-                 hover:text-purple-700 hover:scale-110 transition-all"
+          class="fixed top-4 right-4 z-[51] p-1.5 text-white hover:text-purple-700 hover:scale-110 transition-all"
           aria-label="Cerrar visor">
-          <!-- cerrar
-    <span class="sr-only">Cerrar</span> -->
-    <!-- Icono 'X' dentro de un círculo -->
     X
   </button>
 
-
-  <!--
-    Contenedor de Contenido:
-    - (click)="$event.stopPropagation()": ¡CRÍTICO! Previene que un clic en el
-      contenido (imagen, error) se "propague" al fondo y cierre el modal.
-    - 'relative': Necesario para que el contenido se muestre correctamente.
-  -->
   <div (click)="$event.stopPropagation()" class="relative">
-
     <!-- 1. Estado de Carga -->
     @if (loading) {
-      <!-- Tarjeta blanca para el estado -->
       <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full flex flex-col items-center gap-4">
-        <!-- Spinner SVG animado (Color Púrpura) -->
-        <svg class="w-12 h-12 text-purple-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
-          viewBox="0 0 24 24">
+        <svg class="w-12 h-12 text-purple-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
@@ -52,53 +54,31 @@
         <span class="text-lg font-medium text-gray-700">Cargando comprobante...</span>
       </div>
     }
-
     <!-- 2. Estado de Error -->
     @else if (error) {
-      <!-- Tarjeta blanca para el estado -->
       <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full flex flex-col items-center gap-5 text-center">
-        <!-- Icono de Error/Alerta (Color Púrpura) -->
-        <svg class="w-14 h-14 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-          stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        <svg class="w-14 h-14 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
         </svg>
         <h3 class="text-xl font-semibold text-gray-900">Ocurrió un error</h3>
-        <!-- Mensaje de error dinámico (Color Gris) -->
         <p class="text-gray-600">{{ error }}</p>
       </div>
     }
-
     <!-- 3. Estado de Éxito (LA IMAGEN) -->
     @else if (documentUrl) {
-      <!--
-        La Imagen:
-        - 'max-w-[95vw]': Limita el ancho al 95% del ANCHO del viewport.
-        - 'max-h-[95vh]': Limita la altura al 95% de la ALTURA del viewport.
-        - 'object-contain': Mantiene la relación de aspecto y se asegura que la imagen
-          quepa dentro de esos límites (95vw, 95vh) sin deformarse.
-        - 'rounded-lg shadow-2xl': Estilos de borde y sombra.
-        - 'bg-white': Fondo blanco por si la imagen es un PNG con transparencias.
-      -->
       <img [src]="documentUrl"
            alt="Comprobante de envío"
            class="max-w-[95vw] max-h-[95vh] object-contain rounded-lg shadow-2xl bg-white" />
     }
-
   </div>
 </div>
+}
 
-<!--
-  Estilos Opcionales para la animación de entrada.
-  Puedes poner esto en tu 'styles.css' global o en el
-  array 'styles' de tu componente .ts si lo prefieres.
--->
 <style>
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
-
   .animate-fade-in {
     animation: fadeIn 0.2s ease-out;
   }

@@ -263,11 +263,11 @@
           <fa-icon [icon]="faBoxes"></fa-icon>
           <span>Ver Productos</span>
         </button>
-        @if (selectedShipping.guia && selectedShipping.estado === 'en_transito') {
-        <button (click)="setShippingToView(selectedShipping.id)"
+        @if (selectedShipping.guia) {
+        <button (click)="openGuidePanel()"
           class="w-full flex items-center justify-center gap-2 bg-purple-50 text-purple-600 font-semibold py-3 px-5 rounded-xl border border-purple-200 hover:bg-purple-100 transition-colors">
-          <fa-icon [icon]="faTruck"></fa-icon>
-          <span>Ver Comprobante</span>
+          <fa-icon [icon]="faEye"></fa-icon>
+          <span>Ver Guía</span>
         </button>
         }
         <button (click)="openUpdateStatusModal()"
@@ -291,7 +291,7 @@
     <div class="bg-white px-6 pt-5 pb-4 border-b border-gray-100">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div class="flex items-center gap-3 mb-2">
+          <div class="flex items-center gap-3 mb-2 flex-wrap">
             <span class="text-xs font-bold text-violet-700 bg-violet-50 px-3 py-1 rounded-full">
               {{ shipping.order?.numeroOrden || 'Sin número' }}
             </span>
@@ -304,6 +304,13 @@
               <fa-icon [icon]="getStatusInfo(shipping.estado).icon" class="text-[10px]"></fa-icon>
               {{ getStatusInfo(shipping.estado).label }}
             </span>
+            @if (shipping.guia) {
+            <button (click)="openGuidePanel()"
+              class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600 shadow-sm hover:shadow-md transition-all duration-200">
+              <fa-icon [icon]="faEye" class="text-[10px]"></fa-icon>
+              Ver Guía
+            </button>
+            }
           </div>
           <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Detalle del Envío</h2>
           @if (shipping.guia) {
@@ -520,13 +527,6 @@
           <fa-icon [icon]="faBoxes"></fa-icon>
           <span>Ver Productos</span>
         </button>
-        @if (shipping.guia && shipping.estado === 'en_transito') {
-        <button (click)="setShippingToView(shipping.id)"
-          class="flex items-center justify-center gap-2 bg-purple-50 text-purple-600 font-semibold py-3 px-5 rounded-xl border border-purple-200 hover:bg-purple-100 transition-all">
-          <fa-icon [icon]="faTruck"></fa-icon>
-          <span>Ver Comprobante</span>
-        </button>
-        }
         <button (click)="openUpdateStatusModal()"
           class="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-5 rounded-xl border border-gray-200 transition-colors">
           <fa-icon [icon]="faEdit"></fa-icon>
@@ -766,8 +766,6 @@
               <div class="mt-1 flex flex-wrap gap-1">
                 @if (product.SKU) {
                 <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-mono">{{ product.SKU }}</span>
-                }
-                @if (product.marca) {
                 <span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-semibold">{{ product.marca }}</span>
                 }
               </div>
@@ -780,6 +778,153 @@
         }
       </div>
       }
+    </div>
+  </div>
+</div>
+}
+
+<!-- Panel Lateral de Guía - Desktop -->
+@if (showGuidePanel && selectedShipping) {
+<div class="fixed inset-0 z-[60] hidden lg:flex">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeGuidePanel()"></div>
+  
+  <!-- Panel lateral -->
+  <div class="absolute right-0 top-0 h-full w-full max-w-3xl bg-white shadow-2xl flex animate__animated animate__slideInRight animate__faster">
+    
+    <!-- Panel de información (izquierda) -->
+    <div class="w-72 bg-white border-r border-gray-200 p-6 flex flex-col">
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="w-14 h-14 bg-violet-100 rounded-2xl flex items-center justify-center mb-4">
+          <fa-icon [icon]="faTruck" size="2x" class="text-violet-600"></fa-icon>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900">Guía de Envío</h2>
+        <p class="text-gray-500 text-sm mt-1">Orden {{ selectedShipping.order?.numeroOrden || 'N/A' }}</p>
+      </div>
+
+      <!-- Info del envío -->
+      <div class="space-y-4 mb-8 flex-1">
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Número de Guía</p>
+          <p class="font-bold text-xl text-violet-700 font-mono">{{ selectedShipping.guia }}</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Transportadora</p>
+          <p class="font-semibold text-sm text-gray-800">{{ selectedShipping.transportadora || 'N/A' }}</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Empresa</p>
+          <p class="font-semibold text-sm text-gray-800 truncate">{{ selectedShipping.order?.company?.razon_social || 'N/A' }}</p>
+        </div>
+        @if (selectedShipping.fechaEstimada) {
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Fecha Estimada</p>
+          <p class="font-semibold text-sm text-gray-800">{{ selectedShipping.fechaEstimada | date: 'longDate' }}</p>
+        </div>
+        }
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Estado</p>
+          <span [ngClass]="{
+            'bg-yellow-100 text-yellow-700': selectedShipping.estado === 'preparando',
+            'bg-blue-100 text-blue-700': selectedShipping.estado === 'en_transito',
+            'bg-green-100 text-green-700': selectedShipping.estado === 'entregado',
+            'bg-red-100 text-red-700': selectedShipping.estado === 'fallido'
+          }" class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg">
+            <fa-icon [icon]="getStatusInfo(selectedShipping.estado).icon" class="text-[10px]"></fa-icon>
+            {{ getStatusInfo(selectedShipping.estado).label }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Botón cerrar -->
+      <div class="pt-4 border-t border-gray-200">
+        <button (click)="closeGuidePanel()"
+          class="w-full text-gray-500 hover:text-gray-700 py-2 text-sm font-medium transition-colors">
+          Cerrar panel
+        </button>
+      </div>
+    </div>
+
+    <!-- Visor de la guía (derecha) -->
+    <div class="flex-1 bg-gray-50 p-6 overflow-hidden flex flex-col">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-gray-800">Comprobante de Guía</h3>
+        <button (click)="closeGuidePanel()" 
+          class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="flex-1 overflow-hidden rounded-xl bg-white border border-gray-200 flex items-center justify-center">
+        <app-shipping-viewer [shippingId]="selectedShipping.id" [embedded]="true" (close)="closeGuidePanel()"></app-shipping-viewer>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Panel de Guía - Mobile (Bottom Sheet) -->
+<div class="lg:hidden fixed inset-0 z-[60] flex items-end" (click)="closeGuidePanel()">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  
+  <!-- Bottom Sheet -->
+  <div class="relative w-full bg-white rounded-t-3xl max-h-[90vh] overflow-hidden animate__animated animate__slideInUp animate__faster"
+    (click)="$event.stopPropagation()">
+    
+    <!-- Handle -->
+    <div class="flex justify-center pt-3 pb-2">
+      <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="px-5 pb-4 border-b border-gray-100">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+            <fa-icon [icon]="faTruck" class="text-violet-600"></fa-icon>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Guía de Envío</h2>
+            <p class="text-xs text-gray-500 font-mono">{{ selectedShipping.guia }}</p>
+          </div>
+        </div>
+        <button (click)="closeGuidePanel()" 
+          class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Info rápida -->
+    <div class="px-5 py-4 bg-gray-50 border-b border-gray-100">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-white rounded-lg p-3 border border-gray-100">
+          <p class="text-[10px] text-gray-500 uppercase">Transportadora</p>
+          <p class="font-semibold text-gray-800 text-sm truncate">{{ selectedShipping.transportadora || 'N/A' }}</p>
+        </div>
+        <div class="bg-white rounded-lg p-3 border border-gray-100">
+          <p class="text-[10px] text-gray-500 uppercase">Estado</p>
+          <span [ngClass]="{
+            'text-yellow-700': selectedShipping.estado === 'preparando',
+            'text-blue-700': selectedShipping.estado === 'en_transito',
+            'text-green-700': selectedShipping.estado === 'entregado',
+            'text-red-700': selectedShipping.estado === 'fallido'
+          }" class="font-bold text-sm">
+            {{ getStatusInfo(selectedShipping.estado).label }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visor del comprobante -->
+    <div class="p-4 max-h-[50vh] overflow-auto">
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden min-h-[200px] flex items-center justify-center">
+        <app-shipping-viewer [shippingId]="selectedShipping.id" [embedded]="true" (close)="closeGuidePanel()"></app-shipping-viewer>
+      </div>
     </div>
   </div>
 </div>

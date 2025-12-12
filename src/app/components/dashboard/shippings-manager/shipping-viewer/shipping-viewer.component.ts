@@ -16,6 +16,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class ShippingViewerComponent implements OnInit {
   @Input({ required: true }) shippingId!: string;
+  @Input() embedded = false; // Si está embebido en otro panel, no muestra overlay
 
   // ¡NUEVO! Output para notificar al padre que debe cerrar este modal
   @Output() close = new EventEmitter<void>();

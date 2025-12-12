@@ -137,7 +137,7 @@
   </div>
 
   <!-- Detalle de inventario de una empresa -->
-  <section *ngIf="selectedCompany()" class="mt-6">
+  <section *ngIf="selectedCompany()" class="mt-6 min-w-0">
 
     <!-- Header del detalle con logo de empresa -->
     <div
@@ -321,8 +321,8 @@
 
     <!-- Vista Lista/Tabla de productos -->
     <div *ngIf="viewMode() === 'list' && filteredInventory().length > 0" 
-      class="w-full border border-gray-200 rounded-lg shadow-sm bg-white animate__animated animate__fadeIn">
-      <div class="overflow-x-auto max-w-full">
+      class="w-full border border-gray-200 rounded-lg shadow-sm bg-white animate__animated animate__fadeIn min-w-0">
+      <div class="overflow-x-auto" style="max-width: calc(100vw - 300px);">
         <table class="w-full divide-y divide-gray-200 table-auto">
           <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
             <tr>

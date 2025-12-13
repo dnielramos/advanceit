@@ -24,25 +24,25 @@
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate__animated animate__fadeInUp">
       @for (user of filteredUsers(); track user.id) {
       <div
-        class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200/70 overflow-hidden flex flex-col cursor-pointer transform hover:-translate-y-1"
+        class="group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200/80 overflow-hidden flex flex-col cursor-pointer"
         (click)="viewUser(user)">
 
-        <div class="h-1.5 bg-gradient-to-r from-violet-600 to-purple-700"></div>
+        <div class="h-1.5 bg-violet-200"></div>
 
         <!-- Card Header -->
-        <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-white to-gray-50">
+        <div class="p-5 border-b border-slate-200/60 bg-white">
           <div class="flex items-start justify-between gap-4">
             <div class="flex items-start gap-3 min-w-0">
               <!-- Icon/Avatar Container -->
               <div class="relative shrink-0">
                 <img [src]="user.picture || 'https://placehold.co/150x150/663399/FFFFFF?text=' + user.name.charAt(0)"
                   alt="Foto de {{ user.name }}"
-                  class="w-12 h-12 rounded-xl object-cover ring-2 ring-violet-100 group-hover:ring-violet-200 transition-all duration-300 shadow-sm" />
+                  class="w-12 h-12 rounded-xl object-cover ring-2 ring-slate-200 group-hover:ring-violet-200 transition-all duration-200" />
               </div>
 
               <div class="min-w-0">
                 <h2
-                  class="text-base font-extrabold text-gray-900 truncate leading-tight group-hover:text-violet-700 transition-colors"
+                  class="text-base font-bold text-gray-900 truncate leading-tight group-hover:text-violet-700 transition-colors"
                   [title]="user.name">
                   {{ user.name }}
                 </h2>
@@ -50,34 +50,35 @@
 
                 <div class="mt-2 flex items-center gap-1.5 flex-wrap">
                   <!-- Role Badge -->
-                  <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wide border"
+                  <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wide border"
                     [ngClass]="{
-                          'bg-violet-100 text-violet-800 border-violet-100': user.type === 'admin',
-                          'bg-blue-100 text-blue-800 border-blue-100': user.type === 'user',
-                          'bg-orange-100 text-orange-800 border-orange-100': user.type === 'cashier',
-                          'bg-gray-100 text-gray-800 border-gray-200': user.type === 'warehouse'
+                          'bg-violet-50 text-violet-700 border-violet-100': user.type === 'admin',
+                          'bg-slate-50 text-slate-700 border-slate-200': user.type === 'user',
+                          'bg-amber-50 text-amber-700 border-amber-100': user.type === 'cashier',
+                          'bg-slate-50 text-slate-600 border-slate-200': user.type === 'warehouse'
                         }">
                     <fa-icon [icon]="faUsers" class="text-[10px] opacity-80"></fa-icon>
                     {{ user.type }}
                   </span>
 
                   <!-- Status Badge -->
-                  <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wide border"
+                  <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wide border"
                     [ngClass]="{
-                          'bg-emerald-100 text-emerald-800 border-emerald-100': user.status === 'ACTIVE' || !user.status,
-                          'bg-red-100 text-red-800 border-red-100': user.status === 'INACTIVE'
+                          'bg-emerald-50 text-emerald-700 border-emerald-100': user.status === 'ACTIVE' || !user.status,
+                          'bg-rose-50 text-rose-700 border-rose-100': user.status === 'INACTIVE'
                         }">
                     <span class="w-1.5 h-1.5 rounded-full"
                       [ngClass]="(user.status === 'INACTIVE') ? 'bg-red-600' : 'bg-emerald-600'"></span>
                     {{ user.status === 'INACTIVE' ? 'INACTIVO' : 'ACTIVO' }}
                   </span>
+
                 </div>
               </div>
             </div>
 
             <div class="shrink-0">
               <button (click)="viewUser(user); $event.stopPropagation()"
-                class="w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-violet-700 hover:border-violet-100 hover:shadow-sm transition-all flex items-center justify-center"
+                class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-violet-700 hover:border-violet-200 transition-colors flex items-center justify-center"
                 title="Ver detalles">
                 <fa-icon [icon]="faEye"></fa-icon>
               </button>
@@ -89,16 +90,16 @@
         <div class="p-5 space-y-3 flex-1">
           <!-- Info Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all sm:col-span-2">
+            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/60 group-hover:bg-white transition-colors sm:col-span-2">
               <p class="text-[11px] text-gray-500 font-bold mb-1 uppercase tracking-wider">Empresa</p>
               <p class="text-sm font-extrabold text-gray-800 truncate">{{ $any(user.company)?.name || user.company || 'Sin empresa' }}</p>
             </div>
 
-            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all">
+            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/60 group-hover:bg-white transition-colors">
               <p class="text-[11px] text-gray-500 font-bold mb-1 uppercase tracking-wider">Ubicación</p>
               <p class="text-sm font-semibold text-gray-800 truncate">{{ user.city || 'N/A' }}, {{ user.country || 'N/A' }}</p>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all">
+            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/60 group-hover:bg-white transition-colors">
               <p class="text-[11px] text-gray-500 font-bold mb-1 uppercase tracking-wider">Teléfono</p>
               <p class="text-sm font-semibold text-gray-800 truncate">{{ user.telephone || 'N/A' }}</p>
             </div>
@@ -106,31 +107,31 @@
         </div>
 
         <!-- Card Footer / Actions -->
-        <div class="p-4 bg-white border-t border-gray-100">
+        <div class="p-4 bg-white border-t border-slate-200/60">
           <div class="flex items-center gap-1.5 flex-nowrap">
             <button (click)="editUser(user); $event.stopPropagation()"
-              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-purple-700 hover:from-violet-700 hover:to-purple-800 shadow-sm hover:shadow-md transition-all duration-200"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-violet-600 hover:bg-violet-700 transition-colors"
               title="Editar usuario">
               <fa-icon [icon]="faPen"></fa-icon>
               <span class="hidden sm:inline">Editar</span>
             </button>
 
             <button *ngIf="user.status !== 'INACTIVE'" (click)="softDelete(user); $event.stopPropagation()"
-              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all duration-200"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors"
               title="Desactivar usuario">
               <fa-icon [icon]="faUserSlash"></fa-icon>
               <span class="hidden sm:inline">Desactivar</span>
             </button>
 
             <button *ngIf="user.status === 'INACTIVE'" (click)="reactivate(user); $event.stopPropagation()"
-              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white transition-all duration-200"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors"
               title="Reactivar usuario">
               <fa-icon [icon]="faUsers"></fa-icon>
               <span class="hidden sm:inline">Reactivar</span>
             </button>
 
             <button (click)="viewUser(user); $event.stopPropagation()"
-              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100 border border-slate-200 hover:bg-slate-200 transition-colors"
               title="Ver detalles">
               <fa-icon [icon]="faEye"></fa-icon>
               <span class="hidden sm:inline">Ver</span>
@@ -156,7 +157,7 @@
     <div
       class="inline-block w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm animate__animated animate__fadeIn">
       <table class="w-full">
-        <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+        <thead class="bg-slate-900 text-white">
           <tr>
             <th class="px-6 py-4 text-left text-sm font-semibold">Usuario</th>
             <th class="px-6 py-4 text-left text-sm font-semibold">Email</th>
@@ -168,11 +169,11 @@
         <tbody class="divide-y divide-gray-200 bg-white">
           @for (user of filteredUsers(); track user.id) {
           <tr [class]="$index % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
-            class="hover:bg-purple-50 transition-colors group cursor-pointer" (click)="viewUser(user)">
+            class="hover:bg-slate-50 transition-colors group cursor-pointer" (click)="viewUser(user)">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
                 <img [src]="user.picture || 'https://placehold.co/150x150/663399/FFFFFF?text=' + user.name.charAt(0)"
-                  class="h-10 w-10 rounded-lg object-cover border border-gray-200 group-hover:border-purple-300 transition-colors"
+                  class="h-10 w-10 rounded-lg object-cover border border-gray-200 group-hover:border-violet-200 transition-colors"
                   alt="">
                 <div class="ml-4">
                   <div class="text-sm font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{{
@@ -181,6 +182,7 @@
                 </div>
               </div>
             </td>
+
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
               {{ user.email }}
             </td>
@@ -188,22 +190,23 @@
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border"
                 [ngClass]="{
-                      'bg-purple-100 text-purple-800 border-purple-100': user.type === 'admin',
-                      'bg-blue-100 text-blue-800 border-blue-100': user.type === 'user',
-                      'bg-orange-100 text-orange-800 border-orange-100': user.type === 'cashier',
-                      'bg-gray-100 text-gray-800 border-gray-100': user.type === 'warehouse'
+                      'bg-violet-50 text-violet-700 border-violet-100': user.type === 'admin',
+                      'bg-slate-50 text-slate-700 border-slate-200': user.type === 'user',
+                      'bg-amber-50 text-amber-700 border-amber-100': user.type === 'cashier',
+                      'bg-slate-50 text-slate-600 border-slate-200': user.type === 'warehouse'
                     }">
                 {{ user.type }}
               </span>
             </td>
+
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
               <div class="flex flex-col gap-1">
                 <span>{{ user.city || 'N/A' }}, {{ user.country || 'N/A' }}</span>
                 <span
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border self-start"
                   [ngClass]="{
-                    'bg-emerald-100 text-emerald-800 border-emerald-100': user.status === 'ACTIVE' || !user.status,
-                    'bg-red-100 text-red-800 border-red-100': user.status === 'INACTIVE'
+                    'bg-emerald-50 text-emerald-700 border-emerald-100': user.status === 'ACTIVE' || !user.status,
+                    'bg-rose-50 text-rose-700 border-rose-100': user.status === 'INACTIVE'
                   }">
                   {{ user.status === 'INACTIVE' ? 'INACTIVO' : 'ACTIVO' }}
                 </span>
@@ -211,22 +214,22 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
               <button (click)="viewUser(user); $event.stopPropagation()"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
                 title="Ver">
                 <fa-icon [icon]="faEye"></fa-icon>
               </button>
               <button (click)="editUser(user); $event.stopPropagation()"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-violet-700 hover:bg-violet-50 transition-colors"
                 title="Editar">
                 <fa-icon [icon]="faPen"></fa-icon>
               </button>
               <button *ngIf="user.status !== 'INACTIVE'" (click)="softDelete(user); $event.stopPropagation()"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg text-red-600 hover:bg-red-100 transition-colors"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-rose-700 hover:bg-rose-50 transition-colors"
                 title="Desactivar">
                 <fa-icon [icon]="faUserSlash"></fa-icon>
               </button>
               <button *ngIf="user.status === 'INACTIVE'" (click)="reactivate(user); $event.stopPropagation()"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors"
+                class="inline-flex items-center px-3 py-1.5 rounded-lg text-emerald-700 hover:bg-emerald-50 transition-colors"
                 title="Reactivar">
                 <fa-icon [icon]="faUsers"></fa-icon>
               </button>
@@ -236,6 +239,7 @@
         </tbody>
       </table>
     </div>
+
     }
 
     <!-- Error State -->
@@ -255,13 +259,14 @@
     <!-- Empty State -->
     @if (!state().loading && !state().error && filteredUsers().length === 0) {
     <div
-      class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-white via-gray-50 to-gray-100 rounded-lg animate__animated animate__fadeIn border border-gray-200 border-dashed">
+      class="flex flex-col items-center justify-center py-20 px-4 bg-white rounded-lg animate__animated animate__fadeIn border border-slate-200 border-dashed">
       <div class="bg-white p-4 rounded-full shadow-sm mb-4">
         <fa-icon [icon]="faUserSlash" class="text-gray-400 text-3xl"></fa-icon>
       </div>
       <h2 class="text-xl font-semibold text-gray-900 mb-2">
         No se encontraron usuarios
       </h2>
+
       <p class="text-gray-500 text-sm text-center max-w-md mb-6">
         {{ state().searchTerm ? 'No hay resultados para tu búsqueda. Intenta con otros términos.' : 'Aún no hay usuarios
         registrados en el sistema.' }}
@@ -274,7 +279,7 @@
       </button>
       } @else {
       <button (click)="openAddModal()"
-        class="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
+        class="px-5 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
         <fa-icon [icon]="faPlus"></fa-icon>
         Agregar Usuario
       </button>
@@ -282,7 +287,6 @@
     </div>
     }
     }
-
   </div>
 </div>
 

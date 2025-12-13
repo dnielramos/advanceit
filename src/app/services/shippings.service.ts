@@ -136,7 +136,7 @@ export class ShippingsService {
    * @returns Un Observable con los productos del RMA.
    */
   getRmaProducts(rmaId: string): Observable<{ total: number; data: RmaProductInfo[] }> {
-    const url = `${ENVIRONMENT.apiUrl}/rmas/${rmaId}/products`;
+    const url = `${ENVIRONMENT.apiUrlRender}/rmas/${rmaId}/products`;
     return this.http.get<{ total: number; data: RmaProductInfo[] }>(url).pipe(
       tap((response) => console.log(`Productos del RMA ${rmaId}:`, response)),
       catchError(this.handleError)

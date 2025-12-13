@@ -1,7 +1,7 @@
 <div class="p-4 sm:p-6 md:p-8 bg-slate-50 scroll-purple flex flex-col h-full">
 
     <!-- Header -->
-    <app-header-crud titulo="Empresas" descripcion="Gestiona las empresas que pueden comprar en tu plataforma"
+    <app-header-crud titulo="Empresas" descripcion="Entidades con crédito."
         textoBotonNuevo="Nueva Empresa" textoBotonActualizar="Actualizar" [showViewToggle]="!isMobile()"
         [currentView]="viewMode()" (viewChange)="onViewChange($event)" [filterByStatus]="true"
         [filterStatusValues]="availableStates" placeholderInput="Buscar por razón social o NIT..."

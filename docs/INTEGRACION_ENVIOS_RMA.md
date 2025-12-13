@@ -19,6 +19,36 @@ El módulo de envíos ahora soporta dos tipos de asociación:
 
 ---
 
+## Comportamiento Automático al Crear Envío RMA
+
+> **¡IMPORTANTE!** Al crear un envío asociado a un RMA, el sistema actualiza automáticamente el RMA.
+
+Cuando se crea un envío con `rma_id`, el backend realiza las siguientes acciones automáticamente:
+
+| Campo del RMA | Valor Asignado |
+|---------------|----------------|
+| `estado` | `'approved'` |
+| `shipping_id` | ID del envío recién creado |
+| `fecha_resolucion` | Fecha/hora actual |
+| `historial` | Se agrega entrada: "RMA aprobado - Envío de reposición creado" |
+
+### Flujo de la Transacción
+
+```
+1. Frontend envía POST /shippings con rma_id
+2. Backend crea el envío (estado: 'preparando')
+3. Backend actualiza el RMA automáticamente:
+   - estado → 'approved'
+   - shipping_id → nuevo shipping.id
+   - fecha_resolucion → NOW()
+   - historial → nueva entrada agregada
+4. Se retorna el envío creado
+```
+
+**Nota:** Todo ocurre en una sola transacción. Si falla cualquier paso, se revierte todo.
+
+---
+
 ## Endpoint de Creación
 
 ### `POST /shippings`
@@ -130,8 +160,12 @@ interface ShippingRmaInfo {
   rma_number: string;
   motivo: string;
   estado: string;
+  company?: ShippingCompanyInfo;  // Empresa del usuario que creó el envío
+  user?: ShippingUserInfo;        // Usuario que creó el envío
 }
 ```
+
+> **Nota:** Para envíos RMA, la información de `company` y `user` se obtiene del usuario que creó el envío (`created_by`), ya que no hay una orden asociada.
 
 ---
 
@@ -176,7 +210,17 @@ interface ShippingRmaInfo {
     "id": "660e8400-e29b-41d4-a716-446655440001",
     "rma_number": "RMA-ABC123-XYZ",
     "motivo": "Producto defectuoso",
-    "estado": "approved"
+    "estado": "approved",
+    "company": {
+      "id": 15,
+      "razon_social": "Empresa del Cliente S.A.S",
+      "nit": "900123456-7"
+    },
+    "user": {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Juan Pérez",
+      "email": "juan.perez@empresa.com"
+    }
   },
   "direccion_entrega": "Bodega principal - Zona Industrial",
   "transportadora": "Coordinadora",
@@ -185,12 +229,14 @@ interface ShippingRmaInfo {
   "fechaEstimada": "2024-12-22",
   "notas": "Devolución por garantía",
   "historial": [...],
-  "created_by": {...},
-  "updated_by": {...},
+  "created_by": { "id": "a1b2c3d4-...", "name": "Juan Pérez" },
+  "updated_by": { "id": "a1b2c3d4-...", "name": "Juan Pérez" },
   "created_at": "2024-12-12T08:00:00.000Z",
   "updated_at": "2024-12-12T08:00:00.000Z"
 }
 ```
+
+> **Importante:** En envíos RMA, `rma.company` y `rma.user` contienen la información del usuario que creó el envío y su empresa asociada. Esto permite al frontend mostrar la misma información de cliente/empresa que en los envíos normales.
 
 ---
 
@@ -247,7 +293,9 @@ function getInfoAsociada(shipping: Shipping) {
       tipo: 'Orden',
       numero: shipping.order.numeroOrden,
       empresa: shipping.order.company.razon_social,
-      cliente: shipping.order.user.name
+      nit: shipping.order.company.nit,
+      cliente: shipping.order.user.name,
+      email: shipping.order.user.email
     };
   }
   
@@ -256,12 +304,47 @@ function getInfoAsociada(shipping: Shipping) {
       tipo: 'RMA',
       numero: shipping.rma.rma_number,
       motivo: shipping.rma.motivo,
-      estadoRma: shipping.rma.estado
+      estadoRma: shipping.rma.estado,
+      // Info de usuario/empresa del creador del envío
+      empresa: shipping.rma.company?.razon_social || 'N/A',
+      nit: shipping.rma.company?.nit || 'N/A',
+      cliente: shipping.rma.user?.name || 'N/A',
+      email: shipping.rma.user?.email || 'N/A'
     };
   }
   
   return null;
 }
+```
+
+### Obtener Usuario y Empresa de Forma Unificada
+
+```typescript
+// Función helper para obtener info de empresa/usuario independientemente del tipo de envío
+function getShippingClientInfo(shipping: Shipping) {
+  // Envío normal: info viene de la orden
+  if (shipping.order) {
+    return {
+      company: shipping.order.company,
+      user: shipping.order.user
+    };
+  }
+  
+  // Envío RMA: info viene del usuario creador
+  if (shipping.rma) {
+    return {
+      company: shipping.rma.company,
+      user: shipping.rma.user
+    };
+  }
+  
+  return { company: null, user: null };
+}
+
+// Uso en componentes
+const { company, user } = getShippingClientInfo(shipping);
+console.log(company?.razon_social); // Funciona igual para ambos tipos
+console.log(user?.name);
 ```
 
 ### Formulario de Creación
@@ -315,6 +398,49 @@ function buildPayload(form: CreateShippingForm, userId: string) {
 | `rma_id` | No existía | Opcional (requerido si no hay `order_id`) |
 | Objeto `rma` en respuesta | No existía | Presente si el envío está asociado a RMA |
 | Validación | Solo validaba `order_id` | Valida que exista exactamente uno de los dos |
+| Actualización automática de RMA | No aplicaba | Al crear envío con `rma_id`: RMA pasa a `approved`, se asigna `shipping_id` y `fecha_resolucion` |
+
+---
+
+## Diagrama de Flujo: Envío RMA
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CREAR ENVÍO RMA                          │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  POST /shippings                                            │
+│  {                                                          │
+│    "rma_id": "...",                                         │
+│    "direccion_entrega": "...",                              │
+│    "transportadora": "...",                                 │
+│    "fechaEstimada": "...",                                  │
+│    "user_id": "..."                                         │
+│  }                                                          │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  BACKEND - Transacción Atómica                              │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │ 1. INSERT shipping (estado: 'preparando')              │ │
+│  ├────────────────────────────────────────────────────────┤ │
+│  │ 2. UPDATE rma SET                                      │ │
+│  │    - estado = 'approved'                               │ │
+│  │    - shipping_id = nuevo_shipping.id                   │ │
+│  │    - fecha_resolucion = NOW()                          │ │
+│  │    - historial += nueva entrada                        │ │
+│  └────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  RESPUESTA: Shipping creado                                 │
+│  RMA actualizado automáticamente                            │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 

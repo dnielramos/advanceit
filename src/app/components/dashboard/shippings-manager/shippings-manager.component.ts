@@ -200,7 +200,7 @@ export class ShippingsManagerComponent implements OnInit {
     this.shippings = this.allShippings.filter((shipping) => {
       const matchEstado = estado ? shipping.estado === estado : true;
       
-      // Búsqueda mejorada: incluye orden, empresa, cliente, guía, transportadora
+      // Búsqueda mejorada: incluye orden, empresa, cliente, guía, transportadora y RMA
       const matchTexto = texto
         ? shipping.order_id?.toLowerCase().includes(texto) ||
           shipping.order?.numeroOrden?.toLowerCase().includes(texto) ||
@@ -210,7 +210,15 @@ export class ShippingsManagerComponent implements OnInit {
           shipping.order?.user?.email?.toLowerCase().includes(texto) ||
           shipping.guia?.toLowerCase().includes(texto) ||
           shipping.transportadora?.toLowerCase().includes(texto) ||
-          shipping.direccion_entrega?.toLowerCase().includes(texto)
+          shipping.direccion_entrega?.toLowerCase().includes(texto) ||
+          // Búsqueda por campos RMA
+          shipping.rma_id?.toLowerCase().includes(texto) ||
+          shipping.rma?.rma_number?.toLowerCase().includes(texto) ||
+          shipping.rma?.motivo?.toLowerCase().includes(texto) ||
+          shipping.rma?.company?.razon_social?.toLowerCase().includes(texto) ||
+          shipping.rma?.company?.nit?.toLowerCase().includes(texto) ||
+          shipping.rma?.user?.name?.toLowerCase().includes(texto) ||
+          shipping.rma?.user?.email?.toLowerCase().includes(texto)
         : true;
         
       return matchEstado && matchTexto;

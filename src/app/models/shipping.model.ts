@@ -48,12 +48,15 @@ export interface ShippingOrder {
 
 /**
  * Representa la información de RMA asociada al envío.
+ * Incluye información del usuario y empresa del creador del envío.
  */
 export interface ShippingRma {
   id: string;
   rma_number: string;
   motivo: string;
   estado: string;
+  company?: ShippingCompany;  // Empresa del usuario que creó el envío
+  user?: ShippingUser;        // Usuario que creó el envío
 }
 
 /**

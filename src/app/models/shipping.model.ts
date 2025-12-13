@@ -47,6 +47,16 @@ export interface ShippingOrder {
 }
 
 /**
+ * Representa un producto asociado a un RMA.
+ */
+export interface RmaProductInfo {
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  serial?: string;
+}
+
+/**
  * Representa la información de RMA asociada al envío.
  * Incluye información del usuario y empresa del creador del envío.
  */
@@ -57,6 +67,7 @@ export interface ShippingRma {
   estado: string;
   company?: ShippingCompany;  // Empresa del usuario que creó el envío
   user?: ShippingUser;        // Usuario que creó el envío
+  productos?: RmaProductInfo[]; // Productos asociados al RMA
 }
 
 /**

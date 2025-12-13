@@ -32,6 +32,7 @@ import {
   Shipping,
   ShippingStatus,
   UpdateStatusPayload,
+  RmaProductInfo,
 } from '../../../models/shipping.model';
 import { UpdateStatusModalComponent } from './update-status-modal/update-status-modal.component';
 import { FilterData } from '../../../pages/dashboard/orders/order-filter/order-filter.component';
@@ -72,6 +73,7 @@ export class ShippingsManagerComponent implements OnInit {
   // --- LÓGICA PARA PRODUCTOS ---
   public showProductsPanel = false;
   public orderProducts: OrderProducts[] = [];
+  public rmaProducts: RmaProductInfo[] = [];
   public isLoadingProducts = false;
   public productsError: string | null = null;
   // --- FIN LÓGICA PRODUCTOS ---
@@ -405,17 +407,23 @@ export class ShippingsManagerComponent implements OnInit {
 
   // --- MÉTODOS PARA PRODUCTOS ---
   openProductsPanel(): void {
-    if (!this.selectedShipping?.order_id) {
-      alert('Este envío no tiene una orden asociada.');
+    if (!this.selectedShipping?.order_id && !this.selectedShipping?.rma_id) {
+      alert('Este envío no tiene una orden ni un RMA asociado.');
       return;
     }
     this.showProductsPanel = true;
-    this.loadOrderProducts();
+    
+    if (this.selectedShipping?.rma_id) {
+      this.loadRmaProducts();
+    } else {
+      this.loadOrderProducts();
+    }
   }
 
   closeProductsPanel(): void {
     this.showProductsPanel = false;
     this.orderProducts = [];
+    this.rmaProducts = [];
     this.productsError = null;
   }
 
@@ -438,7 +446,29 @@ export class ShippingsManagerComponent implements OnInit {
       });
   }
 
+  loadRmaProducts(): void {
+    if (!this.selectedShipping?.rma_id) return;
+    
+    this.isLoadingProducts = true;
+    this.productsError = null;
+    
+    this.shippingsService.getRmaProducts(this.selectedShipping.rma_id)
+      .pipe(finalize(() => this.isLoadingProducts = false))
+      .subscribe({
+        next: (response) => {
+          this.rmaProducts = response.data;
+        },
+        error: (err) => {
+          console.error('Error loading RMA products:', err);
+          this.productsError = 'No se pudieron cargar los productos del RMA.';
+        }
+      });
+  }
+
   getTotalProductsCount(): number {
+    if (this.selectedShipping?.rma_id) {
+      return this.rmaProducts.reduce((sum, p) => sum + (p.quantity || 1), 0);
+    }
     return this.orderProducts.reduce((sum, p) => sum + (p.cantidad_solicitada || 1), 0);
   }
 

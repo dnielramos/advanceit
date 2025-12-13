@@ -651,12 +651,17 @@
     <div class="bg-white border-b border-gray-200 px-6 py-5">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center">
-            <fa-icon [icon]="faBoxes" size="lg" class="text-violet-600"></fa-icon>
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+            [ngClass]="selectedShipping.rma_id ? 'bg-orange-100' : 'bg-violet-100'">
+            <fa-icon [icon]="faBoxes" size="lg" [ngClass]="selectedShipping.rma_id ? 'text-orange-600' : 'text-violet-600'"></fa-icon>
           </div>
           <div>
             <h2 class="text-xl font-bold text-gray-900">Productos del Envío</h2>
+            @if (selectedShipping.rma_id) {
+            <p class="text-sm text-orange-600 font-medium">RMA {{ selectedShipping.rma?.rma_number || 'N/A' }}</p>
+            } @else {
             <p class="text-sm text-gray-500">Orden {{ selectedShipping.order?.numeroOrden || 'N/A' }}</p>
+            }
           </div>
         </div>
         <button (click)="closeProductsPanel()" 
@@ -669,9 +674,12 @@
       
       <!-- Resumen -->
       <div class="mt-4 flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-violet-50 px-3 py-1.5 rounded-lg">
-          <fa-icon [icon]="faCubes" class="text-violet-600 text-sm"></fa-icon>
-          <span class="text-sm font-semibold text-violet-700">{{ orderProducts.length }} producto(s)</span>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+          [ngClass]="selectedShipping.rma_id ? 'bg-orange-50' : 'bg-violet-50'">
+          <fa-icon [icon]="faCubes" [ngClass]="selectedShipping.rma_id ? 'text-orange-600' : 'text-violet-600'" class="text-sm"></fa-icon>
+          <span class="text-sm font-semibold" [ngClass]="selectedShipping.rma_id ? 'text-orange-700' : 'text-violet-700'">
+            {{ selectedShipping.rma_id ? rmaProducts.length : orderProducts.length }} producto(s)
+          </span>
         </div>
         <div class="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg">
           <span class="text-sm text-gray-600">Total unidades: <span class="font-bold text-gray-800">{{ getTotalProductsCount() }}</span></span>
@@ -683,7 +691,7 @@
     <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
       @if (isLoadingProducts) {
       <div class="flex flex-col items-center justify-center h-64">
-        <fa-icon [icon]="faCircleNotch" size="2x" class="text-violet-500 animate-spin"></fa-icon>
+        <fa-icon [icon]="faCircleNotch" size="2x" [ngClass]="selectedShipping.rma_id ? 'text-orange-500' : 'text-violet-500'" class="animate-spin"></fa-icon>
         <p class="mt-4 text-gray-500">Cargando productos...</p>
       </div>
       } @else if (productsError) {
@@ -693,16 +701,18 @@
           <p class="font-medium">{{ productsError }}</p>
         </div>
       </div>
-      } @else if (orderProducts.length === 0) {
+      } @else if ((selectedShipping.rma_id && rmaProducts.length === 0) || (!selectedShipping.rma_id && orderProducts.length === 0)) {
       <div class="flex flex-col items-center justify-center h-64 text-center">
         <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
           <fa-icon [icon]="faBoxes" size="lg" class="text-gray-400"></fa-icon>
         </div>
         <p class="font-semibold text-gray-700">No hay productos</p>
-        <p class="text-sm text-gray-500 mt-1">Esta orden no tiene productos asociados.</p>
+        <p class="text-sm text-gray-500 mt-1">{{ selectedShipping.rma_id ? 'Este RMA no tiene productos asociados.' : 'Esta orden no tiene productos asociados.' }}</p>
       </div>
       } @else {
       <div class="space-y-4">
+        <!-- Productos de Orden -->
+        @if (!selectedShipping.rma_id) {
         @for (product of orderProducts; track product.id) {
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
           <div class="flex gap-4 p-4">
@@ -761,6 +771,39 @@
           }
         </div>
         }
+        }
+        <!-- Productos de RMA -->
+        @if (selectedShipping.rma_id) {
+        @for (product of rmaProducts; track product.product_id) {
+        <div class="bg-white rounded-xl border border-orange-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex gap-4 p-4">
+            <!-- Icono producto RMA -->
+            <div class="w-20 h-20 bg-orange-50 rounded-lg flex-shrink-0 overflow-hidden flex items-center justify-center">
+              <fa-icon [icon]="faBoxes" class="text-orange-400 text-2xl"></fa-icon>
+            </div>
+            
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <h4 class="font-bold text-gray-900 text-sm line-clamp-2">{{ product.product_name }}</h4>
+                <span class="flex-shrink-0 bg-orange-100 text-orange-700 font-bold px-3 py-1.5 rounded-lg text-sm">
+                  x{{ product.quantity }}
+                </span>
+              </div>
+              
+              <div class="mt-2 flex flex-wrap gap-2">
+                @if (product.product_id) {
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-mono">ID: {{ product.product_id }}</span>
+                }
+                @if (product.serial) {
+                <span class="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded font-semibold">Serial: {{ product.serial }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+        }
       </div>
       }
     </div>
@@ -793,12 +836,15 @@
     <div class="px-5 pb-4 border-b border-gray-100">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
-            <fa-icon [icon]="faBoxes" class="text-violet-600"></fa-icon>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+            [ngClass]="selectedShipping.rma_id ? 'bg-orange-100' : 'bg-violet-100'">
+            <fa-icon [icon]="faBoxes" [ngClass]="selectedShipping.rma_id ? 'text-orange-600' : 'text-violet-600'"></fa-icon>
           </div>
           <div>
             <h2 class="text-lg font-bold text-gray-900">Productos</h2>
-            <p class="text-xs text-gray-500">{{ orderProducts.length }} producto(s) - {{ getTotalProductsCount() }} unidades</p>
+            <p class="text-xs" [ngClass]="selectedShipping.rma_id ? 'text-orange-600' : 'text-gray-500'">
+              {{ selectedShipping.rma_id ? rmaProducts.length : orderProducts.length }} producto(s) - {{ getTotalProductsCount() }} unidades
+            </p>
           </div>
         </div>
         <button (click)="closeProductsPanel()" 
@@ -814,20 +860,22 @@
     <div class="overflow-y-auto max-h-[65vh] p-4">
       @if (isLoadingProducts) {
       <div class="flex flex-col items-center justify-center h-40">
-        <fa-icon [icon]="faCircleNotch" size="2x" class="text-violet-500 animate-spin"></fa-icon>
+        <fa-icon [icon]="faCircleNotch" size="2x" [ngClass]="selectedShipping.rma_id ? 'text-orange-500' : 'text-violet-500'" class="animate-spin"></fa-icon>
         <p class="mt-3 text-gray-500 text-sm">Cargando...</p>
       </div>
       } @else if (productsError) {
       <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm">
         {{ productsError }}
       </div>
-      } @else if (orderProducts.length === 0) {
+      } @else if ((selectedShipping.rma_id && rmaProducts.length === 0) || (!selectedShipping.rma_id && orderProducts.length === 0)) {
       <div class="flex flex-col items-center justify-center h-40 text-center">
         <fa-icon [icon]="faBoxes" class="text-gray-300 text-3xl mb-2"></fa-icon>
         <p class="text-gray-500 text-sm">No hay productos</p>
       </div>
       } @else {
       <div class="space-y-3">
+        <!-- Productos de Orden -->
+        @if (!selectedShipping.rma_id) {
         @for (product of orderProducts; track product.id) {
         <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
           <div class="flex gap-3">
@@ -864,13 +912,45 @@
           </div>
         </div>
         }
+        }
+        <!-- Productos de RMA -->
+        @if (selectedShipping.rma_id) {
+        @for (product of rmaProducts; track product.product_id) {
+        <div class="bg-orange-50 rounded-xl p-3 border border-orange-100">
+          <div class="flex gap-3">
+            <!-- Icono producto RMA -->
+            <div class="w-14 h-14 bg-white rounded-lg flex-shrink-0 overflow-hidden border border-orange-200 flex items-center justify-center">
+              <fa-icon [icon]="faBoxes" class="text-orange-400"></fa-icon>
+            </div>
+            
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <h4 class="font-semibold text-gray-900 text-sm line-clamp-2">{{ product.product_name }}</h4>
+                <span class="flex-shrink-0 bg-orange-100 text-orange-700 font-bold px-2 py-0.5 rounded text-xs">
+                  x{{ product.quantity }}
+                </span>
+              </div>
+              <div class="mt-1 flex flex-wrap gap-1">
+                @if (product.product_id) {
+                <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-mono">{{ product.product_id }}</span>
+                }
+                @if (product.serial) {
+                <span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-semibold">{{ product.serial }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+        }
       </div>
       }
     </div>
   </div>
 </div>
-}
 
+}
 <!-- Panel Lateral de Guía - Desktop -->
 @if (showGuidePanel && selectedShipping) {
 <div class="fixed inset-0 z-[60] hidden lg:flex">

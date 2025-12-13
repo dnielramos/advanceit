@@ -155,6 +155,13 @@ interface ShippingOrderInfo {
 ### Objeto RMA (solo en envíos RMA)
 
 ```typescript
+interface RmaProductInfo {
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  serial?: string;
+}
+
 interface ShippingRmaInfo {
   id: string;
   rma_number: string;
@@ -162,10 +169,40 @@ interface ShippingRmaInfo {
   estado: string;
   company?: ShippingCompanyInfo;  // Empresa del usuario que creó el envío
   user?: ShippingUserInfo;        // Usuario que creó el envío
+  productos?: RmaProductInfo[];   // Productos asociados al RMA
 }
 ```
 
-> **Nota:** Para envíos RMA, la información de `company` y `user` se obtiene del usuario que creó el envío (`created_by`), ya que no hay una orden asociada.
+> **Nota:** Para envíos RMA:
+> - `company` y `user` se obtienen del usuario que creó el envío (`created_by`)
+> - `productos` se obtiene del campo `evidencias` del RMA (parseado automáticamente)
+
+---
+
+## Endpoint de Productos RMA
+
+Similar al endpoint de órdenes, se puede obtener los productos de un RMA directamente:
+
+### GET /rmas/:id/products
+
+```bash
+GET http://localhost:3002/rmas/c410007e-e132-45ce-8e26-7f8f683dba42/products
+```
+
+**Respuesta:**
+```json
+{
+  "total": 1,
+  "data": [
+    {
+      "product_id": "89BFG74",
+      "product_name": "Dell Latitude 5450",
+      "quantity": 1,
+      "serial": "89BFG74"
+    }
+  ]
+}
+```
 
 ---
 
@@ -208,8 +245,8 @@ interface ShippingRmaInfo {
   "rma_id": "660e8400-e29b-41d4-a716-446655440001",
   "rma": {
     "id": "660e8400-e29b-41d4-a716-446655440001",
-    "rma_number": "RMA-ABC123-XYZ",
-    "motivo": "Producto defectuoso",
+    "rma_number": "RMA-MJ2ZLE1S-Q49T",
+    "motivo": "Cambio de RAM",
     "estado": "approved",
     "company": {
       "id": 15,
@@ -220,7 +257,15 @@ interface ShippingRmaInfo {
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "name": "Juan Pérez",
       "email": "juan.perez@empresa.com"
-    }
+    },
+    "productos": [
+      {
+        "product_id": "89BFG74",
+        "product_name": "Dell Latitude 5450",
+        "quantity": 1,
+        "serial": "89BFG74"
+      }
+    ]
   },
   "direccion_entrega": "Bodega principal - Zona Industrial",
   "transportadora": "Coordinadora",

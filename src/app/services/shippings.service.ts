@@ -10,6 +10,7 @@ import {
   CreateShippingPayload,
   UpdateStatusPayload,
   UpdateDeliveryDatePayload,
+  RmaProductInfo,
 } from '../models/shipping.model';
 import { ENVIRONMENT } from '../../enviroments/enviroment';
 
@@ -125,6 +126,19 @@ export class ShippingsService {
       tap((updatedShipping) =>
         console.log('Fecha de entrega actualizada:', updatedShipping)
       ),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Obtiene los productos asociados a un RMA.
+   * @param rmaId - El ID del RMA.
+   * @returns Un Observable con los productos del RMA.
+   */
+  getRmaProducts(rmaId: string): Observable<{ total: number; data: RmaProductInfo[] }> {
+    const url = `${ENVIRONMENT.apiUrl}/rmas/${rmaId}/products`;
+    return this.http.get<{ total: number; data: RmaProductInfo[] }>(url).pipe(
+      tap((response) => console.log(`Productos del RMA ${rmaId}:`, response)),
       catchError(this.handleError)
     );
   }

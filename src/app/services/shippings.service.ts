@@ -31,7 +31,7 @@ export interface CreateShippingDto {
 export class ShippingsService {
   // Asegúrate de que esta URL base coincida con la de tu backend.
   // Es recomendable usar variables de entorno para esto.
-  private readonly apiUrl = `${ENVIRONMENT.apiUrl}/shippings`;
+  private readonly apiUrl = `${ENVIRONMENT.apiUrlRender}/shippings`;
 
   constructor(private http: HttpClient) {}
 

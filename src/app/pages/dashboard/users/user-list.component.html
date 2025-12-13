@@ -24,112 +24,116 @@
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate__animated animate__fadeInUp">
       @for (user of filteredUsers(); track user.id) {
       <div
-        class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col cursor-pointer transform hover:-translate-y-1"
+        class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200/70 overflow-hidden flex flex-col cursor-pointer transform hover:-translate-y-1"
         (click)="viewUser(user)">
 
+        <div class="h-1.5 bg-gradient-to-r from-violet-600 to-purple-700"></div>
+
         <!-- Card Header -->
-        <div class="p-5 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white">
-          <div class="flex justify-between items-start gap-3">
-            <div class="flex items-start gap-3 overflow-hidden">
+        <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-white to-gray-50">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-3 min-w-0">
               <!-- Icon/Avatar Container -->
               <div class="relative shrink-0">
                 <img [src]="user.picture || 'https://placehold.co/150x150/663399/FFFFFF?text=' + user.name.charAt(0)"
                   alt="Foto de {{ user.name }}"
-                  class="w-12 h-12 rounded-xl object-cover border border-purple-100 group-hover:border-purple-400 transition-colors duration-300 shadow-sm" />
+                  class="w-12 h-12 rounded-xl object-cover ring-2 ring-violet-100 group-hover:ring-violet-200 transition-all duration-300 shadow-sm" />
               </div>
 
               <div class="min-w-0">
                 <h2
-                  class="text-base font-bold text-gray-900 truncate leading-tight mb-1 group-hover:text-purple-600 transition-colors"
+                  class="text-base font-extrabold text-gray-900 truncate leading-tight group-hover:text-violet-700 transition-colors"
                   [title]="user.name">
                   {{ user.name }}
                 </h2>
-                <div class="flex items-center gap-1.5 text-xs text-gray-500">
-                  <fa-icon [icon]="faUsers" class="text-gray-400"></fa-icon>
-                  <span class="truncate capitalize">{{ user.type }}</span>
+                <p class="text-xs text-gray-500 truncate" [title]="user.email">{{ user.email }}</p>
+
+                <div class="mt-2 flex items-center gap-1.5 flex-wrap">
+                  <!-- Role Badge -->
+                  <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wide border"
+                    [ngClass]="{
+                          'bg-violet-100 text-violet-800 border-violet-100': user.type === 'admin',
+                          'bg-blue-100 text-blue-800 border-blue-100': user.type === 'user',
+                          'bg-orange-100 text-orange-800 border-orange-100': user.type === 'cashier',
+                          'bg-gray-100 text-gray-800 border-gray-200': user.type === 'warehouse'
+                        }">
+                    <fa-icon [icon]="faUsers" class="text-[10px] opacity-80"></fa-icon>
+                    {{ user.type }}
+                  </span>
+
+                  <!-- Status Badge -->
+                  <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wide border"
+                    [ngClass]="{
+                          'bg-emerald-100 text-emerald-800 border-emerald-100': user.status === 'ACTIVE' || !user.status,
+                          'bg-red-100 text-red-800 border-red-100': user.status === 'INACTIVE'
+                        }">
+                    <span class="w-1.5 h-1.5 rounded-full"
+                      [ngClass]="(user.status === 'INACTIVE') ? 'bg-red-600' : 'bg-emerald-600'"></span>
+                    {{ user.status === 'INACTIVE' ? 'INACTIVO' : 'ACTIVO' }}
+                  </span>
                 </div>
               </div>
             </div>
 
-            <!-- Role Badge -->
-            <span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm border"
-              [ngClass]="{
-                    'bg-purple-100 text-purple-800 border-purple-200': user.type === 'admin',
-                    'bg-blue-100 text-blue-800 border-blue-200': user.type === 'user',
-                    'bg-orange-100 text-orange-800 border-orange-200': user.type === 'cashier',
-                    'bg-gray-100 text-gray-800 border-gray-200': user.type === 'warehouse'
-                  }">
-              {{ user.type }}
-            </span>
+            <div class="shrink-0">
+              <button (click)="viewUser(user); $event.stopPropagation()"
+                class="w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-violet-700 hover:border-violet-100 hover:shadow-sm transition-all flex items-center justify-center"
+                title="Ver detalles">
+                <fa-icon [icon]="faEye"></fa-icon>
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Card Body -->
-        <div class="p-5 space-y-4 flex-1">
-          <!-- Email -->
-          <div
-            class="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100 group-hover:border-purple-200 transition-colors">
-            <div class="flex items-center gap-2 overflow-hidden">
-              <div class="p-1.5 bg-white rounded-lg text-purple-600 shrink-0 shadow-sm">
-                <span class="text-xs font-bold">&#64;</span>
-              </div>
-              <span class="text-sm font-semibold text-gray-700 truncate" [title]="user.email">{{ user.email }}</span>
-            </div>
-          </div>
-
+        <div class="p-5 space-y-3 flex-1">
           <!-- Info Grid -->
-          <div class="grid grid-cols-2 gap-3">
-            <div
-              class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all">
-              <p class="text-xs text-gray-500 font-semibold mb-1 uppercase tracking-wider">Ciudad</p>
-              <p class="text-sm font-bold text-gray-700 truncate">{{ user.city || 'N/A' }}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all sm:col-span-2">
+              <p class="text-[11px] text-gray-500 font-bold mb-1 uppercase tracking-wider">Empresa</p>
+              <p class="text-sm font-extrabold text-gray-800 truncate">{{ $any(user.company)?.name || user.company || 'Sin empresa' }}</p>
             </div>
-            <div
-              class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all">
-              <p class="text-xs text-gray-500 font-semibold mb-1 uppercase tracking-wider">Teléfono</p>
-              <p class="text-sm font-bold text-gray-700 truncate">{{ user.telephone || 'N/A' }}</p>
+
+            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all">
+              <p class="text-[11px] text-gray-500 font-bold mb-1 uppercase tracking-wider">Ubicación</p>
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ user.city || 'N/A' }}, {{ user.country || 'N/A' }}</p>
             </div>
-            <div
-              class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all col-span-2">
-              <p class="text-xs text-gray-500 font-semibold mb-1 uppercase tracking-wider">Estado</p>
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border"
-                [ngClass]="{
-                  'bg-emerald-100 text-emerald-800 border-emerald-200': user.status === 'ACTIVE' || !user.status,
-                  'bg-red-100 text-red-800 border-red-200': user.status === 'INACTIVE'
-                }">
-                {{ user.status === 'INACTIVE' ? 'INACTIVO' : 'ACTIVO' }}
-              </span>
+            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 group-hover:bg-white group-hover:shadow-sm transition-all">
+              <p class="text-[11px] text-gray-500 font-bold mb-1 uppercase tracking-wider">Teléfono</p>
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ user.telephone || 'N/A' }}</p>
             </div>
           </div>
         </div>
 
         <!-- Card Footer / Actions -->
-        <div class="p-4 bg-gray-50 border-t border-gray-100">
-          <div class="flex flex-wrap gap-2">
-            <button (click)="viewUser(user); $event.stopPropagation()"
-              class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-purple-600 transition-all duration-200 border border-transparent hover:border-gray-100 hover:shadow-sm"
-              title="Ver detalles">
-              <fa-icon [icon]="faEye"></fa-icon>
-              <span>Ver</span>
-            </button>
+        <div class="p-4 bg-white border-t border-gray-100">
+          <div class="flex items-center gap-1.5 flex-nowrap">
             <button (click)="editUser(user); $event.stopPropagation()"
-              class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white transition-all duration-200"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-purple-700 hover:from-violet-700 hover:to-purple-800 shadow-sm hover:shadow-md transition-all duration-200"
               title="Editar usuario">
               <fa-icon [icon]="faPen"></fa-icon>
-              <span>Editar</span>
+              <span class="hidden sm:inline">Editar</span>
             </button>
+
             <button *ngIf="user.status !== 'INACTIVE'" (click)="softDelete(user); $event.stopPropagation()"
-              class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-red-600 bg-red-50 hover:bg-red-600 hover:text-white transition-all duration-200"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all duration-200"
               title="Desactivar usuario">
               <fa-icon [icon]="faUserSlash"></fa-icon>
-              <span>Desactivar</span>
+              <span class="hidden sm:inline">Desactivar</span>
             </button>
+
             <button *ngIf="user.status === 'INACTIVE'" (click)="reactivate(user); $event.stopPropagation()"
-              class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white transition-all duration-200"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white transition-all duration-200"
               title="Reactivar usuario">
               <fa-icon [icon]="faUsers"></fa-icon>
-              <span>Reactivar</span>
+              <span class="hidden sm:inline">Reactivar</span>
+            </button>
+
+            <button (click)="viewUser(user); $event.stopPropagation()"
+              class="flex-1 flex items-center justify-center gap-2 py-2 px-2 sm:py-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              title="Ver detalles">
+              <fa-icon [icon]="faEye"></fa-icon>
+              <span class="hidden sm:inline">Ver</span>
             </button>
           </div>
         </div>
@@ -173,7 +177,7 @@
                 <div class="ml-4">
                   <div class="text-sm font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{{
                     user.name }}</div>
-                  <div class="text-xs text-gray-500">{{ user.company || 'Sin empresa' }}</div>
+                  <div class="text-xs text-gray-500">{{ $any(user.company)?.name || user.company || 'Sin empresa' }}</div>
                 </div>
               </div>
             </td>
@@ -184,10 +188,10 @@
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border"
                 [ngClass]="{
-                      'bg-purple-100 text-purple-800 border-purple-200': user.type === 'admin',
-                      'bg-blue-100 text-blue-800 border-blue-200': user.type === 'user',
-                      'bg-orange-100 text-orange-800 border-orange-200': user.type === 'cashier',
-                      'bg-gray-100 text-gray-800 border-gray-200': user.type === 'warehouse'
+                      'bg-purple-100 text-purple-800 border-purple-100': user.type === 'admin',
+                      'bg-blue-100 text-blue-800 border-blue-100': user.type === 'user',
+                      'bg-orange-100 text-orange-800 border-orange-100': user.type === 'cashier',
+                      'bg-gray-100 text-gray-800 border-gray-100': user.type === 'warehouse'
                     }">
                 {{ user.type }}
               </span>
@@ -198,8 +202,8 @@
                 <span
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border self-start"
                   [ngClass]="{
-                    'bg-emerald-100 text-emerald-800 border-emerald-200': user.status === 'ACTIVE' || !user.status,
-                    'bg-red-100 text-red-800 border-red-200': user.status === 'INACTIVE'
+                    'bg-emerald-100 text-emerald-800 border-emerald-100': user.status === 'ACTIVE' || !user.status,
+                    'bg-red-100 text-red-800 border-red-100': user.status === 'INACTIVE'
                   }">
                   {{ user.status === 'INACTIVE' ? 'INACTIVO' : 'ACTIVO' }}
                 </span>
@@ -232,7 +236,6 @@
         </tbody>
       </table>
     </div>
-    }
     }
 
     <!-- Error State -->
@@ -277,6 +280,7 @@
       </button>
       }
     </div>
+    }
     }
 
   </div>
